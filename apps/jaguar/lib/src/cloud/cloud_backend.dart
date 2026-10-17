@@ -152,6 +152,14 @@ abstract class CloudBackend {
   Future<CloudUser> registerTeacher({required String email, required String password, required String alias});
   Future<void> signOut();
 
+  /// Sends the teacher an email to choose a new password.
+  Future<void> resetPassword(String email);
+
+  /// Deletes the account and what it left online: profile, publications,
+  /// its place in classes and its submissions; for a teacher, also the
+  /// classes they created. Programs on the device are not touched.
+  Future<void> deleteAccount();
+
   // Classes.
   Future<ClassRoom> createClass(String name);
   Future<ClassRoom> joinClass({required String code, required String name});

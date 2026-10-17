@@ -113,6 +113,17 @@ describe('clases', () => {
     await setDoc(doc(db('beto'), 'classes/c1/members/beto'), member());
     await assertFails(getDoc(doc(db('beto'), 'classes/c1/assignments/a1/submissions/ana')));
   });
+
+  test('al borrar su cuenta el alumno se lleva su entrega, no la de otros', async () => {
+    await seedClass();
+    await setDoc(doc(db('ana'), 'classes/c1/members/ana'), member());
+    await setDoc(doc(db('beto'), 'classes/c1/members/beto'), member());
+    const work = { name: 'Ana', source: 'x', passed: 1, total: 1, updatedAt: serverTimestamp() };
+    await setDoc(doc(db('ana'), 'classes/c1/assignments/a1/submissions/ana'), work);
+    await assertFails(deleteDoc(doc(db('beto'), 'classes/c1/assignments/a1/submissions/ana')));
+    await assertSucceeds(deleteDoc(doc(db('ana'), 'classes/c1/assignments/a1/submissions/ana')));
+    await assertSucceeds(deleteDoc(doc(db('ana'), 'classes/c1/members/ana')));
+  });
 });
 
 describe('comunidad', () => {

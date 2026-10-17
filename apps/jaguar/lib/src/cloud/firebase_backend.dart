@@ -77,6 +77,53 @@ class FirebaseBackend implements CloudBackend {
     _user = null;
   }
 
+  @override
+  Future<void> resetPassword(String email) => _guard(() async {
+    await _auth.setLanguageCode('es');
+    await _auth.sendPasswordResetEmail(email: email);
+  });
+
+  @override
+  Future<void> deleteAccount() => _guard(() async {
+    final user = _auth.currentUser;
+    final uid = _uid;
+    if (user == null) throw const CloudException('Primero entra a tu cuenta.');
+    // Classes they created, with everything inside.
+    final owned = await _db.collection('classes').where('ownerId', isEqualTo: uid).get();
+    for (final room in owned.docs) {
+      for (final member in (await room.reference.collection('members').get()).docs) {
+        await member.reference.delete();
+      }
+      for (final assignment in (await room.reference.collection('assignments').get()).docs) {
+        for (final submission in (await assignment.reference.collection('submissions').get()).docs) {
+          await submission.reference.delete();
+        }
+        await assignment.reference.delete();
+      }
+      final code = room.data()['code'];
+      if (code is String && code.isNotEmpty) await _db.doc('classCodes/$code').delete();
+      await room.reference.delete();
+    }
+    // Their place and their work in other people's classes.
+    final joined = [for (final id in ((await _profile(uid).get()).data()?['classes'] as List?) ?? const []) '$id'];
+    for (final classId in joined) {
+      try {
+        for (final assignment in (await _db.collection('classes/$classId/assignments').get()).docs) {
+          await assignment.reference.collection('submissions').doc(uid).delete();
+        }
+        await _db.doc('classes/$classId/members/$uid').delete();
+      } on FirebaseException {
+        // The class may be gone already.
+      }
+    }
+    for (final publication in (await _db.collection('publications').where('authorId', isEqualTo: uid).get()).docs) {
+      await publication.reference.delete();
+    }
+    await _profile(uid).delete();
+    await user.delete();
+    _user = null;
+  });
+
   // Classes -------------------------------------------------------------------
 
   @override
@@ -320,6 +367,8 @@ class FirebaseBackend implements CloudBackend {
         'invalid-email' => 'Ese correo no parece válido.',
         'operation-not-allowed' => 'Ese tipo de cuenta aún no está activado en el servidor de Jaguar.',
         'network-request-failed' => 'No hay conexión a internet.',
+        'requires-recent-login' => 'Por seguridad, sal, vuelve a entrar y entonces borra tu cuenta.',
+        'missing-email' => 'Escribe tu correo.',
         _ => 'No se pudo entrar: ${e.message ?? e.code}',
       });
     } on FirebaseException catch (e) {
