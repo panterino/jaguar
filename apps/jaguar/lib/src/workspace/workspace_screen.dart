@@ -134,8 +134,30 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
     final choice = await showWelcome(context, again: again);
     if (choice == null || !mounted) return;
     _settings.mode = choice == WelcomeChoice.learning ? AppMode.basic : AppMode.full;
-    // Schools teach flowcharts first, then pseudocode.
-    if (choice == WelcomeChoice.learning && !again) _settings.editorView = EditorView.diagram;
+    // Schools teach flowcharts first, then pseudocode. On a phone the code
+    // stays and a hint shows where the diagram is.
+    if (choice == WelcomeChoice.learning && !again) {
+      if (MediaQuery.sizeOf(context).width >= _wideLayoutWidth) {
+        _settings.editorView = EditorView.diagram;
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            duration: Duration(seconds: 8),
+            content: Row(
+              children: [
+                Icon(Icons.account_tree_outlined, color: Colors.white),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Toca este botón arriba para ver tu programa como diagrama de flujo, y otra vez para volver al código.',
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+    }
     _settings.teacher = choice == WelcomeChoice.teacher;
     if (choice == WelcomeChoice.teacher) _openTeacher();
   }

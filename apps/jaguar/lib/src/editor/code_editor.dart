@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -484,6 +485,9 @@ class CodeEditorState extends State<CodeEditor> {
                                               minLines: 1,
                                               style: textStyle,
                                               strutStyle: strut,
+                                              // Android defaults to full-width boxes, which put the
+                                              // end handle past the end of the selection.
+                                              selectionWidthStyle: ui.BoxWidthStyle.tight,
                                               keyboardType: TextInputType.multiline,
                                               autocorrect: false,
                                               enableSuggestions: false,
