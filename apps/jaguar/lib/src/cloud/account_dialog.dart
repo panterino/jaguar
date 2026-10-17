@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'cloud.dart';
@@ -26,6 +27,7 @@ class _AccountDialogState extends State<_AccountDialog> {
   final _email = TextEditingController();
   final _password = TextEditingController();
   String? _error;
+  String? _notice;
   bool _busy = false;
 
   @override
@@ -69,6 +71,66 @@ class _AccountDialogState extends State<_AccountDialog> {
     }
   }
 
+  Future<void> _resetPassword() async {
+    final email = _email.text.trim();
+    if (email.isEmpty) {
+      setState(() => _error = 'Escribe tu correo y te mandamos un enlace para cambiar la contraseña.');
+      return;
+    }
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    try {
+      await widget.cloud.resetPassword(email);
+      if (mounted) setState(() => _notice = 'Te mandamos un correo a $email para cambiar tu contraseña.');
+    } on CloudException catch (e) {
+      setState(() => _error = e.message);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _deleteAccount(CloudUser user) async {
+    final sure = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('¿Borrar tu cuenta?'),
+        content: Text(
+          user.isTeacher
+              ? 'Se borran tu cuenta, tus clases con las entregas de tus alumnos y lo que publicaste. '
+                    'No se puede deshacer. Tus programas en este dispositivo se quedan.'
+              : 'Se borran tu cuenta, tu lugar en tus clases, tus entregas y lo que publicaste. '
+                    'No se puede deshacer. Tus programas en este dispositivo se quedan.',
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: Theme.of(context).colorScheme.onError,
+            ),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Borrar cuenta'),
+          ),
+        ],
+      ),
+    );
+    if (sure != true || !mounted) return;
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    try {
+      await widget.cloud.deleteAccount();
+      if (mounted) Navigator.pop(context);
+    } on CloudException catch (e) {
+      if (mounted) setState(() => _error = e.message);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -76,6 +138,7 @@ class _AccountDialogState extends State<_AccountDialog> {
     if (user != null) return _signedIn(context, user);
     final teacher = _role == CloudRole.profesor;
     return AlertDialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       title: const Text('Entrar a Jaguar en línea'),
       content: SizedBox(
         width: 420,
@@ -89,21 +152,28 @@ class _AccountDialogState extends State<_AccountDialog> {
                 style: theme.textTheme.bodyMedium,
               ),
               const SizedBox(height: 16),
-              SegmentedButton<CloudRole>(
-                segments: const [
-                  ButtonSegment(value: CloudRole.alumno, label: Text('Alumno'), icon: Icon(Icons.backpack_outlined)),
-                  ButtonSegment(value: CloudRole.profesor, label: Text('Profesor'), icon: Icon(Icons.school_outlined)),
-                  ButtonSegment(
-                    value: CloudRole.autodidacta,
-                    label: Text('Por mi cuenta'),
-                    icon: Icon(Icons.explore_outlined),
-                  ),
+              // Chips wrap on a phone; three segments did not fit.
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final (role, label, icon) in const [
+                    (CloudRole.alumno, 'Alumno', Icons.backpack_outlined),
+                    (CloudRole.profesor, 'Profesor', Icons.school_outlined),
+                    (CloudRole.autodidacta, 'Por mi cuenta', Icons.explore_outlined),
+                  ])
+                    ChoiceChip(
+                      avatar: Icon(icon, size: 18),
+                      label: Text(label),
+                      selected: _role == role,
+                      showCheckmark: false,
+                      onSelected: (_) => setState(() {
+                        _role = role;
+                        _error = null;
+                        _notice = null;
+                      }),
+                    ),
                 ],
-                selected: {_role},
-                onSelectionChanged: (s) => setState(() {
-                  _role = s.single;
-                  _error = null;
-                }),
               ),
               const SizedBox(height: 16),
               if (!teacher) ...[
@@ -138,22 +208,33 @@ class _AccountDialogState extends State<_AccountDialog> {
                   decoration: const InputDecoration(labelText: 'Contraseña'),
                   onSubmitted: (_) => _submit(),
                 ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextButton(
-                    onPressed: () => setState(() => _teacherHasAccount = !_teacherHasAccount),
-                    child: Text(_teacherHasAccount ? '¿Primera vez? Crear cuenta de profesor' : 'Ya tengo cuenta'),
-                  ),
+                Wrap(
+                  children: [
+                    TextButton(
+                      onPressed: () => setState(() => _teacherHasAccount = !_teacherHasAccount),
+                      child: Text(_teacherHasAccount ? '¿Primera vez? Crear cuenta de profesor' : 'Ya tengo cuenta'),
+                    ),
+                    if (_teacherHasAccount)
+                      TextButton(onPressed: _busy ? null : _resetPassword, child: const Text('Olvidé mi contraseña')),
+                  ],
                 ),
               ],
               if (!teacher)
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: Text(
-                    'Tu cuenta vive en este dispositivo: si borras los datos del navegador se pierde. '
-                    'Tus programas siguen guardados aquí aunque no entres.',
+                    kIsWeb
+                        ? 'Tu cuenta vive en este navegador: si borras sus datos se pierde. '
+                              'Tus programas siguen guardados aquí aunque no entres.'
+                        : 'Tu cuenta vive en este teléfono: si desinstalas Jaguar o borras sus datos se pierde. '
+                              'Tus programas siguen guardados aquí aunque no entres.',
                     style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                   ),
+                ),
+              if (_notice != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: Text(_notice!, style: TextStyle(color: theme.colorScheme.primary)),
                 ),
               if (_error != null)
                 Padding(
@@ -177,13 +258,29 @@ class _AccountDialogState extends State<_AccountDialog> {
   }
 
   Widget _signedIn(BuildContext context, CloudUser user) {
+    final theme = Theme.of(context);
     return AlertDialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       title: Text(user.alias),
-      content: Text(switch (user.role) {
-        CloudRole.profesor => 'Cuenta de profesor${user.email == null ? '' : ' (${user.email})'}.',
-        CloudRole.alumno => 'Cuenta de alumno en este dispositivo.',
-        CloudRole.autodidacta => 'Aprendes por tu cuenta, en este dispositivo.',
-      }),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(switch (user.role) {
+            CloudRole.profesor => 'Cuenta de profesor${user.email == null ? '' : ' (${user.email})'}.',
+            CloudRole.alumno => 'Cuenta de alumno en este dispositivo.',
+            CloudRole.autodidacta => 'Aprendes por tu cuenta, en este dispositivo.',
+          }),
+          const SizedBox(height: 8),
+          TextButton.icon(
+            style: TextButton.styleFrom(foregroundColor: theme.colorScheme.error, padding: EdgeInsets.zero),
+            onPressed: _busy ? null : () => _deleteAccount(user),
+            icon: const Icon(Icons.delete_forever_outlined, size: 18),
+            label: const Text('Borrar mi cuenta'),
+          ),
+          if (_error != null) Text(_error!, style: TextStyle(color: theme.colorScheme.error)),
+        ],
+      ),
       actions: [
         if (!user.isTeacher)
           TextButton(
