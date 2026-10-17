@@ -99,10 +99,12 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
   void dispose() {
     _saveNow();
     _saveTimer?.cancel();
+    // Before the controller it listens to; it is created here if the
+    // diagram view never needed it.
+    _diagnostics.dispose();
     _code.dispose();
     _codeFocus.dispose();
     _undo.dispose();
-    _diagnostics.dispose();
     _session.dispose();
     super.dispose();
   }
@@ -1132,7 +1134,12 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
   );
 
   Widget _buildTouch() {
-    final wide = MediaQuery.sizeOf(context).width >= _wideLayoutWidth;
+    final width = MediaQuery.sizeOf(context).width;
+    final wide = width >= _wideLayoutWidth;
+    // On phones the program name needs the room: Ejecutar becomes an icon.
+    final compact = width < 480;
+    // Two points smaller on phones, so most lines fit without scrolling.
+    final fontSize = wide ? _settings.fontSize : _settings.fontSize - 2;
     final running = _session.isRunning;
     final errorLine = _session.state == RunState.failed ? _session.error?.line : null;
     final exercise = _exercise;
@@ -1158,7 +1165,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
               undoController: _undo,
               errorLine: errorLine,
               executingLine: _executingLine,
-              fontSize: _settings.fontSize,
+              fontSize: fontSize,
             ),
           ),
           KeywordBar(controller: _code, focusNode: _codeFocus),
@@ -1171,6 +1178,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        titleSpacing: 0,
         title: ListenableBuilder(
           listenable: _code,
           builder: (context, _) => Text(programName(_code.text), overflow: TextOverflow.ellipsis),
@@ -1190,20 +1198,36 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
             IconButton(tooltip: 'Guardar .psc', icon: const Icon(Icons.save_alt), onPressed: _saveFile),
           ],
           _MoreMenu(onNew: _newProgram, onOpenFile: _openFile, onSaveFile: _saveFile, onOpenLink: _openLink),
-          Padding(
-            padding: const EdgeInsets.only(right: 12, left: 4),
-            child: FilledButton.icon(
-              onPressed: _run,
-              icon: Icon(running ? Icons.stop : Icons.play_arrow),
-              label: Text(running ? 'Detener' : 'Ejecutar'),
-              style: running
-                  ? FilledButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.error,
-                      foregroundColor: Theme.of(context).colorScheme.onError,
-                    )
-                  : null,
+          if (compact)
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: IconButton.filled(
+                tooltip: running ? 'Detener' : 'Ejecutar',
+                onPressed: _run,
+                icon: Icon(running ? Icons.stop : Icons.play_arrow),
+                style: running
+                    ? IconButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.error,
+                        foregroundColor: Theme.of(context).colorScheme.onError,
+                      )
+                    : null,
+              ),
+            )
+          else
+            Padding(
+              padding: const EdgeInsets.only(right: 12, left: 4),
+              child: FilledButton.icon(
+                onPressed: _run,
+                icon: Icon(running ? Icons.stop : Icons.play_arrow),
+                label: Text(running ? 'Detener' : 'Ejecutar'),
+                style: running
+                    ? FilledButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.error,
+                        foregroundColor: Theme.of(context).colorScheme.onError,
+                      )
+                    : null,
+              ),
             ),
-          ),
         ],
       ),
       drawer: ProgramsDrawer(

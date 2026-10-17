@@ -32,3 +32,4 @@ node_modules/
 # macOS / iOS
 **/Pods/
 **/Flutter/ephemeral/
+apps/jaguar/tool/capturas/salida/
