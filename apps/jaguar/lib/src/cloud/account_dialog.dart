@@ -185,6 +185,18 @@ class _AccountDialogState extends State<_AccountDialog> {
         CloudRole.autodidacta => 'Aprendes por tu cuenta, en este dispositivo.',
       }),
       actions: [
+        if (!user.isTeacher)
+          TextButton(
+            // Leaves this account and shows the teacher sign-in.
+            onPressed: () async {
+              await widget.cloud.signOut();
+              setState(() {
+                _role = CloudRole.profesor;
+                _error = null;
+              });
+            },
+            child: const Text('Entrar como profesor'),
+          ),
         TextButton(
           onPressed: () async {
             await widget.cloud.signOut();

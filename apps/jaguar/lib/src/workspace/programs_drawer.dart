@@ -17,8 +17,10 @@ class ProgramsDrawer extends StatelessWidget {
     required this.onAccount,
     required this.onGuide,
     required this.onAbout,
-    required this.onOpenTeacher,
-    required this.onChangeName,
+    this.onOpenTeacher,
+    this.onChangeName,
+    required this.onToggleTeacher,
+    required this.teacher,
     required this.modeSwitch,
   });
 
@@ -34,8 +36,14 @@ class ProgramsDrawer extends StatelessWidget {
   final VoidCallback onAccount;
   final VoidCallback onGuide;
   final VoidCallback onAbout;
-  final VoidCallback onOpenTeacher;
-  final VoidCallback onChangeName;
+
+  /// Teachers only.
+  final VoidCallback? onOpenTeacher;
+
+  /// Students only.
+  final VoidCallback? onChangeName;
+  final VoidCallback onToggleTeacher;
+  final bool teacher;
 
   @override
   Widget build(BuildContext context) {
@@ -132,15 +140,16 @@ class ProgramsDrawer extends StatelessWidget {
                     },
                   ),
                 ],
-                ListTile(
-                  leading: const Icon(Icons.badge_outlined),
-                  title: Text(exercises.studentName ?? 'Escribe tu nombre'),
-                  subtitle: const Text('Aparece al mostrar un ejercicio al profesor'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    onChangeName();
-                  },
-                ),
+                if (onChangeName case final changeName?)
+                  ListTile(
+                    leading: const Icon(Icons.badge_outlined),
+                    title: Text(exercises.studentName ?? 'Escribe tu nombre'),
+                    subtitle: const Text('Aparece al mostrar un ejercicio al profesor'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      changeName();
+                    },
+                  ),
                 Row(
                   children: [
                     Expanded(
@@ -165,14 +174,22 @@ class ProgramsDrawer extends StatelessWidget {
                     ),
                   ],
                 ),
-                ListTile(
-                  leading: const Icon(Icons.school_outlined),
-                  title: const Text('Mis ejercicios'),
-                  subtitle: const Text('Profesor: pruebas que se generan solas'),
-                  onTap: () {
+                if (onOpenTeacher case final openTeacher?)
+                  ListTile(
+                    leading: const Icon(Icons.school_outlined),
+                    title: const Text('Mis ejercicios'),
+                    subtitle: const Text('Pruebas que se generan solas'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      openTeacher();
+                    },
+                  ),
+                TextButton(
+                  onPressed: () {
                     Navigator.pop(context);
-                    onOpenTeacher();
+                    onToggleTeacher();
                   },
+                  child: Text(teacher ? 'Eres profesor · cambiar' : '¿Eres profesor? Cambiar perfil'),
                 ),
               ],
             );

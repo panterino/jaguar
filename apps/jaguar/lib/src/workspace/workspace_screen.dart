@@ -92,6 +92,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
     _code.addListener(_scheduleSave);
     _session.addListener(_onSessionChanged);
     if (_settings.chosenMode == null) WidgetsBinding.instance.addPostFrameCallback((_) => _welcome());
+    WidgetsBinding.instance.addPostFrameCallback((_) => _syncTeacher());
   }
 
   @override
@@ -125,12 +126,15 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
     setState(() {});
   }
 
-  Future<void> _welcome() async {
-    final choice = await showWelcome(context);
+  /// The first-launch question; [again] reopens it to change profile
+  /// (student, programmer, teacher) at any time.
+  Future<void> _welcome({bool again = false}) async {
+    final choice = await showWelcome(context, again: again);
     if (choice == null || !mounted) return;
     _settings.mode = choice == WelcomeChoice.learning ? AppMode.basic : AppMode.full;
     // Schools teach flowcharts first, then pseudocode.
-    if (choice == WelcomeChoice.learning) _settings.editorView = EditorView.diagram;
+    if (choice == WelcomeChoice.learning && !again) _settings.editorView = EditorView.diagram;
+    _settings.teacher = choice == WelcomeChoice.teacher;
     if (choice == WelcomeChoice.teacher) _openTeacher();
   }
 
@@ -327,6 +331,12 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
       return;
     }
     await showAccountDialog(context, cloud);
+    _syncTeacher();
+  }
+
+  /// Signing in with a teacher account turns the teacher tools on.
+  void _syncTeacher() {
+    if (widget.cloud?.user?.isTeacher ?? false) _settings.teacher = true;
   }
 
   Future<void> _shareWithCommunity() async {
@@ -801,16 +811,17 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
               AppMenuItem(label, checked: settings.themeMode == mode, onSelected: () => settings.themeMode = mode),
           ]),
         ]),
-      AppMenu('Profesor', [
-        AppMenuItem(
-          'Crear ejercicio con este programa…',
-          icon: Icons.auto_awesome,
-          onSelected: () => _exerciseFromProgram(),
-        ),
-        AppMenuItem('Mis ejercicios…', icon: Icons.school_outlined, onSelected: _openTeacher),
-        if (widget.cloud != null) AppMenuItem('Mis clases…', icon: Icons.groups_outlined, onSelected: _openClasses),
-        AppMenuItem('Mi nombre para los ejercicios…', icon: Icons.badge_outlined, onSelected: _changeName),
-      ]),
+      if (_settings.teacher)
+        AppMenu('Profesor', [
+          AppMenuItem(
+            'Crear ejercicio con este programa…',
+            icon: Icons.auto_awesome,
+            onSelected: () => _exerciseFromProgram(),
+          ),
+          AppMenuItem('Mis ejercicios…', icon: Icons.school_outlined, onSelected: _openTeacher),
+          if (widget.cloud != null) AppMenuItem('Mis clases…', icon: Icons.groups_outlined, onSelected: _openClasses),
+          AppMenuItem('Mi nombre para los ejercicios…', icon: Icons.badge_outlined, onSelected: _changeName),
+        ]),
       AppMenu('Ayuda', [
         AppMenuItem(
           'Guía rápida',
@@ -819,6 +830,11 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
           shortcut: const SingleActivator(LogicalKeyboardKey.f1),
         ),
         AppMenuItem('Comunidad y ejemplos…', icon: Icons.public, onSelected: _openCommunity),
+        AppMenuItem(
+          'Cambiar cómo uso Jaguar (alumno, profesor…)',
+          icon: Icons.swap_horiz,
+          onSelected: () => _welcome(again: true),
+        ),
         AppSubmenu('Ejemplos', [
           for (final (title, source) in examples) AppMenuItem(title, onSelected: () => _openSource(source)),
         ]),
@@ -960,13 +976,15 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
       onNew: _newProgram,
       onDuplicate: _duplicate,
       onSaveFile: _saveFile,
-      onMakeExercise: _exerciseFromProgram,
+      onMakeExercise: _settings.teacher ? _exerciseFromProgram : null,
       cloud: widget.cloud,
       onOpenCommunity: _openCommunity,
       onOpenClasses: _openClasses,
       onAccount: _account,
-      onOpenTeacher: _openTeacher,
-      onChangeName: _changeName,
+      onOpenTeacher: _settings.teacher ? _openTeacher : null,
+      onChangeName: _settings.teacher ? null : _changeName,
+      teacher: _settings.teacher,
+      onChangeProfile: () => _welcome(again: true),
     );
 
     return Scaffold(
@@ -1200,8 +1218,10 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
         exercises: widget.exercises,
         onSelect: _load,
         onNew: _newProgram,
-        onOpenTeacher: _openTeacher,
-        onChangeName: _changeName,
+        onOpenTeacher: _settings.teacher ? _openTeacher : null,
+        onChangeName: _settings.teacher ? null : _changeName,
+        onToggleTeacher: () => _welcome(again: true),
+        teacher: _settings.teacher,
       ),
       body: wide
           ? Row(

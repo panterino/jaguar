@@ -17,13 +17,15 @@ class ProgramsSidebar extends StatefulWidget {
     required this.onNew,
     required this.onDuplicate,
     required this.onSaveFile,
-    required this.onMakeExercise,
+    this.onMakeExercise,
     required this.cloud,
     required this.onOpenCommunity,
     required this.onOpenClasses,
     required this.onAccount,
-    required this.onOpenTeacher,
-    required this.onChangeName,
+    this.onOpenTeacher,
+    this.onChangeName,
+    required this.teacher,
+    required this.onChangeProfile,
   });
 
   final ProgramStore store;
@@ -32,13 +34,23 @@ class ProgramsSidebar extends StatefulWidget {
   final VoidCallback onNew;
   final ValueChanged<SavedProgram> onDuplicate;
   final ValueChanged<SavedProgram> onSaveFile;
-  final ValueChanged<SavedProgram> onMakeExercise;
+
+  /// Teachers only.
+  final ValueChanged<SavedProgram>? onMakeExercise;
   final Cloud? cloud;
   final VoidCallback onOpenCommunity;
   final VoidCallback onOpenClasses;
   final VoidCallback onAccount;
-  final VoidCallback onOpenTeacher;
-  final VoidCallback onChangeName;
+
+  /// Teachers only.
+  final VoidCallback? onOpenTeacher;
+
+  /// Students only: the name shown to the teacher.
+  final VoidCallback? onChangeName;
+
+  /// Who is using Jaguar, and how to change it.
+  final bool teacher;
+  final VoidCallback onChangeProfile;
 
   @override
   State<ProgramsSidebar> createState() => _ProgramsSidebarState();
@@ -89,11 +101,12 @@ class _ProgramsSidebarState extends State<ProgramsSidebar> {
                               onPressed: () => widget.onSaveFile(program),
                               child: const Text('Guardar como .psc…'),
                             ),
-                            MenuItemButton(
-                              leadingIcon: const Icon(Icons.auto_awesome, size: 18),
-                              onPressed: () => widget.onMakeExercise(program),
-                              child: const Text('Crear ejercicio con este programa…'),
-                            ),
+                            if (widget.onMakeExercise case final makeExercise?)
+                              MenuItemButton(
+                                leadingIcon: const Icon(Icons.auto_awesome, size: 18),
+                                onPressed: () => makeExercise(program),
+                                child: const Text('Crear ejercicio con este programa…'),
+                              ),
                             const Divider(height: 1),
                             MenuItemButton(
                               leadingIcon: const Icon(Icons.delete_outline, size: 18),
@@ -128,18 +141,26 @@ class _ProgramsSidebarState extends State<ProgramsSidebar> {
                     tooltip: widget.cloud!.signedIn ? 'Tu cuenta' : 'Para clases y comunidad; no es obligatorio',
                     onTap: widget.onAccount,
                   ),
+                if (widget.onChangeName case final changeName?)
+                  _SidebarRow(
+                    icon: Icons.badge_outlined,
+                    label: widget.exercises.studentName ?? 'Escribe tu nombre',
+                    tooltip: 'Aparece al mostrar un ejercicio al profesor',
+                    onTap: changeName,
+                  ),
                 _SidebarRow(
-                  icon: Icons.badge_outlined,
-                  label: widget.exercises.studentName ?? 'Escribe tu nombre',
-                  tooltip: 'Aparece al mostrar un ejercicio al profesor',
-                  onTap: widget.onChangeName,
+                  icon: Icons.swap_horiz,
+                  label: widget.teacher ? 'Profesor · cambiar' : 'Alumno · cambiar',
+                  tooltip: 'Cambiar cómo usas Jaguar: alumno, por tu cuenta o profesor',
+                  onTap: widget.onChangeProfile,
                 ),
-                _SidebarRow(
-                  icon: Icons.school_outlined,
-                  label: 'Mis ejercicios',
-                  tooltip: 'Profesor: ejercicios con pruebas que se generan solas',
-                  onTap: widget.onOpenTeacher,
-                ),
+                if (widget.onOpenTeacher case final openTeacher?)
+                  _SidebarRow(
+                    icon: Icons.school_outlined,
+                    label: 'Mis ejercicios',
+                    tooltip: 'Ejercicios con pruebas que se generan solas',
+                    onTap: openTeacher,
+                  ),
                 const SizedBox(height: 6),
               ],
             );

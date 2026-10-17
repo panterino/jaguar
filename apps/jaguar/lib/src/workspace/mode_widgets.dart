@@ -5,16 +5,19 @@ import '../settings.dart';
 /// What the person answered the first time Jaguar opened.
 enum WelcomeChoice { learning, programmer, teacher }
 
-/// The only question Jaguar asks on its first launch. It sets the mode;
-/// teachers also land on their exercises.
-Future<WelcomeChoice?> showWelcome(BuildContext context) => showDialog<WelcomeChoice>(
+/// The question Jaguar asks on its first launch, and again whenever the
+/// person wants to change how they use it ([again]). It sets the mode and
+/// whether the teacher tools show.
+Future<WelcomeChoice?> showWelcome(BuildContext context, {bool again = false}) => showDialog<WelcomeChoice>(
   context: context,
-  barrierDismissible: false,
-  builder: (context) => const _WelcomeDialog(),
+  barrierDismissible: again,
+  builder: (context) => _WelcomeDialog(again: again),
 );
 
 class _WelcomeDialog extends StatelessWidget {
-  const _WelcomeDialog();
+  const _WelcomeDialog({this.again = false});
+
+  final bool again;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +33,11 @@ class _WelcomeDialog extends StatelessWidget {
             children: [
               Image.asset('assets/images/mascota.png', height: 80),
               const SizedBox(height: 12),
-              Text('¡Hola! ¿Cómo quieres empezar?', style: theme.textTheme.titleLarge, textAlign: TextAlign.center),
+              Text(
+                again ? '¿Cómo usas Jaguar?' : '¡Hola! ¿Cómo quieres empezar?',
+                style: theme.textTheme.titleLarge,
+                textAlign: TextAlign.center,
+              ),
               const SizedBox(height: 20),
               const _WelcomeOption(
                 choice: WelcomeChoice.learning,

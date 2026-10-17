@@ -405,6 +405,26 @@ void main() {
       debugDefaultTargetPlatformOverride = null;
     });
 
+    testWidgets('las herramientas de profesor solo para profesores, y el perfil se cambia cuando sea', (tester) async {
+      await pumpDesktop(tester, 'Algoritmo hola\nFinAlgoritmo\n');
+      expect(find.text('Profesor'), findsNothing);
+      expect(find.text('Mis ejercicios'), findsNothing);
+      expect(find.text('Escribe tu nombre'), findsOneWidget);
+
+      await tester.tap(find.text('Alumno · cambiar'));
+      await tester.pumpAndSettle();
+      expect(find.text('¿Cómo usas Jaguar?'), findsOneWidget);
+      await tester.tap(find.text('Soy profesor'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(BackButton)); // the exercises screen opens for teachers
+      await tester.pumpAndSettle();
+      expect(find.text('Profesor'), findsOneWidget);
+      expect(find.text('Mis ejercicios'), findsOneWidget);
+      expect(find.text('Escribe tu nombre'), findsNothing);
+      expect(find.text('Profesor · cambiar'), findsOneWidget);
+      debugDefaultTargetPlatformOverride = null;
+    });
+
     testWidgets('el menú Editar comenta la línea del cursor', (tester) async {
       await pumpDesktop(tester, 'Algoritmo hola\n    Escribir 1\nFinAlgoritmo\n');
       final editor = tester.widget<TextField>(find.byType(TextField).first);
