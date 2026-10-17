@@ -52,21 +52,66 @@ class KeywordBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    // Phones get two rows of bigger keys: symbols on top, instructions
+    // below. Larger screens keep one compact row.
+    final phone = MediaQuery.sizeOf(context).width < 600;
+    final keys = [
+      _KeyButton(icon: Icons.keyboard_arrow_left, tooltip: 'Mover a la izquierda', onTap: () => _move(-1)),
+      _KeyButton(icon: Icons.keyboard_arrow_right, tooltip: 'Mover a la derecha', onTap: () => _move(1)),
+      _KeyButton(icon: Icons.keyboard_tab, tooltip: 'Sangría', onTap: () => _insert('    ')),
+    ];
     return Material(
       color: scheme.surfaceContainerHigh,
       child: SizedBox(
-        height: 44,
+        height: phone ? 104 : 44,
         child: Row(
           children: [
             // Moving the cursor with a finger is the hardest part of
             // editing on a phone.
-            _KeyButton(icon: Icons.keyboard_arrow_left, tooltip: 'Mover a la izquierda', onTap: () => _move(-1)),
-            _KeyButton(icon: Icons.keyboard_arrow_right, tooltip: 'Mover a la derecha', onTap: () => _move(1)),
-            _KeyButton(icon: Icons.keyboard_tab, tooltip: 'Sangría', onTap: () => _insert('    ')),
+            if (phone)
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(children: keys.take(2).toList()),
+                  keys.last,
+                ],
+              )
+            else
+              ...keys,
             VerticalDivider(width: 1, indent: 8, endIndent: 8, color: scheme.outlineVariant),
-            Expanded(child: _snippetList()),
+            Expanded(child: phone ? _snippetGrid() : _snippetList()),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _snippetGrid() {
+    Widget key((String, String) snippet) => Padding(
+      padding: const EdgeInsets.all(3),
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          minimumSize: const Size(48, 42),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+        onPressed: () => _insert(snippet.$2),
+        child: Text(snippet.$1, style: monoStyle.copyWith(fontSize: 15)),
+      ),
+    );
+    // Instructions (Escribir, Si…) below; symbols and operators (Y, MOD…) on top.
+    final words = _snippets.where((s) => RegExp('[a-z]').hasMatch(s.$1)).toList();
+    final symbols = _snippets.where((s) => !words.contains(s)).toList();
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [for (final s in symbols) key(s)]),
+          Row(children: [for (final s in words) key(s)]),
+        ],
       ),
     );
   }
