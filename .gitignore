@@ -1,0 +1,34 @@
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Editores
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+
+# Dart y Flutter
+.dart_tool/
+.packages
+build/
+coverage/
+.flutter-plugins
+.flutter-plugins-dependencies
+# El paquete no fija versiones; la app sí (su pubspec.lock se sube).
+packages/**/pubspec.lock
+
+# Firebase y Node
+.firebase/
+*-debug.log
+node_modules/
+
+# Android: llaves de firma y rutas locales
+**/android/local.properties
+**/android/key.properties
+*.jks
+*.keystore
+
+# macOS / iOS
+**/Pods/
+**/Flutter/ephemeral/
