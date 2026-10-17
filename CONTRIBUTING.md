@@ -21,5 +21,6 @@ cd apps/jaguar && flutter analyze && flutter test
 cd firebase-tests && npm test        # si cambiaste firestore.rules
 ```
 
-Los mensajes de commit van en español y en presente: "Agrega retos de
-secuencia", "Corrige la sangría al pegar".
+Los commits llevan un mensaje corto, de una línea y sin descripción:
+"Agregado icono de app", "Se agregó panel de pruebas", "Corregido error al
+guardar".
