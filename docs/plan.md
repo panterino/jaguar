@@ -43,20 +43,23 @@ la comunidad usan Firebase (ver [nube.md](nube.md)).
 - Clases en línea: código para unirse, tareas, entregas y tabla de avance.
 - Comunidad: publicar programas y ejercicios, "me sirvió", reportar.
 - Web publicada en https://jaguar-edu.web.app
+- Cuentas en línea activadas (anónima para alumnos, correo para profesores),
+  con "olvidé mi contraseña" y borrar la cuenta.
+- APK de prueba en Firebase App Distribution, firmado con la llave de subida
+  que después servirá para Play Store.
 
 ## Lo que sigue
 
-1. Activar en Firebase el inicio de sesión anónimo y con correo.
-2. Probarlo con uno o dos profesores de verdad, en su clase. Antes de eso,
+1. Probarlo con uno o dos profesores de verdad, en su clase. Antes de eso,
    platicar con ellos (abajo están las preguntas).
-3. Retos para aprender solo: un primer nivel de 8 a 10 ejercicios.
-4. Probar en celulares baratos y revisar que los `.psc` que guarda Jaguar
+2. Retos para aprender solo: un primer nivel de 8 a 10 ejercicios.
+3. Probar en celulares baratos y revisar que los `.psc` que guarda Jaguar
    abran bien en PSeInt.
-5. Tutoriales que se puedan compartir por enlace.
-6. Directorio de la red de apoyo (ver [producto.md](producto.md)).
-7. Calificar proyectos por lotes y detectar copias comparando la estructura
+4. Tutoriales que se puedan compartir por enlace.
+5. Directorio de la red de apoyo (ver [producto.md](producto.md)).
+6. Calificar proyectos por lotes y detectar copias comparando la estructura
    del programa.
-8. APK en Play Store.
+7. Subir a Play Store.
 
 Pendientes de DFD: los símbolos exactos de cada objeto, abrir archivos `.dfd`,
 exportar el diagrama a PDF y los arreglos que DFD crea sin `Dimension`.
@@ -70,6 +73,19 @@ exportar el diagrama a PDF y los arreglos que DFD crea sin `Dimension`.
 5. ¿Sus alumnos tienen computadora en casa? ¿Celular?
 6. ¿Piden el diagrama antes que el código, después, o los dos?
 7. ¿Probarían Jaguar con un grupo el próximo semestre?
+
+## Lo que aprendí de la competencia
+
+La app más usada para practicar PSeInt en el celular tiene más de un millón
+de descargas. Lo que la gente le agradece: que funciona sin internet, la
+barra de símbolos sobre el teclado y que trae ejemplos. Lo que le reclaman:
+los anuncios, que "Borrar Pantalla" no funciona, que con muchos `Si`
+anidados uno se pierde porque no hay líneas de sangría, y que los archivos
+se guardan donde no se pueden encontrar. Tampoco tiene diagramas.
+
+Jaguar no tiene anuncios, marca la sangría, guarda donde tú eliges y manda el
+`.psc` por WhatsApp. Lo que todavía nos falta y ella sí tiene: un modo
+estricto (obliga a `Definir`) y una referencia de sintaxis dentro de la app.
 
 ## Limpieza
 

@@ -63,6 +63,27 @@ void main() {
     expect(() => backend.submissions(room.id, assignment.id), throwsA(isA<CloudException>()));
   });
 
+  test('olvidé mi contraseña y borrar la cuenta', () async {
+    final backend = MemoryBackend();
+    final teacher = await backend.registerTeacher(email: 'profe@escuela.mx', password: 'secreta', alias: 'Profa');
+    final room = await backend.createClass('Lógica');
+    await backend.signOut();
+    await backend.resetPassword('profe@escuela.mx');
+    expect(backend.passwordResets, ['profe@escuela.mx']);
+    expect(() => backend.resetPassword('nadie@escuela.mx'), throwsA(isA<CloudException>()));
+
+    final student = await backend.signInAnonymously(alias: 'Ana', role: CloudRole.alumno);
+    await backend.joinClass(code: room.code, name: 'Ana');
+    await backend.deleteAccount();
+    expect(backend.currentUser, isNull);
+    await backend.signInTeacher(email: 'profe@escuela.mx', password: 'secreta');
+    expect((await backend.members(room.id)).map((m) => m.uid), isNot(contains(student.uid)));
+
+    await backend.deleteAccount();
+    expect(() => backend.signInTeacher(email: 'profe@escuela.mx', password: 'secreta'), throwsA(isA<CloudException>()));
+    expect(teacher.isTeacher, isTrue);
+  });
+
   test('un ejercicio que no viene de una clase no se envía', () async {
     SharedPreferences.setMockInitialValues({});
     final cloud = Cloud(MemoryBackend(), await SharedPreferences.getInstance());

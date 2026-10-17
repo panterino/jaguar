@@ -3,7 +3,7 @@
     "short_name": "Jaguar",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#F4B723",
+    "background_color": "#3B2410",
     "theme_color": "#F4B723",
     "description": "Jaguar: escribe y ejecuta pseudocódigo compatible con PSeInt en la web, el celular y la computadora.",
     "orientation": "portrait-primary",

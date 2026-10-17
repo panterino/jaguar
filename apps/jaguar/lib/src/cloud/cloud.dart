@@ -56,6 +56,8 @@ class Cloud extends ChangeNotifier {
   Future<CloudUser> registerTeacher({required String email, required String password, required String alias}) =>
       _run(() => backend.registerTeacher(email: email, password: password, alias: alias));
   Future<void> signOut() => _run(backend.signOut);
+  Future<void> resetPassword(String email) => backend.resetPassword(email);
+  Future<void> deleteAccount() => _run(backend.deleteAccount);
 
   Future<ClassRoom> createClass(String name) => _run(() => backend.createClass(name));
   Future<ClassRoom> joinClass({required String code, required String name}) =>

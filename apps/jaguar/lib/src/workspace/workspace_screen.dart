@@ -99,10 +99,12 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
   void dispose() {
     _saveNow();
     _saveTimer?.cancel();
+    // Before the controller it listens to; it is created here if the
+    // diagram view never needed it.
+    _diagnostics.dispose();
     _code.dispose();
     _codeFocus.dispose();
     _undo.dispose();
-    _diagnostics.dispose();
     _session.dispose();
     super.dispose();
   }
@@ -453,6 +455,15 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
       if (await savePscFile(programName(source), source)) _toast('Programa guardado');
     } on Object catch (e) {
       _toast('No se pudo guardar el archivo: $e');
+    }
+  }
+
+  Future<void> _sendFile() async {
+    _saveNow();
+    try {
+      await sendPscFile(programName(_code.text), _code.text);
+    } on Object catch (e) {
+      _toast('No se pudo enviar el archivo: $e');
     }
   }
 
@@ -1132,7 +1143,13 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
   );
 
   Widget _buildTouch() {
-    final wide = MediaQuery.sizeOf(context).width >= _wideLayoutWidth;
+    final width = MediaQuery.sizeOf(context).width;
+    final wide = width >= _wideLayoutWidth;
+    // On phones the program name needs the room: Ejecutar becomes an icon.
+    final compact = width < 480;
+    final scheme = Theme.of(context).colorScheme;
+    // Two points smaller on phones, so most lines fit without scrolling.
+    final fontSize = wide ? _settings.fontSize : _settings.fontSize - 2;
     final running = _session.isRunning;
     final errorLine = _session.state == RunState.failed ? _session.error?.line : null;
     final exercise = _exercise;
@@ -1158,7 +1175,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
               undoController: _undo,
               errorLine: errorLine,
               executingLine: _executingLine,
-              fontSize: _settings.fontSize,
+              fontSize: fontSize,
             ),
           ),
           KeywordBar(controller: _code, focusNode: _codeFocus),
@@ -1171,6 +1188,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        titleSpacing: 0,
         title: ListenableBuilder(
           listenable: _code,
           builder: (context, _) => Text(programName(_code.text), overflow: TextOverflow.ellipsis),
@@ -1189,21 +1207,42 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
             IconButton(tooltip: 'Abrir .psc', icon: const Icon(Icons.folder_open), onPressed: _openFile),
             IconButton(tooltip: 'Guardar .psc', icon: const Icon(Icons.save_alt), onPressed: _saveFile),
           ],
-          _MoreMenu(onNew: _newProgram, onOpenFile: _openFile, onSaveFile: _saveFile, onOpenLink: _openLink),
-          Padding(
-            padding: const EdgeInsets.only(right: 12, left: 4),
-            child: FilledButton.icon(
-              onPressed: _run,
-              icon: Icon(running ? Icons.stop : Icons.play_arrow),
-              label: Text(running ? 'Detener' : 'Ejecutar'),
-              style: running
-                  ? FilledButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.error,
-                      foregroundColor: Theme.of(context).colorScheme.onError,
-                    )
-                  : null,
-            ),
+          _MoreMenu(
+            onNew: _newProgram,
+            onOpenFile: _openFile,
+            onSaveFile: _saveFile,
+            onSendFile: _sendFile,
+            onOpenLink: _openLink,
           ),
+          if (compact)
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: IconButton.filled(
+                tooltip: running ? 'Detener' : 'Ejecutar',
+                onPressed: _run,
+                icon: Icon(running ? Icons.stop : Icons.play_arrow),
+                // Explicit colors: the app bar tints its action icons.
+                style: IconButton.styleFrom(
+                  backgroundColor: running ? scheme.error : scheme.primary,
+                  foregroundColor: running ? scheme.onError : scheme.onPrimary,
+                ),
+              ),
+            )
+          else
+            Padding(
+              padding: const EdgeInsets.only(right: 12, left: 4),
+              child: FilledButton.icon(
+                onPressed: _run,
+                icon: Icon(running ? Icons.stop : Icons.play_arrow),
+                label: Text(running ? 'Detener' : 'Ejecutar'),
+                style: running
+                    ? FilledButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.error,
+                        foregroundColor: Theme.of(context).colorScheme.onError,
+                      )
+                    : null,
+              ),
+            ),
         ],
       ),
       drawer: ProgramsDrawer(
@@ -1428,11 +1467,18 @@ class _GoToLineDialogState extends State<_GoToLineDialog> {
 }
 
 class _MoreMenu extends StatelessWidget {
-  const _MoreMenu({required this.onNew, required this.onOpenFile, required this.onSaveFile, required this.onOpenLink});
+  const _MoreMenu({
+    required this.onNew,
+    required this.onOpenFile,
+    required this.onSaveFile,
+    required this.onSendFile,
+    required this.onOpenLink,
+  });
 
   final VoidCallback onNew;
   final VoidCallback onOpenFile;
   final VoidCallback onSaveFile;
+  final VoidCallback onSendFile;
   final VoidCallback onOpenLink;
 
   @override
@@ -1454,6 +1500,11 @@ class _MoreMenu extends StatelessWidget {
           leadingIcon: const Icon(Icons.save_alt),
           onPressed: onSaveFile,
           child: const Text('Guardar como .psc'),
+        ),
+        MenuItemButton(
+          leadingIcon: const Icon(Icons.send_outlined),
+          onPressed: onSendFile,
+          child: const Text('Enviar .psc (WhatsApp, correo…)'),
         ),
         MenuItemButton(leadingIcon: const Icon(Icons.link), onPressed: onOpenLink, child: const Text('Abrir enlace')),
       ],

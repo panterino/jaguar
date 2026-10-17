@@ -63,6 +63,28 @@ class MemoryBackend implements CloudBackend {
   @override
   Future<void> signOut() async => _user = null;
 
+  /// Emails "sent" by [resetPassword], for tests.
+  final passwordResets = <String>[];
+
+  @override
+  Future<void> resetPassword(String email) async {
+    if (!_teachers.containsKey(email)) throw const CloudException('No hay ninguna cuenta con ese correo.');
+    passwordResets.add(email);
+  }
+
+  @override
+  Future<void> deleteAccount() async {
+    final me = _me;
+    _users.remove(me.uid);
+    _teachers.removeWhere((_, account) => account.uid == me.uid);
+    _classes.removeWhere((_, room) => room.ownerId == me.uid);
+    for (final members in _members.values) {
+      members.remove(me.uid);
+    }
+    _joined.remove(me.uid);
+    _user = null;
+  }
+
   @override
   Future<ClassRoom> createClass(String name) async {
     final me = _me;
