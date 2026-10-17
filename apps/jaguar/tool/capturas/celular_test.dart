@@ -4,12 +4,16 @@
 //   flutter test tool/capturas --update-goldens
 //
 // Las imágenes quedan en tool/capturas/salida/ (no se suben al repo).
+
+// ignore_for_file: invalid_use_of_visible_for_testing_member
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jaguar/main.dart';
+import 'package:jaguar/src/cloud/cloud.dart';
+import 'package:jaguar/src/cloud/memory_backend.dart';
 import 'package:jaguar/src/exercises/exercise_store.dart';
 import 'package:jaguar/src/programs/program_store.dart';
 import 'package:jaguar/src/settings.dart';
@@ -51,14 +55,22 @@ Future<void> _fuentes() async {
   await carga('JetBrainsMono', ['assets/fonts/JetBrainsMono-Regular.ttf', 'assets/fonts/JetBrainsMono-Bold.ttf']);
 }
 
-Future<void> _abre(WidgetTester tester, {Size size = const Size(360, 740), Map<String, Object> prefs = const {}}) async {
+Future<void> _abre(
+  WidgetTester tester, {
+  Size size = const Size(360, 740),
+  Map<String, Object> prefs = const {},
+  bool nube = false,
+}) async {
   SharedPreferences.setMockInitialValues({'jaguar.view.mode': 'basic', ...prefs});
   final p = await SharedPreferences.getInstance();
   final store = ProgramStore(p)..openSource(_programa);
   tester.view.devicePixelRatio = 2;
   tester.view.physicalSize = size * 2;
   addTearDown(tester.view.reset);
-  await tester.pumpWidget(JaguarApp(store: store, exercises: ExerciseStore(p), settings: ViewSettings(p)));
+  final cloud = nube ? Cloud(MemoryBackend(), p) : null;
+  await tester.pumpWidget(
+    JaguarApp(store: store, exercises: ExerciseStore(p), settings: ViewSettings(p), cloud: cloud),
+  );
   await tester.pumpAndSettle();
 }
 
@@ -89,6 +101,27 @@ void main() {
   testWidgets('celular chico', (tester) async {
     await _abre(tester, size: const Size(320, 640));
     await _foto('05_chico');
+  });
+
+  testWidgets('consola', (tester) async {
+    await _abre(tester);
+    await tester.tap(find.byTooltip('Ejecutar'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).last, '50');
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+    await _foto('07_consola');
+  });
+
+  testWidgets('cuenta', (tester) async {
+    await _abre(tester, nube: true);
+    await tester.tap(find.byTooltip('Abrir menú de navegación').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.textContaining('Entrar').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Profesor').last);
+    await tester.pumpAndSettle();
+    await _foto('08_cuenta');
   });
 
   testWidgets('bienvenida', (tester) async {

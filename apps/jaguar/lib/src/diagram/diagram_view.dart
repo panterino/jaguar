@@ -280,17 +280,18 @@ class _DiagramViewState extends State<DiagramView> {
     final sheet = _sheet;
     if (sheet == null || _viewport.isEmpty) return;
     const padding = 24.0;
-    final left = _editable ? _paletteWidth + padding : padding;
-    final scale = math.min(
-      1.0,
-      math.min(
-        (_viewport.width - left - padding) / sheet.size.width,
-        (_viewport.height - 2 * padding) / sheet.size.height,
-      ),
-    );
+    final compact = _viewport.width < 600;
+    final left = _editable && !compact ? _paletteWidth + padding : padding;
+    final top = _editable && compact ? 48 + padding / 2 : padding;
+    final widthScale = (_viewport.width - left - padding) / sheet.size.width;
+    // A phone fits the width and scrolls down; fitting a long program
+    // whole would leave its blocks unreadable.
+    final scale = compact
+        ? math.min(1.0, math.max(widthScale, 0.55))
+        : math.min(1.0, math.min(widthScale, (_viewport.height - top - padding) / sheet.size.height));
     final dx = left + (_viewport.width - left - padding - sheet.size.width * scale) / 2;
     _transform.value = Matrix4.identity()
-      ..translateByDouble(math.max(dx, left), padding, 0, 1)
+      ..translateByDouble(compact ? dx : math.max(dx, left), top, 0, 1)
       ..scaleByDouble(scale, scale, 1, 1);
   }
 
@@ -339,6 +340,11 @@ class _DiagramViewState extends State<DiagramView> {
     return LayoutBuilder(
       builder: (context, constraints) {
         _viewport = constraints.biggest;
+        // Phones: the palette is a strip on top instead of a column that
+        // would cover half the diagram.
+        final compact = constraints.maxWidth < 600;
+        final hintLeft = compact ? 12.0 : _paletteWidth + 20;
+        final hintTop = compact && _editable ? 60.0 : 12.0;
         if (!_fitted && sheet != null) {
           _fitted = true;
           WidgetsBinding.instance.addPostFrameCallback((_) => _fit());
@@ -393,24 +399,30 @@ class _DiagramViewState extends State<DiagramView> {
                       ),
                     ),
                   ),
-                if (_editable) Positioned(left: 8, top: 8, bottom: 64, child: _palette(scheme)),
+                if (_editable)
+                  if (compact)
+                    Positioned(left: 0, right: 0, top: 0, child: _paletteStrip(scheme))
+                  else
+                    Positioned(left: 8, top: 8, bottom: 64, child: _palette(scheme)),
                 if (_editable && (_tool != null || emptyProgram))
                   Positioned(
-                    left: _paletteWidth + 20,
+                    left: hintLeft,
                     right: 12,
-                    top: 12,
+                    top: hintTop,
                     child: _Hint(
                       text: _tool != null
                           ? 'Toca un ＋ del diagrama para colocar: ${_tool!.label}.  (Esc para cancelar)'
+                          : compact
+                          ? 'Elige un objeto arriba y toca el ＋ entre Inicio y Fin.'
                           : 'Elige un objeto a la izquierda y toca el ＋ entre Inicio y Fin. '
                                 'O toca el ＋ directamente para ver la lista.',
                     ),
                   ),
                 if (_error != null && _showError)
                   Positioned(
-                    left: _editable ? _paletteWidth + 20 : 12,
+                    left: _editable ? hintLeft : 12,
                     right: 12,
-                    top: 12,
+                    top: hintTop,
                     child: Material(
                       color: scheme.errorContainer,
                       borderRadius: BorderRadius.circular(8),
@@ -427,7 +439,19 @@ class _DiagramViewState extends State<DiagramView> {
                       ),
                     ),
                   ),
-                Positioned(right: 10, bottom: 10, child: _toolbar(scheme, sheet)),
+                Positioned(
+                  left: 10,
+                  right: 10,
+                  bottom: 10,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      reverse: true,
+                      child: _toolbar(scheme, sheet, compact: compact),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -501,7 +525,47 @@ class _DiagramViewState extends State<DiagramView> {
     );
   }
 
-  Widget _toolbar(ColorScheme scheme, DiagramSheet? sheet) {
+  /// The palette as one scrollable row, for phones.
+  Widget _paletteStrip(ColorScheme scheme) {
+    Widget tool(BlockKind? kind) {
+      final selected = _tool == kind;
+      return Padding(
+        padding: const EdgeInsets.only(right: 6),
+        child: ChoiceChip(
+          showCheckmark: false,
+          visualDensity: VisualDensity.compact,
+          avatar: SizedBox(
+            width: 22,
+            height: 14,
+            child: kind == null
+                ? Icon(Icons.near_me_outlined, size: 14, color: scheme.onSurface)
+                : CustomPaint(painter: ShapeIconPainter(kind.shape, scheme, selected: selected)),
+          ),
+          label: Text(kind?.label ?? 'Cursor', style: const TextStyle(fontSize: 12)),
+          selected: selected,
+          onSelected: (_) => setState(() => _tool = selected ? null : kind),
+        ),
+      );
+    }
+
+    return Material(
+      color: scheme.surfaceContainerHigh,
+      child: SizedBox(
+        height: 48,
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          children: [
+            tool(null),
+            for (final kind in BlockKind.values.where((k) => k.inDfd)) tool(kind),
+            for (final kind in BlockKind.values.where((k) => !k.inDfd)) tool(kind),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _toolbar(ColorScheme scheme, DiagramSheet? sheet, {bool compact = false}) {
     return Material(
       color: scheme.surfaceContainerHigh,
       elevation: 2,
@@ -532,8 +596,11 @@ class _DiagramViewState extends State<DiagramView> {
             ),
           if (widget.onUndo != null)
             IconButton(tooltip: 'Deshacer', icon: const Icon(Icons.undo), onPressed: widget.onUndo),
-          IconButton(tooltip: 'Alejar', icon: const Icon(Icons.zoom_out), onPressed: () => _zoom(0.8)),
-          IconButton(tooltip: 'Acercar', icon: const Icon(Icons.zoom_in), onPressed: () => _zoom(1.25)),
+          // On a touch screen the diagram zooms with two fingers.
+          if (!compact) ...[
+            IconButton(tooltip: 'Alejar', icon: const Icon(Icons.zoom_out), onPressed: () => _zoom(0.8)),
+            IconButton(tooltip: 'Acercar', icon: const Icon(Icons.zoom_in), onPressed: () => _zoom(1.25)),
+          ],
           IconButton(tooltip: 'Ver todo', icon: const Icon(Icons.fit_screen_outlined), onPressed: _fit),
           IconButton(
             tooltip: 'Guardar como imagen',

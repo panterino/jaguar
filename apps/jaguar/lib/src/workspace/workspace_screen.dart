@@ -458,6 +458,15 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
     }
   }
 
+  Future<void> _sendFile() async {
+    _saveNow();
+    try {
+      await sendPscFile(programName(_code.text), _code.text);
+    } on Object catch (e) {
+      _toast('No se pudo enviar el archivo: $e');
+    }
+  }
+
   void _share() => showShareDialog(context, name: programName(_code.text), source: _code.text);
 
   Future<void> _openLink() async {
@@ -1138,6 +1147,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
     final wide = width >= _wideLayoutWidth;
     // On phones the program name needs the room: Ejecutar becomes an icon.
     final compact = width < 480;
+    final scheme = Theme.of(context).colorScheme;
     // Two points smaller on phones, so most lines fit without scrolling.
     final fontSize = wide ? _settings.fontSize : _settings.fontSize - 2;
     final running = _session.isRunning;
@@ -1197,7 +1207,13 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
             IconButton(tooltip: 'Abrir .psc', icon: const Icon(Icons.folder_open), onPressed: _openFile),
             IconButton(tooltip: 'Guardar .psc', icon: const Icon(Icons.save_alt), onPressed: _saveFile),
           ],
-          _MoreMenu(onNew: _newProgram, onOpenFile: _openFile, onSaveFile: _saveFile, onOpenLink: _openLink),
+          _MoreMenu(
+            onNew: _newProgram,
+            onOpenFile: _openFile,
+            onSaveFile: _saveFile,
+            onSendFile: _sendFile,
+            onOpenLink: _openLink,
+          ),
           if (compact)
             Padding(
               padding: const EdgeInsets.only(right: 8),
@@ -1205,12 +1221,11 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                 tooltip: running ? 'Detener' : 'Ejecutar',
                 onPressed: _run,
                 icon: Icon(running ? Icons.stop : Icons.play_arrow),
-                style: running
-                    ? IconButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.error,
-                        foregroundColor: Theme.of(context).colorScheme.onError,
-                      )
-                    : null,
+                // Explicit colors: the app bar tints its action icons.
+                style: IconButton.styleFrom(
+                  backgroundColor: running ? scheme.error : scheme.primary,
+                  foregroundColor: running ? scheme.onError : scheme.onPrimary,
+                ),
               ),
             )
           else
@@ -1452,11 +1467,18 @@ class _GoToLineDialogState extends State<_GoToLineDialog> {
 }
 
 class _MoreMenu extends StatelessWidget {
-  const _MoreMenu({required this.onNew, required this.onOpenFile, required this.onSaveFile, required this.onOpenLink});
+  const _MoreMenu({
+    required this.onNew,
+    required this.onOpenFile,
+    required this.onSaveFile,
+    required this.onSendFile,
+    required this.onOpenLink,
+  });
 
   final VoidCallback onNew;
   final VoidCallback onOpenFile;
   final VoidCallback onSaveFile;
+  final VoidCallback onSendFile;
   final VoidCallback onOpenLink;
 
   @override
@@ -1478,6 +1500,11 @@ class _MoreMenu extends StatelessWidget {
           leadingIcon: const Icon(Icons.save_alt),
           onPressed: onSaveFile,
           child: const Text('Guardar como .psc'),
+        ),
+        MenuItemButton(
+          leadingIcon: const Icon(Icons.send_outlined),
+          onPressed: onSendFile,
+          child: const Text('Enviar .psc (WhatsApp, correo…)'),
         ),
         MenuItemButton(leadingIcon: const Icon(Icons.link), onPressed: onOpenLink, child: const Text('Abrir enlace')),
       ],
