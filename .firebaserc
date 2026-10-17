@@ -1,0 +1,18 @@
+{
+  "projects": {
+    "default": "jaguarapp-50a15"
+  },
+  "targets": {
+    "jaguarapp-50a15": {
+      "hosting": {
+        "app": [
+          "jaguar-edu"
+        ],
+        "legacy": [
+          "jaguarapp-50a15"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

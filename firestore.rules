@@ -1,0 +1,153 @@
+rules_version = '2';
+
+// Jaguar: classes (teachers and students), community publications and the
+// support network. Many users are minors: no personal data is required,
+// students only see their own work, and nobody can list other people.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isMe(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    // Only the listed fields, so nobody can sneak in extra data.
+    function onlyFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function shortText(field, max) {
+      return request.resource.data[field] is string
+        && request.resource.data[field].size() > 0
+        && request.resource.data[field].size() <= max;
+    }
+
+    // Profile: an alias and a role. Read and written only by its owner.
+    match /users/{uid} {
+      allow read, delete: if isMe(uid);
+      allow create, update: if isMe(uid)
+        && onlyFields(['alias', 'role', 'classes', 'createdAt'])
+        && shortText('alias', 40)
+        && request.resource.data.role in ['alumno', 'profesor', 'autodidacta']
+        && (!('classes' in request.resource.data) || request.resource.data.classes is list);
+    }
+
+    // A class code points to its class. It can be read only by asking for
+    // that exact code (no listing), so knowing the code is the key.
+    match /classCodes/{code} {
+      allow get: if signedIn();
+      allow create: if signedIn()
+        && onlyFields(['classId', 'ownerId'])
+        && request.resource.data.ownerId == request.auth.uid
+        && get(/databases/$(database)/documents/classes/$(request.resource.data.classId)).data.ownerId == request.auth.uid;
+      allow delete: if signedIn() && resource.data.ownerId == request.auth.uid;
+    }
+
+    match /classes/{classId} {
+      function owner() {
+        return get(/databases/$(database)/documents/classes/$(classId)).data.ownerId;
+      }
+      function isOwner() {
+        return signedIn() && owner() == request.auth.uid;
+      }
+      function isMember() {
+        return signedIn() && exists(/databases/$(database)/documents/classes/$(classId)/members/$(request.auth.uid));
+      }
+
+      allow get: if isOwner() || isMember();
+      allow list: if signedIn() && resource.data.ownerId == request.auth.uid;
+      allow create: if signedIn()
+        && onlyFields(['name', 'ownerId', 'ownerAlias', 'code', 'createdAt'])
+        && request.resource.data.ownerId == request.auth.uid
+        && shortText('name', 60);
+      allow update: if isOwner()
+        && request.resource.data.ownerId == resource.data.ownerId
+        && request.resource.data.code == resource.data.code;
+      allow delete: if isOwner();
+
+      // Joining needs the class code; a student sees only themselves, the
+      // teacher sees everyone.
+      match /members/{uid} {
+        allow get: if isMe(uid) || isOwner();
+        allow list: if isOwner();
+        allow create: if isMe(uid)
+          && onlyFields(['name', 'role', 'code', 'joinedAt'])
+          && request.resource.data.role == 'alumno'
+          && request.resource.data.code == get(/databases/$(database)/documents/classes/$(classId)).data.code
+          && shortText('name', 60);
+        allow update: if isMe(uid)
+          && onlyFields(['name', 'role', 'code', 'joinedAt'])
+          && request.resource.data.role == resource.data.role
+          && request.resource.data.code == resource.data.code
+          && shortText('name', 60);
+        allow delete: if isMe(uid) || isOwner();
+      }
+
+      // Exercises assigned by the teacher. The teacher's solution never
+      // comes here: it stays on the teacher's device.
+      match /assignments/{assignmentId} {
+        allow read: if isOwner() || isMember();
+        allow create, update: if isOwner()
+          && onlyFields(['title', 'exercise', 'createdAt', 'dueAt'])
+          && shortText('title', 120)
+          && request.resource.data.exercise is map;
+        allow delete: if isOwner();
+
+        // One submission per student, rewritten on every Probar.
+        match /submissions/{uid} {
+          allow read: if isMe(uid) || isOwner();
+          allow create, update: if isMe(uid) && isMember()
+            && onlyFields(['name', 'source', 'passed', 'total', 'updatedAt'])
+            && request.resource.data.source is string
+            && request.resource.data.source.size() <= 50000
+            && request.resource.data.passed is int
+            && request.resource.data.total is int;
+          allow delete: if isOwner();
+        }
+      }
+    }
+
+    // Community: programs, exercises and tutorials anyone can open, try and
+    // remix. Authors are shown by alias only.
+    match /publications/{pubId} {
+      allow read: if resource.data.status == 'publicado' || (signedIn() && resource.data.authorId == request.auth.uid);
+      allow create: if signedIn()
+        && onlyFields(['kind', 'title', 'description', 'topic', 'authorId', 'authorAlias', 'content',
+                       'remixOf', 'status', 'createdAt'])
+        && request.resource.data.authorId == request.auth.uid
+        && request.resource.data.status == 'publicado'
+        && request.resource.data.kind in ['programa', 'ejercicio', 'tutorial']
+        && shortText('title', 120)
+        && request.resource.data.description is string
+        && request.resource.data.description.size() <= 2000
+        && request.resource.data.content is map;
+      allow update: if signedIn() && resource.data.authorId == request.auth.uid
+        && request.resource.data.authorId == resource.data.authorId
+        && request.resource.data.status in ['publicado', 'oculto'];
+      allow delete: if signedIn() && resource.data.authorId == request.auth.uid;
+
+      // "Me sirvió": one per person, readable to count them.
+      match /useful/{uid} {
+        allow read: if true;
+        allow create: if isMe(uid) && request.resource.data.keys().size() == 0;
+        allow delete: if isMe(uid);
+      }
+    }
+
+    // Anyone signed in can report; only moderators (in the console) read.
+    match /reports/{reportId} {
+      allow create: if signedIn()
+        && onlyFields(['publicationId', 'reporterId', 'reason', 'createdAt'])
+        && request.resource.data.reporterId == request.auth.uid
+        && shortText('reason', 500);
+    }
+
+    // Support network: verified offers, added by Panterino from the console.
+    match /supportOffers/{offerId} {
+      allow read: if resource.data.verified == true;
+    }
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "emulators": {
+    "firestore": {
+      "port": 8080
+    },
+    "auth": {
+      "port": 9099
+    },
+    "ui": {
+      "enabled": false
+    },
+    "singleProjectMode": true
+  },
+  "hosting": [
+    {
+      "public": "apps/jaguar/build/web",
+      "ignore": [
+        "firebase.json",
+        "**/.*"
+      ],
+      "headers": [
+        {
+          "source": "**",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "no-cache"
+            }
+          ]
+        },
+        {
+          "source": "**/*.@(png|jpg|ttf|otf|woff2)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "public, max-age=3600"
+            }
+          ]
+        }
+      ],
+      "target": "app"
+    },
+    {
+      "target": "legacy",
+      "public": "apps/jaguar/build/web",
+      "ignore": [
+        "**/*"
+      ],
+      "redirects": [
+        {
+          "source": "**",
+          "destination": "https://jaguar-edu.web.app",
+          "type": 301
+        }
+      ]
+    }
+  ]
+}
