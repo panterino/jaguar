@@ -20,6 +20,7 @@ import '../editor/keyword_bar.dart';
 import '../diagram/diagram_editing.dart';
 import '../diagram/diagram_view.dart';
 import '../editor/syntax_controller.dart';
+import '../exercises/plan_dialog.dart';
 import '../exercises/exercise_banner.dart';
 import '../exercises/exercise_editor_screen.dart';
 import '../exercises/exercise_store.dart';
@@ -543,6 +544,20 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
 
   void _showAbout() => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const AboutScreen()));
 
+  /// Writes the planteamiento as comments at the top of the program.
+  Future<void> _plan() async {
+    final plan = await showPlanDialog(context, readPlan(_code.text), statement: _exercise?.statement);
+    if (plan == null || !mounted) return;
+    final before = _code.text;
+    final after = writePlan(before, plan);
+    if (after == before) return;
+    final offset = _code.selection.isValid ? _code.selection.baseOffset + after.length - before.length : 0;
+    _code.value = TextEditingValue(
+      text: after,
+      selection: TextSelection.collapsed(offset: offset.clamp(0, after.length)),
+    );
+  }
+
   void _deskCheck() {
     _saveNow();
     Navigator.push(
@@ -580,6 +595,8 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
           shortcut: primary(LogicalKeyboardKey.keyO),
         ),
         AppMenuItem('Abrir enlace…', icon: Icons.link, onSelected: _openLink),
+        const AppMenuDivider(),
+        AppMenuItem('Planteamiento (entrada, proceso, salida)…', icon: Icons.edit_note, onSelected: _plan),
         const AppMenuDivider(),
         AppMenuItem(
           'Guardar como .psc…',
@@ -966,6 +983,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
         _EditorTab(code: _code, isExercise: exercise != null),
         if (exercise != null)
           ExerciseBanner(
+            onPlan: _plan,
             key: ValueKey(exercise.id),
             exercise: exercise,
             checking: _checking,
@@ -1192,6 +1210,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
       children: [
         if (exercise != null)
           ExerciseBanner(
+            onPlan: _plan,
             key: ValueKey(exercise.id),
             exercise: exercise,
             checking: _checking,
@@ -1248,6 +1267,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
             onSendFile: _sendFile,
             onOpenLink: _openLink,
             onDeskCheck: _deskCheck,
+            onPlan: _plan,
           ),
           if (compact)
             Padding(
@@ -1509,6 +1529,7 @@ class _MoreMenu extends StatelessWidget {
     required this.onSendFile,
     required this.onOpenLink,
     required this.onDeskCheck,
+    required this.onPlan,
   });
 
   final VoidCallback onNew;
@@ -1516,6 +1537,7 @@ class _MoreMenu extends StatelessWidget {
   final VoidCallback onSaveFile;
   final VoidCallback onSendFile;
   final VoidCallback onDeskCheck;
+  final VoidCallback onPlan;
   final VoidCallback onOpenLink;
 
   @override
@@ -1527,6 +1549,7 @@ class _MoreMenu extends StatelessWidget {
         onPressed: () => controller.isOpen ? controller.close() : controller.open(),
       ),
       menuChildren: [
+        MenuItemButton(leadingIcon: const Icon(Icons.edit_note), onPressed: onPlan, child: const Text('Planteamiento')),
         MenuItemButton(
           leadingIcon: const Icon(Icons.table_chart_outlined),
           onPressed: onDeskCheck,
