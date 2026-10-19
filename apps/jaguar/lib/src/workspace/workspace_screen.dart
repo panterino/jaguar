@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:jaguar_core/jaguar_core.dart';
 
+import '../challenges/challenges.dart';
+import '../challenges/challenges_screen.dart';
 import '../cloud/account_dialog.dart';
 import '../cloud/classes_screen.dart';
 import '../cloud/cloud.dart';
@@ -245,6 +247,10 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
     final result = await checkSolution(source, exercise);
     if (!mounted) return;
     _store.recordTests(programId, passed: result.passedCount, total: exercise.cases.length);
+    if (result.passed && challengeById(exercise.id) != null && !_settings.doneChallenges.contains(exercise.id)) {
+      _settings.markChallengeDone(exercise.id);
+      _toast('¡Reto superado! Abre Retos para seguir con el siguiente.');
+    }
     // Exercises from a class send their result to the teacher.
     final sent = await widget.cloud?.submitIfAssigned(
       exercise: exercise,
@@ -318,6 +324,19 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
       ),
     );
   }
+
+  void _openChallenges() => Navigator.push(
+    context,
+    MaterialPageRoute<void>(
+      builder: (_) => ChallengesScreen(
+        settings: _settings,
+        onOpen: (challenge) {
+          widget.exercises.saveReceived(challenge.exercise);
+          _openExercise(challenge.exercise);
+        },
+      ),
+    ),
+  );
 
   void _openCommunity() {
     Navigator.push(
@@ -891,6 +910,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
           onSelected: _showGuide,
           shortcut: const SingleActivator(LogicalKeyboardKey.f1),
         ),
+        AppMenuItem('Retos para practicar…', icon: Icons.flag_outlined, onSelected: _openChallenges),
         AppMenuItem('Comunidad y ejemplos…', icon: Icons.public, onSelected: _openCommunity),
         AppMenuItem(
           'Cambiar cómo uso Jaguar (alumno, profesor…)',
@@ -983,6 +1003,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
         _EditorTab(code: _code, isExercise: exercise != null),
         if (exercise != null)
           ExerciseBanner(
+            onHints: challengeById(exercise.id) == null ? null : () => showHints(context, challengeById(exercise.id)!),
             onPlan: _plan,
             key: ValueKey(exercise.id),
             exercise: exercise,
@@ -1042,6 +1063,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
       onMakeExercise: _settings.teacher ? _exerciseFromProgram : null,
       cloud: widget.cloud,
       onOpenCommunity: _openCommunity,
+      onOpenChallenges: _openChallenges,
       onOpenClasses: _openClasses,
       onAccount: _account,
       onOpenTeacher: _settings.teacher ? _openTeacher : null,
@@ -1210,6 +1232,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
       children: [
         if (exercise != null)
           ExerciseBanner(
+            onHints: challengeById(exercise.id) == null ? null : () => showHints(context, challengeById(exercise.id)!),
             onPlan: _plan,
             key: ValueKey(exercise.id),
             exercise: exercise,
@@ -1304,6 +1327,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
         store: _store,
         cloud: widget.cloud,
         onOpenCommunity: _openCommunity,
+        onOpenChallenges: _openChallenges,
         onOpenClasses: _openClasses,
         onAccount: _account,
         onGuide: _showGuide,

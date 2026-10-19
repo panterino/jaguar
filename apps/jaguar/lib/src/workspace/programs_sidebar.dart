@@ -20,6 +20,7 @@ class ProgramsSidebar extends StatefulWidget {
     this.onMakeExercise,
     required this.cloud,
     required this.onOpenCommunity,
+    required this.onOpenChallenges,
     required this.onOpenClasses,
     required this.onAccount,
     this.onOpenTeacher,
@@ -39,6 +40,7 @@ class ProgramsSidebar extends StatefulWidget {
   final ValueChanged<SavedProgram>? onMakeExercise;
   final Cloud? cloud;
   final VoidCallback onOpenCommunity;
+  final VoidCallback onOpenChallenges;
   final VoidCallback onOpenClasses;
   final VoidCallback onAccount;
 
@@ -120,6 +122,12 @@ class _ProgramsSidebarState extends State<ProgramsSidebar> {
                 ),
                 const Divider(height: 1),
                 const SizedBox(height: 4),
+                _SidebarRow(
+                  icon: Icons.flag_outlined,
+                  label: 'Retos',
+                  tooltip: 'Ejercicios para practicar por tu cuenta, con pistas',
+                  onTap: widget.onOpenChallenges,
+                ),
                 _SidebarRow(
                   icon: Icons.public,
                   label: 'Comunidad',

@@ -37,6 +37,13 @@ class ViewSettings extends ChangeNotifier {
   bool get teacher => _prefs.getBool('jaguar.view.teacher') ?? false;
   set teacher(bool value) => _set(() => _prefs.setBool('jaguar.view.teacher', value));
 
+  /// Challenges solved on this device.
+  Set<String> get doneChallenges => {...?_prefs.getStringList('jaguar.retos.hechos')};
+  void markChallengeDone(String id) {
+    if (doneChallenges.contains(id)) return;
+    _set(() => _prefs.setStringList('jaguar.retos.hechos', [...doneChallenges, id]));
+  }
+
   /// Runs that finished without error in programs with loops or functions:
   /// a sign the student is ready for the full mode.
   int get fluentRuns => _prefs.getInt('jaguar.view.fluentRuns') ?? 0;
