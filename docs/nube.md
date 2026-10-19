@@ -31,6 +31,8 @@ activar los dos métodos en la consola, en Authentication → Sign-in method.
   y `reports` (reportes, que solo se leen desde la consola).
 - `supportOffers`: la red de apoyo. Solo lectura; las ofertas se dan de alta a
   mano después de revisarlas.
+- `mensajes`: lo que mandan desde el formulario de la página de presentación.
+  Cualquiera puede escribir uno; nadie los puede leer fuera de la consola.
 
 Todo esto lo hacen cumplir las reglas de `firestore.rules`, que tienen sus
 propias pruebas en `firebase-tests/`.
@@ -49,9 +51,10 @@ cd apps/jaguar && flutter run -d chrome --dart-define=JAGUAR_EMULATORS=true
 ## Publicar
 
 ```sh
-firebase deploy --only firestore                 # reglas e índices
-cd apps/jaguar && flutter build web --release --pwa-strategy=none
-cd ../.. && firebase deploy --only hosting
+firebase deploy --only firestore --project jaguarapp-50a15   # reglas e índices
+tool/publicar_web.sh                                          # la app web
+tool/publicar_sitio.sh                                        # la página de presentación
+tool/publicar_android.sh "Notas de la versión"                # APK a App Distribution
 ```
 
 El hosting manda `Cache-Control: no-cache`, para que el navegador revise si hay
