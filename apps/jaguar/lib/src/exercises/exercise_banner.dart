@@ -9,6 +9,7 @@ class ExerciseBanner extends StatefulWidget {
     required this.checking,
     required this.onCheck,
     this.showCheckButton = true,
+    this.onPlan,
   });
 
   final Exercise exercise;
@@ -17,6 +18,9 @@ class ExerciseBanner extends StatefulWidget {
 
   /// Desktop: the toolbar has the button next to Ejecutar.
   final bool showCheckButton;
+
+  /// Opens the planteamiento: think the problem before the code.
+  final VoidCallback? onPlan;
 
   @override
   State<ExerciseBanner> createState() => _ExerciseBannerState();
@@ -57,6 +61,13 @@ class _ExerciseBannerState extends State<ExerciseBanner> {
                     icon: Icon(_expanded ? Icons.expand_less : Icons.expand_more),
                     color: scheme.onPrimaryContainer,
                     onPressed: () => setState(() => _expanded = !_expanded),
+                  ),
+                if (widget.onPlan case final onPlan?)
+                  IconButton(
+                    tooltip: 'Planteamiento: entrada, proceso y salida',
+                    icon: const Icon(Icons.edit_note),
+                    color: scheme.onPrimaryContainer,
+                    onPressed: onPlan,
                   ),
                 const SizedBox(width: 4),
                 if (widget.showCheckButton)
