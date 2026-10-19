@@ -176,3 +176,23 @@ describe('red de apoyo', () => {
     await assertFails(setDoc(doc(db('ana'), 'supportOffers/o3'), { title: 'Falsa', verified: true }));
   });
 });
+
+describe('mensajes de la página', () => {
+  test('cualquiera deja un mensaje, nadie lo lee ni lo cambia', async () => {
+    const msg = { tipo: 'piloto', mensaje: 'Doy Cultura Digital en 1A', escuela: 'CBTis 1', creado: serverTimestamp() };
+    await assertSucceeds(setDoc(doc(db(null), 'mensajes/m1'), msg));
+    await assertFails(getDoc(doc(db(null), 'mensajes/m1')));
+    await assertFails(getDocs(collection(db('ana'), 'mensajes')));
+    await assertFails(setDoc(doc(db(null), 'mensajes/m1'), { ...msg, mensaje: 'Otro' }));
+    await assertFails(deleteDoc(doc(db(null), 'mensajes/m1')));
+  });
+
+  test('solo los campos y tamaños permitidos', async () => {
+    const base = { tipo: 'sugerencia', mensaje: 'Más retos', creado: serverTimestamp() };
+    await assertFails(setDoc(doc(db(null), 'mensajes/m2'), { ...base, tipo: 'spam' }));
+    await assertFails(setDoc(doc(db(null), 'mensajes/m3'), { ...base, mensaje: '' }));
+    await assertFails(setDoc(doc(db(null), 'mensajes/m4'), { ...base, mensaje: 'x'.repeat(2001) }));
+    await assertFails(setDoc(doc(db(null), 'mensajes/m5'), { ...base, extra: 'algo' }));
+    await assertFails(setDoc(doc(db(null), 'mensajes/m6'), { ...base, creado: new Date(0) }));
+  });
+});

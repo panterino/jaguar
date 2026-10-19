@@ -1,0 +1,889 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jaguar: pseudocódigo y diagramas de flujo en tu celular</title>
+<meta name="description" content="Próximamente: Jaguar, app gratis para aprender a programar con pseudocódigo compatible con PSeInt, diagramas de flujo como DFD y prueba de escritorio.">
+<link rel="canonical" href="https://pseudocodigo-jaguar.web.app/">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="favicon.png">
+<link rel="icon" type="image/svg+xml" href="logo.svg">
+<link rel="apple-touch-icon" href="icono.png">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Jaguar">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://pseudocodigo-jaguar.web.app/">
+<meta property="og:title" content="Jaguar: pseudocódigo y diagramas de flujo en tu celular">
+<meta property="og:description" content="Próximamente. Escribe pseudocódigo como en PSeInt, dibuja diagramas como en DFD y haz la prueba de escritorio desde el celular. Gratis y sin anuncios.">
+<meta property="og:image" content="https://pseudocodigo-jaguar.web.app/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Jaguar, la mascota, junto al texto: pseudocódigo y diagramas de flujo en tu celular. Próximamente.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Jaguar: pseudocódigo y diagramas de flujo en tu celular">
+<meta name="twitter:description" content="Próximamente. Pseudocódigo como en PSeInt, diagramas como en DFD y prueba de escritorio, desde el celular. Gratis y sin anuncios.">
+<meta name="twitter:image" content="https://pseudocodigo-jaguar.web.app/compartir.png">
+<meta name="twitter:image:alt" content="Jaguar, la mascota, junto al texto: pseudocódigo y diagramas de flujo en tu celular. Próximamente.">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Jaguar",
+  "url": "https://pseudocodigo-jaguar.web.app/",
+  "image": "https://pseudocodigo-jaguar.web.app/compartir.png",
+  "description": "App gratis y de código abierto para aprender lógica de programación: pseudocódigo compatible con PSeInt, diagramas de flujo como en DFD, prueba de escritorio automática y retos con pistas. Funciona sin internet.",
+  "applicationCategory": "EducationalApplication",
+  "operatingSystem": "Android, Web",
+  "inLanguage": "es-MX",
+  "isAccessibleForFree": true,
+  "license": "https://www.gnu.org/licenses/agpl-3.0.html",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "MXN" },
+  "publisher": { "@type": "Organization", "name": "Panterino", "url": "https://github.com/panterino" },
+  "sameAs": "https://github.com/panterino/jaguar"
+}
+</script>
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "FAQPage",
+ "mainEntity": [
+  {
+   "@type": "Question",
+   "name": "¿Jaguar es compatible con PSeInt?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Sí. Usa el mismo pseudocódigo que PSeInt (Algoritmo, Leer, Escribir, Si, Mientras, Para, Segun…) y abre y guarda archivos .psc, así que puedes pasar tus programas de uno a otro."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "¿Se puede usar PSeInt en el celular?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "PSeInt está hecho para computadora. Jaguar es la opción para el celular: corre en Android y en el navegador, con el mismo pseudocódigo y también en la compu."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "¿Hace diagramas de flujo como DFD?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Sí. Dibujas el diagrama con las figuras de siempre y Jaguar escribe el pseudocódigo, o escribes el código y te muestra su diagrama. Lo puedes exportar como imagen."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "¿Qué es la prueba de escritorio?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Es seguir un programa paso a paso anotando en una tabla cuánto vale cada variable. Jaguar la arma sola con los datos que le des, o la llenas tú y te marca qué acertaste."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "¿Cuánto cuesta?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Nada. Jaguar es gratis, no tiene anuncios y es software libre con licencia AGPL."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "¿Necesito internet?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Para programar, no: una vez abierta funciona sin datos. Solo las clases en línea y las entregas necesitan conexión."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "¿Cuándo sale?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Todavía no tiene fecha. Mientras, compártelo con tu grupo o con tu profe."
+   }
+  }
+ ]
+}
+</script>
+
+<style>
+:root {
+  --cafe: #3B2410;
+  --amarillo: #F4B723;
+  --azul: #00A8F0;
+  --crema: #FFF8F0;
+
+  --fondo: #FFF8F0;
+  --superficie: #FFFFFF;
+  --superficie-2: #FBF1E4;
+  --texto: #2A1A0B;
+  --suave: #6B5645;
+  --borde: #EADBC8;
+  --enlace: #8A4B00;
+  --portada: #3B2410;
+  --portada-texto: #FFF3E0;
+  --portada-suave: #E6CFB4;
+  --codigo: #FFFBF6;
+  --codigo-barra: #F4E8DA;
+  --consola: #FFFFFF;
+  --entrada: #0070AD;
+  --marca: rgba(244,183,35,.28);
+  --k: #8A4B00; --s: #2E7D32; --n: #8E24AA; --o: #B0006A;
+  --fig-linea: #7A6450;
+  --fig-texto: #2A1A0B;
+  --fig-inicio: #F7D995;
+  --fig-io: #F4E3C4;
+  --fig-proc: #EFE6DC;
+  --fig-dec: #CDEBC5;
+  --fig-sal: #DCEFD7;
+  --sombra: 0 18px 50px rgba(30,15,0,.28);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fondo: #1A120B;
+    --superficie: #241810;
+    --superficie-2: #20150D;
+    --texto: #F5EADF;
+    --suave: #C9B6A2;
+    --borde: #3E2C1C;
+    --enlace: #F4B723;
+    --portada: #24170B;
+    --codigo: #1E140C;
+    --codigo-barra: #2E2014;
+    --consola: #241810;
+    --entrada: #6CC4FF;
+    --marca: rgba(244,183,35,.22);
+    --k: #F4B723; --s: #9CD67E; --n: #D7A6F5; --o: #FF8AB8;
+    --fig-linea: #A88A6C;
+    --fig-texto: #F5EADF;
+    --fig-inicio: #6B4A12;
+    --fig-io: #4A3420;
+    --fig-proc: #3A2A1C;
+    --fig-dec: #2F4A2A;
+    --fig-sal: #2A3F26;
+    --sombra: 0 18px 50px rgba(0,0,0,.5);
+  }
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--texto);
+  font: 17px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  overflow-x: hidden;
+}
+img, svg { max-width: 100%; }
+a { color: var(--enlace); text-underline-offset: 3px; }
+:focus-visible { outline: 3px solid var(--azul); outline-offset: 3px; border-radius: 6px; }
+.ancho { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+.oculto { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Portada ---------- */
+.portada {
+  background-color: var(--portada);
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(244,183,35,.10) 0 7px, transparent 8px),
+    radial-gradient(circle at 70% 8%, rgba(244,183,35,.08) 0 5px, transparent 6px),
+    radial-gradient(circle at 88% 62%, rgba(244,183,35,.09) 0 9px, transparent 10px),
+    radial-gradient(circle at 40% 85%, rgba(244,183,35,.07) 0 6px, transparent 7px);
+  color: var(--portada-texto);
+  padding: 18px 0 64px;
+}
+.barra-sup { display: flex; align-items: center; gap: 10px; margin-bottom: 40px; }
+.barra-sup img { width: 46px; height: auto; }
+.barra-sup .nombre { font-size: 22px; font-weight: 800; letter-spacing: -.01em; margin-right: auto; }
+.barra-sup a { color: var(--portada-texto); text-decoration: none; font-size: 15px; opacity: .9; }
+.barra-sup a:hover { opacity: 1; text-decoration: underline; }
+
+.pronto {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--amarillo); color: var(--cafe);
+  font-weight: 800; font-size: 13px; letter-spacing: .12em; text-transform: uppercase;
+  padding: 6px 14px 6px 12px; border-radius: 999px;
+}
+.pronto::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--cafe);
+  animation: latido 1.6s ease-in-out infinite;
+}
+@keyframes latido { 50% { transform: scale(.45); opacity: .5; } }
+
+.portada-grid { display: grid; grid-template-columns: minmax(0,1.05fr) minmax(0,1fr); gap: 48px; align-items: end; }
+h1 {
+  font-size: clamp(34px, 6.2vw, 58px); line-height: 1.05; margin: 18px 0 18px;
+  letter-spacing: -.025em; font-weight: 850;
+}
+h1 span { color: var(--amarillo); display: block; }
+.lema { font-size: 19px; color: var(--portada-suave); margin: 0 0 28px; max-width: 32em; }
+.botones { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.boton {
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  min-height: 48px; padding: 12px 22px; border-radius: 999px;
+  font-family: inherit; font-weight: 700; font-size: 16px; line-height: 1.2;
+  text-decoration: none; cursor: pointer; border: 0;
+  transition: transform .15s ease, background-color .15s ease;
+}
+.boton svg { width: 20px; height: 20px; flex: none; }
+.boton.principal { background: var(--amarillo); color: var(--cafe); }
+.boton.principal:hover { background: #FFC94A; transform: translateY(-1px); }
+.boton.borde { background: transparent; color: var(--portada-texto); box-shadow: inset 0 0 0 1.5px #A88A6C; }
+.boton.borde:hover { box-shadow: inset 0 0 0 1.5px var(--portada-texto); }
+.nota { font-size: 14.5px; color: var(--portada-suave); margin: 16px 0 0; }
+.aviso { font-size: 15px; margin: 12px 0 0; color: inherit; font-weight: 600; }
+.aviso:empty { margin: 0; }
+
+/* Escena: mascota asomándose detrás del editor */
+.escena { position: relative; padding-top: 150px; max-width: 520px; width: 100%; justify-self: end; }
+.escena .mascota {
+  position: absolute; top: 0; right: 18px; width: 190px; height: auto; z-index: 0;
+  animation: asoma 1s cubic-bezier(.2,.9,.3,1.3) .2s both;
+}
+@keyframes asoma { from { transform: translateY(70px); } }
+.editor {
+  position: relative; z-index: 1;
+  background: var(--codigo); color: var(--texto);
+  border-radius: 16px; overflow: hidden; box-shadow: var(--sombra);
+  font: 14px/1.6 ui-monospace, "SF Mono", Menlo, Consolas, "Roboto Mono", monospace;
+}
+.editor .tit {
+  display: flex; align-items: center; gap: 8px; padding: 10px 14px;
+  background: var(--codigo-barra); color: var(--texto); font: 700 15px system-ui, sans-serif;
+}
+.editor .tit small { font-weight: 500; color: var(--suave); }
+.editor .play {
+  margin-left: auto; width: 32px; height: 32px; border-radius: 50%;
+  background: var(--amarillo); display: grid; place-items: center; color: var(--cafe);
+}
+.editor pre { margin: 0; padding: 14px 16px; overflow-x: auto; }
+.editor .ln { display: block; animation: escribe .5s steps(18, end) both; animation-delay: calc(var(--i) * .32s + .6s); }
+@keyframes escribe { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+.k { color: var(--k); font-weight: 700; }
+.s { color: var(--s); }
+.n { color: var(--n); }
+.o { color: var(--o); }
+.consola { border-top: 1px solid var(--borde); padding: 10px 16px 14px; background: var(--consola); }
+.consola .etq { font: 700 11.5px system-ui, sans-serif; color: var(--suave); text-transform: uppercase; letter-spacing: .08em; }
+.consola pre { padding: 4px 0 0; }
+.consola .ln { animation-name: sale; animation-duration: .25s; animation-timing-function: ease-out; }
+@keyframes sale { from { opacity: 0; } }
+.ent { color: var(--entrada); font-weight: 700; }
+.cursor { display: inline-block; width: .55em; height: 1.1em; vertical-align: -.2em; background: var(--k); animation: parpadea 1s steps(1) infinite; }
+@keyframes parpadea { 50% { opacity: 0; } }
+
+/* ---------- Cinta ---------- */
+.cinta { background: var(--amarillo); color: var(--cafe); overflow: hidden; padding: 12px 0; border-block: 3px solid var(--cafe); }
+.cinta .pista { display: flex; width: max-content; animation: corre 38s linear infinite; }
+.cinta span { font: 800 17px ui-monospace, "SF Mono", Menlo, Consolas, monospace; white-space: nowrap; padding-right: 28px; }
+.cinta span::after { content: "✦"; margin-left: 28px; font-size: 13px; vertical-align: 2px; }
+@keyframes corre { to { transform: translateX(-50%); } }
+
+/* ---------- Secciones ---------- */
+section { padding: 72px 0; }
+.eti {
+  font-size: 13px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--enlace); margin: 0 0 10px;
+}
+h2 { font-size: clamp(27px, 4.2vw, 38px); line-height: 1.15; margin: 0 0 14px; letter-spacing: -.02em; font-weight: 800; }
+.intro { color: var(--suave); max-width: 40em; margin: 0 0 36px; font-size: 18px; }
+
+.tarjetas { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; }
+.tarjeta {
+  background: var(--superficie); border: 1px solid var(--borde);
+  border-radius: 18px; padding: 22px;
+  transition: transform .2s ease, border-color .2s ease;
+}
+.tarjeta:hover { transform: translateY(-3px); border-color: var(--amarillo); }
+.tarjeta h3 { margin: 14px 0 6px; font-size: 18.5px; line-height: 1.25; }
+.tarjeta p { margin: 0; color: var(--suave); font-size: 15.5px; }
+.icono {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: var(--amarillo); color: var(--cafe);
+  display: grid; place-items: center;
+}
+.icono svg { width: 23px; height: 23px; }
+.tarjeta:nth-child(3n+2) .icono { background: var(--azul); color: var(--cafe); }
+
+.barra-sup a + a { margin-left: 14px; }
+.tarjeta.solo:hover { transform: none; border-color: var(--borde); }
+.boton.linea { background: transparent; color: var(--texto); box-shadow: inset 0 0 0 1.5px var(--borde); }
+.boton.linea:hover { box-shadow: inset 0 0 0 1.5px var(--amarillo); }
+.contacto {
+  margin-top: 40px; padding: 28px; border-radius: 18px;
+  background: var(--superficie); border: 2px solid var(--amarillo);
+  display: grid; gap: 18px;
+}
+.contacto h3 { margin: 0 0 8px; font-size: 24px; line-height: 1.2; }
+.contacto p { margin: 0; color: var(--suave); max-width: 44em; }
+.contacto .nota-contacto { font-size: 15px; }
+.contacto a:not(.boton) { color: var(--enlace); overflow-wrap: anywhere; }
+.formulario { display: grid; gap: 14px; }
+.tipos { border: 0; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+.tipos label {
+  display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+  padding: 10px 16px; border-radius: 999px; box-shadow: inset 0 0 0 1.5px var(--borde); font-weight: 600; font-size: 15.5px;
+}
+.tipos label:has(input:checked) { box-shadow: inset 0 0 0 2px var(--amarillo); background: var(--marca); }
+.tipos input { accent-color: #A06A00; margin: 0; }
+.campo { display: grid; gap: 6px; font-weight: 600; font-size: 15.5px; }
+.campo small { font-weight: 400; color: var(--suave); }
+.campo input, .campo textarea {
+  font: inherit; font-weight: 400; font-size: 16px; color: var(--texto); background: var(--fondo);
+  border: 1.5px solid var(--borde); border-radius: 12px; padding: 12px 14px; width: 100%;
+}
+.campo textarea { resize: vertical; min-height: 110px; }
+.campo input:focus, .campo textarea:focus { outline: none; border-color: var(--amarillo); box-shadow: 0 0 0 3px var(--marca); }
+.dos { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.oculto { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.estado { font-weight: 600; }
+.estado:empty { display: none; }
+.boton[disabled] { opacity: .6; cursor: wait; }
+.historia { list-style: none; margin: 8px 0 0; padding: 0 0 0 22px; border-left: 3px solid var(--amarillo); }
+.historia li { position: relative; margin: 0 0 22px; }
+.historia li:last-child { margin-bottom: 0; }
+.historia li::before {
+  content: ""; position: absolute; left: -31px; top: 6px; width: 15px; height: 15px;
+  border-radius: 50%; background: var(--amarillo); box-shadow: 0 0 0 4px var(--fondo);
+}
+.historia b { font-size: 22px; color: var(--enlace); }
+.historia p { margin: 4px 0 0; color: var(--suave); font-size: 17px; max-width: 40em; }
+.angosto { max-width: 800px; }
+details { border-bottom: 1px solid var(--borde); }
+details:first-of-type { border-top: 1px solid var(--borde); }
+summary {
+  cursor: pointer; list-style: none; padding: 18px 36px 18px 0; position: relative;
+  font-weight: 700; font-size: 18px;
+}
+summary::-webkit-details-marker { display: none; }
+summary::after {
+  content: "+"; position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  font-size: 26px; font-weight: 400; color: var(--enlace);
+}
+details[open] summary::after { content: "−"; }
+details p { margin: 0 0 18px; color: var(--suave); max-width: 44em; }
+.franja { background: var(--superficie-2); border-block: 1px solid var(--borde); }
+.par { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 48px; align-items: center; }
+.par + .par { margin-top: 80px; }
+.lista { list-style: none; padding: 0; margin: 20px 0 0; }
+.lista li { position: relative; padding-left: 30px; margin: 10px 0; color: var(--suave); }
+.lista li::before {
+  content: ""; position: absolute; left: 0; top: .32em; width: 18px; height: 18px; border-radius: 6px;
+  background: var(--amarillo) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233B2410' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/13px no-repeat;
+}
+.lista b { color: var(--texto); }
+
+.diagrama {
+  background: var(--codigo); border: 1px solid var(--borde); border-radius: 18px; padding: 18px;
+}
+.diagrama svg { display: block; width: 100%; height: auto; max-width: 340px; margin: 0 auto; }
+.diagrama text { font: 13px ui-monospace, "SF Mono", Menlo, Consolas, monospace; fill: var(--fig-texto); }
+.diagrama .linea { stroke: var(--fig-linea); }
+.diagrama .ini { fill: var(--fig-inicio); }
+.diagrama .io { fill: var(--fig-io); }
+.diagrama .proc { fill: var(--fig-proc); }
+.diagrama .dec { fill: var(--fig-dec); }
+.diagrama .sal { fill: var(--fig-sal); }
+.diagrama .fig { stroke: var(--fig-linea); }
+.diagrama .ficha { fill: var(--azul); stroke: #fff; stroke-width: 2; }
+
+.tabla { overflow-x: auto; background: var(--superficie); border: 1px solid var(--borde); border-radius: 18px; }
+table { border-collapse: collapse; width: 100%; font: 14px ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+caption { text-align: left; padding: 12px 14px 0; font: 700 13px system-ui, sans-serif; color: var(--suave); }
+th, td { border-bottom: 1px solid var(--borde); padding: 10px 12px; text-align: left; white-space: nowrap; }
+th { font: 700 13px system-ui, sans-serif; color: var(--suave); }
+td.cambia { font-weight: 800; color: var(--k); }
+tbody tr { animation: paso 8s infinite; }
+tbody tr:nth-child(2) { animation-delay: 2s; }
+tbody tr:nth-child(3) { animation-delay: 4s; }
+tbody tr:nth-child(4) { animation-delay: 6s; }
+@keyframes paso { 0%, 24% { background: var(--marca); } 25%, 100% { background: transparent; } }
+tr:last-child td { border-bottom: 0; }
+
+.publico { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 16px; }
+.publico .tarjeta { padding: 26px; }
+.publico .tarjeta:hover { transform: none; }
+.publico h3 { font-size: 22px; margin: 0; }
+
+.sin { display: flex; flex-wrap: wrap; gap: 12px; margin: 8px 0 28px; padding: 0; list-style: none; }
+.sin li {
+  font-size: clamp(20px, 3.4vw, 28px); font-weight: 800;
+  padding: 8px 18px; border-radius: 14px; border: 2px dashed var(--borde);
+  text-decoration: line-through; text-decoration-color: var(--amarillo); text-decoration-thickness: 4px;
+  color: var(--suave);
+}
+
+.cierre { background: var(--portada); color: var(--portada-texto); overflow: hidden; }
+.cierre .par { grid-template-columns: auto 1fr; gap: 40px; }
+.cierre img { width: 240px; height: auto; display: block; }
+.cierre h2 { font-size: clamp(32px, 5.5vw, 50px); }
+.cierre h2 span { color: var(--amarillo); }
+.cierre p.pronto { color: var(--cafe); margin: 0; font-size: 13px; }
+.cierre p { color: var(--portada-suave); max-width: 32em; font-size: 18px; margin: 0 0 24px; }
+
+footer { padding: 28px 0 40px; color: var(--suave); font-size: 15px; }
+footer .ancho { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px; }
+footer img { width: 30px; height: auto; }
+footer .quien { margin-right: auto; display: flex; align-items: center; gap: 10px; }
+
+@media (max-width: 860px) {
+  .portada-grid, .par, .publico { grid-template-columns: minmax(0,1fr); }
+  .escena { justify-self: center; }
+  .par .visual { order: 2; }
+  .tarjetas { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .cierre .par { grid-template-columns: minmax(0,1fr); text-align: center; justify-items: center; }
+  .cierre p { margin-inline: auto; }
+  .cierre .botones { justify-content: center; }
+  .cierre img { width: 170px; }
+}
+@media (max-width: 560px) {
+  .contacto { padding: 20px; }
+  .dos { grid-template-columns: 1fr; }
+  .contacto .boton { flex: 1 1 100%; justify-content: center; }
+  .barra-sup a + a { margin-left: 4px; }
+  body { font-size: 16px; }
+  .barra-sup { margin-bottom: 28px; }
+  .barra-sup img { width: 40px; }
+  .tarjetas { grid-template-columns: minmax(0,1fr); }
+  section { padding: 56px 0; }
+  .portada { padding-bottom: 48px; }
+  .lema, .intro { font-size: 17px; }
+  .boton { flex: 1 1 100%; }
+  .escena { padding-top: 112px; }
+  .escena .mascota { width: 140px; right: 10px; }
+  .editor { font-size: 13px; }
+  .editor pre { padding: 12px 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .cinta .pista { flex-wrap: wrap; width: auto; justify-content: center; }
+  .cinta .pista > span[aria-hidden] { display: none; }
+  .diagrama .ficha { display: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="portada">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="logo.svg" alt="" width="46" height="40">
+      <span class="nombre">Jaguar</span>
+      <a href="#profes">Para profes</a>
+      <a href="https://github.com/panterino/jaguar">GitHub</a>
+    </div>
+    <div class="portada-grid">
+      <div>
+        <p class="pronto">Próximamente</p>
+        <h1>Pseudocódigo y diagramas de flujo <span>en tu celular</span></h1>
+        <p class="lema">Jaguar es una app gratis para aprender a programar. Escribes como en PSeInt, dibujas como en DFD y la prueba de escritorio se hace sola. Desde el teléfono y aunque no tengas datos.</p>
+        <div class="botones">
+          <button class="boton principal" type="button" data-compartir>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+            Compártelo
+          </button>
+          <a class="boton borde" href="#que-trae">¿Qué trae?</a>
+        </div>
+        <p class="aviso" role="status" aria-live="polite"></p>
+        <p class="nota">Sin anuncios, sin cuenta y sin pedirte datos. Software libre.</p>
+      </div>
+
+      <div class="escena">
+        <img class="mascota" src="mascota.png" alt="La mascota de Jaguar, un cachorro de jaguar amarillo con ojos azules, asomándose" width="440" height="510">
+        <figure class="editor" style="margin:0" aria-label="Ejemplo: un programa en pseudocódigo que calcula un promedio y su salida en la consola">
+          <div class="tit">promedio.psc <small>· pseudocódigo</small>
+            <span class="play" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4v16l13-8z"/></svg></span>
+          </div>
+<pre><span class="ln" style="--i:0"><span class="k">Algoritmo</span> promedio</span><span class="ln" style="--i:1">    <span class="k">Escribir</span> <span class="s">"Dame dos calificaciones"</span></span><span class="ln" style="--i:2">    <span class="k">Leer</span> a, b</span><span class="ln" style="--i:3">    p <span class="o">&lt;-</span> (a <span class="o">+</span> b) <span class="o">/</span> <span class="n">2</span></span><span class="ln" style="--i:4">    <span class="k">Si</span> p <span class="o">&gt;=</span> <span class="n">6</span> <span class="k">Entonces</span></span><span class="ln" style="--i:5">        <span class="k">Escribir</span> <span class="s">"Pasaste con "</span>, p</span><span class="ln" style="--i:6">    <span class="k">SiNo</span></span><span class="ln" style="--i:7">        <span class="k">Escribir</span> <span class="s">"Casi, sacaste "</span>, p</span><span class="ln" style="--i:8">    <span class="k">FinSi</span></span><span class="ln" style="--i:9"><span class="k">FinAlgoritmo</span></span></pre>
+          <div class="consola">
+            <div class="etq">Consola</div>
+<pre><span class="ln" style="--i:11">Dame dos calificaciones</span><span class="ln" style="--i:12"><span class="ent">7</span></span><span class="ln" style="--i:13"><span class="ent">10</span></span><span class="ln" style="--i:14">Pasaste con 8.5 <span class="cursor"></span></span></pre>
+          </div>
+        </figure>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="cinta" aria-hidden="true">
+  <div class="pista">
+    <span>Algoritmo</span><span>Leer</span><span>Escribir</span><span>Si Entonces</span><span>Mientras</span><span>Para</span><span>Repetir Hasta Que</span><span>Segun</span><span>FinAlgoritmo</span>
+    <span aria-hidden="true">Algoritmo</span><span aria-hidden="true">Leer</span><span aria-hidden="true">Escribir</span><span aria-hidden="true">Si Entonces</span><span aria-hidden="true">Mientras</span><span aria-hidden="true">Para</span><span aria-hidden="true">Repetir Hasta Que</span><span aria-hidden="true">Segun</span><span aria-hidden="true">FinAlgoritmo</span>
+  </div>
+</div>
+
+<main>
+<section id="que-trae">
+  <div class="ancho">
+    <p class="eti">Lo que trae</p>
+    <h2>Todo lo de la materia de programación, en una app</h2>
+    <p class="intro">Si llevas Cultura Digital o alguna materia de algoritmos, ya conoces PSeInt y DFD. Jaguar entiende el mismo pseudocódigo y dibuja los mismos diagramas, así que lo que hagas aquí te sirve en clase.</p>
+    <div class="tarjetas">
+      <article class="tarjeta">
+        <div class="icono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5"/></svg></div>
+        <h3>Pseudocódigo compatible con PSeInt</h3>
+        <p>Abre y guarda archivos .psc. Si algo falla, el error sale en español y te dice en qué línea. Le das a ejecutar y ves la consola al momento.</p>
+      </article>
+      <article class="tarjeta">
+        <div class="icono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="2" width="8" height="5" rx="2"/><path d="M12 7v3M12 10l5 4-5 4-5-4z"/><path d="M12 18v4"/></svg></div>
+        <h3>Diagramas de flujo como en DFD</h3>
+        <p>Dibuja el diagrama y Jaguar escribe el pseudocódigo. O al revés. Luego lo exportas como imagen para entregarlo.</p>
+      </article>
+      <article class="tarjeta">
+        <div class="icono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10M15 10v10"/></svg></div>
+        <h3>Prueba de escritorio automática</h3>
+        <p>La tabla de variables, paso a paso. Y si quieres practicar, la llenas tú y Jaguar te marca lo que va bien.</p>
+      </article>
+      <article class="tarjeta">
+        <div class="icono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h7"/></svg></div>
+        <h3>Planteamiento primero</h3>
+        <p>Entrada, proceso y salida antes de escribir una sola línea, como te lo piden en clase.</p>
+      </article>
+      <article class="tarjeta">
+        <div class="icono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/></svg></div>
+        <h3>10 retos con pistas</h3>
+        <p>De variables a ciclos, siguiendo el programa de Cultura Digital de la SEP. Las pistas te van ayudando sin soltarte la respuesta.</p>
+      </article>
+      <article class="tarjeta">
+        <div class="icono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0"/><path d="M3 3l18 18"/></svg></div>
+        <h3>Funciona sin internet</h3>
+        <p>Hecho para el celular: Android o navegador. También corre en la compu, por si te toca la sala de cómputo.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="franja">
+  <div class="ancho">
+    <div class="par">
+      <div>
+        <p class="eti">Diagramas</p>
+        <h2>Diagramas de flujo que se vuelven pseudocódigo, y al revés</h2>
+        <p class="intro" style="margin:0">¿Tu profe pide el diagrama y tú piensas mejor en código? No lo haces dos veces. Jaguar pasa de uno a otro.</p>
+        <ul class="lista">
+          <li>Las figuras de siempre: inicio, lectura, asignación, decisión, ciclos y salida.</li>
+          <li>Exporta el diagrama como imagen y entrégalo.</li>
+          <li>En el celular eliges la figura arriba y la pones donde va.</li>
+        </ul>
+      </div>
+      <div class="visual diagrama">
+        <svg viewBox="0 0 320 380" role="img" aria-labelledby="diag-tit">
+          <title id="diag-tit">Diagrama de flujo del programa promedio: leer a y b, calcular el promedio p y decidir si p es mayor o igual a 6</title>
+          <g class="linea" stroke-width="1.5" fill="none">
+            <path d="M160 40v20M160 92v20M160 144v22M100 190H60v40M220 190h40v40M60 262v48h100M260 262v48h-100M160 310v26"/>
+          </g>
+          <rect class="ini fig" x="115" y="10" width="90" height="30" rx="15"/>
+          <text x="160" y="30" text-anchor="middle">Inicio</text>
+          <path class="io fig" d="M70 60h190l-20 32H50z"/>
+          <text x="155" y="81" text-anchor="middle">Leer a, b</text>
+          <rect class="proc fig" x="70" y="112" width="180" height="32" rx="3"/>
+          <text x="160" y="133" text-anchor="middle">p &lt;- (a + b) / 2</text>
+          <path class="dec fig" d="M160 166l60 24-60 24-60-24z"/>
+          <text x="160" y="195" text-anchor="middle">p &gt;= 6</text>
+          <text x="40" y="182" font-size="11">No</text>
+          <text x="262" y="182" font-size="11">Sí</text>
+          <path class="sal fig" d="M14 230h112l-10 32H4z"/>
+          <text x="63" y="251" text-anchor="middle" font-size="11">"Casi"</text>
+          <path class="sal fig" d="M204 230h112l-10 32H194z"/>
+          <text x="255" y="251" text-anchor="middle" font-size="11">"Pasaste"</text>
+          <circle cx="160" cy="310" r="4" fill="var(--fig-linea)"/>
+          <rect class="ini fig" x="115" y="336" width="90" height="30" rx="15"/>
+          <text x="160" y="356" text-anchor="middle">Fin</text>
+          <circle class="ficha" r="6">
+            <animateMotion dur="6s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;1" keyTimes="0;.8;1" path="M160 40V190H260V246V310H160V336"/>
+          </circle>
+        </svg>
+      </div>
+    </div>
+
+    <div class="par">
+      <div class="visual tabla">
+        <table>
+          <caption>Prueba de escritorio con a = 7 y b = 10</caption>
+          <thead><tr><th scope="col">Paso</th><th scope="col">Instrucción</th><th scope="col">a</th><th scope="col">b</th><th scope="col">p</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Leer a, b</td><td class="cambia">7</td><td class="cambia">10</td><td></td></tr>
+            <tr><td>2</td><td>p &lt;- (a + b) / 2</td><td>7</td><td>10</td><td class="cambia">8.5</td></tr>
+            <tr><td>3</td><td>Si p &gt;= 6</td><td>7</td><td>10</td><td>8.5</td></tr>
+            <tr><td>4</td><td>Escribir "Pasaste…"</td><td>7</td><td>10</td><td>8.5</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <p class="eti">Prueba de escritorio</p>
+        <h2>La prueba de escritorio, sin hojas cuadriculadas</h2>
+        <p class="intro" style="margin:0">Pones los datos de entrada y Jaguar arma la tabla: una fila por paso, una columna por variable y marcado lo que cambió. Así ves por qué ese ciclo nunca termina.</p>
+        <ul class="lista">
+          <li><b>Modo Practicar:</b> tú llenas la tabla y Jaguar te marca los aciertos.</li>
+          <li>Copia la tabla y pégala en una hoja de cálculo.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="alumnos">
+  <div class="ancho">
+    <div class="par">
+      <div>
+        <p class="eti">Si estás aprendiendo</p>
+        <h2>Practica en casa lo que ves en clase</h2>
+        <p class="intro" style="margin:0">No necesitas computadora ni datos. Abres Jaguar en el celular y sigues con la tarea donde la dejaste.</p>
+      </div>
+      <div class="tarjeta solo">
+        <ul class="lista" style="margin:0">
+          <li>Ejecuta tu programa y ve la salida al momento.</li>
+          <li>Repasa con los retos cuando quieras.</li>
+          <li>Comparte tus programas por WhatsApp, por correo o con un código QR.</li>
+          <li>Si tu profe tiene una clase en Jaguar, entras con un código y entregas desde ahí.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="profes" class="franja">
+  <div class="ancho">
+    <p class="eti">Para profes</p>
+    <h2>Jaguar para profes de programación e informática</h2>
+    <p class="intro">Jaguar no es un curso cerrado. Es una herramienta: tú pones los ejercicios, el ritmo y la forma de evaluar. Sirve para Cultura Digital o cualquier materia donde se enseñe con PSeInt y DFD.</p>
+    <div class="tarjetas">
+      <article class="tarjeta">
+        <div class="icono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14a6.5 6.5 0 0 1 3 6"/></svg></div>
+        <h3>Clases con un código</h3>
+        <p>Creas la clase y compartes un código. Tus alumnos entran sin correo y sin dar datos personales.</p>
+      </article>
+      <article class="tarjeta">
+        <div class="icono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg></div>
+        <h3>Ejercicios que se revisan solos</h3>
+        <p>Dejas un ejercicio con casos de prueba y Jaguar le dice al alumno si su programa da lo que debe, antes de entregarlo.</p>
+      </article>
+      <article class="tarjeta">
+        <div class="icono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 14h6"/></svg></div>
+        <h3>Las entregas en un solo lugar</h3>
+        <p>Ves quién entregó y abres cada programa ahí mismo. La calificación y la rúbrica las pones tú.</p>
+      </article>
+      <article class="tarjeta">
+        <div class="icono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5M8 7h6"/></svg></div>
+        <h3>Lo mismo que ya enseñas</h3>
+        <p>Pseudocódigo como en PSeInt, diagramas como en DFD, planteamiento y prueba de escritorio. No tienes que cambiar tu temario.</p>
+      </article>
+      <article class="tarjeta">
+        <div class="icono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg></div>
+        <h3>Sin depender de la sala de cómputo</h3>
+        <p>Los alumnos practican en el celular, en casa o en el camión, aunque no tengan computadora ni datos.</p>
+      </article>
+      <article class="tarjeta">
+        <div class="icono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/></svg></div>
+        <h3>Seguro para menores</h3>
+        <p>Sin anuncios, sin chat entre usuarios y sin pedir datos personales a tus alumnos.</p>
+      </article>
+    </div>
+
+    <div class="contacto" id="contacto">
+      <div>
+        <h3>¿Das clase? Queremos escucharte</h3>
+        <p>Buscamos profes que quieran probar Jaguar con su grupo antes de que salga. También nos sirve mucho saber qué te falta en el salón: ejercicios, funciones, lo que sea.</p>
+      </div>
+      <form class="formulario" novalidate>
+        <fieldset class="tipos">
+          <legend class="oculto">¿Qué nos quieres decir?</legend>
+          <label><input type="radio" name="tipo" value="piloto" checked> Quiero probarlo con mi grupo</label>
+          <label><input type="radio" name="tipo" value="sugerencia"> Tengo una sugerencia</label>
+        </fieldset>
+        <label class="campo">Tu mensaje
+          <textarea name="mensaje" rows="4" maxlength="2000" required placeholder="Doy Cultura Digital en primer semestre y me gustaría…"></textarea>
+        </label>
+        <div class="dos">
+          <label class="campo"><span>Escuela o materia <small>(opcional)</small></span>
+            <input name="escuela" maxlength="200" autocomplete="organization">
+          </label>
+          <label class="campo"><span>¿Cómo te respondemos? <small>(opcional)</small></span>
+            <input name="contacto" maxlength="200" placeholder="Correo o WhatsApp">
+          </label>
+        </div>
+        <label class="oculto" aria-hidden="true">No llenar <input name="sitio" tabindex="-1" autocomplete="off"></label>
+        <div class="botones">
+          <button class="boton principal" type="submit">Enviar</button>
+          <a class="boton linea" href="https://github.com/panterino/jaguar/issues">O proponlo en GitHub</a>
+        </div>
+        <p class="estado" role="status" aria-live="polite"></p>
+        <p class="nota-contacto">Tu mensaje solo lo lee el equipo de Jaguar. Si dejas un contacto, lo usamos únicamente para responderte. Más detalles en el <a href="https://jaguar-edu.web.app/privacidad.html">aviso de privacidad</a>.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section id="preguntas">
+  <div class="ancho angosto">
+    <p class="eti">Preguntas</p>
+    <h2>Preguntas frecuentes</h2>
+    <details>
+      <summary>¿Jaguar es compatible con PSeInt?</summary>
+      <p>Sí. Usa el mismo pseudocódigo que PSeInt (Algoritmo, Leer, Escribir, Si, Mientras, Para, Segun…) y abre y guarda archivos .psc, así que puedes pasar tus programas de uno a otro.</p>
+    </details>
+    <details>
+      <summary>¿Se puede usar PSeInt en el celular?</summary>
+      <p>PSeInt está hecho para computadora. Jaguar es la opción para el celular: corre en Android y en el navegador, con el mismo pseudocódigo y también en la compu.</p>
+    </details>
+    <details>
+      <summary>¿Hace diagramas de flujo como DFD?</summary>
+      <p>Sí. Dibujas el diagrama con las figuras de siempre y Jaguar escribe el pseudocódigo, o escribes el código y te muestra su diagrama. Lo puedes exportar como imagen.</p>
+    </details>
+    <details>
+      <summary>¿Qué es la prueba de escritorio?</summary>
+      <p>Es seguir un programa paso a paso anotando en una tabla cuánto vale cada variable. Jaguar la arma sola con los datos que le des, o la llenas tú y te marca qué acertaste.</p>
+    </details>
+    <details>
+      <summary>¿Cuánto cuesta?</summary>
+      <p>Nada. Jaguar es gratis, no tiene anuncios y es software libre con licencia AGPL.</p>
+    </details>
+    <details>
+      <summary>¿Necesito internet?</summary>
+      <p>Para programar, no: una vez abierta funciona sin datos. Solo las clases en línea y las entregas necesitan conexión.</p>
+    </details>
+    <details>
+      <summary>¿Cuándo sale?</summary>
+      <p>Todavía no tiene fecha. Mientras, compártelo con tu grupo o con tu profe.</p>
+    </details>
+  </div>
+</section>
+
+<section class="franja">
+  <div class="ancho">
+    <p class="eti">Lo que no trae</p>
+    <h2>Lo que no vas a encontrar</h2>
+    <ul class="sin">
+      <li>Anuncios</li>
+      <li>Cuenta obligatoria</li>
+      <li>Datos personales</li>
+    </ul>
+    <p class="intro" style="margin:0">Jaguar es software libre, con licencia AGPL. El código está en <a href="https://github.com/panterino/jaguar">GitHub</a> para quien quiera revisarlo o echar la mano.</p>
+  </div>
+</section>
+
+<section id="historia">
+  <div class="ancho angosto">
+    <p class="eti">Un poco de historia</p>
+    <h2>Empezó en la prepa</h2>
+    <ol class="historia">
+      <li><b>2019</b><p>Un grupo de estudiantes de preparatoria arma Panterino con una idea: que cualquiera pueda aprender a programar, tenga o no computadora, internet o dinero para cursos. Así nace Jaguar, con todo y mascota.</p></li>
+      <li><b>2026</b><p>Después de varios intentos, Jaguar regresa con una idea más simple: llevar al celular lo que ya se enseña en las escuelas, PSeInt y DFD, para que nadie se quede sin practicar.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="cierre">
+  <div class="ancho">
+    <div class="par">
+      <img src="mascota.png" alt="" width="440" height="510" loading="lazy">
+      <div>
+        <p class="pronto">Próximamente</p>
+        <h2 style="margin-top:16px">Jaguar ya viene <span>en camino</span></h2>
+        <p>Mientras, pásale la voz a tu grupo o a tu profe de informática. Entre más lo sepan, mejor.</p>
+        <div class="botones">
+          <button class="boton principal" type="button" data-compartir>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+            Compártelo
+          </button>
+        </div>
+        <p class="aviso" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="ancho">
+    <span class="quien"><img src="logo.svg" alt="" width="30" height="26">Un proyecto de Panterino · hecho en México</span>
+    <a href="https://github.com/panterino/jaguar">Código en GitHub</a>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var url = 'https://pseudocodigo-jaguar.web.app/';
+  var texto = 'Viene Jaguar: una app gratis para hacer pseudocódigo como en PSeInt y diagramas de flujo como en DFD desde el celular. Sin anuncios y funciona sin internet.';
+  function avisa(boton, msg) {
+    var p = boton.closest('.botones').nextElementSibling;
+    if (p) { p.textContent = msg; setTimeout(function () { p.textContent = ''; }, 5000); }
+  }
+  function copia(boton) {
+    var todo = texto + ' ' + url;
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(todo).then(
+        function () { avisa(boton, '¡Listo! Copiamos el mensaje. Pégalo en tu chat.'); },
+        function () { avisa(boton, 'Copia este enlace: ' + url); }
+      );
+    } else {
+      avisa(boton, 'Copia este enlace: ' + url);
+    }
+  }
+  document.querySelectorAll('[data-compartir]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      if (navigator.share) {
+        navigator.share({ title: 'Jaguar', text: texto, url: url }).catch(function (e) {
+          if (e && e.name !== 'AbortError') copia(b);
+        });
+      } else {
+        copia(b);
+      }
+    });
+  });
+})();
+
+(function () {
+  // Guarda el mensaje en Firestore (colección "mensajes"). Las reglas solo
+  // dejan crear; se leen desde la consola de Firebase.
+  var form = document.querySelector('.formulario');
+  if (!form) return;
+  var estado = form.querySelector('.estado');
+  var api = 'https://firestore.googleapis.com/v1/projects/jaguarapp-50a15/databases/(default)/documents';
+  var llave = 'AIzaSyD771Ak8TGNvnW1B_vRhMb6AG0IxPssrcE';
+  function id() {
+    var c = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', s = '';
+    var r = new Uint8Array(20); crypto.getRandomValues(r);
+    for (var i = 0; i < r.length; i++) s += c[r[i] % c.length];
+    return s;
+  }
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var d = new FormData(form);
+    if (d.get('sitio')) return;
+    var mensaje = String(d.get('mensaje') || '').trim();
+    if (!mensaje) { estado.textContent = 'Escribe tu mensaje antes de enviar.'; form.mensaje.focus(); return; }
+    var campos = { tipo: { stringValue: d.get('tipo') }, mensaje: { stringValue: mensaje } };
+    ['escuela', 'contacto'].forEach(function (k) {
+      var v = String(d.get(k) || '').trim();
+      if (v) campos[k] = { stringValue: v };
+    });
+    var boton = form.querySelector('[type=submit]');
+    boton.disabled = true;
+    estado.textContent = 'Enviando…';
+    fetch(api + ':commit?key=' + llave, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ writes: [{
+        update: { name: 'projects/jaguarapp-50a15/databases/(default)/documents/mensajes/' + id(), fields: campos },
+        updateTransforms: [{ fieldPath: 'creado', setToServerValue: 'REQUEST_TIME' }],
+        currentDocument: { exists: false }
+      }] })
+    }).then(function (r) {
+      if (!r.ok) throw new Error(r.status);
+      form.reset();
+      estado.textContent = '¡Gracias! Ya nos llegó tu mensaje.';
+    }).catch(function () {
+      estado.textContent = 'No se pudo enviar. Revisa tu conexión e inténtalo otra vez.';
+    }).then(function () { boton.disabled = false; });
+  });
+})();
+</script>
+</body>
+</html>
