@@ -23,7 +23,8 @@ packages/jaguar_core   el intérprete, en Dart puro (sin Flutter)
 apps/jaguar            la app en Flutter
 firestore.rules        reglas de la base de datos (clases y comunidad)
 firebase-tests/        pruebas de esas reglas contra el emulador
-docs/                  notas de diseño y la hoja de ruta
+sitio/                 la página de presentación
+docs/                  documentación
 ```
 
 ## Correrla
@@ -75,10 +76,8 @@ final result = await runProgram(source, inputs: ['5']);
 print(result.ok ? result.output : result.error!.format(source));
 ```
 
-## Notas
+## Documentación
 
-- [Hoja de ruta](docs/plan.md)
-- [Cómo funciona para alumnos y profesores](docs/producto.md)
 - [Diagramas de flujo y compatibilidad con DFD](docs/diagramas.md)
 - [La nube (Firebase)](docs/nube.md)
 - [Qué pseudocódigo entiende Jaguar](docs/gramatica.md)
