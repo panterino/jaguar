@@ -2,8 +2,7 @@
 // tool/aviso_html.dart, que genera web/privacidad.html.
 
 /// Where to write about personal data.
-// TODO(angel): poner el correo de contacto antes de publicar.
-const privacyContact = '[correo de contacto]';
+const privacyContact = 'angelfc.contact@gmail.com';
 
 const privacyUpdated = '18 de octubre de 2026';
 
