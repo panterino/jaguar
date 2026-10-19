@@ -10,6 +10,9 @@
         ],
         "legacy": [
           "jaguarapp-50a15"
+        ],
+        "sitio": [
+          "pseudocodigo-jaguar"
         ]
       }
     }

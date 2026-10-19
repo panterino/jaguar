@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://pseudocodigo-jaguar.web.app/sitemap.xml

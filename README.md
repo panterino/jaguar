@@ -57,6 +57,9 @@ El APK se firma con la llave de subida si existe `android/key.properties`
 (no está en el repo). Sin ese archivo se firma con la llave de depuración,
 que sirve para probar pero no para Play Store.
 
+La página de presentación está en `sitio/`: es un solo HTML, sin
+compilar. Se publica con `tool/publicar_sitio.sh`.
+
 ## El intérprete solo
 
 ```sh

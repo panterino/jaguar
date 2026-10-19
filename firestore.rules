@@ -150,5 +150,17 @@ service cloud.firestore {
     match /supportOffers/{offerId} {
       allow read: if resource.data.verified == true;
     }
+
+    // Messages from the landing page (teachers who want to try Jaguar,
+    // suggestions). Anyone can leave one; only Panterino reads them, in the
+    // console. The contact is optional.
+    match /mensajes/{id} {
+      allow create: if onlyFields(['tipo', 'mensaje', 'escuela', 'contacto', 'creado'])
+        && request.resource.data.tipo in ['piloto', 'sugerencia']
+        && shortText('mensaje', 2000)
+        && (!('escuela' in request.resource.data) || shortText('escuela', 200))
+        && (!('contacto' in request.resource.data) || shortText('contacto', 200))
+        && request.resource.data.creado == request.time;
+    }
   }
 }

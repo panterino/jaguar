@@ -57,6 +57,22 @@
           "type": 301
         }
       ]
+    },
+    {
+      "target": "sitio",
+      "public": "sitio",
+      "cleanUrls": true,
+      "headers": [
+        {
+          "source": "**/*.png",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "public, max-age=86400"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
