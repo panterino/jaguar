@@ -50,17 +50,17 @@ la comunidad usan Firebase (ver [nube.md](nube.md)).
 
 ## Lo que sigue
 
-El orden sale de [investigacion.md](investigacion.md).
+El orden sale de [investigacion.md](investigacion.md). Ya están la prueba de
+escritorio, el planteamiento, los retos del primer nivel, el modo sin
+conexión, el APK ligero y el aviso de privacidad. Las rúbricas y listas de
+cotejo las lleva el profesor; Jaguar se queda como herramienta general.
 
-1. Prueba de escritorio: tabla de pasos y variables, para llenar o revisar.
-2. Planteamiento (entrada, proceso, salida) antes del código en los ejercicios.
-3. Retos del primer nivel, uno por contenido del programa de Cultura Digital I.
-4. Lista de cotejo de la clase para el profesor.
-5. APK más ligero y web que funcione sin conexión.
-6. Aviso de privacidad.
-7. Probarlo con uno o dos profesores de verdad, en su clase. Antes de eso,
+1. Poner el correo de contacto en el aviso de privacidad.
+2. Probarlo con uno o dos profesores de verdad, en su clase. Antes de eso,
    platicar con ellos (abajo están las preguntas).
-8. Subir a Play Store.
+3. Subir a Play Store, primero en pruebas internas (ver
+   [play-store.md](play-store.md)).
+4. Retos del segundo nivel: arreglos, funciones y cadenas.
 
 Después: tutoriales por enlace, directorio de la red de apoyo, calificar por
 lotes y detectar copias.
