@@ -50,16 +50,20 @@ la comunidad usan Firebase (ver [nube.md](nube.md)).
 
 ## Lo que sigue
 
-1. Probarlo con uno o dos profesores de verdad, en su clase. Antes de eso,
+El orden sale de [investigacion.md](investigacion.md).
+
+1. Prueba de escritorio: tabla de pasos y variables, para llenar o revisar.
+2. Planteamiento (entrada, proceso, salida) antes del código en los ejercicios.
+3. Retos del primer nivel, uno por contenido del programa de Cultura Digital I.
+4. Lista de cotejo de la clase para el profesor.
+5. APK más ligero y web que funcione sin conexión.
+6. Aviso de privacidad.
+7. Probarlo con uno o dos profesores de verdad, en su clase. Antes de eso,
    platicar con ellos (abajo están las preguntas).
-2. Retos para aprender solo: un primer nivel de 8 a 10 ejercicios.
-3. Probar en celulares baratos y revisar que los `.psc` que guarda Jaguar
-   abran bien en PSeInt.
-4. Tutoriales que se puedan compartir por enlace.
-5. Directorio de la red de apoyo (ver [producto.md](producto.md)).
-6. Calificar proyectos por lotes y detectar copias comparando la estructura
-   del programa.
-7. Subir a Play Store.
+8. Subir a Play Store.
+
+Después: tutoriales por enlace, directorio de la red de apoyo, calificar por
+lotes y detectar copias.
 
 Pendientes de DFD: los símbolos exactos de cada objeto, abrir archivos `.dfd`,
 exportar el diagrama a PDF y los arreglos que DFD crea sin `Dimension`.

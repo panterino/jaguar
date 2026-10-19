@@ -44,8 +44,7 @@ cd apps/jaguar && flutter run -d chrome --dart-define=JAGUAR_EMULATORS=true
 Publicar la web:
 
 ```sh
-cd apps/jaguar && flutter build web --release --pwa-strategy=none
-cd ../.. && firebase deploy --only hosting
+tool/publicar_web.sh
 ```
 
 Mandar un APK de prueba a App Distribution:
