@@ -9,6 +9,7 @@ import '../cloud/account_dialog.dart';
 import '../cloud/classes_screen.dart';
 import '../cloud/cloud.dart';
 import '../cloud/community_screen.dart';
+import '../console/desk_check_screen.dart';
 import '../console/console_session.dart';
 import '../console/console_view.dart';
 import '../console/debug_widgets.dart';
@@ -542,6 +543,16 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
 
   void _showAbout() => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const AboutScreen()));
 
+  void _deskCheck() {
+    _saveNow();
+    Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (_) => DeskCheckScreen(name: programName(_code.text), source: _code.text),
+      ),
+    );
+  }
+
   void _showGuide() => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const GuideScreen()));
 
   void _toast(String message) {
@@ -757,6 +768,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
           onSelected: running && !_session.stepping ? _session.pause : null,
           shortcut: const SingleActivator(LogicalKeyboardKey.pause),
         ),
+        AppMenuItem('Prueba de escritorio…', icon: Icons.table_chart_outlined, onSelected: _deskCheck),
         const AppMenuDivider(),
         AppMenuItem(
           'Probar',
@@ -1235,6 +1247,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
             onSaveFile: _saveFile,
             onSendFile: _sendFile,
             onOpenLink: _openLink,
+            onDeskCheck: _deskCheck,
           ),
           if (compact)
             Padding(
@@ -1495,12 +1508,14 @@ class _MoreMenu extends StatelessWidget {
     required this.onSaveFile,
     required this.onSendFile,
     required this.onOpenLink,
+    required this.onDeskCheck,
   });
 
   final VoidCallback onNew;
   final VoidCallback onOpenFile;
   final VoidCallback onSaveFile;
   final VoidCallback onSendFile;
+  final VoidCallback onDeskCheck;
   final VoidCallback onOpenLink;
 
   @override
@@ -1512,6 +1527,12 @@ class _MoreMenu extends StatelessWidget {
         onPressed: () => controller.isOpen ? controller.close() : controller.open(),
       ),
       menuChildren: [
+        MenuItemButton(
+          leadingIcon: const Icon(Icons.table_chart_outlined),
+          onPressed: onDeskCheck,
+          child: const Text('Prueba de escritorio'),
+        ),
+        const Divider(height: 1),
         MenuItemButton(leadingIcon: const Icon(Icons.add), onPressed: onNew, child: const Text('Nuevo programa')),
         MenuItemButton(
           leadingIcon: const Icon(Icons.folder_open),
