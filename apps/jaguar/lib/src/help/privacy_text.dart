@@ -28,6 +28,12 @@ const privacySections = <(String, String)>[
         'CC BY-SA, los "me sirvió" y los reportes.',
   ),
   (
+    'Si nos escribes desde la página',
+    'En pseudocodigo-jaguar.web.app hay un formulario para profesores y sugerencias. Guardamos tu mensaje y, solo '
+        'si los escribes, tu escuela o materia y cómo responderte. Los usamos únicamente para contestarte y mejorar '
+        'Jaguar, y los borramos cuando lo pidas.',
+  ),
+  (
     'Para qué',
     'Solo para que funcionen las clases (que el profesor vea las entregas de su grupo) y la comunidad. No hay '
         'publicidad, no vendemos ni compartimos datos con nadie y no medimos lo que haces en la app.',
