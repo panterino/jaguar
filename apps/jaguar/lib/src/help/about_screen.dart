@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme.dart';
+import 'privacy.dart';
 
 const jaguarVersion = '0.3.1';
 
@@ -107,6 +108,16 @@ class AboutScreen extends StatelessWidget {
               Text(
                 'Lo que se publica en la comunidad se comparte bajo licencia CC BY-SA.',
                 style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                  onPressed: () =>
+                      Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const PrivacyScreen())),
+                  icon: const Icon(Icons.privacy_tip_outlined, size: 18),
+                  label: const Text('Aviso de privacidad'),
+                ),
               ),
             ],
           ),

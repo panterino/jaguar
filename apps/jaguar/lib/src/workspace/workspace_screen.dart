@@ -30,6 +30,7 @@ import '../exercises/exercises_screen.dart';
 import '../exercises/tests_panel.dart';
 import '../exercises/verified_screen.dart';
 import '../files/psc_files.dart';
+import '../help/privacy.dart';
 import '../help/about_screen.dart';
 import '../help/guide_screen.dart';
 import '../programs/examples.dart';
@@ -916,6 +917,11 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
           'Cambiar cómo uso Jaguar (alumno, profesor…)',
           icon: Icons.swap_horiz,
           onSelected: () => _welcome(again: true),
+        ),
+        AppMenuItem(
+          'Aviso de privacidad',
+          icon: Icons.privacy_tip_outlined,
+          onSelected: () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const PrivacyScreen())),
         ),
         AppSubmenu('Ejemplos', [
           for (final (title, source) in examples) AppMenuItem(title, onSelected: () => _openSource(source)),
