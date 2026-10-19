@@ -41,7 +41,7 @@ DFD se sienta en casa:
 Una diferencia a propósito: en DFD un objeto de asignación puede tener hasta
 tres asignaciones; en Jaguar cada una es un bloque.
 
-## Pendiente
+## Lo que todavía no hace
 
 - La forma exacta de los símbolos de DFD. No encontré capturas confiables y
   no quise inventarlas; hoy Lectura y Salida tienen la misma figura y se

@@ -74,7 +74,7 @@ FinAlgoritmo
 - **Límites** para no congelar la app ni el calificador: número máximo de pasos
   (configurable) y 200 llamadas anidadas.
 
-## Pendiente para compatibilidad completa
+## Lo que todavía no hace
 
 - Perfil estricto (Definir obligatorio, `;` obligatorio, índices desde 0).
 - Validar contra los ejemplos que trae PSeInt y tareas reales de alumnos.
