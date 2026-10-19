@@ -55,12 +55,11 @@ escritorio, el planteamiento, los retos del primer nivel, el modo sin
 conexión, el APK ligero y el aviso de privacidad. Las rúbricas y listas de
 cotejo las lleva el profesor; Jaguar se queda como herramienta general.
 
-1. Poner el correo de contacto en el aviso de privacidad.
-2. Probarlo con uno o dos profesores de verdad, en su clase. Antes de eso,
+1. Probarlo con uno o dos profesores de verdad, en su clase. Antes de eso,
    platicar con ellos (abajo están las preguntas).
-3. Subir a Play Store, primero en pruebas internas (ver
+2. Subir a Play Store, primero en pruebas internas (ver
    [play-store.md](play-store.md)).
-4. Retos del segundo nivel: arreglos, funciones y cadenas.
+3. Retos del segundo nivel: arreglos, funciones y cadenas.
 
 Después: tutoriales por enlace, directorio de la red de apoyo, calificar por
 lotes y detectar copias.

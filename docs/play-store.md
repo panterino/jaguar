@@ -79,8 +79,6 @@ Respuestas para el formulario, según el aviso de privacidad:
 
 ## Antes de la primera versión pública
 
-- Poner el correo de contacto en el aviso (`lib/src/help/privacy_text.dart`,
-  luego `dart run tool/aviso_html.dart`).
 - Crear la cuenta de desarrollador de Google Play (pago único) y la app con
   el paquete `com.panterino.jaguar`.
 - Probar primero en la pista de pruebas internas con el piloto.
