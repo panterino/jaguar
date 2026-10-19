@@ -50,16 +50,19 @@ la comunidad usan Firebase (ver [nube.md](nube.md)).
 
 ## Lo que sigue
 
+El orden sale de [investigacion.md](investigacion.md). Ya están la prueba de
+escritorio, el planteamiento, los retos del primer nivel, el modo sin
+conexión, el APK ligero y el aviso de privacidad. Las rúbricas y listas de
+cotejo las lleva el profesor; Jaguar se queda como herramienta general.
+
 1. Probarlo con uno o dos profesores de verdad, en su clase. Antes de eso,
    platicar con ellos (abajo están las preguntas).
-2. Retos para aprender solo: un primer nivel de 8 a 10 ejercicios.
-3. Probar en celulares baratos y revisar que los `.psc` que guarda Jaguar
-   abran bien en PSeInt.
-4. Tutoriales que se puedan compartir por enlace.
-5. Directorio de la red de apoyo (ver [producto.md](producto.md)).
-6. Calificar proyectos por lotes y detectar copias comparando la estructura
-   del programa.
-7. Subir a Play Store.
+2. Subir a Play Store, primero en pruebas internas (ver
+   [play-store.md](play-store.md)).
+3. Retos del segundo nivel: arreglos, funciones y cadenas.
+
+Después: tutoriales por enlace, directorio de la red de apoyo, calificar por
+lotes y detectar copias.
 
 Pendientes de DFD: los símbolos exactos de cada objeto, abrir archivos `.dfd`,
 exportar el diagrama a PDF y los arreglos que DFD crea sin `Dimension`.

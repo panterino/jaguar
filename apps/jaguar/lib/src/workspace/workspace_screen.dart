@@ -5,10 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:jaguar_core/jaguar_core.dart';
 
+import '../challenges/challenges.dart';
+import '../challenges/challenges_screen.dart';
 import '../cloud/account_dialog.dart';
 import '../cloud/classes_screen.dart';
 import '../cloud/cloud.dart';
 import '../cloud/community_screen.dart';
+import '../console/desk_check_screen.dart';
 import '../console/console_session.dart';
 import '../console/console_view.dart';
 import '../console/debug_widgets.dart';
@@ -19,6 +22,7 @@ import '../editor/keyword_bar.dart';
 import '../diagram/diagram_editing.dart';
 import '../diagram/diagram_view.dart';
 import '../editor/syntax_controller.dart';
+import '../exercises/plan_dialog.dart';
 import '../exercises/exercise_banner.dart';
 import '../exercises/exercise_editor_screen.dart';
 import '../exercises/exercise_store.dart';
@@ -26,6 +30,7 @@ import '../exercises/exercises_screen.dart';
 import '../exercises/tests_panel.dart';
 import '../exercises/verified_screen.dart';
 import '../files/psc_files.dart';
+import '../help/privacy.dart';
 import '../help/about_screen.dart';
 import '../help/guide_screen.dart';
 import '../programs/examples.dart';
@@ -243,6 +248,10 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
     final result = await checkSolution(source, exercise);
     if (!mounted) return;
     _store.recordTests(programId, passed: result.passedCount, total: exercise.cases.length);
+    if (result.passed && challengeById(exercise.id) != null && !_settings.doneChallenges.contains(exercise.id)) {
+      _settings.markChallengeDone(exercise.id);
+      _toast('¡Reto superado! Abre Retos para seguir con el siguiente.');
+    }
     // Exercises from a class send their result to the teacher.
     final sent = await widget.cloud?.submitIfAssigned(
       exercise: exercise,
@@ -316,6 +325,19 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
       ),
     );
   }
+
+  void _openChallenges() => Navigator.push(
+    context,
+    MaterialPageRoute<void>(
+      builder: (_) => ChallengesScreen(
+        settings: _settings,
+        onOpen: (challenge) {
+          widget.exercises.saveReceived(challenge.exercise);
+          _openExercise(challenge.exercise);
+        },
+      ),
+    ),
+  );
 
   void _openCommunity() {
     Navigator.push(
@@ -542,6 +564,30 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
 
   void _showAbout() => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const AboutScreen()));
 
+  /// Writes the planteamiento as comments at the top of the program.
+  Future<void> _plan() async {
+    final plan = await showPlanDialog(context, readPlan(_code.text), statement: _exercise?.statement);
+    if (plan == null || !mounted) return;
+    final before = _code.text;
+    final after = writePlan(before, plan);
+    if (after == before) return;
+    final offset = _code.selection.isValid ? _code.selection.baseOffset + after.length - before.length : 0;
+    _code.value = TextEditingValue(
+      text: after,
+      selection: TextSelection.collapsed(offset: offset.clamp(0, after.length)),
+    );
+  }
+
+  void _deskCheck() {
+    _saveNow();
+    Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (_) => DeskCheckScreen(name: programName(_code.text), source: _code.text),
+      ),
+    );
+  }
+
   void _showGuide() => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const GuideScreen()));
 
   void _toast(String message) {
@@ -569,6 +615,8 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
           shortcut: primary(LogicalKeyboardKey.keyO),
         ),
         AppMenuItem('Abrir enlace…', icon: Icons.link, onSelected: _openLink),
+        const AppMenuDivider(),
+        AppMenuItem('Planteamiento (entrada, proceso, salida)…', icon: Icons.edit_note, onSelected: _plan),
         const AppMenuDivider(),
         AppMenuItem(
           'Guardar como .psc…',
@@ -757,6 +805,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
           onSelected: running && !_session.stepping ? _session.pause : null,
           shortcut: const SingleActivator(LogicalKeyboardKey.pause),
         ),
+        AppMenuItem('Prueba de escritorio…', icon: Icons.table_chart_outlined, onSelected: _deskCheck),
         const AppMenuDivider(),
         AppMenuItem(
           'Probar',
@@ -862,11 +911,17 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
           onSelected: _showGuide,
           shortcut: const SingleActivator(LogicalKeyboardKey.f1),
         ),
+        AppMenuItem('Retos para practicar…', icon: Icons.flag_outlined, onSelected: _openChallenges),
         AppMenuItem('Comunidad y ejemplos…', icon: Icons.public, onSelected: _openCommunity),
         AppMenuItem(
           'Cambiar cómo uso Jaguar (alumno, profesor…)',
           icon: Icons.swap_horiz,
           onSelected: () => _welcome(again: true),
+        ),
+        AppMenuItem(
+          'Aviso de privacidad',
+          icon: Icons.privacy_tip_outlined,
+          onSelected: () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const PrivacyScreen())),
         ),
         AppSubmenu('Ejemplos', [
           for (final (title, source) in examples) AppMenuItem(title, onSelected: () => _openSource(source)),
@@ -954,6 +1009,8 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
         _EditorTab(code: _code, isExercise: exercise != null),
         if (exercise != null)
           ExerciseBanner(
+            onHints: challengeById(exercise.id) == null ? null : () => showHints(context, challengeById(exercise.id)!),
+            onPlan: _plan,
             key: ValueKey(exercise.id),
             exercise: exercise,
             checking: _checking,
@@ -1012,6 +1069,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
       onMakeExercise: _settings.teacher ? _exerciseFromProgram : null,
       cloud: widget.cloud,
       onOpenCommunity: _openCommunity,
+      onOpenChallenges: _openChallenges,
       onOpenClasses: _openClasses,
       onAccount: _account,
       onOpenTeacher: _settings.teacher ? _openTeacher : null,
@@ -1180,6 +1238,8 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
       children: [
         if (exercise != null)
           ExerciseBanner(
+            onHints: challengeById(exercise.id) == null ? null : () => showHints(context, challengeById(exercise.id)!),
+            onPlan: _plan,
             key: ValueKey(exercise.id),
             exercise: exercise,
             checking: _checking,
@@ -1235,6 +1295,8 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
             onSaveFile: _saveFile,
             onSendFile: _sendFile,
             onOpenLink: _openLink,
+            onDeskCheck: _deskCheck,
+            onPlan: _plan,
           ),
           if (compact)
             Padding(
@@ -1271,6 +1333,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
         store: _store,
         cloud: widget.cloud,
         onOpenCommunity: _openCommunity,
+        onOpenChallenges: _openChallenges,
         onOpenClasses: _openClasses,
         onAccount: _account,
         onGuide: _showGuide,
@@ -1495,12 +1558,16 @@ class _MoreMenu extends StatelessWidget {
     required this.onSaveFile,
     required this.onSendFile,
     required this.onOpenLink,
+    required this.onDeskCheck,
+    required this.onPlan,
   });
 
   final VoidCallback onNew;
   final VoidCallback onOpenFile;
   final VoidCallback onSaveFile;
   final VoidCallback onSendFile;
+  final VoidCallback onDeskCheck;
+  final VoidCallback onPlan;
   final VoidCallback onOpenLink;
 
   @override
@@ -1512,6 +1579,13 @@ class _MoreMenu extends StatelessWidget {
         onPressed: () => controller.isOpen ? controller.close() : controller.open(),
       ),
       menuChildren: [
+        MenuItemButton(leadingIcon: const Icon(Icons.edit_note), onPressed: onPlan, child: const Text('Planteamiento')),
+        MenuItemButton(
+          leadingIcon: const Icon(Icons.table_chart_outlined),
+          onPressed: onDeskCheck,
+          child: const Text('Prueba de escritorio'),
+        ),
+        const Divider(height: 1),
         MenuItemButton(leadingIcon: const Icon(Icons.add), onPressed: onNew, child: const Text('Nuevo programa')),
         MenuItemButton(
           leadingIcon: const Icon(Icons.folder_open),

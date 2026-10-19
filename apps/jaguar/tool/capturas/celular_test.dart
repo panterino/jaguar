@@ -14,6 +14,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:jaguar/main.dart';
 import 'package:jaguar/src/cloud/cloud.dart';
 import 'package:jaguar/src/cloud/memory_backend.dart';
+import 'package:jaguar/src/console/desk_check_screen.dart';
 import 'package:jaguar/src/exercises/exercise_store.dart';
 import 'package:jaguar/src/programs/program_store.dart';
 import 'package:jaguar/src/settings.dart';
@@ -122,6 +123,28 @@ void main() {
     await tester.tap(find.text('Profesor').last);
     await tester.pumpAndSettle();
     await _foto('08_cuenta');
+  });
+
+  testWidgets('prueba de escritorio', (tester) async {
+    tester.view.devicePixelRatio = 2;
+    tester.view.physicalSize = const Size(720, 1480);
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(useMaterial3: true),
+        home: const DeskCheckScreen(
+          name: 'promedio',
+          source: 'Algoritmo promedio\n    Leer a, b\n    s <- a + b\n    p <- s / 2\n    Escribir "Promedio: ", p\nFinAlgoritmo\n',
+        ),
+      ),
+    );
+    await tester.enterText(find.byType(TextField), '7, 10');
+    await tester.tap(find.text('Hacer la tabla'));
+    await tester.pumpAndSettle();
+    await _foto('09_escritorio');
+    await tester.tap(find.text('Practicar: yo la lleno'));
+    await tester.pumpAndSettle();
+    await _foto('10_escritorio_practica');
   });
 
   testWidgets('bienvenida', (tester) async {

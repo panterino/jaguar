@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../help/privacy.dart';
 import 'cloud.dart';
 
 /// Entering Jaguar online. Students and self-learners only choose an alias
@@ -231,6 +232,15 @@ class _AccountDialogState extends State<_AccountDialog> {
                     style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                   ),
                 ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton(
+                  style: TextButton.styleFrom(padding: EdgeInsets.zero, visualDensity: VisualDensity.compact),
+                  onPressed: () =>
+                      Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const PrivacyScreen())),
+                  child: const Text('Al entrar aceptas el aviso de privacidad'),
+                ),
+              ),
               if (_notice != null)
                 Padding(
                   padding: const EdgeInsets.only(top: 12),

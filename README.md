@@ -44,16 +44,13 @@ cd apps/jaguar && flutter run -d chrome --dart-define=JAGUAR_EMULATORS=true
 Publicar la web:
 
 ```sh
-cd apps/jaguar && flutter build web --release --pwa-strategy=none
-cd ../.. && firebase deploy --only hosting
+tool/publicar_web.sh
 ```
 
 Mandar un APK de prueba a App Distribution:
 
 ```sh
-cd apps/jaguar && flutter build apk --release
-firebase appdistribution:distribute build/app/outputs/flutter-apk/app-release.apk \
-  --app 1:860170749647:android:f854ea9492fb07131d19ba --release-notes "..."
+tool/publicar_android.sh "Notas de la versión"
 ```
 
 El APK se firma con la llave de subida si existe `android/key.properties`

@@ -425,6 +425,49 @@ void main() {
       debugDefaultTargetPlatformOverride = null;
     });
 
+    testWidgets('retos: abrir, ver pistas, resolver y quedar marcado', (tester) async {
+      await pumpDesktop(tester, 'Algoritmo hola\nFinAlgoritmo\n');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Retos'));
+      await tester.pumpAndSettle();
+      expect(find.text('Llevas 0 de 10.', findRichText: true), findsNothing);
+      await tester.tap(find.text('Saludo'));
+      await tester.pumpAndSettle();
+      expect(find.text('Reto 1 · Saludo'), findsOneWidget);
+      await tester.tap(find.byTooltip('Pistas'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Necesitas una variable'), findsOneWidget);
+      await tester.tap(find.text('A intentarlo'));
+      await tester.pumpAndSettle();
+      final editor = find.descendant(of: find.byType(CodeEditor), matching: find.byType(TextField)).first;
+      await tester.enterText(editor, 'Algoritmo saludo\n    Leer n\n    Escribir "Hola, ", n\nFinAlgoritmo\n');
+      await tester.tap(find.text('Probar').first);
+      await tester.pumpAndSettle();
+      expect(find.text('¡Reto superado! Abre Retos para seguir con el siguiente.'), findsOneWidget);
+      await tester.tap(find.text('Retos'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Llevas 1 de 10'), findsOneWidget);
+      debugDefaultTargetPlatformOverride = null;
+    });
+
+    testWidgets('el planteamiento queda como comentarios al inicio', (tester) async {
+      await pumpDesktop(tester, 'Algoritmo suma\n    Leer a, b\nFinAlgoritmo\n');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Archivo'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Planteamiento (entrada, proceso, salida)…'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.widgetWithText(TextField, 'Entrada'), 'dos números');
+      await tester.enterText(find.widgetWithText(TextField, 'Salida'), 'la suma');
+      await tester.tap(find.text('Guardar'));
+      await tester.pumpAndSettle();
+      final editor = tester.widget<TextField>(
+        find.descendant(of: find.byType(CodeEditor), matching: find.byType(TextField)).first,
+      );
+      expect(editor.controller!.text, startsWith('// Entrada: dos números\n// Salida: la suma\nAlgoritmo suma'));
+      debugDefaultTargetPlatformOverride = null;
+    });
+
     testWidgets('el menú Editar comenta la línea del cursor', (tester) async {
       await pumpDesktop(tester, 'Algoritmo hola\n    Escribir 1\nFinAlgoritmo\n');
       final editor = tester.widget<TextField>(find.byType(TextField).first);

@@ -31,13 +31,25 @@ class GuideScreen extends StatelessWidget {
         'Abajo verás cada variable y su valor; las que acaban de cambiar se marcan.',
         'F4 ejecuta hasta la línea donde está el cursor. En pausa puedes evaluar cualquier expresión.',
       ]),
+      _Section(Icons.table_chart_outlined, 'Prueba de escritorio', [
+        'En Ejecutar (o en ⋮ en el celular), Prueba de escritorio arma la tabla: una fila por instrucción y una '
+            'columna por variable, con los datos de entrada que escribas.',
+        'Con Practicar la llenas tú primero y Jaguar te marca en qué acertaste. Copiar tabla la pega en tu documento.',
+      ]),
+      _Section(Icons.flag_outlined, 'Retos y planteamiento', [
+        'En Retos hay diez ejercicios, uno por tema: variables, operadores, Si, Según, Mientras, Para y Repetir. '
+            'Cada uno trae pistas que van de una idea a un ejemplo.',
+        'Antes de programar, Planteamiento te pide entrada, proceso y salida. Se guarda como comentario al '
+            'inicio del programa, así que también lo ve tu profesor y PSeInt lo abre igual.',
+      ]),
       _Section(Icons.fact_check_outlined, 'Resuelve ejercicios', [
         'Un ejercicio llega con un enlace, un QR o desde tu clase. Arriba ves el enunciado.',
         'Probar revisa tu programa con las pruebas del profesor y te explica cuál falla y por qué.',
         'Cuando todo está bien, Mostrar al profesor enseña una pantalla verde con tu nombre y la hora.',
       ]),
       _Section(Icons.save_alt, 'Guarda y lleva tu trabajo', [
-        'Tus programas se guardan solos en este dispositivo, sin cuenta.',
+        'Tus programas se guardan solos en este dispositivo, sin cuenta. En la web, Jaguar abre aunque no haya internet '
+            'después de la primera visita.',
         'Guardar crea un archivo .psc que abre PSeInt; Abrir lee los .psc de PSeInt.',
         'Compartir genera un QR o un enlace: ábrelo en otro equipo o en tu celular y sigues ahí.',
       ]),

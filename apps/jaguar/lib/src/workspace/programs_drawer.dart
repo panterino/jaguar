@@ -13,6 +13,7 @@ class ProgramsDrawer extends StatelessWidget {
     required this.onNew,
     required this.cloud,
     required this.onOpenCommunity,
+    required this.onOpenChallenges,
     required this.onOpenClasses,
     required this.onAccount,
     required this.onGuide,
@@ -32,6 +33,7 @@ class ProgramsDrawer extends StatelessWidget {
   final VoidCallback onNew;
   final Cloud? cloud;
   final VoidCallback onOpenCommunity;
+  final VoidCallback onOpenChallenges;
   final VoidCallback onOpenClasses;
   final VoidCallback onAccount;
   final VoidCallback onGuide;
@@ -113,6 +115,15 @@ class ProgramsDrawer extends StatelessWidget {
                   ),
                 ),
                 const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.flag_outlined),
+                  title: const Text('Retos'),
+                  subtitle: const Text('Para practicar por tu cuenta, con pistas'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    onOpenChallenges();
+                  },
+                ),
                 ListTile(
                   leading: const Icon(Icons.public),
                   title: const Text('Comunidad'),
