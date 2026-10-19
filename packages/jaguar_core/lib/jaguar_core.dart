@@ -2,6 +2,7 @@
 library;
 
 export 'src/ast.dart';
+export 'src/desk_check.dart';
 export 'src/builtins.dart' show builtinNames;
 export 'src/editing.dart';
 export 'src/errors.dart';
