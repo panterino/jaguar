@@ -8,5 +8,5 @@ cd "$(dirname "$0")/../apps/jaguar"
 flutter build apk --release --target-platform android-arm,android-arm64 \
   --obfuscate --split-debug-info=build/simbolos
 firebase appdistribution:distribute build/app/outputs/flutter-apk/app-release.apk \
-  --app 1:860170749647:android:f854ea9492fb07131d19ba --project jaguarapp-50a15 \
+  --app 1:860170749647:android:60030de4566900181d19ba --project jaguarapp-50a15 \
   --release-notes "${1:-Versión de prueba}"
