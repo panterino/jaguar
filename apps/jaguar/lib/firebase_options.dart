@@ -55,7 +55,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDuxGjedloQEAyzDWCxHr-XcdoPIP2XHS4',
-    appId: '1:860170749647:android:f854ea9492fb07131d19ba',
+    appId: '1:860170749647:android:60030de4566900181d19ba',
     messagingSenderId: '860170749647',
     projectId: 'jaguarapp-50a15',
     storageBucket: 'jaguarapp-50a15.firebasestorage.app',
