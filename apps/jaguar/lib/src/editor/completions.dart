@@ -153,7 +153,23 @@ class Diagnostics extends ChangeNotifier {
   JaguarError? error;
   Program? program;
 
+  int _cursorLine = 0;
+
+  /// The error worth showing while typing: not one about a block that is
+  /// still open, and not one on the line being written. Both go quiet until
+  /// the cursor leaves the line or the program runs.
+  JaguarError? get shownError {
+    final problem = error;
+    if (problem == null || problem.unfinished) return null;
+    return problem.line == _cursorLine ? null : problem;
+  }
+
   void _onChanged() {
+    final line = code.cursorPosition.$1;
+    if (line != _cursorLine) {
+      _cursorLine = line;
+      if (code.text == _checked) notifyListeners();
+    }
     if (code.text == _checked) return;
     _timer?.cancel();
     // Half a word is not a mistake yet.

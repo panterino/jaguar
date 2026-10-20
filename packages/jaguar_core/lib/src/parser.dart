@@ -209,10 +209,25 @@ class Parser {
     if (_isSeparator()) return;
     // Flexible profile: a keyword may follow on the same line.
     if (_current.type == TokenType.word && _reserved.contains(_current.norm)) return;
+    if (_lineStartsWith('escribir')) {
+      throw _error(
+        'Parece que falta una comilla o una coma: sobra ${_current.describe()}.',
+        hint: 'Los textos van entre comillas y se separan con comas: Escribir "Hola ", nombre',
+      );
+    }
     throw _error(
       'Sobra ${_current.describe()} al final de la instrucción.',
       hint: 'Pon cada instrucción en su propia línea o sepáralas con ";".',
     );
+  }
+
+  /// Whether the statement being read began with [word].
+  bool _lineStartsWith(String word) {
+    var i = _pos;
+    while (i > 0 && _tokens[i - 1].line == _current.line) {
+      i--;
+    }
+    return _tokens[i].type == TokenType.word && _tokens[i].norm == word;
   }
 
   // -------------------------------------------------------------------------

@@ -517,12 +517,16 @@ class Interpreter {
     switch (e.op) {
       case '+':
         if (left is num && right is num) return _finite(left + right, e);
-        if (left is String && right is String) return left + right;
+        // A text with a number or a Verdadero/Falso joins them, as in "Hola " + nombre.
+        if ((left is String && (right is String || right is num || right is bool)) ||
+            (right is String && (left is num || left is bool))) {
+          return formatValue(left) + formatValue(right);
+        }
         throw _fail(
           e,
           'No se puede sumar ${describeValue(left)} con ${describeValue(right)}.',
           hint: left is String || right is String
-              ? 'Para mostrar texto y números juntos usa comas: Escribir "Total: ", x'
+              ? 'Para unir textos con valores usa +, o comas en Escribir: Escribir "Total: ", x'
               : null,
         );
       case '-':

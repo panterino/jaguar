@@ -24,9 +24,8 @@ class ProgramsSidebar extends StatefulWidget {
     required this.onOpenClasses,
     required this.onAccount,
     this.onOpenTeacher,
-    this.onChangeName,
-    required this.teacher,
-    required this.onChangeProfile,
+    required this.onHome,
+    required this.onSettings,
   });
 
   final ProgramStore store;
@@ -47,12 +46,8 @@ class ProgramsSidebar extends StatefulWidget {
   /// Teachers only.
   final VoidCallback? onOpenTeacher;
 
-  /// Students only: the name shown to the teacher.
-  final VoidCallback? onChangeName;
-
-  /// Who is using Jaguar, and how to change it.
-  final bool teacher;
-  final VoidCallback onChangeProfile;
+  final VoidCallback onHome;
+  final VoidCallback onSettings;
 
   @override
   State<ProgramsSidebar> createState() => _ProgramsSidebarState();
@@ -122,6 +117,14 @@ class _ProgramsSidebarState extends State<ProgramsSidebar> {
                 ),
                 const Divider(height: 1),
                 const SizedBox(height: 4),
+                _SidebarRow(icon: Icons.home_outlined, label: 'Inicio', onTap: widget.onHome),
+                if (widget.onOpenTeacher case final openTeacher?)
+                  _SidebarRow(
+                    icon: Icons.school_outlined,
+                    label: 'Mis ejercicios',
+                    tooltip: 'Ejercicios con pruebas que se generan solas',
+                    onTap: openTeacher,
+                  ),
                 _SidebarRow(
                   icon: Icons.flag_outlined,
                   label: 'Retos',
@@ -134,41 +137,22 @@ class _ProgramsSidebarState extends State<ProgramsSidebar> {
                   tooltip: 'Programas y ejercicios que comparten otras personas, y ejemplos',
                   onTap: widget.onOpenCommunity,
                 ),
-                if (widget.cloud != null)
+                if (widget.cloud != null) ...[
                   _SidebarRow(
                     icon: Icons.groups_outlined,
                     label: 'Mis clases',
                     tooltip: 'Únete con el código de tu profesor, o crea una clase si eres profesor',
                     onTap: widget.onOpenClasses,
                   ),
-                const Divider(height: 9),
-                if (widget.cloud != null)
                   _SidebarRow(
                     icon: widget.cloud!.signedIn ? Icons.account_circle : Icons.login,
                     label: widget.cloud!.user?.alias ?? 'Entrar en línea',
                     tooltip: widget.cloud!.signedIn ? 'Tu cuenta' : 'Para clases y comunidad; no es obligatorio',
                     onTap: widget.onAccount,
                   ),
-                if (widget.onChangeName case final changeName?)
-                  _SidebarRow(
-                    icon: Icons.badge_outlined,
-                    label: widget.exercises.studentName ?? 'Escribe tu nombre',
-                    tooltip: 'Aparece al mostrar un ejercicio al profesor',
-                    onTap: changeName,
-                  ),
-                _SidebarRow(
-                  icon: Icons.swap_horiz,
-                  label: widget.teacher ? 'Profesor · cambiar' : 'Alumno · cambiar',
-                  tooltip: 'Cambiar cómo usas Jaguar: alumno, por tu cuenta o profesor',
-                  onTap: widget.onChangeProfile,
-                ),
-                if (widget.onOpenTeacher case final openTeacher?)
-                  _SidebarRow(
-                    icon: Icons.school_outlined,
-                    label: 'Mis ejercicios',
-                    tooltip: 'Ejercicios con pruebas que se generan solas',
-                    onTap: openTeacher,
-                  ),
+                ],
+                const Divider(height: 9),
+                _SidebarRow(icon: Icons.settings_outlined, label: 'Ajustes', onTap: widget.onSettings),
                 const SizedBox(height: 6),
               ],
             );
