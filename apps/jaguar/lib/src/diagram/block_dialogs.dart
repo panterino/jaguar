@@ -3,7 +3,7 @@ import 'package:jaguar_core/jaguar_core.dart';
 
 import '../theme.dart';
 
-/// The objects of the palette: DFD's, plus Repetir and Según from PSeInt.
+/// The objects of the palette.
 enum BlockKind {
   asignacion('Asignación', BlockShape.process, 'Guarda un valor en una variable'),
   lectura('Lectura', BlockShape.input, 'Pide datos al usuario (Leer)'),
@@ -21,18 +21,21 @@ enum BlockKind {
   final BlockShape shape;
   final String description;
 
-  /// DFD has these; Repetir and Según come from PSeInt.
+  /// The basic objects of a flowchart; Repetir and Según are extra.
   bool get inDfd => this != repetir && this != segun;
 }
 
 /// One field of a block's dialog.
 class BlockField {
-  BlockField(this.label, {String initial = '', this.hint, this.help})
+  BlockField(this.label, {String initial = '', this.hint, this.help, this.examples = const []})
     : controller = TextEditingController(text: initial);
 
   final String label;
   final String? hint;
   final String? help;
+
+  /// Whole answers to try: tapping one fills the field.
+  final List<String> examples;
   final TextEditingController controller;
 
   String get value => controller.text.trim();
@@ -65,10 +68,9 @@ List<BlockField> fieldsFor(BlockKind kind, {Stmt? stmt, Notation notation = Nota
       BlockField(
         'Qué mostrar',
         initial: stmt is WriteStmt ? list(stmt.values) : '',
-        hint: notation == Notation.dfd ? "'Total: ', total" : '"Total: ", total',
-        help: notation == Notation.dfd
-            ? "Textos entre comillas simples; separa con comas: 'Total: ', total"
-            : 'Textos entre comillas; separa con comas: "Total: ", total',
+        hint: '"Hola " + nombre',
+        help: 'Escribe textos entre comillas y valores de variables. Únelos con + o con comas.',
+        examples: const ['"Hola " + nombre', '"Total: ", total'],
       ),
     ],
     BlockKind.decision => [
@@ -178,7 +180,9 @@ class _BlockDialogState extends State<_BlockDialog> {
   void _save() {
     final empty = widget.fields.where((f) => f.value.isEmpty && f.label != 'Argumentos' && f.label != 'Incremento');
     if (empty.isNotEmpty) {
-      setState(() => _error = 'Falta llenar: ${empty.first.label}.');
+      setState(
+        () => _error = widget.kind == BlockKind.salida ? 'Falta lo que quieres mostrar.' : 'Falta llenar: ${empty.first.label}.',
+      );
       return;
     }
     final error = widget.onSave(blockText(widget.kind, widget.fields, isNew: widget.isNew));
@@ -239,6 +243,19 @@ class _BlockDialogState extends State<_BlockDialog> {
                 ),
                 onSubmitted: (_) => _save(),
               ),
+              if (field.examples.isNotEmpty)
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    for (final example in field.examples)
+                      ActionChip(
+                        label: Text(example, style: monoStyle.copyWith(letterSpacing: 0, fontSize: 12)),
+                        onPressed: () => field.controller
+                          ..text = example
+                          ..selection = TextSelection.collapsed(offset: example.length),
+                      ),
+                  ],
+                ),
               const SizedBox(height: 10),
             ],
             if (_error != null)
