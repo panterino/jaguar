@@ -18,7 +18,7 @@ val keyProperties = Properties().apply {
 }
 
 android {
-    namespace = "com.panterino.jaguar"
+    namespace = "io.github.panterino.jaguar"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -29,7 +29,7 @@ android {
 
 
     defaultConfig {
-        applicationId = "com.panterino.jaguar"
+        applicationId = "io.github.panterino.jaguar"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
