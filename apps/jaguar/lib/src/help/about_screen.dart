@@ -38,8 +38,8 @@ class AboutScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               Text(
-                'Jaguar es un lugar para aprender lógica de programación: diagramas de flujo como en DFD, '
-                'pseudocódigo como en PSeInt, ejercicios que se revisan solos y una comunidad para compartir. '
+                'Jaguar es un lugar para aprender lógica de programación: escribes pseudocódigo o dibujas diagramas de flujo, '
+                'resuelves ejercicios que se revisan solos y compartes con una comunidad. '
                 'Funciona en la computadora del laboratorio, en el navegador y en el celular, sin internet y sin cuenta.',
                 style: theme.textTheme.bodyLarge,
               ),
@@ -66,9 +66,10 @@ class AboutScreen extends StatelessWidget {
                 year: '2026',
                 title: 'Jaguar regresa',
                 text:
-                    'Con lo aprendido en estos años, Jaguar vuelve para cumplir lo que prometió: herramientas que '
-                    'las escuelas ya usan (PSeInt y DFD) en una sola app, que funciona en cualquier equipo y que '
-                    'une a estudiantes, profesores y gente que aprende por su cuenta.',
+                    'Con lo aprendido en estos años, Jaguar vuelve para cumplir lo que prometió: aprender lógica '
+                    'con diagramas y pseudocódigo en una sola app, que funciona en cualquier equipo y que '
+                    'une a estudiantes, profesores y gente que aprende por su cuenta. Abre también los archivos '
+                    '.psc de otros programas de pseudocódigo.',
                 last: true,
               ),
               const SizedBox(height: 20),
@@ -99,8 +100,8 @@ class AboutScreen extends StatelessWidget {
                   padding: EdgeInsets.all(16),
                   child: Text(
                     'Gracias a los compañeros de la prepa que creyeron en la idea desde 2019, a los profesores '
-                    'que enseñan lógica con lo que tienen a la mano y a quienes crearon PSeInt y DFD, que '
-                    'abrieron el camino.',
+                    'que enseñan lógica con lo que tienen a la mano y a todas las personas que han hecho '
+                    'herramientas para aprender a programar.',
                   ),
                 ),
               ),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
+import 'package:flutter/services.dart';
 import 'package:jaguar_core/jaguar_core.dart';
 
 import '../theme.dart';
@@ -19,6 +21,7 @@ class TestsPanel extends StatelessWidget {
     required this.onShowTeacher,
     this.challenge = false,
     this.onNextChallenge,
+    this.onAllChallenges,
   });
 
   final Exercise exercise;
@@ -42,6 +45,9 @@ class TestsPanel extends StatelessWidget {
   /// Opens the next reto; null on the last one.
   final VoidCallback? onNextChallenge;
 
+  /// Opens the list of challenges, after the last one.
+  final VoidCallback? onAllChallenges;
+
   @override
   Widget build(BuildContext context) {
     final result = this.result;
@@ -54,7 +60,12 @@ class TestsPanel extends StatelessWidget {
         _Summary(result: result, total: tests.length, running: running, stale: stale, onRunTests: onRunTests),
         const SizedBox(height: 12),
         if (result != null && result.passed && !stale) ...[
-          _AllPassed(onShowTeacher: onShowTeacher, challenge: challenge, onNextChallenge: onNextChallenge),
+          _AllPassed(
+            onShowTeacher: onShowTeacher,
+            challenge: challenge,
+            onNextChallenge: onNextChallenge,
+            onAllChallenges: onAllChallenges,
+          ),
           const SizedBox(height: 12),
         ],
         if (syntaxError != null) ...[
@@ -71,6 +82,7 @@ class TestsPanel extends StatelessWidget {
             hiddenNumber: tests.take(i + 1).where((t) => t.hidden).length,
             test: tests[i],
             result: result == null || syntaxError != null ? null : result.cases[i],
+            stale: stale,
             onGoToLine: onGoToLine,
             onReplay: () => onReplay(tests[i]),
             challenge: challenge,
@@ -110,10 +122,13 @@ class _Summary extends StatelessWidget {
     final scheme = theme.colorScheme;
     final result = this.result;
     final (text, detail) = switch (result) {
-      null => ('$total ${total == 1 ? 'prueba' : 'pruebas'}', 'Presiona Probar para ver si tu programa las pasa.'),
+      null => ('$total ${total == 1 ? 'prueba' : 'pruebas'}', 'Aún no has probado. Toca Probar para ver si tu programa las pasa.'),
       CheckResult(syntaxError: _?) => ('Tu programa tiene un error', null),
       CheckResult(passed: true) => ('¡Pasa todas las pruebas!', null),
-      _ => ('${result.passedCount} de $total pruebas correctas', null),
+      _ => (
+        '${result.passedCount} de $total pruebas correctas',
+        result.passedCount > 0 ? 'Casi: revisa la prueba ${result.cases.indexWhere((c) => !c.passed) + 1}.' : null,
+      ),
     };
 
     return Row(
@@ -122,11 +137,24 @@ class _Summary extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(text, style: theme.textTheme.titleMedium),
+              Text(
+                text,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: stale && result != null ? scheme.onSurfaceVariant : null,
+                ),
+              ),
               if (stale && result != null)
-                Text(
-                  'Cambiaste el código: vuelve a probar.',
-                  style: theme.textTheme.bodySmall?.copyWith(color: scheme.tertiary),
+                Row(
+                  children: [
+                    Icon(Icons.history, size: 14, color: scheme.onSurfaceVariant),
+                    const SizedBox(width: 4),
+                    Flexible(
+                      child: Text(
+                        'Desactualizado: cambiaste el código desde la última prueba.',
+                        style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                      ),
+                    ),
+                  ],
                 )
               else if (detail != null)
                 Text(detail, style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
@@ -146,52 +174,143 @@ class _Summary extends StatelessWidget {
   }
 }
 
-class _AllPassed extends StatelessWidget {
-  const _AllPassed({required this.onShowTeacher, required this.challenge, required this.onNextChallenge});
+/// The green card when everything passes: it grows in, the seal pops and a
+/// ring spreads out. With animations off in the system it just fades.
+class _AllPassed extends StatefulWidget {
+  const _AllPassed({
+    required this.onShowTeacher,
+    required this.challenge,
+    required this.onNextChallenge,
+    required this.onAllChallenges,
+  });
 
   final VoidCallback onShowTeacher;
   final bool challenge;
   final VoidCallback? onNextChallenge;
+  final VoidCallback? onAllChallenges;
+
+  @override
+  State<_AllPassed> createState() => _AllPassedState();
+}
+
+class _AllPassedState extends State<_AllPassed> {
+  String get _message => widget.challenge
+      ? (widget.onNextChallenge == null ? '¡Terminaste el nivel 1!' : '¡Reto superado!')
+      : '¡Todo correcto! Ya puedes mostrárselo al profesor.';
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      SemanticsService.announce(_message, TextDirection.ltr);
+      if (!MediaQuery.disableAnimationsOf(context)) HapticFeedback.lightImpact();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final green = Colors.green.shade700;
-    return Card(
-      margin: EdgeInsets.zero,
-      color: green.withValues(alpha: 0.12),
-      elevation: 0,
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Row(
-          children: [
-            Icon(Icons.verified, color: green, size: 32),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                challenge
-                    ? (onNextChallenge == null ? '¡Reto superado! Terminaste el nivel 1.' : '¡Reto superado!')
-                    : '¡Todo correcto! Ya puedes mostrárselo al profesor.',
-                style: TextStyle(color: green, fontWeight: FontWeight.w600),
+    final brightness = Theme.of(context).brightness;
+    final green = brightness == Brightness.dark ? Colors.green.shade300 : Colors.green.shade700;
+    final still = MediaQuery.disableAnimationsOf(context);
+    final next = widget.onNextChallenge;
+    final all = widget.onAllChallenges;
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: motion(context, const Duration(milliseconds: 350)),
+      curve: Curves.easeOutCubic,
+      builder: (context, t, child) => Opacity(
+        opacity: t,
+        child: Align(alignment: Alignment.topCenter, heightFactor: still ? 1 : t, child: child),
+      ),
+      child: Card(
+        margin: EdgeInsets.zero,
+        color: green.withValues(alpha: 0.12),
+        elevation: 0,
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  _Seal(color: green, animate: !still),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(_message, style: TextStyle(color: green, fontWeight: FontWeight.w600)),
+                  ),
+                  if (!widget.challenge) ...[
+                    const SizedBox(width: 8),
+                    FilledButton.icon(
+                      onPressed: widget.onShowTeacher,
+                      icon: const Icon(Icons.school_outlined, size: 18),
+                      label: const Text('Mostrar al profesor'),
+                      style: FilledButton.styleFrom(backgroundColor: green, foregroundColor: Colors.white),
+                    ),
+                  ],
+                ],
               ),
-            ),
-            const SizedBox(width: 8),
-            if (!challenge)
-              FilledButton.icon(
-                onPressed: onShowTeacher,
-                icon: const Icon(Icons.school_outlined, size: 18),
-                label: const Text('Mostrar al profesor'),
-                style: FilledButton.styleFrom(backgroundColor: green, foregroundColor: Colors.white),
-              )
-            else if (onNextChallenge case final next?)
-              FilledButton.icon(
-                onPressed: next,
-                icon: const Icon(Icons.arrow_forward, size: 18),
-                label: const Text('Siguiente reto'),
-                style: FilledButton.styleFrom(backgroundColor: green, foregroundColor: Colors.white),
-              ),
-          ],
+              if (widget.challenge && next != null) ...[
+                const SizedBox(height: 12),
+                FilledButton.icon(
+                  onPressed: next,
+                  icon: const Icon(Icons.arrow_forward, size: 20),
+                  label: const Text('Siguiente reto'),
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size.fromHeight(56),
+                    backgroundColor: green,
+                    foregroundColor: brightness == Brightness.dark ? Colors.black : Colors.white,
+                  ),
+                ),
+              ] else if (widget.challenge && all != null) ...[
+                const SizedBox(height: 12),
+                OutlinedButton(onPressed: all, child: const Text('Ver todos los retos')),
+              ],
+            ],
+          ),
         ),
       ),
+    );
+  }
+}
+
+/// The verified seal: pops from small and a ring spreads out behind it.
+class _Seal extends StatelessWidget {
+  const _Seal({required this.color, required this.animate});
+
+  final Color color;
+  final bool animate;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!animate) return Icon(Icons.verified, color: color, size: 32);
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.elasticOut,
+      builder: (context, t, _) {
+        final ring = (t).clamp(0.0, 1.0);
+        return SizedBox.square(
+          dimension: 32,
+          child: Stack(
+            alignment: Alignment.center,
+            clipBehavior: Clip.none,
+            children: [
+              Transform.scale(
+                scale: 1 + ring,
+                child: Opacity(
+                  opacity: (0.35 * (1 - ring)).clamp(0.0, 1.0),
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: color, width: 2)),
+                    child: const SizedBox.square(dimension: 28),
+                  ),
+                ),
+              ),
+              Transform.scale(scale: 0.4 + 0.6 * t, child: Icon(Icons.verified, color: color, size: 32)),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -202,12 +321,16 @@ class _TestTile extends StatelessWidget {
     required this.hiddenNumber,
     required this.test,
     required this.result,
+    required this.stale,
     required this.onGoToLine,
     required this.onReplay,
     required this.challenge,
   });
 
   final bool challenge;
+
+  /// The code changed after this result: shown in grey, never as a failure.
+  final bool stale;
   final int number;
   final int hiddenNumber;
   final TestCase test;
@@ -220,10 +343,14 @@ class _TestTile extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final result = this.result;
-    final failed = result != null && !result.passed;
+    final failed = result != null && !result.passed && !stale;
     final name = test.hidden ? 'Prueba oculta $hiddenNumber' : (test.name.isNotEmpty ? test.name : 'Prueba $number');
     final (icon, color) = switch (result) {
       null => (Icons.radio_button_unchecked, scheme.onSurfaceVariant),
+      _ when stale => (
+        result.passed ? Icons.check_circle_outline : Icons.cancel_outlined,
+        scheme.onSurfaceVariant.withValues(alpha: 0.6),
+      ),
       CaseResult(passed: true) => (Icons.check_circle, Colors.green.shade600),
       _ => (Icons.cancel, scheme.error),
     };

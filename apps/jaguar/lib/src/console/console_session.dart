@@ -32,6 +32,9 @@ class ConsoleSession extends ChangeNotifier implements JaguarIO {
 
   final List<ConsoleSegment> segments = [];
   RunState state = RunState.idle;
+
+  /// How many runs have started: tells one run's end from the next.
+  int runCount = 0;
   JaguarError? error;
 
   Interpreter? _interpreter;
@@ -92,6 +95,7 @@ class ConsoleSession extends ChangeNotifier implements JaguarIO {
       ..clear()
       ..addAll(inputs);
     segments.clear();
+    runCount++;
     error = null;
     _outputChars = 0;
     _truncated = false;

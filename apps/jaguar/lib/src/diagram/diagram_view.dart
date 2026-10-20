@@ -26,9 +26,9 @@ class DiagramView extends StatefulWidget {
     required this.onTapLine,
     this.executingLine,
     this.notation = Notation.pseint,
-    this.onNotationChanged,
     this.editing,
     this.onUndo,
+    this.intro,
   });
 
   final SyntaxController code;
@@ -37,13 +37,15 @@ class DiagramView extends StatefulWidget {
   /// Step by step: the block about to run lights up in yellow.
   final int? executingLine;
 
-  /// PSeInt or DFD notation inside the blocks.
+  /// How the blocks write expressions.
   final Notation notation;
-  final ValueChanged<Notation>? onNotationChanged;
 
   /// Null for a read-only diagram (while a program runs).
   final DiagramEditing? editing;
   final VoidCallback? onUndo;
+
+  /// A one-time line explaining that this is the same program, drawn.
+  final String? intro;
 
   @override
   State<DiagramView> createState() => _DiagramViewState();
@@ -418,6 +420,8 @@ class _DiagramViewState extends State<DiagramView> {
                                 'O toca el ＋ directamente para ver la lista.',
                     ),
                   ),
+                if (widget.intro != null && _tool == null && !emptyProgram && !(_error != null && _showError))
+                  Positioned(left: hintLeft, right: 12, top: hintTop, child: _Hint(text: widget.intro!)),
                 if (_error != null && _showError)
                   Positioned(
                     left: _editable ? hintLeft : 12,
@@ -573,27 +577,6 @@ class _DiagramViewState extends State<DiagramView> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (widget.onNotationChanged != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6),
-              child: SegmentedButton<Notation>(
-                segments: const [
-                  ButtonSegment(
-                    value: Notation.pseint,
-                    label: Text('PSeInt'),
-                    tooltip: 'x <- a + 1, "texto", Y, O, <>',
-                  ),
-                  ButtonSegment(value: Notation.dfd, label: Text('DFD'), tooltip: "x ← a + 1, 'texto', AND, OR, !="),
-                ],
-                selected: {widget.notation},
-                showSelectedIcon: false,
-                onSelectionChanged: (s) => widget.onNotationChanged!(s.single),
-                style: SegmentedButton.styleFrom(
-                  visualDensity: const VisualDensity(horizontal: -3, vertical: -3),
-                  textStyle: const TextStyle(fontSize: 12),
-                ),
-              ),
-            ),
           if (widget.onUndo != null)
             IconButton(tooltip: 'Deshacer', icon: const Icon(Icons.undo), onPressed: widget.onUndo),
           // On a touch screen the diagram zooms with two fingers.

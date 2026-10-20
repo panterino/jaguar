@@ -382,7 +382,7 @@ class CodeEditorState extends State<CodeEditor> {
         final lineHeight = textScaler.scale(fontSize) * _lineHeight;
         final cursorLine = widget.controller.cursorPosition.$1;
         final currentLine = widget.highlightCurrentLine && widget.focusNode.hasFocus ? cursorLine : null;
-        final diagnostic = widget.diagnostics?.error;
+        final diagnostic = widget.diagnostics?.shownError;
         final errorLine = widget.errorLine ?? diagnostic?.line;
         final longest = lines.fold('', (longest, line) => line.length > longest.length ? line : longest);
         // Measured in bold, the widest the line can be drawn: if the field

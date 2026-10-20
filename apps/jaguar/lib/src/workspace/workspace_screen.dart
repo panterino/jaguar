@@ -41,11 +41,15 @@ import '../share/scan_screen.dart';
 import '../share/share_dialog.dart';
 import '../theme.dart';
 import 'app_menus.dart';
+import 'intro_sheet.dart';
 import 'mode_widgets.dart';
 import 'desktop_chrome.dart';
 import 'programs_drawer.dart';
 import 'programs_sidebar.dart';
+import 'settings_screen.dart';
+import 'start_panel.dart';
 import 'split_view.dart';
+import 'tour.dart';
 
 /// Tablets in landscape show code and console side by side; phones switch
 /// between them with tabs.
@@ -81,6 +85,14 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
   final _session = ConsoleSession();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  /// The play button, for the first-launch balloons.
+  final _runKey = GlobalKey();
+  final _firstLineKey = GlobalKey();
+  final _testsTabKey = GlobalKey();
+
+  /// True while [_show] puts a program in the editor, which is not typing.
+  bool _loading = false;
+
   /// When Atrás was last pressed on the main screen: a second press soon
   /// after closes the app.
   DateTime? _lastBack;
@@ -94,6 +106,10 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
   CheckResult? _testResult;
   String? _testedSource;
 
+  /// Results by program, so they survive opening another program and coming
+  /// back (and, through [SavedProgram.testedSource], restarting the app).
+  final _results = <String, (CheckResult, String)>{};
+
   ProgramStore get _store => widget.store;
   ViewSettings get _settings => widget.settings;
 
@@ -101,15 +117,18 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
   void initState() {
     super.initState();
     _code.addListener(_scheduleSave);
+    _code.addListener(_onTyped);
     _session.addListener(_onSessionChanged);
     if (_settings.chosenMode == null) WidgetsBinding.instance.addPostFrameCallback((_) => _welcome());
     WidgetsBinding.instance.addPostFrameCallback((_) => _syncTeacher());
+    WidgetsBinding.instance.addPostFrameCallback((_) => _restoreTests(_store.current));
   }
 
   @override
   void dispose() {
     _saveNow();
     _saveTimer?.cancel();
+    _hintTimer?.cancel();
     // Before the controller it listens to; it is created here if the
     // diagram view never needed it.
     _diagnostics.dispose();
@@ -118,6 +137,50 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
     _undo.dispose();
     _session.dispose();
     super.dispose();
+  }
+
+  void _onTyped() {
+    if (!_loading) _tourAdvance(0);
+  }
+
+  // The first-launch balloons: write, run, tests. Each one goes away when
+  // the person does what it says.
+
+  bool get _tourActive =>
+      _settings.tourStep < 3 && !_store.isEmpty && _exercise?.id == challenges.first.id;
+
+  void _tourAdvance(int from) {
+    if (_settings.tourStep == from) _settings.tourStep = from + 1;
+  }
+
+  Widget? _tourBalloon() {
+    if (!_tourActive) return null;
+    void onSkip() => _settings.tourStep = 3;
+    return switch (_settings.tourStep) {
+      0 when _tab == 0 && _settings.editorView != EditorView.diagram => TourBalloon(
+        key: const ValueKey('tour-0'),
+        target: _firstLineKey,
+        arrow: TourArrow.up,
+        text: 'Escribe aquí tu programa. Cada instrucción va en su línea.',
+        onSkip: onSkip,
+        onGotIt: () => _tourAdvance(0),
+      ),
+      1 => TourBalloon(
+        key: const ValueKey('tour-1'),
+        target: _runKey,
+        arrow: TourArrow.up,
+        text: 'Toca Ejecutar, el triángulo de arriba, para correr tu programa.',
+        onSkip: onSkip,
+      ),
+      2 when _tab != 2 => TourBalloon(
+        key: const ValueKey('tour-2'),
+        target: _testsTabKey,
+        arrow: TourArrow.down,
+        text: 'Toca Pruebas para saber si está bien.',
+        onSkip: onSkip,
+      ),
+      _ => null,
+    };
   }
 
   void _scheduleSave() {
@@ -139,48 +202,43 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
     setState(() {});
   }
 
-  /// The first-launch question; [again] reopens it to change profile
-  /// (student, programmer, teacher) at any time.
+  /// The first-launch question; [again] reopens it to change how Jaguar is
+  /// used (from Ajustes) without opening anything.
   Future<void> _welcome({bool again = false}) async {
     final choice = await showWelcome(context, again: again);
     if (choice == null || !mounted) return;
     _settings.mode = choice == WelcomeChoice.learning ? AppMode.basic : AppMode.full;
-    // Schools teach flowcharts first, then pseudocode. On a phone the code
-    // stays and a hint shows where the diagram is.
-    if (choice == WelcomeChoice.learning && !again) {
-      final phone = MediaQuery.sizeOf(context).width < _wideLayoutWidth;
-      if (!phone) _settings.editorView = EditorView.diagram;
-      _firstSteps(phone: phone);
-    }
     _settings.teacher = choice == WelcomeChoice.teacher;
-    if (choice == WelcomeChoice.teacher) _openTeacher();
+    if (again) return;
+    // The blank program of a first launch is not wanted any more.
+    _saveNow();
+    _store.discardBlank();
+    final wide = MediaQuery.sizeOf(context).width >= _wideLayoutWidth;
+    _settings.editorView = wide ? EditorView.both : EditorView.code;
+    switch (choice) {
+      case WelcomeChoice.learning:
+        // The first challenge; its balloons start once the introduction closes.
+        _settings.tourStep = 3;
+        _openChallenge(challenges.first);
+        await _intro(beginner: true);
+        if (mounted) _settings.tourStep = 0;
+      case WelcomeChoice.programmer:
+        _settings.tourStep = 3;
+        _openSource(examples.first.$2);
+        await _intro(beginner: false);
+      case WelcomeChoice.teacher:
+        _settings.tourStep = 3;
+        if (_store.isEmpty) _show(_store.current);
+    }
   }
 
-  /// First launch: where the diagram is and where to start, at the top so
-  /// it does not cover the keyword bar.
-  void _firstSteps({required bool phone}) {
-    final messenger = ScaffoldMessenger.of(context);
-    messenger.showMaterialBanner(
-      MaterialBanner(
-        leading: const Icon(Icons.tips_and_updates_outlined),
-        content: Text(
-          phone
-              ? 'El botón de diagrama, arriba, cambia entre el código y el diagrama de flujo. '
-                    '¿No sabes por dónde empezar? Prueba el Reto 1.'
-              : '¿No sabes por dónde empezar? Prueba el Reto 1: viene con pistas.',
-        ),
-        actions: [
-          TextButton(onPressed: messenger.hideCurrentMaterialBanner, child: const Text('Entendido')),
-          FilledButton(
-            onPressed: () {
-              messenger.hideCurrentMaterialBanner();
-              _openChallenge(challenges.first);
-            },
-            child: const Text('Empezar el Reto 1'),
-          ),
-        ],
-      ),
-    );
+  /// The short introduction: the ideas for someone new, the map for someone
+  /// who already programs. Always available again from Ajustes and the start
+  /// panel.
+  Future<void> _intro({required bool beginner}) async {
+    if (!mounted) return;
+    final result = await showIntro(context, beginner: beginner);
+    if (result == IntroResult.openGuide && mounted) _showGuide();
   }
 
   static final _advancedCode = RegExp(r'^\s*(para|mientras|repetir|funcion|subproceso)\b', multiLine: true);
@@ -204,19 +262,42 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
   }
 
   void _showPanel(_Panel panel) => setState(() {
+    if (panel == _Panel.tests) _tourAdvance(2);
     _panel = panel;
     _tab = panel == _Panel.console ? 1 : 2;
   });
 
   void _show(SavedProgram program) {
     _session.stop();
-    _testResult = null;
-    _testedSource = null;
+    final known = _results[program.id];
+    _testResult = known?.$1;
+    _testedSource = known?.$2;
+    if (known == null) _restoreTests(program);
     _panel = _Panel.console;
     _editingId = program.id;
+    _loading = true;
     _code.value = TextEditingValue(text: program.source);
+    _loading = false;
     _undo.value = UndoHistoryValue.empty;
     setState(() => _tab = 0);
+  }
+
+  /// After a restart only the counts were saved: running the tests again on
+  /// the code that was tested gives the same result, so the Pruebas tab shows
+  /// it (in grey if the code changed since).
+  Future<void> _restoreTests(SavedProgram program) async {
+    final tested = program.testedSource;
+    final id = program.exerciseId;
+    if (tested == null || id == null) return;
+    final exercise = widget.exercises.byId(id);
+    if (exercise == null) return;
+    final result = await checkSolution(tested, exercise);
+    if (!mounted || _editingId != program.id) return;
+    _results[program.id] = (result, tested);
+    setState(() {
+      _testResult = result;
+      _testedSource = tested;
+    });
   }
 
   void _load(SavedProgram program) {
@@ -263,7 +344,8 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
     setState(() => _checking = true);
     final result = await checkSolution(source, exercise);
     if (!mounted) return;
-    _store.recordTests(programId, passed: result.passedCount, total: exercise.cases.length);
+    _store.recordTests(programId, passed: result.passedCount, total: exercise.cases.length, source: source);
+    _results[programId] = (result, source);
     if (result.passed && challengeById(exercise.id) != null && !_settings.doneChallenges.contains(exercise.id)) {
       _settings.markChallengeDone(exercise.id);
       _toast('¡Reto superado!');
@@ -428,6 +510,8 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
       return;
     }
     _saveNow();
+    // Running ends the write and run balloons, whichever was showing.
+    if (_settings.tourStep < 2) _settings.tourStep = 2;
     _showPanel(_Panel.console);
     _session.run(_code.text);
   }
@@ -462,7 +546,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
 
   /// The console, with the step-by-step controls and variables when in use.
   Widget _console() {
-    final console = ConsoleView(session: _session, onGoToLine: _goToLine, fontSize: _settings.fontSize);
+    final console = ConsoleView(session: _session, onGoToLine: _goToLine, fontSize: _settings.fontSize, settings: _settings);
     if (!_session.stepping) return console;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -949,11 +1033,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
         ),
         AppMenuItem('Retos para practicar…', icon: Icons.flag_outlined, onSelected: _openChallenges),
         AppMenuItem('Comunidad y ejemplos…', icon: Icons.public, onSelected: _openCommunity),
-        AppMenuItem(
-          'Cambiar cómo uso Jaguar (alumno, profesor…)',
-          icon: Icons.swap_horiz,
-          onSelected: () => _welcome(again: true),
-        ),
+        AppMenuItem('Ajustes…', icon: Icons.settings_outlined, onSelected: _openSettings),
         AppMenuItem(
           'Aviso de privacidad',
           icon: Icons.privacy_tip_outlined,
@@ -973,7 +1053,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: _settings,
+      listenable: Listenable.merge([_settings, _store]),
       builder: (context, _) {
         widget.cloud?.prefersTeacher = _settings.teacher;
         final desktop = useDesktopLayout(context);
@@ -1134,9 +1214,8 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
       onOpenClasses: _openClasses,
       onAccount: _account,
       onOpenTeacher: _settings.teacher ? _openTeacher : null,
-      onChangeName: _settings.teacher ? null : _changeName,
-      teacher: _settings.teacher,
-      onChangeProfile: () => _welcome(again: true),
+      onHome: _openHome,
+      onSettings: _openSettings,
     );
 
     return Scaffold(
@@ -1199,15 +1278,26 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
 
   /// Tapping a block selects its line. With the code beside it, the code
   /// gets the focus so the selection shows; otherwise nothing moves.
-  Widget _diagram() => DiagramView(
+  Timer? _hintTimer;
+
+  Widget _diagram() {
+    // The first time the diagram shows, a line says it is the same program.
+    final intro = !_settings.viewHintShown;
+    if (intro) {
+      _hintTimer ??= Timer(const Duration(seconds: 10), () => _settings.viewHintShown = true);
+    }
+    return _diagramView(intro: intro);
+  }
+
+  Widget _diagramView({required bool intro}) => DiagramView(
     code: _code,
+    intro: intro ? 'Es el mismo programa dibujado. Toca un bloque para ver su línea de código.' : null,
     executingLine: _executingLine,
-    notation: _settings.notation,
-    onNotationChanged: (notation) => _settings.notation = notation,
     // While a program runs the diagram shows where it goes; editing waits.
-    editing: _session.isRunning ? null : DiagramEditing(code: _code, notation: _settings.notation),
+    editing: _session.isRunning ? null : DiagramEditing(code: _code, notation: Notation.pseint),
     onUndo: _session.isRunning ? null : _undo.undo,
     onTapLine: (line) {
+      _settings.viewHintShown = true;
       _code.selectLine(line);
       if (_settings.editorView == EditorView.both && useDesktopLayout(context)) _codeFocus.requestFocus();
     },
@@ -1285,6 +1375,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
         final next? => () => _openChallenge(next),
         null => null,
       },
+      onAllChallenges: _openChallenges,
     ),
   );
 
@@ -1318,12 +1409,94 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
       );
   }
 
+  /// The title in the app bar: a challenge shows just "Reto 1", the full title
+  /// is in its statement.
+  String _barTitle() {
+    final exercise = _exercise;
+    if (exercise != null && challengeById(exercise.id) != null) return exercise.title.split(' · ').first;
+    return programName(_code.text);
+  }
+
+  void _openHome() {
+    Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (context) => Scaffold(
+          appBar: AppBar(title: const Text('Jaguar')),
+          body: _startPanel(afterAction: () => Navigator.pop(context)),
+        ),
+      ),
+    );
+  }
+
+  /// What the content area shows with no program open.
+  Widget _startPanel({VoidCallback? afterAction}) {
+    VoidCallback wrap(VoidCallback action) => () {
+      afterAction?.call();
+      action();
+    };
+    return StartPanel(
+      settings: _settings,
+      store: _store,
+      onNew: wrap(_newProgram),
+      onOpenFile: wrap(_openFile),
+      onOpenSource: (source) => wrap(() => _openSource(source))(),
+      onOpenLink: wrap(_openLink),
+      onOpenChallenges: wrap(_openChallenges),
+      onContinueChallenge: (challenge) => wrap(() => _openChallenge(challenge))(),
+      onSelect: (program) => wrap(() => _load(program))(),
+      onScan: canScanQr ? wrap(_scanQr) : null,
+      onOpenTeacher: _settings.teacher ? wrap(_openTeacher) : null,
+      onOpenGuide: wrap(_showGuide),
+    );
+  }
+
+  void _openSettings() {
+    Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (context) => SettingsScreen(
+          settings: _settings,
+          exercises: widget.exercises,
+          onChangeName: _changeName,
+          onWelcome: () => _welcome(again: true),
+          onIntro: () => _intro(beginner: _settings.isBasic),
+          onRepeatTour: () {
+            Navigator.pop(context);
+            _settings.tourStep = 0;
+            _openChallenge(challenges.first);
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _drawer() => ProgramsDrawer(
+    store: _store,
+    cloud: widget.cloud,
+    settings: _settings,
+    onOpenCommunity: _openCommunity,
+    onOpenChallenges: _openChallenges,
+    onOpenClasses: _openClasses,
+    onAccount: _account,
+    onGuide: _showGuide,
+    onAbout: _showAbout,
+    onHome: _openHome,
+    onSettings: _openSettings,
+    exercises: widget.exercises,
+    onSelect: _load,
+    onNew: _newProgram,
+    onScan: canScanQr && !_settings.isBasic ? _scanQr : null,
+    onOpenTeacher: _settings.teacher ? _openTeacher : null,
+  );
+
   Widget _buildTouch() {
     final width = MediaQuery.sizeOf(context).width;
     final wide = width >= _wideLayoutWidth;
     // On phones the program name needs the room: Ejecutar becomes an icon.
     final compact = width < 480;
     final scheme = Theme.of(context).colorScheme;
+    final empty = _store.isEmpty;
     // Two points smaller on phones, so most lines fit without scrolling.
     final fontSize = wide ? _settings.fontSize : _settings.fontSize - 2;
     final running = _session.isRunning;
@@ -1342,38 +1515,62 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
             onCheck: () => _check(exercise),
           );
 
+    final codePane = Column(
+      children: [
+        Expanded(
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              CodeEditor(
+                key: _editorKey,
+                diagnostics: _diagnostics,
+                controller: _code,
+                focusNode: _codeFocus,
+                undoController: _undo,
+                errorLine: errorLine,
+                executingLine: _executingLine,
+                onLargePaste: _onLargePaste,
+                fontSize: fontSize,
+                inlineErrors: wide,
+              ),
+              // Where the first balloon points: under the first lines.
+              Positioned(top: fontSize * 3, left: 16, child: SizedBox(key: _firstLineKey, width: 1, height: 1)),
+            ],
+          ),
+        ),
+        if (!wide) _ErrorStrip(diagnostics: _diagnostics, code: _code, onGoToLine: _goToLine),
+        KeywordBar(controller: _code, focusNode: _codeFocus),
+      ],
+    );
+    final view = _settings.editorView;
     final editor = Column(
       children: [
         if (banner != null && !wide) banner,
-        if (_settings.editorView == EditorView.diagram)
-          Expanded(child: _diagram())
-        else ...[
-          Expanded(
-            child: CodeEditor(
-              key: _editorKey,
-              diagnostics: _diagnostics,
-              controller: _code,
-              focusNode: _codeFocus,
-              undoController: _undo,
-              errorLine: errorLine,
-              executingLine: _executingLine,
-              onLargePaste: _onLargePaste,
-              fontSize: fontSize,
-              inlineErrors: wide,
+        _ViewStrip(settings: _settings, allowBoth: wide),
+        Expanded(
+          child: switch (view) {
+            EditorView.diagram => _diagram(),
+            EditorView.both when wide => SplitView(
+              axis: Axis.horizontal,
+              fraction: _diagramSplit,
+              onChanged: (fraction) => setState(() => _diagramSplit = fraction),
+              onReset: () => setState(() => _diagramSplit = 0.5),
+              minFirst: 240,
+              minSecond: 200,
+              first: codePane,
+              second: _diagram(),
             ),
-          ),
-          if (!wide) _ErrorStrip(diagnostics: _diagnostics, onGoToLine: _goToLine),
-          KeywordBar(controller: _code, focusNode: _codeFocus),
-        ],
+            _ => codePane,
+          },
+        ),
       ],
     );
     final console = _console();
     // Phones: Pruebas is a third tab at the bottom.
     final tab = exercise == null && _tab == 2 ? 1 : _tab;
 
-    final diagramView = _settings.editorView == EditorView.diagram;
-
-    return PopScope(
+    final balloon = _tourBalloon();
+    final scaffold = PopScope(
       // The browser keeps its own Atrás.
       canPop: kIsWeb,
       onPopInvokedWithResult: (didPop, _) {
@@ -1383,85 +1580,68 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
         key: _scaffoldKey,
         appBar: AppBar(
           titleSpacing: 0,
-          title: ListenableBuilder(
-            listenable: _code,
-            builder: (context, _) => Text(programName(_code.text), overflow: TextOverflow.ellipsis),
-          ),
-          actions: [
-            IconButton(tooltip: 'Compartir (QR o enlace)', icon: const Icon(Icons.qr_code_2), onPressed: _share),
-            // Phones switch between the code and its flowchart from here.
-            IconButton(
-              tooltip: _settings.editorView == EditorView.diagram ? 'Ver pseudocódigo' : 'Ver diagrama de flujo',
-              icon: Icon(_settings.editorView == EditorView.diagram ? Icons.code : Icons.account_tree_outlined),
-              onPressed: () => _settings.editorView = _settings.editorView == EditorView.diagram
-                  ? EditorView.code
-                  : EditorView.diagram,
-            ),
-            if (wide) ...[
-              IconButton(tooltip: 'Abrir .psc', icon: const Icon(Icons.folder_open), onPressed: _openFile),
-              IconButton(tooltip: 'Guardar .psc', icon: const Icon(Icons.save_alt), onPressed: _saveFile),
-            ],
-            _MoreMenu(
-              onNew: _newProgram,
-              onOpenFile: _openFile,
-              onSaveFile: _saveFile,
-              onSendFile: _sendFile,
-              onOpenLink: _openLink,
-              onScan: canScanQr ? _scanQr : null,
-              onDeskCheck: _deskCheck,
-              onPlan: _plan,
-            ),
-            if (compact)
-              Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: IconButton.filled(
-                  tooltip: running ? 'Detener' : 'Ejecutar',
-                  onPressed: _run,
-                  icon: Icon(running ? Icons.stop : Icons.play_arrow),
-                  // Explicit colors: the app bar tints its action icons.
-                  style: IconButton.styleFrom(
-                    backgroundColor: running ? scheme.error : scheme.primary,
-                    foregroundColor: running ? scheme.onError : scheme.onPrimary,
+          title: empty
+              ? const Text('Jaguar')
+              : ListenableBuilder(
+                  listenable: _code,
+                  builder: (context, _) => Text(_barTitle(), overflow: TextOverflow.ellipsis),
+                ),
+          // Three controls: the menu, play and the rest. What is used less
+          // lives under the three dots.
+          actions: empty
+              ? null
+              : [
+                  if (compact)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 4),
+                      child: IconButton.filled(
+                        key: _runKey,
+                        tooltip: running ? 'Detener' : 'Ejecutar',
+                        onPressed: _run,
+                        icon: Icon(running ? Icons.stop : Icons.play_arrow),
+                        // Explicit colors: the app bar tints its action icons.
+                        style: IconButton.styleFrom(
+                          backgroundColor: running ? scheme.error : scheme.primary,
+                          foregroundColor: running ? scheme.onError : scheme.onPrimary,
+                        ),
+                      ),
+                    )
+                  else
+                    Padding(
+                      padding: const EdgeInsets.only(right: 4, left: 4),
+                      child: FilledButton.icon(
+                        key: _runKey,
+                        onPressed: _run,
+                        icon: Icon(running ? Icons.stop : Icons.play_arrow),
+                        label: Text(running ? 'Detener' : 'Ejecutar'),
+                        style: running
+                            ? FilledButton.styleFrom(
+                                backgroundColor: Theme.of(context).colorScheme.error,
+                                foregroundColor: Theme.of(context).colorScheme.onError,
+                              )
+                            : null,
+                      ),
+                    ),
+                  _MoreMenu(
+                    full: !_settings.isBasic,
+                    hasExercise: exercise != null,
+                    onNew: _newProgram,
+                    onOpenFile: _openFile,
+                    onSaveFile: _saveFile,
+                    onSendFile: _sendFile,
+                    onShare: _share,
+                    onOpenLink: _openLink,
+                    onScan: canScanQr ? _scanQr : null,
+                    onDeskCheck: _deskCheck,
+                    onPlan: _plan,
+                    onGuide: _showGuide,
                   ),
-                ),
-              )
-            else
-              Padding(
-                padding: const EdgeInsets.only(right: 12, left: 4),
-                child: FilledButton.icon(
-                  onPressed: _run,
-                  icon: Icon(running ? Icons.stop : Icons.play_arrow),
-                  label: Text(running ? 'Detener' : 'Ejecutar'),
-                  style: running
-                      ? FilledButton.styleFrom(
-                          backgroundColor: Theme.of(context).colorScheme.error,
-                          foregroundColor: Theme.of(context).colorScheme.onError,
-                        )
-                      : null,
-                ),
-              ),
-          ],
+                ],
         ),
-        drawer: ProgramsDrawer(
-          store: _store,
-          cloud: widget.cloud,
-          onOpenCommunity: _openCommunity,
-          onOpenChallenges: _openChallenges,
-          onOpenClasses: _openClasses,
-          onAccount: _account,
-          onGuide: _showGuide,
-          onAbout: _showAbout,
-          modeSwitch: ModeSwitch(settings: _settings, dense: false),
-          exercises: widget.exercises,
-          onSelect: _load,
-          onNew: _newProgram,
-          onScan: canScanQr ? _scanQr : null,
-          onOpenTeacher: _settings.teacher ? _openTeacher : null,
-          onChangeName: _settings.teacher ? null : _changeName,
-          onToggleTeacher: () => _welcome(again: true),
-          teacher: _settings.teacher,
-        ),
-        body: wide
+        drawer: _drawer(),
+        body: empty
+            ? _startPanel()
+            : wide
             ? Row(
                 children: [
                   Expanded(flex: 3, child: editor),
@@ -1482,24 +1662,22 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                 index: tab,
                 children: [editor, console, if (exercise != null) _testsPanel(exercise) else const SizedBox.shrink()],
               ),
-        bottomNavigationBar: wide
-            ? (_session.stepping && running ? DebugBar(session: _session, onRunToCursor: _runToCursor) : null)
+        bottomNavigationBar: empty || wide
+            ? (!empty && _session.stepping && running ? DebugBar(session: _session, onRunToCursor: _runToCursor) : null)
             : Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (_session.stepping && running) DebugBar(session: _session, onRunToCursor: _runToCursor),
                   NavigationBar(
-                    height: 60,
                     selectedIndex: tab,
+                    labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
                     onDestinationSelected: (tab) => setState(() {
+                      if (tab == 2) _tourAdvance(2);
                       _tab = tab;
                       if (tab > 0) _panel = tab == 1 ? _Panel.console : _Panel.tests;
                     }),
                     destinations: [
-                      NavigationDestination(
-                        icon: Icon(diagramView ? Icons.account_tree_outlined : Icons.code),
-                        label: diagramView ? 'Diagrama' : 'Código',
-                      ),
+                      const NavigationDestination(icon: Icon(Icons.code), label: 'Programa'),
                       NavigationDestination(
                         icon: Badge(
                           isLabelVisible: _session.state == RunState.waitingInput || _session.state == RunState.failed,
@@ -1510,10 +1688,10 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                       if (exercise != null)
                         NavigationDestination(
                           icon: Badge(
-                            isLabelVisible: _testResult != null,
-                            label: Text('${_testResult?.passedCount ?? 0}/${exercise.cases.length}'),
-                            backgroundColor: _testResult?.passed == true ? Colors.green.shade700 : null,
-                            child: const Icon(Icons.fact_check_outlined),
+                            isLabelVisible: true,
+                            label: Text(_testsBadgeText(exercise)),
+                            backgroundColor: _testsBadgeColor(),
+                            child: Icon(Icons.fact_check_outlined, key: _testsTabKey),
                           ),
                           label: 'Pruebas',
                         ),
@@ -1523,22 +1701,40 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
               ),
       ),
     );
+    if (balloon == null) return scaffold;
+    return Stack(children: [scaffold, Positioned.fill(child: balloon)]);
+  }
+
+  /// "3" before the first Probar, "2/3" after. Never a failure before trying.
+  String _testsBadgeText(Exercise exercise) {
+    final result = _testResult;
+    return result == null ? '${exercise.cases.length}' : '${result.passedCount}/${exercise.cases.length}';
+  }
+
+  /// Green when everything passed, amber for part, red when none did, and
+  /// grey when there is nothing to judge or the code changed since.
+  Color? _testsBadgeColor() {
+    final result = _testResult;
+    if (result == null || _testsStale) return Theme.of(context).colorScheme.outline;
+    if (result.passed) return Colors.green.shade700;
+    return result.passedCount == 0 ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.tertiary;
   }
 }
 
 /// Phones: the error under the code, whole, instead of at the end of a line
 /// that does not fit on the screen.
 class _ErrorStrip extends StatelessWidget {
-  const _ErrorStrip({required this.diagnostics, required this.onGoToLine});
+  const _ErrorStrip({required this.diagnostics, required this.code, required this.onGoToLine});
 
   final Diagnostics diagnostics;
+  final SyntaxController code;
   final ValueChanged<int> onGoToLine;
 
   @override
   Widget build(BuildContext context) => ListenableBuilder(
     listenable: diagnostics,
     builder: (context, _) {
-      final error = diagnostics.error;
+      final error = diagnostics.shownError;
       if (error == null) return const SizedBox.shrink();
       final scheme = Theme.of(context).colorScheme;
       return Material(
@@ -1629,14 +1825,22 @@ class _EditorTab extends StatelessWidget {
   }
 }
 
-/// `Pseudocódigo | Diagrama | Ambos`, in the toolbar.
+/// `Código | Diagrama | Ambos`: the same program written or drawn.
 class _EditorViewSwitch extends StatelessWidget {
-  const _EditorViewSwitch({required this.settings, required this.allowBoth});
+  const _EditorViewSwitch({required this.settings, required this.allowBoth, this.expanded = false});
 
   final ViewSettings settings;
   final bool allowBoth;
 
-  static const _labels = {EditorView.code: 'Pseudocódigo', EditorView.diagram: 'Diagrama', EditorView.both: 'Ambos'};
+  /// Fills the width with larger text (phones) instead of the toolbar's size.
+  final bool expanded;
+
+  static const _labels = {EditorView.code: 'Código', EditorView.diagram: 'Diagrama', EditorView.both: 'Ambos'};
+  static const _tips = {
+    EditorView.code: 'Tu programa escrito paso a paso',
+    EditorView.diagram: 'Tu programa dibujado como diagrama de flujo',
+    EditorView.both: 'El código y el diagrama lado a lado',
+  };
   static const _icons = {
     EditorView.code: Icons.code,
     EditorView.diagram: Icons.account_tree_outlined,
@@ -1646,23 +1850,33 @@ class _EditorViewSwitch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final view = !allowBoth && settings.editorView == EditorView.both ? EditorView.code : settings.editorView;
-    return SegmentedButton<EditorView>(
-      segments: [
-        for (final option in [EditorView.code, EditorView.diagram, if (allowBoth) EditorView.both])
-          ButtonSegment(
-            value: option,
-            icon: Icon(_icons[option], size: 16),
-            // Icons only, in the toolbar; the names are in the tooltips.
-            tooltip: _labels[option],
-          ),
-      ],
-      selected: {view},
-      showSelectedIcon: false,
-      onSelectionChanged: (selection) => settings.editorView = selection.single,
-      style: SegmentedButton.styleFrom(
-        visualDensity: const VisualDensity(horizontal: -3, vertical: -4),
-        textStyle: const TextStyle(fontSize: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 8),
+    return Semantics(
+      label: 'Vista del programa',
+      child: SegmentedButton<EditorView>(
+        segments: [
+          for (final option in [EditorView.code, EditorView.diagram, if (allowBoth) EditorView.both])
+            ButtonSegment(
+              value: option,
+              icon: Icon(_icons[option], size: expanded ? 18 : 16),
+              label: Text(_labels[option]!),
+              tooltip: _tips[option],
+            ),
+        ],
+        selected: {view},
+        showSelectedIcon: false,
+        onSelectionChanged: (selection) => settings.editorView = selection.single,
+        style: expanded
+            // Snug in its bar: no extra tap-target padding under the buttons.
+            ? SegmentedButton.styleFrom(
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                minimumSize: const Size(0, 36),
+                visualDensity: VisualDensity.standard,
+              )
+            : SegmentedButton.styleFrom(
+                visualDensity: const VisualDensity(horizontal: -3, vertical: -4),
+                textStyle: const TextStyle(fontSize: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+              ),
       ),
     );
   }
@@ -1721,24 +1935,69 @@ class _GoToLineDialogState extends State<_GoToLineDialog> {
   }
 }
 
+/// `Código | Diagrama`: one clear switch, with words, under the app bar. It
+/// folds away while typing so the code gets the room.
+class _ViewStrip extends StatelessWidget {
+  const _ViewStrip({required this.settings, required this.allowBoth});
+
+  final ViewSettings settings;
+  final bool allowBoth;
+
+  @override
+  Widget build(BuildContext context) {
+    final typing = MediaQuery.viewInsetsOf(context).bottom > 0;
+    return AnimatedSize(
+      duration: motion(context, const Duration(milliseconds: 200)),
+      alignment: Alignment.topCenter,
+      child: typing
+          ? const SizedBox(width: double.infinity)
+          : DecoratedBox(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerLow,
+                border: Border(bottom: BorderSide(color: Theme.of(context).colorScheme.outlineVariant)),
+              ),
+              child: SizedBox(
+                height: 48,
+                width: double.infinity,
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: _EditorViewSwitch(settings: settings, allowBoth: allowBoth, expanded: true),
+                  ),
+                ),
+              ),
+            ),
+    );
+  }
+}
+
 class _MoreMenu extends StatelessWidget {
   const _MoreMenu({
+    required this.full,
+    required this.hasExercise,
     required this.onNew,
     required this.onOpenFile,
     required this.onSaveFile,
     required this.onSendFile,
+    required this.onShare,
     required this.onOpenLink,
     this.onScan,
     required this.onDeskCheck,
     required this.onPlan,
+    required this.onGuide,
   });
 
+  /// Completo adds New, Open link and Scan.
+  final bool full;
+  final bool hasExercise;
   final VoidCallback onNew;
   final VoidCallback onOpenFile;
   final VoidCallback onSaveFile;
   final VoidCallback onSendFile;
+  final VoidCallback onShare;
   final VoidCallback onDeskCheck;
   final VoidCallback onPlan;
+  final VoidCallback onGuide;
   final VoidCallback onOpenLink;
   final VoidCallback? onScan;
 
@@ -1751,36 +2010,54 @@ class _MoreMenu extends StatelessWidget {
         onPressed: () => controller.isOpen ? controller.close() : controller.open(),
       ),
       menuChildren: [
-        if (onScan != null)
+        MenuItemButton(
+          leadingIcon: const Icon(Icons.menu_book_outlined),
+          onPressed: onGuide,
+          child: const Text('Guía: cómo funciona todo'),
+        ),
+        if (hasExercise)
           MenuItemButton(
-            leadingIcon: const Icon(Icons.qr_code_scanner),
-            onPressed: onScan,
-            child: const Text('Escanear QR del ejercicio'),
+            leadingIcon: const Icon(Icons.edit_note),
+            onPressed: onPlan,
+            child: const Text('Planteamiento'),
           ),
-        MenuItemButton(leadingIcon: const Icon(Icons.edit_note), onPressed: onPlan, child: const Text('Planteamiento')),
         MenuItemButton(
           leadingIcon: const Icon(Icons.table_chart_outlined),
           onPressed: onDeskCheck,
           child: const Text('Prueba de escritorio'),
         ),
         const Divider(height: 1),
-        MenuItemButton(leadingIcon: const Icon(Icons.add), onPressed: onNew, child: const Text('Nuevo programa')),
+        if (full)
+          MenuItemButton(leadingIcon: const Icon(Icons.add), onPressed: onNew, child: const Text('Nuevo programa')),
         MenuItemButton(
           leadingIcon: const Icon(Icons.folder_open),
           onPressed: onOpenFile,
-          child: const Text('Abrir archivo .psc'),
+          child: const Text('Abrir archivo (.psc)'),
         ),
         MenuItemButton(
           leadingIcon: const Icon(Icons.save_alt),
           onPressed: onSaveFile,
-          child: const Text('Guardar como .psc'),
+          child: const Text('Guardar como archivo (.psc)'),
+        ),
+        MenuItemButton(
+          leadingIcon: const Icon(Icons.qr_code_2),
+          onPressed: onShare,
+          child: const Text('Compartir (QR o enlace)'),
         ),
         MenuItemButton(
           leadingIcon: const Icon(Icons.send_outlined),
           onPressed: onSendFile,
-          child: const Text('Enviar .psc (WhatsApp, correo…)'),
+          child: const Text('Enviar archivo (WhatsApp, correo…)'),
         ),
-        MenuItemButton(leadingIcon: const Icon(Icons.link), onPressed: onOpenLink, child: const Text('Abrir enlace')),
+        if (full) ...[
+          MenuItemButton(leadingIcon: const Icon(Icons.link), onPressed: onOpenLink, child: const Text('Abrir enlace')),
+          if (onScan != null)
+            MenuItemButton(
+              leadingIcon: const Icon(Icons.qr_code_scanner),
+              onPressed: onScan,
+              child: const Text('Escanear QR del ejercicio'),
+            ),
+        ],
       ],
     );
   }

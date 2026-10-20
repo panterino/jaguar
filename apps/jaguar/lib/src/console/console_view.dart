@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:jaguar_core/jaguar_core.dart';
 
 import '../settings.dart';
@@ -6,9 +9,12 @@ import '../theme.dart';
 import 'console_session.dart';
 
 class ConsoleView extends StatefulWidget {
-  const ConsoleView({super.key, required this.session, required this.onGoToLine, this.fontSize = 14});
+  const ConsoleView({super.key, required this.session, required this.onGoToLine, this.fontSize = 14, this.settings});
 
   final ConsoleSession session;
+
+  /// Remembers that the first program that ran got its celebration.
+  final ViewSettings? settings;
   final ValueChanged<int> onGoToLine;
   final double fontSize;
 
@@ -81,6 +87,7 @@ class _ConsoleViewState extends State<ConsoleView> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
+                          if (session.state == RunState.finished) _FinishedNotice(key: ValueKey(session.runCount), session: session, settings: widget.settings),
                           SelectableText.rich(
                             TextSpan(
                               style: mono,
@@ -291,11 +298,124 @@ class _EmptyConsole extends StatelessWidget {
             Text('Aquí verás lo que hace tu programa', style: theme.textTheme.titleMedium, textAlign: TextAlign.center),
             const SizedBox(height: 4),
             Text(
-              'Presiona Ejecutar (${shortcutLabel('Enter')})',
+              MediaQuery.sizeOf(context).width < 600
+                  ? 'Toca Ejecutar, el triángulo de arriba, para correr tu programa'
+                  : 'Presiona Ejecutar (${shortcutLabel('Enter')})',
               style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
               textAlign: TextAlign.center,
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// After a run that ended well: the very first time, a celebration; when the
+/// program showed nothing, a hint about Escribir. Neutral, never an error.
+class _FinishedNotice extends StatefulWidget {
+  const _FinishedNotice({super.key, required this.session, required this.settings});
+
+  final ConsoleSession session;
+  final ViewSettings? settings;
+
+  @override
+  State<_FinishedNotice> createState() => _FinishedNoticeState();
+}
+
+class _FinishedNoticeState extends State<_FinishedNotice> {
+  bool _visible = true;
+  late final bool _celebrate;
+  late final bool _empty;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _empty = widget.session.segments.every((s) => s.kind == SegmentKind.info);
+    final settings = widget.settings;
+    _celebrate = !_empty && settings != null && !settings.firstRunDone;
+    if (_celebrate) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        settings!.firstRunDone = true;
+        SemanticsService.announce('¡Tu primer programa corrió!', TextDirection.ltr);
+      });
+      _timer = Timer(const Duration(seconds: 5), () {
+        if (mounted && !MediaQuery.disableAnimationsOf(context)) setState(() => _visible = false);
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_celebrate && !_empty) return const SizedBox.shrink();
+    final scheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final still = MediaQuery.disableAnimationsOf(context);
+    final card = Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      elevation: 0,
+      color: _celebrate ? scheme.primaryContainer : scheme.secondaryContainer,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            if (_celebrate)
+              TweenAnimationBuilder<double>(
+                tween: Tween(begin: still ? 1 : 0.8, end: 1),
+                duration: still ? Duration.zero : const Duration(milliseconds: 600),
+                curve: Curves.elasticOut,
+                builder: (context, scale, child) => Transform.scale(scale: scale, child: child),
+                child: Image.asset('assets/images/mascota.png', width: 40, height: 40),
+              )
+            else
+              Icon(Icons.info_outline, color: scheme.onSecondaryContainer),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _celebrate ? '¡Tu primer programa corrió!' : 'Tu programa terminó, pero no mostró nada.',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      color: _celebrate ? scheme.onPrimaryContainer : scheme.onSecondaryContainer,
+                    ),
+                  ),
+                  Text(
+                    _celebrate
+                        ? 'Eso que ves es lo que hizo tu código.'
+                        : 'Usa Escribir para ver resultados. Ejemplo: Escribir "Hola"',
+                    style: TextStyle(color: _celebrate ? scheme.onPrimaryContainer : scheme.onSecondaryContainer),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+    return Semantics(
+      liveRegion: true,
+      child: AnimatedSlide(
+        offset: _visible ? Offset.zero : const Offset(0, -0.3),
+        duration: motion(context, const Duration(milliseconds: 250)),
+        curve: Curves.easeIn,
+        child: AnimatedOpacity(
+          opacity: _visible ? 1 : 0,
+          duration: motion(context, const Duration(milliseconds: 250)),
+          child: TweenAnimationBuilder<double>(
+            tween: Tween(begin: still ? 0 : 1, end: 0),
+            duration: still ? Duration.zero : const Duration(milliseconds: 450),
+            curve: Curves.easeOutBack,
+            builder: (context, drop, child) => Transform.translate(offset: Offset(0, -24 * drop), child: child),
+            child: _visible ? card : IgnorePointer(child: card),
+          ),
         ),
       ),
     );
