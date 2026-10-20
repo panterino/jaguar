@@ -68,7 +68,7 @@ class SyntaxColors {
     builtin: Color(0xFF0060A0),
     string: Color(0xFF2E7D32),
     number: Color(0xFF9C27B0),
-    comment: Color(0xFF8A8A8A),
+    comment: Color(0xFF6E6E6E),
     operator: Color(0xFFB0006A),
     type: Color(0xFF00796B),
   );
@@ -78,10 +78,15 @@ class SyntaxColors {
     builtin: Color(0xFF6CC4FF),
     string: Color(0xFF9CD67E),
     number: Color(0xFFD7A6F5),
-    comment: Color(0xFF8C8C8C),
+    comment: Color(0xFF9A9A9A),
     operator: Color(0xFFFF8AB8),
     type: Color(0xFF6ED8C8),
   );
 
   static SyntaxColors of(BuildContext context) => Theme.of(context).brightness == Brightness.dark ? _dark : _light;
 }
+
+/// How long an animation lasts: [duration], or a short fade when the person
+/// turned animations off in the system settings.
+Duration motion(BuildContext context, Duration duration) =>
+    MediaQuery.disableAnimationsOf(context) ? const Duration(milliseconds: 150) : duration;

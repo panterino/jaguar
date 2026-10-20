@@ -27,6 +27,20 @@ Future<JaguarError> runError(String source, {List<String> inputs = const [], int
 String program(String body) => 'Algoritmo prueba\n$body\nFinAlgoritmo\n';
 
 void main() {
+  group('unir con +', () {
+    test('texto y variable', () async {
+      expect(await run('nombre <- "Ana"\nEscribir "Hola " + nombre'), 'Hola Ana\n');
+    });
+    test('texto y número', () async {
+      expect(await run('x <- 5\nEscribir "Total: " + x'), 'Total: 5\n');
+      expect(await run('Escribir 2.5 + " m"'), '2.5 m\n');
+    });
+    test('de izquierda a derecha', () async {
+      expect(await run('Escribir "a" + 1 + 2'), 'a12\n');
+      expect(await run('Escribir 1 + 2 + "a"'), '3a\n');
+    });
+  });
+
   group('Escribir', () {
     test('hola mundo', () async {
       expect(await run('Escribir "Hola mundo"'), 'Hola mundo\n');
@@ -393,9 +407,9 @@ void main() {
       expect(error.message, contains('todavía no tiene valor'));
     });
 
-    test('sumar texto y número sugiere usar comas', () async {
-      final error = await runError(program('x <- 5\nEscribir "Total: " + x'));
-      expect(error.hint, contains('comas'));
+    test('restar un texto sigue siendo un error', () async {
+      final error = await runError(program('Escribir "5" - 1'));
+      expect(error.message, contains('resta'));
     });
 
     test('división entre cero', () async {

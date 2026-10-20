@@ -17,6 +17,7 @@ class SavedProgram {
     this.exerciseId,
     this.testsPassed,
     this.testsTotal,
+    this.testedSource,
     this.pastedLines = 0,
   });
 
@@ -27,6 +28,7 @@ class SavedProgram {
     exerciseId: json['exerciseId'] as String?,
     testsPassed: (json['testsPassed'] as num?)?.toInt(),
     testsTotal: (json['testsTotal'] as num?)?.toInt(),
+    testedSource: json['testedSource'] as String?,
     pastedLines: (json['pastedLines'] as num?)?.toInt() ?? 0,
   );
 
@@ -41,6 +43,10 @@ class SavedProgram {
   int? testsPassed;
   int? testsTotal;
 
+  /// The code that last run through Probar, to tell whether the result still
+  /// applies after the code changed.
+  String? testedSource;
+
   /// The most lines that arrived at once while writing it (pasted). The
   /// teacher sees it next to the submission.
   int pastedLines;
@@ -52,7 +58,11 @@ class SavedProgram {
     'source': source,
     'updatedAt': updatedAt.toIso8601String(),
     if (exerciseId != null) 'exerciseId': exerciseId,
-    if (testsTotal != null) ...{'testsPassed': testsPassed, 'testsTotal': testsTotal},
+    if (testsTotal != null) ...{
+      'testsPassed': testsPassed,
+      'testsTotal': testsTotal,
+      if (testedSource != null) 'testedSource': testedSource,
+    },
     if (pastedLines > 0) 'pastedLines': pastedLines,
   };
 }
@@ -78,9 +88,11 @@ class ProgramStore extends ChangeNotifier {
       final list = (jsonDecode(raw) as List).cast<Map<String, Object?>>();
       _programs.addAll(list.map(SavedProgram.fromJson));
     }
-    if (_programs.isEmpty) create(newProgramTemplate);
+    // A first launch starts with a blank program; a person who deleted them
+    // all (the key exists, with an empty list) lands on the start panel.
+    if (raw == null) create(newProgramTemplate);
     final savedId = _prefs.getString(_currentKey);
-    _current = _programs.firstWhere((p) => p.id == savedId, orElse: () => _programs.first);
+    _current = _programs.where((p) => p.id == savedId).firstOrNull ?? _programs.firstOrNull;
   }
 
   static const _programsKey = 'jaguar.programs';
@@ -88,12 +100,25 @@ class ProgramStore extends ChangeNotifier {
 
   final SharedPreferences _prefs;
   final List<SavedProgram> _programs = [];
-  late SavedProgram _current;
+  SavedProgram? _current;
+
+  /// Shown by the editor while there are no programs; it is never saved.
+  final _placeholder = SavedProgram(id: '', source: newProgramTemplate, updatedAt: DateTime.fromMillisecondsSinceEpoch(0));
 
   /// Most recently edited first.
   List<SavedProgram> get programs => [..._programs]..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
 
-  SavedProgram get current => _current;
+  /// The program in the editor. With no programs it is a blank stand-in with
+  /// an empty id, so saving to it does nothing.
+  SavedProgram get current => _current ?? _placeholder;
+
+  /// No programs: the workspace shows the start panel.
+  bool get isEmpty => _programs.isEmpty;
+
+  /// A program nobody has written in yet.
+  static bool isBlank(SavedProgram program) =>
+      program.exerciseId == null &&
+      program.source.replaceAll(RegExp(r'\s+'), ' ').trim() == newProgramTemplate.replaceAll(RegExp(r'\s+'), ' ').trim();
 
   SavedProgram create(String source, {String? exerciseId}) {
     final program = SavedProgram(
@@ -134,6 +159,7 @@ class ProgramStore extends ChangeNotifier {
   }
 
   void select(SavedProgram program) {
+    if (!_programs.contains(program)) return;
     _current = program;
     _persist();
   }
@@ -148,12 +174,13 @@ class ProgramStore extends ChangeNotifier {
     _persist();
   }
 
-  void recordTests(String id, {required int passed, required int total}) {
+  void recordTests(String id, {required int passed, required int total, String? source}) {
     final index = _programs.indexWhere((p) => p.id == id);
     if (index < 0) return;
     _programs[index]
       ..testsPassed = passed
-      ..testsTotal = total;
+      ..testsTotal = total
+      ..testedSource = source;
     _persist();
   }
 
@@ -166,16 +193,39 @@ class ProgramStore extends ChangeNotifier {
 
   int pastedLines(String id) => _programs.where((p) => p.id == id).firstOrNull?.pastedLines ?? 0;
 
+  /// Removes [program]. The last one can go too: the start panel takes over.
   void delete(SavedProgram program) {
     _programs.remove(program);
-    if (_programs.isEmpty) create(newProgramTemplate);
-    if (identical(_current, program)) _current = programs.first;
+    if (identical(_current, program)) _current = programs.firstOrNull;
+    _persist();
+  }
+
+  /// Puts back a program that [delete] removed (Deshacer) and opens it.
+  void restore(SavedProgram program) {
+    if (_programs.contains(program)) return;
+    _programs.add(program);
+    _current = program;
+    _persist();
+  }
+
+  /// Drops the blank program a first launch creates, once the person has
+  /// chosen where to start.
+  void discardBlank() {
+    final blank = _programs.where(isBlank).toList();
+    if (blank.length != 1 || _programs.length != 1) return;
+    _programs.remove(blank.first);
+    _current = null;
     _persist();
   }
 
   void _persist() {
     _prefs.setString(_programsKey, jsonEncode([for (final p in _programs) p.toJson()]));
-    _prefs.setString(_currentKey, _current.id);
+    final current = _current;
+    if (current == null) {
+      _prefs.remove(_currentKey);
+    } else {
+      _prefs.setString(_currentKey, current.id);
+    }
     notifyListeners();
   }
 }

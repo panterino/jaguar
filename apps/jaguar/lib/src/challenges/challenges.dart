@@ -33,8 +33,8 @@ const challenges = <Challenge>[
     ),
     hints: [
       'Necesitas una variable para guardar el nombre: Leer la llena.',
-      'Escribir puede mostrar varias cosas separadas por comas: un texto entre comillas y una variable.',
-      'Leer nombre\nEscribir "Hola, ", nombre',
+      'Escribir puede mostrar un texto entre comillas y una variable juntos: únelos con + o sepáralos con una coma.',
+      'Leer nombre\nEscribir "Hola, " + nombre\n(con coma también sirve: Escribir "Hola, ", nombre)',
     ],
   ),
   Challenge(

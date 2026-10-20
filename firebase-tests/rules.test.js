@@ -199,6 +199,7 @@ describe('mensajes de la página', () => {
 
   test('solo los campos y tamaños permitidos', async () => {
     const base = { tipo: 'sugerencia', mensaje: 'Más retos', creado: serverTimestamp() };
+    await assertSucceeds(setDoc(doc(db(null), 'mensajes/m7'), { ...base, tipo: 'datos' }));
     await assertFails(setDoc(doc(db(null), 'mensajes/m2'), { ...base, tipo: 'spam' }));
     await assertFails(setDoc(doc(db(null), 'mensajes/m3'), { ...base, mensaje: '' }));
     await assertFails(setDoc(doc(db(null), 'mensajes/m4'), { ...base, mensaje: 'x'.repeat(2001) }));
