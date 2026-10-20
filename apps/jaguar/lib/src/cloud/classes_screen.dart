@@ -280,6 +280,10 @@ class _ClassScreenState extends State<ClassScreen> {
                 '${submission.passed} de ${submission.total} pruebas'
                 '${submission.updatedAt == null ? '' : ' · ${_time(submission.updatedAt!)}'}',
               ),
+              if (submission.pastedLines > 0) ...[
+                const SizedBox(height: 8),
+                _PastedNote(lines: submission.pastedLines),
+              ],
               const SizedBox(height: 8),
               Flexible(
                 child: Container(
@@ -493,6 +497,13 @@ class _ProgressTable extends StatelessWidget {
                           _StatusIcon(submission: s),
                           const SizedBox(width: 6),
                           Text('${s.passed}/${s.total}'),
+                          if (s.pastedLines > 0) ...[
+                            const SizedBox(width: 6),
+                            Tooltip(
+                              message: 'Pegó ${s.pastedLines} líneas de una vez',
+                              child: Icon(Icons.content_paste, size: 16, color: Theme.of(context).colorScheme.tertiary),
+                            ),
+                          ],
                         ],
                       ),
                       onTap: () => onTap(s, a),
@@ -692,6 +703,37 @@ class _Empty extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// What the teacher sees when a lot of code arrived at once. A reason to
+/// ask the student to explain it, not proof of anything.
+class _PastedNote extends StatelessWidget {
+  const _PastedNote({required this.lines});
+
+  final int lines;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(color: scheme.tertiaryContainer, borderRadius: BorderRadius.circular(8)),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.content_paste, size: 20, color: scheme.onTertiaryContainer),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'Pegó $lines líneas de una vez mientras lo escribía. Puede ser código suyo de otro lado, '
+              'o de alguien más: pídele que te explique el programa.',
+              style: TextStyle(color: scheme.onTertiaryContainer),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -80,6 +80,7 @@ class Cloud extends ChangeNotifier {
     required String studentName,
     required String source,
     required CheckResult result,
+    int pastedLines = 0,
   }) async {
     final link = _links[exercise.id];
     if (link == null || !signedIn) return false;
@@ -92,6 +93,7 @@ class Cloud extends ChangeNotifier {
         source: source,
         passed: result.passedCount,
         total: exercise.cases.length,
+        pastedLines: pastedLines,
       );
       return true;
     } on Object {

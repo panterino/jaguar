@@ -12,6 +12,7 @@ class ExerciseBanner extends StatefulWidget {
     this.onPlan,
     this.onHints,
     this.challenge = false,
+    this.side = false,
   });
 
   final Exercise exercise;
@@ -29,6 +30,10 @@ class ExerciseBanner extends StatefulWidget {
 
   /// A reto: its tests were written by us, not by a teacher.
   final bool challenge;
+
+  /// A column next to the code instead of a strip above it: the statement
+  /// gets the whole height and the code keeps its own.
+  final bool side;
 
   @override
   State<ExerciseBanner> createState() => _ExerciseBannerState();
@@ -52,9 +57,14 @@ class _ExerciseBannerState extends State<ExerciseBanner> {
       maxLines: 2,
     );
     // On a phone the buttons leave no room: the title goes on its own line.
-    final narrow = MediaQuery.sizeOf(context).width < 480;
+    final narrow = widget.side || MediaQuery.sizeOf(context).width < 480;
     // While typing on a phone the code needs the room: only the title and buttons.
     final typing = narrow && MediaQuery.viewInsetsOf(context).bottom > 0;
+
+    final statement = SingleChildScrollView(
+      padding: const EdgeInsets.only(top: 4, right: 8, bottom: 4),
+      child: SelectableText(exercise.statement, style: TextStyle(color: scheme.onPrimaryContainer)),
+    );
 
     return Material(
       color: scheme.primaryContainer,
@@ -115,13 +125,10 @@ class _ExerciseBannerState extends State<ExerciseBanner> {
               ],
             ),
             if (_expanded && !typing && exercise.statement.isNotEmpty)
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxHeight: 160),
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.only(top: 4, right: 8, bottom: 4),
-                  child: SelectableText(exercise.statement, style: TextStyle(color: scheme.onPrimaryContainer)),
-                ),
-              ),
+              if (widget.side)
+                Expanded(child: statement)
+              else
+                ConstrainedBox(constraints: const BoxConstraints(maxHeight: 160), child: statement),
             if (!typing)
               Padding(
                 padding: const EdgeInsets.only(top: 2),

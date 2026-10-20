@@ -114,6 +114,16 @@ describe('clases', () => {
     await assertFails(getDoc(doc(db('beto'), 'classes/c1/assignments/a1/submissions/ana')));
   });
 
+  test('la entrega puede decir cuántas líneas pegó, solo como número', async () => {
+    await seedClass();
+    await setDoc(doc(db('ana'), 'classes/c1/members/ana'), member());
+    const work = { name: 'Ana', source: 'Algoritmo a\nFinAlgoritmo', passed: 2, total: 3, updatedAt: serverTimestamp() };
+    const path = 'classes/c1/assignments/a1/submissions/ana';
+    await assertSucceeds(setDoc(doc(db('ana'), path), { ...work, pasted: 12 }));
+    await assertFails(setDoc(doc(db('ana'), path), { ...work, pasted: 'mucho' }));
+    await assertFails(setDoc(doc(db('ana'), path), { ...work, pasted: 0 }));
+  });
+
   test('al borrar su cuenta el alumno se lleva su entrega, no la de otros', async () => {
     await seedClass();
     await setDoc(doc(db('ana'), 'classes/c1/members/ana'), member());

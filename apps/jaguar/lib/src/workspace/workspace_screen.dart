@@ -273,6 +273,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
       studentName: widget.exercises.studentName ?? widget.cloud?.user?.alias ?? 'Alumno',
       source: source,
       result: result,
+      pastedLines: _store.pastedLines(programId),
     );
     if (sent ?? false) _toast('Tu resultado llegó a tu profesor: ${result.passedCount} de ${exercise.cases.length}.');
     if (!mounted) return;
@@ -308,6 +309,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
           passedCases: result.passedCount,
           verifiedAt: verifiedAt,
           source: source,
+          pastedLines: _store.pastedLines(_editingId),
         ),
       ),
     );
@@ -998,6 +1000,20 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
     final running = _session.isRunning;
     final errorLine = _session.state == RunState.failed ? _session.error?.line : null;
 
+    final banner = exercise == null
+        ? null
+        : ExerciseBanner(
+            onHints: challengeById(exercise.id) == null ? null : () => showHints(context, challengeById(exercise.id)!),
+            onPlan: _plan,
+            challenge: challengeById(exercise.id) != null,
+            key: ValueKey(exercise.id),
+            exercise: exercise,
+            checking: _checking,
+            onCheck: () => _check(exercise),
+            showCheckButton: false,
+            side: consoleBelow,
+          );
+
     final codePane = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -1010,6 +1026,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
             undoController: _undo,
             errorLine: errorLine,
             executingLine: _executingLine,
+            onLargePaste: _onLargePaste,
             fontSize: settings.fontSize,
             highlightCurrentLine: true,
           ),
@@ -1022,17 +1039,6 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _EditorTab(code: _code, isExercise: exercise != null),
-        if (exercise != null)
-          ExerciseBanner(
-            onHints: challengeById(exercise.id) == null ? null : () => showHints(context, challengeById(exercise.id)!),
-            onPlan: _plan,
-            challenge: challengeById(exercise.id) != null,
-            key: ValueKey(exercise.id),
-            exercise: exercise,
-            checking: _checking,
-            onCheck: () => _check(exercise),
-            showCheckButton: false,
-          ),
         Expanded(
           child: switch (settings.editorView) {
             EditorView.code => codePane,
@@ -1052,7 +1058,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
       ],
     );
 
-    final console = _panelArea(
+    final panel = _panelArea(
       actions: [
         if (!basic)
           ToolbarIcon(
@@ -1071,8 +1077,27 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
       onReset: () => settings.split = 0.6,
       minFirst: 240,
       minSecond: 140,
-      first: editor,
-      second: console,
+      // The statement never takes height from the code: next to it when the
+      // console is below, above the console when it is on the right.
+      first: banner != null && consoleBelow
+          ? Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(child: editor),
+                const VerticalDivider(width: 1),
+                SizedBox(width: 300, child: banner),
+              ],
+            )
+          : editor,
+      second: banner != null && !consoleBelow
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                banner,
+                Expanded(child: panel),
+              ],
+            )
+          : panel,
     );
 
     final sidebar = ProgramsSidebar(
@@ -1243,6 +1268,10 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
     ),
   );
 
+  void _onLargePaste(int lines) {
+    _store.recordPaste(_editingId, lines);
+  }
+
   /// Android's Atrás on the main screen: close the menu, go back to the code,
   /// and only leave after a second press, so nobody loses their place by
   /// accident.
@@ -1281,10 +1310,9 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
     final errorLine = _session.state == RunState.failed ? _session.error?.line : null;
     final exercise = _exercise;
 
-    final editor = Column(
-      children: [
-        if (exercise != null)
-          ExerciseBanner(
+    final banner = exercise == null
+        ? null
+        : ExerciseBanner(
             onHints: challengeById(exercise.id) == null ? null : () => showHints(context, challengeById(exercise.id)!),
             onPlan: _plan,
             challenge: challengeById(exercise.id) != null,
@@ -1292,7 +1320,11 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
             exercise: exercise,
             checking: _checking,
             onCheck: () => _check(exercise),
-          ),
+          );
+
+    final editor = Column(
+      children: [
+        if (banner != null && !wide) banner,
         if (_settings.editorView == EditorView.diagram)
           Expanded(child: _diagram())
         else ...[
@@ -1305,6 +1337,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
               undoController: _undo,
               errorLine: errorLine,
               executingLine: _executingLine,
+              onLargePaste: _onLargePaste,
               fontSize: fontSize,
               inlineErrors: wide,
             ),
@@ -1411,7 +1444,16 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                 children: [
                   Expanded(flex: 3, child: editor),
                   const VerticalDivider(width: 1),
-                  Expanded(flex: 2, child: _panelArea()),
+                  Expanded(
+                    flex: 2,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        ?banner,
+                        Expanded(child: _panelArea()),
+                      ],
+                    ),
+                  ),
                 ],
               )
             : IndexedStack(

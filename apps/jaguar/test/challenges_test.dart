@@ -7,8 +7,7 @@ const _solutions = {
   'reto-1-01': 'Algoritmo a\n Escribir "¿Cómo te llamas?"\n Leer nombre\n Escribir "Hola, ", nombre\nFinAlgoritmo',
   'reto-1-02': 'Algoritmo a\n Leer base, altura\n Escribir "Área: ", base * altura\nFinAlgoritmo',
   'reto-1-03': 'Algoritmo a\n iva <- 0.16\n Leer precio\n Escribir "Total: ", precio + precio * iva\nFinAlgoritmo',
-  'reto-1-04':
-      'Algoritmo a\n Leer m\n Escribir trunc(m / 60), " horas y ", m MOD 60, " minutos"\nFinAlgoritmo',
+  'reto-1-04': 'Algoritmo a\n Leer m\n Escribir trunc(m / 60), " horas y ", m MOD 60, " minutos"\nFinAlgoritmo',
   'reto-1-05':
       'Algoritmo a\n Leer c\n Si c >= 6 Entonces\n  Escribir "Aprobado"\n SiNo\n  Escribir "Reprobado"\n FinSi\nFinAlgoritmo',
   'reto-1-06':
