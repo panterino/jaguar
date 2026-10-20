@@ -79,6 +79,14 @@ void main() {
       expect(error.hint, contains('Trunc'));
     });
 
+    test('texto sin comillas en Escribir', () async {
+      final error = await runError(program('Escribir Dame tu nombre'));
+      expect(error.message, contains('sin comillas'));
+      expect(error.hint, contains('"Dame tu nombre"'));
+      // Variables separadas por comas siguen funcionando.
+      expect(await run('a <- 1\nb <- 2\nEscribir a, b'), '12\n');
+    });
+
     test('Definir Texto rechaza números', () async {
       final error = await runError(program('Definir s Como Texto\ns <- 5'));
       expect(error.hint, contains('ConvertirATexto'));

@@ -78,6 +78,11 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
   final _editorKey = GlobalKey<CodeEditorState>();
   late final _diagnostics = Diagnostics(_code);
   final _session = ConsoleSession();
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  /// When Atrás was last pressed on the main screen: a second press soon
+  /// after closes the app.
+  DateTime? _lastBack;
   Timer? _saveTimer;
   int _tab = 0; // narrow layout: 0 code, 1 console, 2 tests
   _Panel _panel = _Panel.console; // wide layouts
@@ -142,29 +147,39 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
     // Schools teach flowcharts first, then pseudocode. On a phone the code
     // stays and a hint shows where the diagram is.
     if (choice == WelcomeChoice.learning && !again) {
-      if (MediaQuery.sizeOf(context).width >= _wideLayoutWidth) {
-        _settings.editorView = EditorView.diagram;
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            duration: Duration(seconds: 8),
-            content: Row(
-              children: [
-                Icon(Icons.account_tree_outlined, color: Colors.white),
-                SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'Toca este botón arriba para ver tu programa como diagrama de flujo, y otra vez para volver al código.',
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      }
+      final phone = MediaQuery.sizeOf(context).width < _wideLayoutWidth;
+      if (!phone) _settings.editorView = EditorView.diagram;
+      _firstSteps(phone: phone);
     }
     _settings.teacher = choice == WelcomeChoice.teacher;
     if (choice == WelcomeChoice.teacher) _openTeacher();
+  }
+
+  /// First launch: where the diagram is and where to start, at the top so
+  /// it does not cover the keyword bar.
+  void _firstSteps({required bool phone}) {
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.showMaterialBanner(
+      MaterialBanner(
+        leading: const Icon(Icons.tips_and_updates_outlined),
+        content: Text(
+          phone
+              ? 'El botón de diagrama, arriba, cambia entre el código y el diagrama de flujo. '
+                    '¿No sabes por dónde empezar? Prueba el Reto 1.'
+              : '¿No sabes por dónde empezar? Prueba el Reto 1: viene con pistas.',
+        ),
+        actions: [
+          TextButton(onPressed: messenger.hideCurrentMaterialBanner, child: const Text('Entendido')),
+          FilledButton(
+            onPressed: () {
+              messenger.hideCurrentMaterialBanner();
+              _openChallenge(challenges.first);
+            },
+            child: const Text('Empezar el Reto 1'),
+          ),
+        ],
+      ),
+    );
   }
 
   static final _advancedCode = RegExp(r'^\s*(para|mientras|repetir|funcion|subproceso)\b', multiLine: true);
@@ -250,7 +265,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
     _store.recordTests(programId, passed: result.passedCount, total: exercise.cases.length);
     if (result.passed && challengeById(exercise.id) != null && !_settings.doneChallenges.contains(exercise.id)) {
       _settings.markChallengeDone(exercise.id);
-      _toast('¡Reto superado! Abre Retos para seguir con el siguiente.');
+      _toast('¡Reto superado!');
     }
     // Exercises from a class send their result to the teacher.
     final sent = await widget.cloud?.submitIfAssigned(
@@ -326,16 +341,15 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
     );
   }
 
+  void _openChallenge(Challenge challenge) {
+    widget.exercises.saveReceived(challenge.exercise);
+    _openExercise(challenge.exercise);
+  }
+
   void _openChallenges() => Navigator.push(
     context,
     MaterialPageRoute<void>(
-      builder: (_) => ChallengesScreen(
-        settings: _settings,
-        onOpen: (challenge) {
-          widget.exercises.saveReceived(challenge.exercise);
-          _openExercise(challenge.exercise);
-        },
-      ),
+      builder: (_) => ChallengesScreen(settings: _settings, onOpen: _openChallenge),
     ),
   );
 
@@ -939,6 +953,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
     return ListenableBuilder(
       listenable: _settings,
       builder: (context, _) {
+        widget.cloud?.prefersTeacher = _settings.teacher;
         final desktop = useDesktopLayout(context);
         final menus = _menus(desktop: desktop);
         // Básico shows fewer menus, but every shortcut keeps working.
@@ -1011,6 +1026,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
           ExerciseBanner(
             onHints: challengeById(exercise.id) == null ? null : () => showHints(context, challengeById(exercise.id)!),
             onPlan: _plan,
+            challenge: challengeById(exercise.id) != null,
             key: ValueKey(exercise.id),
             exercise: exercise,
             checking: _checking,
@@ -1219,8 +1235,39 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
       onGoToLine: _goToLine,
       onReplay: _replay,
       onShowTeacher: () => _showVerified(exercise, _testResult!, _testedSource!),
+      challenge: challengeById(exercise.id) != null,
+      onNextChallenge: switch (nextChallenge(exercise.id)) {
+        final next? => () => _openChallenge(next),
+        null => null,
+      },
     ),
   );
+
+  /// Android's Atrás on the main screen: close the menu, go back to the code,
+  /// and only leave after a second press, so nobody loses their place by
+  /// accident.
+  void _onBack() {
+    final scaffold = _scaffoldKey.currentState;
+    if (scaffold != null && scaffold.isDrawerOpen) {
+      scaffold.closeDrawer();
+      return;
+    }
+    if (_tab != 0) {
+      setState(() => _tab = 0);
+      return;
+    }
+    final now = DateTime.now();
+    if (_lastBack != null && now.difference(_lastBack!) < const Duration(seconds: 2)) {
+      SystemNavigator.pop();
+      return;
+    }
+    _lastBack = now;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        const SnackBar(duration: Duration(seconds: 2), content: Text('Presiona Atrás otra vez para salir')),
+      );
+  }
 
   Widget _buildTouch() {
     final width = MediaQuery.sizeOf(context).width;
@@ -1240,6 +1287,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
           ExerciseBanner(
             onHints: challengeById(exercise.id) == null ? null : () => showHints(context, challengeById(exercise.id)!),
             onPlan: _plan,
+            challenge: challengeById(exercise.id) != null,
             key: ValueKey(exercise.id),
             exercise: exercise,
             checking: _checking,
@@ -1258,8 +1306,10 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
               errorLine: errorLine,
               executingLine: _executingLine,
               fontSize: fontSize,
+              inlineErrors: wide,
             ),
           ),
+          if (!wide) _ErrorStrip(diagnostics: _diagnostics, onGoToLine: _goToLine),
           KeywordBar(controller: _code, focusNode: _codeFocus),
         ],
       ],
@@ -1268,135 +1318,191 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
     // Phones: Pruebas is a third tab at the bottom.
     final tab = exercise == null && _tab == 2 ? 1 : _tab;
 
-    return Scaffold(
-      appBar: AppBar(
-        titleSpacing: 0,
-        title: ListenableBuilder(
-          listenable: _code,
-          builder: (context, _) => Text(programName(_code.text), overflow: TextOverflow.ellipsis),
-        ),
-        actions: [
-          IconButton(tooltip: 'Compartir (QR o enlace)', icon: const Icon(Icons.qr_code_2), onPressed: _share),
-          // Phones switch between the code and its flowchart from here.
-          IconButton(
-            tooltip: _settings.editorView == EditorView.diagram ? 'Ver pseudocódigo' : 'Ver diagrama de flujo',
-            icon: Icon(_settings.editorView == EditorView.diagram ? Icons.code : Icons.account_tree_outlined),
-            onPressed: () => _settings.editorView = _settings.editorView == EditorView.diagram
-                ? EditorView.code
-                : EditorView.diagram,
+    final diagramView = _settings.editorView == EditorView.diagram;
+
+    return PopScope(
+      // The browser keeps its own Atrás.
+      canPop: kIsWeb,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _onBack();
+      },
+      child: Scaffold(
+        key: _scaffoldKey,
+        appBar: AppBar(
+          titleSpacing: 0,
+          title: ListenableBuilder(
+            listenable: _code,
+            builder: (context, _) => Text(programName(_code.text), overflow: TextOverflow.ellipsis),
           ),
-          if (wide) ...[
-            IconButton(tooltip: 'Abrir .psc', icon: const Icon(Icons.folder_open), onPressed: _openFile),
-            IconButton(tooltip: 'Guardar .psc', icon: const Icon(Icons.save_alt), onPressed: _saveFile),
-          ],
-          _MoreMenu(
-            onNew: _newProgram,
-            onOpenFile: _openFile,
-            onSaveFile: _saveFile,
-            onSendFile: _sendFile,
-            onOpenLink: _openLink,
-            onDeskCheck: _deskCheck,
-            onPlan: _plan,
-          ),
-          if (compact)
-            Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: IconButton.filled(
-                tooltip: running ? 'Detener' : 'Ejecutar',
-                onPressed: _run,
-                icon: Icon(running ? Icons.stop : Icons.play_arrow),
-                // Explicit colors: the app bar tints its action icons.
-                style: IconButton.styleFrom(
-                  backgroundColor: running ? scheme.error : scheme.primary,
-                  foregroundColor: running ? scheme.onError : scheme.onPrimary,
+          actions: [
+            IconButton(tooltip: 'Compartir (QR o enlace)', icon: const Icon(Icons.qr_code_2), onPressed: _share),
+            // Phones switch between the code and its flowchart from here.
+            IconButton(
+              tooltip: _settings.editorView == EditorView.diagram ? 'Ver pseudocódigo' : 'Ver diagrama de flujo',
+              icon: Icon(_settings.editorView == EditorView.diagram ? Icons.code : Icons.account_tree_outlined),
+              onPressed: () => _settings.editorView = _settings.editorView == EditorView.diagram
+                  ? EditorView.code
+                  : EditorView.diagram,
+            ),
+            if (wide) ...[
+              IconButton(tooltip: 'Abrir .psc', icon: const Icon(Icons.folder_open), onPressed: _openFile),
+              IconButton(tooltip: 'Guardar .psc', icon: const Icon(Icons.save_alt), onPressed: _saveFile),
+            ],
+            _MoreMenu(
+              onNew: _newProgram,
+              onOpenFile: _openFile,
+              onSaveFile: _saveFile,
+              onSendFile: _sendFile,
+              onOpenLink: _openLink,
+              onDeskCheck: _deskCheck,
+              onPlan: _plan,
+            ),
+            if (compact)
+              Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: IconButton.filled(
+                  tooltip: running ? 'Detener' : 'Ejecutar',
+                  onPressed: _run,
+                  icon: Icon(running ? Icons.stop : Icons.play_arrow),
+                  // Explicit colors: the app bar tints its action icons.
+                  style: IconButton.styleFrom(
+                    backgroundColor: running ? scheme.error : scheme.primary,
+                    foregroundColor: running ? scheme.onError : scheme.onPrimary,
+                  ),
+                ),
+              )
+            else
+              Padding(
+                padding: const EdgeInsets.only(right: 12, left: 4),
+                child: FilledButton.icon(
+                  onPressed: _run,
+                  icon: Icon(running ? Icons.stop : Icons.play_arrow),
+                  label: Text(running ? 'Detener' : 'Ejecutar'),
+                  style: running
+                      ? FilledButton.styleFrom(
+                          backgroundColor: Theme.of(context).colorScheme.error,
+                          foregroundColor: Theme.of(context).colorScheme.onError,
+                        )
+                      : null,
                 ),
               ),
-            )
-          else
-            Padding(
-              padding: const EdgeInsets.only(right: 12, left: 4),
-              child: FilledButton.icon(
-                onPressed: _run,
-                icon: Icon(running ? Icons.stop : Icons.play_arrow),
-                label: Text(running ? 'Detener' : 'Ejecutar'),
-                style: running
-                    ? FilledButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.error,
-                        foregroundColor: Theme.of(context).colorScheme.onError,
-                      )
-                    : null,
+          ],
+        ),
+        drawer: ProgramsDrawer(
+          store: _store,
+          cloud: widget.cloud,
+          onOpenCommunity: _openCommunity,
+          onOpenChallenges: _openChallenges,
+          onOpenClasses: _openClasses,
+          onAccount: _account,
+          onGuide: _showGuide,
+          onAbout: _showAbout,
+          modeSwitch: ModeSwitch(settings: _settings, dense: false),
+          exercises: widget.exercises,
+          onSelect: _load,
+          onNew: _newProgram,
+          onOpenTeacher: _settings.teacher ? _openTeacher : null,
+          onChangeName: _settings.teacher ? null : _changeName,
+          onToggleTeacher: () => _welcome(again: true),
+          teacher: _settings.teacher,
+        ),
+        body: wide
+            ? Row(
+                children: [
+                  Expanded(flex: 3, child: editor),
+                  const VerticalDivider(width: 1),
+                  Expanded(flex: 2, child: _panelArea()),
+                ],
+              )
+            : IndexedStack(
+                index: tab,
+                children: [editor, console, if (exercise != null) _testsPanel(exercise) else const SizedBox.shrink()],
               ),
-            ),
-        ],
-      ),
-      drawer: ProgramsDrawer(
-        store: _store,
-        cloud: widget.cloud,
-        onOpenCommunity: _openCommunity,
-        onOpenChallenges: _openChallenges,
-        onOpenClasses: _openClasses,
-        onAccount: _account,
-        onGuide: _showGuide,
-        onAbout: _showAbout,
-        modeSwitch: ModeSwitch(settings: _settings, dense: false),
-        exercises: widget.exercises,
-        onSelect: _load,
-        onNew: _newProgram,
-        onOpenTeacher: _settings.teacher ? _openTeacher : null,
-        onChangeName: _settings.teacher ? null : _changeName,
-        onToggleTeacher: () => _welcome(again: true),
-        teacher: _settings.teacher,
-      ),
-      body: wide
-          ? Row(
-              children: [
-                Expanded(flex: 3, child: editor),
-                const VerticalDivider(width: 1),
-                Expanded(flex: 2, child: _panelArea()),
-              ],
-            )
-          : IndexedStack(
-              index: tab,
-              children: [editor, console, if (exercise != null) _testsPanel(exercise) else const SizedBox.shrink()],
-            ),
-      bottomNavigationBar: wide
-          ? (_session.stepping && running ? DebugBar(session: _session, onRunToCursor: _runToCursor) : null)
-          : Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (_session.stepping && running) DebugBar(session: _session, onRunToCursor: _runToCursor),
-                NavigationBar(
-                  height: 60,
-                  selectedIndex: tab,
-                  onDestinationSelected: (tab) => setState(() {
-                    _tab = tab;
-                    if (tab > 0) _panel = tab == 1 ? _Panel.console : _Panel.tests;
-                  }),
-                  destinations: [
-                    const NavigationDestination(icon: Icon(Icons.code), label: 'Código'),
-                    NavigationDestination(
-                      icon: Badge(
-                        isLabelVisible: _session.state == RunState.waitingInput || _session.state == RunState.failed,
-                        child: const Icon(Icons.terminal),
+        bottomNavigationBar: wide
+            ? (_session.stepping && running ? DebugBar(session: _session, onRunToCursor: _runToCursor) : null)
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (_session.stepping && running) DebugBar(session: _session, onRunToCursor: _runToCursor),
+                  NavigationBar(
+                    height: 60,
+                    selectedIndex: tab,
+                    onDestinationSelected: (tab) => setState(() {
+                      _tab = tab;
+                      if (tab > 0) _panel = tab == 1 ? _Panel.console : _Panel.tests;
+                    }),
+                    destinations: [
+                      NavigationDestination(
+                        icon: Icon(diagramView ? Icons.account_tree_outlined : Icons.code),
+                        label: diagramView ? 'Diagrama' : 'Código',
                       ),
-                      label: 'Consola',
-                    ),
-                    if (exercise != null)
                       NavigationDestination(
                         icon: Badge(
-                          isLabelVisible: _testResult != null,
-                          label: Text('${_testResult?.passedCount ?? 0}/${exercise.cases.length}'),
-                          backgroundColor: _testResult?.passed == true ? Colors.green.shade700 : null,
-                          child: const Icon(Icons.fact_check_outlined),
+                          isLabelVisible: _session.state == RunState.waitingInput || _session.state == RunState.failed,
+                          child: const Icon(Icons.terminal),
                         ),
-                        label: 'Pruebas',
+                        label: 'Consola',
                       ),
-                  ],
+                      if (exercise != null)
+                        NavigationDestination(
+                          icon: Badge(
+                            isLabelVisible: _testResult != null,
+                            label: Text('${_testResult?.passedCount ?? 0}/${exercise.cases.length}'),
+                            backgroundColor: _testResult?.passed == true ? Colors.green.shade700 : null,
+                            child: const Icon(Icons.fact_check_outlined),
+                          ),
+                          label: 'Pruebas',
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+      ),
+    );
+  }
+}
+
+/// Phones: the error under the code, whole, instead of at the end of a line
+/// that does not fit on the screen.
+class _ErrorStrip extends StatelessWidget {
+  const _ErrorStrip({required this.diagnostics, required this.onGoToLine});
+
+  final Diagnostics diagnostics;
+  final ValueChanged<int> onGoToLine;
+
+  @override
+  Widget build(BuildContext context) => ListenableBuilder(
+    listenable: diagnostics,
+    builder: (context, _) {
+      final error = diagnostics.error;
+      if (error == null) return const SizedBox.shrink();
+      final scheme = Theme.of(context).colorScheme;
+      return Material(
+        color: scheme.errorContainer,
+        child: InkWell(
+          onTap: () => onGoToLine(error.line),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.error_outline, size: 20, color: scheme.onErrorContainer),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Línea ${error.line}: ${error.message}${error.hint == null ? '' : ' ${error.hint}'}',
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: scheme.onErrorContainer),
+                  ),
                 ),
               ],
             ),
-    );
-  }
+          ),
+        ),
+      );
+    },
+  );
 }
 
 /// The program's name above the code, like an editor tab.

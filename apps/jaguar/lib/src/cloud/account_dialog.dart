@@ -22,7 +22,7 @@ class _AccountDialog extends StatefulWidget {
 }
 
 class _AccountDialogState extends State<_AccountDialog> {
-  CloudRole _role = CloudRole.alumno;
+  late CloudRole _role = widget.cloud.prefersTeacher ? CloudRole.profesor : CloudRole.alumno;
   bool _teacherHasAccount = true;
   final _alias = TextEditingController();
   final _email = TextEditingController();

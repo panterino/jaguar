@@ -473,6 +473,17 @@ class Parser {
       } while (_acceptSymbol(','));
     }
     if (_acceptNoNewline()) newline = false;
+    // Escribir Hola mundo: a text without quotes reads as loose variables.
+    if (values.isNotEmpty && values.last is VarRef && _current.type == TokenType.word && !_isSeparator()) {
+      final words = [(values.last as VarRef).name];
+      for (var i = 0; !_isSeparator(i) && _lookahead(i).type == TokenType.word; i++) {
+        words.add(_lookahead(i).lexeme);
+      }
+      throw _error(
+        'Parece un texto sin comillas.',
+        hint: 'Los textos van entre comillas: Escribir "${words.join(' ')}"',
+      );
+    }
     return WriteStmt(values, start.line, start.column, newline: newline);
   }
 

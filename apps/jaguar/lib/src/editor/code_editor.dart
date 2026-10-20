@@ -28,6 +28,7 @@ class CodeEditor extends StatefulWidget {
     this.errorLine,
     this.fontSize = 14,
     this.highlightCurrentLine = false,
+    this.inlineErrors = true,
     this.undoController,
     this.executingLine,
     this.diagnostics,
@@ -39,6 +40,10 @@ class CodeEditor extends StatefulWidget {
 
   /// Desktop: a band behind the cursor's line, as in other code editors.
   final bool highlightCurrentLine;
+
+  /// The error message at the end of its line. Phones show it below the
+  /// editor instead, where it fits.
+  final bool inlineErrors;
 
   /// Lets the Editar menu undo and redo.
   final UndoHistoryController? undoController;
@@ -385,7 +390,7 @@ class CodeEditorState extends State<CodeEditor> {
         )..layout()).width;
         // Room for the error message at the end of its line.
         var lensWidth = 0.0;
-        if (diagnostic != null && diagnostic.line >= 1 && diagnostic.line <= lines.length) {
+        if (widget.inlineErrors && diagnostic != null && diagnostic.line >= 1 && diagnostic.line <= lines.length) {
           lensWidth = (lines[diagnostic.line - 1].length + 4 + _lensText(diagnostic).length) * charWidth;
         }
         final gutterWidth = math.max(3, '${lines.length}'.length + 1) * charWidth + 12;
@@ -402,7 +407,7 @@ class CodeEditorState extends State<CodeEditor> {
           matches: [for (final m in matches) _position(lines, m)],
           currentMatch: matches.isEmpty ? -1 : _matchIndex % matches.length,
           diagnostic: diagnostic,
-          lens: diagnostic == null ? null : _lensText(diagnostic),
+          lens: diagnostic == null || !widget.inlineErrors ? null : _lensText(diagnostic),
           lensStyle: textStyle.copyWith(
             fontSize: fontSize * 0.9,
             fontStyle: FontStyle.italic,
