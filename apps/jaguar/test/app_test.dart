@@ -308,7 +308,9 @@ void main() {
       await pumpDesktop(tester, 'Algoritmo hola\nFinAlgoritmo\n', mode: null);
       await tester.pumpAndSettle();
       expect(find.text('¡Hola! ¿Cómo quieres empezar?'), findsOneWidget);
-      await tester.tap(find.text('Estoy aprendiendo'));
+      await tester.tap(find.text('Empezar desde cero'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Saltar'));
       await tester.pumpAndSettle();
       expect(ViewSettings(_prefs).mode, AppMode.basic);
       expect(find.text('Básico'), findsOneWidget);
@@ -346,7 +348,7 @@ void main() {
         tester,
         'Algoritmo hola\n    Leer n\n    Si n > 0 Entonces\n        Escribir n\n    FinSi\nFinAlgoritmo\n',
       );
-      await tester.tap(find.byTooltip('Ambos'));
+      await tester.tap(find.text('Ambos'));
       await tester.pumpAndSettle();
       expect(find.byType(DiagramView), findsOneWidget);
       expect(find.byType(CodeEditor), findsOneWidget);
@@ -359,7 +361,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 600));
       expect(find.text('Corrige el error de la línea 2 para actualizar el diagrama.'), findsOneWidget);
 
-      await tester.tap(find.byTooltip('Diagrama'));
+      await tester.tap(find.text('Diagrama'));
       await tester.pumpAndSettle();
       expect(find.byType(CodeEditor), findsNothing);
       debugDefaultTargetPlatformOverride = null;
@@ -429,21 +431,15 @@ void main() {
 
     testWidgets('las herramientas de profesor solo para profesores, y el perfil se cambia cuando sea', (tester) async {
       await pumpDesktop(tester, 'Algoritmo hola\nFinAlgoritmo\n');
-      expect(find.text('Profesor'), findsNothing);
       expect(find.text('Mis ejercicios'), findsNothing);
-      expect(find.text('Escribe tu nombre'), findsOneWidget);
 
-      await tester.tap(find.text('Alumno · cambiar'));
+      await tester.tap(find.text('Ajustes'));
       await tester.pumpAndSettle();
-      expect(find.text('¿Cómo usas Jaguar?'), findsOneWidget);
-      await tester.tap(find.text('Soy profesor'));
+      await tester.tap(find.text('Profesor'));
       await tester.pumpAndSettle();
-      await tester.tap(find.byType(BackButton)); // the exercises screen opens for teachers
+      await tester.tap(find.byType(BackButton));
       await tester.pumpAndSettle();
-      expect(find.text('Profesor'), findsOneWidget);
       expect(find.text('Mis ejercicios'), findsOneWidget);
-      expect(find.text('Escribe tu nombre'), findsNothing);
-      expect(find.text('Profesor · cambiar'), findsOneWidget);
       debugDefaultTargetPlatformOverride = null;
     });
 
@@ -619,7 +615,7 @@ void main() {
 
       await tester.enterText(find.byType(TextField).first, 'Algoritmo p\nFinAlgoritmo\n');
       await tester.pump();
-      expect(find.text('Cambiaste el código: vuelve a probar.'), findsOneWidget);
+      expect(find.text('Desactualizado: cambiaste el código desde la última prueba.'), findsOneWidget);
     });
 
     testWidgets('en celular las pruebas son una pestaña', (tester) async {

@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:jaguar_core/jaguar_core.dart' show Notation;
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// How much of the interface a person sees. Students start in [basic] and
@@ -53,12 +52,21 @@ class ViewSettings extends ChangeNotifier {
   bool get fullModeSuggested => _prefs.getBool('jaguar.view.fullModeSuggested') ?? false;
   set fullModeSuggested(bool value) => _prefs.setBool('jaguar.view.fullModeSuggested', value);
 
+  /// Where the first-launch tour is: 0 to 2 are its balloons, 3 means done
+  /// or skipped. Starts finished, so only "Empezar desde cero" turns it on.
+  int get tourStep => _prefs.getInt('jaguar.view.tourStep') ?? 3;
+  set tourStep(int value) => _set(() => _prefs.setInt('jaguar.view.tourStep', value));
+
+  /// The first program that ran without error got its celebration.
+  bool get firstRunDone => _prefs.getBool('jaguar.view.firstRunDone') ?? false;
+  set firstRunDone(bool value) => _set(() => _prefs.setBool('jaguar.view.firstRunDone', value));
+
+  /// The one-time explanation of how the code and the diagram relate.
+  bool get viewHintShown => _prefs.getBool('jaguar.view.viewHintShown') ?? false;
+  set viewHintShown(bool value) => _set(() => _prefs.setBool('jaguar.view.viewHintShown', value));
+
   EditorView get editorView => EditorView.values.asNameMap()[_prefs.getString('jaguar.view.editor')] ?? EditorView.code;
   set editorView(EditorView view) => _set(() => _prefs.setString('jaguar.view.editor', view.name));
-
-  /// How flowcharts write expressions: like PSeInt or like DFD.
-  Notation get notation => _prefs.getString('jaguar.view.notation') == 'dfd' ? Notation.dfd : Notation.pseint;
-  set notation(Notation value) => _set(() => _prefs.setString('jaguar.view.notation', value.name));
 
   ThemeMode get themeMode => ThemeMode.values.byName(_prefs.getString('jaguar.view.theme') ?? ThemeMode.system.name);
   set themeMode(ThemeMode mode) => _set(() => _prefs.setString('jaguar.view.theme', mode.name));
