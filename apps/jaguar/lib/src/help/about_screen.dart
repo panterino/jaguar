@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme.dart';
 import 'privacy.dart';
 
-const jaguarVersion = '0.4.3';
+const jaguarVersion = '0.4.4';
 
 /// Acerca de: what Jaguar is, where it comes from and what it stands for.
 class AboutScreen extends StatelessWidget {
