@@ -94,7 +94,10 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byTooltip('Eliminar'));
       await tester.pumpAndSettle();
-      expect(find.text('Es tu único programa. Después verás el inicio para empezar otro. Las copias guardadas no cambian.'), findsOneWidget);
+      expect(
+        find.text('Es tu único programa. Después verás el inicio para empezar otro. Las copias guardadas no cambian.'),
+        findsOneWidget,
+      );
       await tester.tap(find.text('Eliminar').last);
       await tester.pumpAndSettle();
 
@@ -117,6 +120,23 @@ void main() {
       expect(find.text('Empezar'), findsOneWidget);
       expect(find.text('Aún no tienes programas. Empieza con un reto o uno nuevo.'), findsOneWidget);
       expect(find.byType(NavigationBar), findsNothing);
+    });
+
+    testWidgets('los botones del inicio miden lo mismo, también con letra grande', (tester) async {
+      await _pumpPhone(tester, values: {'jaguar.view.mode': 'basic', 'jaguar.programs': '[]'}, textScale: 1.3);
+      final tiles = [
+        for (final label in [
+          'Nuevo programa',
+          'Abrir archivo',
+          'Ejemplos',
+          'Guía: cómo funciona todo',
+          'Ajustes',
+          if (find.text('Abrir enlace').evaluate().isNotEmpty) 'Abrir enlace' else 'Escanear QR o abrir enlace',
+        ])
+          tester.getSize(find.ancestor(of: find.text(label), matching: find.byType(InkWell)).first),
+      ];
+      expect(tiles.map((t) => t.height).toSet(), hasLength(1), reason: '$tiles');
+      expect(tiles.map((t) => t.width).toSet(), hasLength(1), reason: '$tiles');
     });
 
     testWidgets('la barra tiene tres controles y el cambio de vista tiene texto', (tester) async {
@@ -181,11 +201,7 @@ void main() {
       await tester.tap(find.text('Empezar desde cero'));
       await tester.pumpAndSettle();
       // Four small ideas first, then the balloons.
-      for (final title in [
-        'Mostrar, preguntar y guardar',
-        'Código o diagrama: tú eliges',
-        'Cómo sabes si está bien',
-      ]) {
+      for (final title in ['Mostrar, preguntar y guardar', 'Código o diagrama: tú eliges', 'Cómo sabes si está bien']) {
         await tester.tap(find.text('Siguiente'));
         await tester.pumpAndSettle();
         expect(find.text(title), findsOneWidget);
@@ -366,7 +382,9 @@ void main() {
     });
 
     testWidgets('con animaciones desactivadas todo aparece igual', (tester) async {
-      tester.platformDispatcher.accessibilityFeaturesTestValue = const FakeAccessibilityFeatures(disableAnimations: true);
+      tester.platformDispatcher.accessibilityFeaturesTestValue = const FakeAccessibilityFeatures(
+        disableAnimations: true,
+      );
       addTearDown(tester.platformDispatcher.clearAllTestValues);
       await openChallenge(tester);
       final editor = find.descendant(of: find.byType(CodeEditor), matching: find.byType(TextField)).first;
