@@ -160,7 +160,7 @@ service cloud.firestore {
     // console. The contact is optional.
     match /mensajes/{id} {
       allow create: if onlyFields(['tipo', 'mensaje', 'escuela', 'contacto', 'creado'])
-        && request.resource.data.tipo in ['piloto', 'sugerencia']
+        && request.resource.data.tipo in ['piloto', 'sugerencia', 'datos']
         && shortText('mensaje', 2000)
         && (!('escuela' in request.resource.data) || shortText('escuela', 200))
         && (!('contacto' in request.resource.data) || shortText('contacto', 200))

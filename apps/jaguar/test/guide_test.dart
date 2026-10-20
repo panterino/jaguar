@@ -4,6 +4,9 @@ import 'package:jaguar/src/help/guide_screen.dart';
 
 void main() {
   testWidgets('la guía abre en la pestaña del perfil y lleva a cada lugar', (tester) async {
+    tester.view.physicalSize = const Size(800, 2400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
     var retos = 0;
     await tester.pumpWidget(
       MaterialApp(
@@ -22,6 +25,9 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Tu primer programa'), findsOneWidget);
 
+    // The first topic is open and tall: close it so the Retos card is in view.
+    await tester.tap(find.text('Tu primer programa'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Retos'));
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('Ver los retos'));

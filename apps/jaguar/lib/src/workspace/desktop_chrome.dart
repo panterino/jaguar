@@ -77,7 +77,7 @@ class DesktopToolbar extends StatelessWidget {
                       _LabeledTool(
                         icon: Icons.folder_open_outlined,
                         label: 'Abrir',
-                        tooltip: 'Abrir un archivo .psc de PSeInt o Jaguar',
+                        tooltip: 'Abrir archivo (.psc). También abre archivos de otros programas de pseudocódigo',
                         onPressed: onOpenFile,
                       ),
                       _LabeledTool(
@@ -375,7 +375,7 @@ class StatusBar extends StatelessWidget {
               ListenableBuilder(
                 listenable: diagnostics!,
                 builder: (context, _) {
-                  final problem = diagnostics!.error;
+                  final problem = diagnostics!.shownError;
                   if (problem == null) return const SizedBox.shrink();
                   return _StatusItem(
                     onTap: () => onGoToLine(problem.line),
@@ -405,8 +405,8 @@ class StatusBar extends StatelessWidget {
             if (!basic) ...[
               const _StatusItem(tooltip: 'Tab inserta 4 espacios', child: Text('Espacios: 4')),
               const _StatusItem(
-                tooltip: 'Acepta la sintaxis flexible de PSeInt: arreglos desde 1, Definir opcional',
-                child: Text('PSeInt · perfil flexible'),
+                tooltip: 'Perfil flexible: Definir es opcional y los arreglos empiezan en 1',
+                child: Text('Perfil flexible'),
               ),
               const _StatusItem(
                 tooltip: 'Tus programas se guardan solos en este dispositivo',
