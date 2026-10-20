@@ -1,7 +1,7 @@
 # Jaguar
 
-Jaguar es una app para aprender lógica de programación: diagramas de flujo
-como en DFD, pseudocódigo como en PSeInt, ejercicios que se revisan solos y
+Jaguar es una app para aprender lógica de programación: diagramas de flujo,
+pseudocódigo, ejercicios que se revisan solos y
 clases en línea para profesores y alumnos. Corre en el navegador, en Android
 y en escritorio, y lo básico funciona sin internet y sin cuenta.
 
@@ -13,8 +13,8 @@ Jaguar empezó en 2019, en la prepa, como el proyecto de Panterino: queríamos
 un "Duolingo de programación" para quien no tuviera computadora, internet o
 dinero para cursos. Lo intentamos varias veces hasta 2021 y nunca pasamos de
 la pantalla de login. En 2026 lo retomé con otra idea: en vez de inventar un
-lenguaje nuevo, usar lo que ya se enseña en las escuelas (PSeInt y DFD) y
-hacer que funcione en cualquier equipo.
+lenguaje nuevo, usar el pseudocódigo y los diagramas que ya se enseñan en las
+escuelas y hacer que funcione en cualquier equipo.
 
 ## Qué hay aquí
 
