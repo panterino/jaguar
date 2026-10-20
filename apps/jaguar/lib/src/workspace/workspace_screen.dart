@@ -37,6 +37,7 @@ import '../programs/examples.dart';
 import '../programs/program_store.dart';
 import '../settings.dart';
 import '../share/share_codec.dart';
+import '../share/scan_screen.dart';
 import '../share/share_dialog.dart';
 import '../theme.dart';
 import 'app_menus.dart';
@@ -529,8 +530,14 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
 
   void _share() => showShareDialog(context, name: programName(_code.text), source: _code.text);
 
-  Future<void> _openLink() async {
-    switch (await showOpenLinkDialog(context)) {
+  Future<void> _openLink() async => _openShared(await showOpenLinkDialog(context));
+
+  /// The QR the teacher projects: the camera reads it and the exercise opens.
+  Future<void> _scanQr() async => _openShared(await scanQr(context));
+
+  void _openShared(SharedContent? content) {
+    if (!mounted) return;
+    switch (content) {
       case SharedProgram(:final source):
         _openSource(source);
       case SharedExercise(:final exercise):
@@ -604,7 +611,20 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
     );
   }
 
-  void _showGuide() => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const GuideScreen()));
+  void _showGuide() => Navigator.push(
+    context,
+    MaterialPageRoute<void>(
+      builder: (_) => GuideScreen(
+        teacher: _settings.teacher,
+        onOpenChallenges: _openChallenges,
+        onDeskCheck: _deskCheck,
+        onPlan: _plan,
+        onOpenClasses: widget.cloud == null ? null : _openClasses,
+        onOpenTeacher: _settings.teacher ? _openTeacher : null,
+        onScan: canScanQr ? _scanQr : null,
+      ),
+    ),
+  );
 
   void _toast(String message) {
     if (!mounted) return;
@@ -922,7 +942,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
         ]),
       AppMenu('Ayuda', [
         AppMenuItem(
-          'Guía rápida',
+          'Guía',
           icon: Icons.menu_book_outlined,
           onSelected: _showGuide,
           shortcut: const SingleActivator(LogicalKeyboardKey.f1),
@@ -1387,6 +1407,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
               onSaveFile: _saveFile,
               onSendFile: _sendFile,
               onOpenLink: _openLink,
+              onScan: canScanQr ? _scanQr : null,
               onDeskCheck: _deskCheck,
               onPlan: _plan,
             ),
@@ -1434,6 +1455,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
           exercises: widget.exercises,
           onSelect: _load,
           onNew: _newProgram,
+          onScan: canScanQr ? _scanQr : null,
           onOpenTeacher: _settings.teacher ? _openTeacher : null,
           onChangeName: _settings.teacher ? null : _changeName,
           onToggleTeacher: () => _welcome(again: true),
@@ -1706,6 +1728,7 @@ class _MoreMenu extends StatelessWidget {
     required this.onSaveFile,
     required this.onSendFile,
     required this.onOpenLink,
+    this.onScan,
     required this.onDeskCheck,
     required this.onPlan,
   });
@@ -1717,6 +1740,7 @@ class _MoreMenu extends StatelessWidget {
   final VoidCallback onDeskCheck;
   final VoidCallback onPlan;
   final VoidCallback onOpenLink;
+  final VoidCallback? onScan;
 
   @override
   Widget build(BuildContext context) {
@@ -1727,6 +1751,12 @@ class _MoreMenu extends StatelessWidget {
         onPressed: () => controller.isOpen ? controller.close() : controller.open(),
       ),
       menuChildren: [
+        if (onScan != null)
+          MenuItemButton(
+            leadingIcon: const Icon(Icons.qr_code_scanner),
+            onPressed: onScan,
+            child: const Text('Escanear QR del ejercicio'),
+          ),
         MenuItemButton(leadingIcon: const Icon(Icons.edit_note), onPressed: onPlan, child: const Text('Planteamiento')),
         MenuItemButton(
           leadingIcon: const Icon(Icons.table_chart_outlined),
