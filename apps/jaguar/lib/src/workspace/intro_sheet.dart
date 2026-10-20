@@ -42,7 +42,7 @@ const _beginnerPages = [
       'Leer le pregunta un dato a quien usa el programa y lo guarda en una variable: una cajita con nombre.',
       'Los textos van entre comillas. Con + los juntas con lo que guardaste.',
     ],
-    code: 'Leer nombre\nEscribir "Hola " + nombre',
+    code: 'Leer nombre\nEscribir "Hola, " + nombre',
   ),
   _IntroPage(
     icon: Icons.account_tree_outlined,
