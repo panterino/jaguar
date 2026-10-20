@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:860170749647:android:f854ea9492fb07131d19ba",
+        "mobilesdk_app_id": "1:860170749647:android:60030de4566900181d19ba",
         "android_client_info": {
-          "package_name": "com.panterino.jaguar"
+          "package_name": "io.github.panterino.jaguar"
         }
       },
       "oauth_client": [
@@ -29,6 +29,13 @@
             {
               "client_id": "860170749647-nm8q2l3jgiq4mqjik9m711tjfl5v8mje.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "860170749647-f8tb7le16ucm6st9k6773ooqkndps7k7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.panterino.jaguar"
+              }
             }
           ]
         }
