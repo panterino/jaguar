@@ -100,11 +100,15 @@ service cloud.firestore {
         match /submissions/{uid} {
           allow read: if isMe(uid) || isOwner();
           allow create, update: if isMe(uid) && isMember()
-            && onlyFields(['name', 'source', 'passed', 'total', 'updatedAt'])
+            && onlyFields(['name', 'source', 'passed', 'total', 'pasted', 'updatedAt'])
             && request.resource.data.source is string
             && request.resource.data.source.size() <= 50000
             && request.resource.data.passed is int
-            && request.resource.data.total is int;
+            && request.resource.data.total is int
+            // Most lines pasted at once, for the teacher. Optional.
+            && (!('pasted' in request.resource.data)
+                || (request.resource.data.pasted is int && request.resource.data.pasted > 0
+                    && request.resource.data.pasted <= 5000));
           // The student can take their work back (deleting their account).
           allow delete: if isMe(uid) || isOwner();
         }

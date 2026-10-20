@@ -15,6 +15,7 @@ class VerifiedScreen extends StatefulWidget {
     required this.passedCases,
     required this.verifiedAt,
     required this.source,
+    this.pastedLines = 0,
   });
 
   final String exerciseTitle;
@@ -22,6 +23,9 @@ class VerifiedScreen extends StatefulWidget {
   final int passedCases;
   final DateTime verifiedAt;
   final String source;
+
+  /// The most lines pasted at once while writing it: the teacher sees it here.
+  final int pastedLines;
 
   @override
   State<VerifiedScreen> createState() => _VerifiedScreenState();
@@ -108,6 +112,20 @@ class _VerifiedScreenState extends State<VerifiedScreen> with SingleTickerProvid
                     'Verificado a las ${_time(widget.verifiedAt)}',
                     style: theme.textTheme.titleMedium?.copyWith(color: onGreen.withValues(alpha: 0.85)),
                   ),
+                  if (widget.pastedLines > 0) ...[
+                    const SizedBox(height: 4),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.content_paste, size: 18, color: onGreen.withValues(alpha: 0.85)),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Pegó ${widget.pastedLines} líneas de una vez',
+                          style: theme.textTheme.titleMedium?.copyWith(color: onGreen.withValues(alpha: 0.85)),
+                        ),
+                      ],
+                    ),
+                  ],
                   const SizedBox(height: 28),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

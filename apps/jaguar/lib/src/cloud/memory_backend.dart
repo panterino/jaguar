@@ -144,6 +144,7 @@ class MemoryBackend implements CloudBackend {
     required String source,
     required int passed,
     required int total,
+    int pastedLines = 0,
   }) async {
     if (!(_members[classId]?.containsKey(_me.uid) ?? false)) {
       throw const CloudException('No tienes permiso para hacer eso.');
@@ -155,6 +156,7 @@ class MemoryBackend implements CloudBackend {
       passed: passed,
       total: total,
       updatedAt: DateTime.now(),
+      pastedLines: pastedLines,
     );
   }
 

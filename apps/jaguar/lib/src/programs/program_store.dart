@@ -17,6 +17,7 @@ class SavedProgram {
     this.exerciseId,
     this.testsPassed,
     this.testsTotal,
+    this.pastedLines = 0,
   });
 
   factory SavedProgram.fromJson(Map<String, Object?> json) => SavedProgram(
@@ -26,6 +27,7 @@ class SavedProgram {
     exerciseId: json['exerciseId'] as String?,
     testsPassed: (json['testsPassed'] as num?)?.toInt(),
     testsTotal: (json['testsTotal'] as num?)?.toInt(),
+    pastedLines: (json['pastedLines'] as num?)?.toInt() ?? 0,
   );
 
   final String id;
@@ -39,6 +41,10 @@ class SavedProgram {
   int? testsPassed;
   int? testsTotal;
 
+  /// The most lines that arrived at once while writing it (pasted). The
+  /// teacher sees it next to the submission.
+  int pastedLines;
+
   String get name => programName(source);
 
   Map<String, Object?> toJson() => {
@@ -47,6 +53,7 @@ class SavedProgram {
     'updatedAt': updatedAt.toIso8601String(),
     if (exerciseId != null) 'exerciseId': exerciseId,
     if (testsTotal != null) ...{'testsPassed': testsPassed, 'testsTotal': testsTotal},
+    if (pastedLines > 0) 'pastedLines': pastedLines,
   };
 }
 
@@ -149,6 +156,15 @@ class ProgramStore extends ChangeNotifier {
       ..testsTotal = total;
     _persist();
   }
+
+  void recordPaste(String id, int lines) {
+    final index = _programs.indexWhere((p) => p.id == id);
+    if (index < 0 || lines <= _programs[index].pastedLines) return;
+    _programs[index].pastedLines = lines;
+    _persist();
+  }
+
+  int pastedLines(String id) => _programs.where((p) => p.id == id).firstOrNull?.pastedLines ?? 0;
 
   void delete(SavedProgram program) {
     _programs.remove(program);

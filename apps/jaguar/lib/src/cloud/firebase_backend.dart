@@ -230,12 +230,14 @@ class FirebaseBackend implements CloudBackend {
     required String source,
     required int passed,
     required int total,
+    int pastedLines = 0,
   }) => _guard(
     () => _db.doc('classes/$classId/assignments/$assignmentId/submissions/$_uid').set({
       'name': name,
       'source': source,
       'passed': passed,
       'total': total,
+      if (pastedLines > 0) 'pasted': pastedLines,
       'updatedAt': FieldValue.serverTimestamp(),
     }),
   );
@@ -249,6 +251,7 @@ class FirebaseBackend implements CloudBackend {
       passed: (data['passed'] as num?)?.toInt() ?? 0,
       total: (data['total'] as num?)?.toInt() ?? 0,
       updatedAt: (data['updatedAt'] as Timestamp?)?.toDate(),
+      pastedLines: (data['pasted'] as num?)?.toInt() ?? 0,
     );
   }
 
