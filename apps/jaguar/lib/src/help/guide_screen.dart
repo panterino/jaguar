@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../settings.dart';
+import '../share/scan_screen.dart';
 import '../theme.dart';
 
 /// Jaguar's guide, inside the app so it works without internet. One tab for
@@ -16,6 +17,7 @@ class GuideScreen extends StatelessWidget {
     this.onPlan,
     this.onOpenClasses,
     this.onOpenTeacher,
+    this.onScan,
   });
 
   /// Opens on the Profe tab.
@@ -25,6 +27,7 @@ class GuideScreen extends StatelessWidget {
   final VoidCallback? onPlan;
   final VoidCallback? onOpenClasses;
   final VoidCallback? onOpenTeacher;
+  final VoidCallback? onScan;
 
   @override
   Widget build(BuildContext context) {
@@ -135,6 +138,23 @@ class GuideScreen extends StatelessWidget {
       action: ('Ver los retos', go(onOpenChallenges)),
     ),
     _Topic(
+      icon: Icons.qr_code_scanner,
+      title: 'El ejercicio del proyector',
+      summary: 'Escanea el QR de tu profe',
+      steps: [
+        if (canScanQr) ...[
+          'Abre el menú de la izquierda y toca Escanear QR. También está en el menú de tres puntos.',
+          'Apunta al QR que proyecta tu profe: el ejercicio se abre solo, listo para resolver.',
+        ] else ...[
+          'Escanéalo con la cámara de tu celular: abre el ejercicio en el navegador.',
+          desktop
+              ? 'Si te pasan el enlace, ábrelo en el menú Archivo, en Abrir enlace.'
+              : 'Si te pasan el enlace, ábrelo en el menú de tres puntos, en Abrir enlace.',
+        ],
+      ],
+      action: ('Escanear un QR', go(onScan)),
+    ),
+    _Topic(
       icon: Icons.edit_note,
       title: 'Planteamiento',
       summary: 'Piensa el problema antes de programar',
@@ -224,6 +244,7 @@ class GuideScreen extends StatelessWidget {
       summary: 'Con un QR en el proyector o un enlace',
       steps: [
         'En Mis ejercicios, Proyectar muestra el QR grande para que tu grupo lo escanee.',
+        'Tus alumnos lo leen con Escanear QR en la app de Jaguar, o con la cámara del celular.',
         'También puedes copiar el enlace y mandarlo por WhatsApp.',
         'Cuando un alumno pasa todas las pruebas, te enseña la pantalla verde con su nombre y la hora.',
       ],
