@@ -124,6 +124,7 @@ const challenges = <Challenge>[
       cases: [
         TestCase(inputs: ['5'], expected: 'Dentro'),
         TestCase(inputs: ['0'], expected: 'Fuera'),
+        TestCase(inputs: ['1'], expected: 'Dentro', hidden: true),
         TestCase(inputs: ['10'], expected: 'Dentro', hidden: true),
         TestCase(inputs: ['11'], expected: 'Fuera', hidden: true),
       ],
@@ -146,6 +147,7 @@ const challenges = <Challenge>[
         TestCase(inputs: ['1'], expected: 'Lunes'),
         TestCase(inputs: ['5'], expected: 'Viernes'),
         TestCase(inputs: ['7'], expected: 'Domingo', hidden: true),
+        TestCase(inputs: ['0'], expected: 'No existe', hidden: true),
         TestCase(inputs: ['9'], expected: 'No existe', hidden: true),
       ],
     ),
