@@ -34,6 +34,11 @@ class JaguarError implements Exception {
   final String? hint;
   final ErrorCause cause;
 
+  /// A block that is still open ("Falta 'FinSi'…"): while typing that is not
+  /// a mistake yet, so the editor waits for the program to run.
+  bool get unfinished =>
+      kind == ErrorKind.syntax && (message.startsWith("Falta '") || RegExp(r"^Encontré '\w+', pero antes falta '").hasMatch(message));
+
   String get title => kind == ErrorKind.syntax ? 'Error de sintaxis' : 'Error de ejecución';
 
   /// Renders the error with the offending source line and a caret.
