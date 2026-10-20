@@ -200,6 +200,28 @@ void main() {
     expect(editor.controller!.text.substring(selection.start, selection.end), '    Escrivir "hola"');
   });
 
+  testWidgets('en celular Atrás cierra el menú y pide confirmar antes de salir', (tester) async {
+    tester.view.physicalSize = const Size(400, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    final store = await _store('Algoritmo hola\nFinAlgoritmo\n');
+    await tester.pumpWidget(JaguarApp(store: store, exercises: ExerciseStore(_prefs), settings: ViewSettings(_prefs)));
+    await tester.pumpAndSettle();
+    final scaffold = tester.firstState<ScaffoldState>(find.byType(Scaffold));
+    scaffold.openDrawer();
+    await tester.pumpAndSettle();
+    expect(scaffold.isDrawerOpen, isTrue);
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(scaffold.isDrawerOpen, isFalse);
+
+    await tester.binding.handlePopRoute();
+    await tester.pump();
+    expect(find.text('Presiona Atrás otra vez para salir'), findsOneWidget);
+  });
+
   testWidgets('en celular cambia entre código y consola', (tester) async {
     tester.view.physicalSize = const Size(400, 800);
     tester.view.devicePixelRatio = 1;
@@ -443,7 +465,11 @@ void main() {
       await tester.enterText(editor, 'Algoritmo saludo\n    Leer n\n    Escribir "Hola, ", n\nFinAlgoritmo\n');
       await tester.tap(find.text('Probar').first);
       await tester.pumpAndSettle();
-      expect(find.text('¡Reto superado! Abre Retos para seguir con el siguiente.'), findsOneWidget);
+      expect(find.text('¡Reto superado!'), findsWidgets);
+      expect(find.text('Mostrar al profesor'), findsNothing);
+      await tester.tap(find.text('Siguiente reto'));
+      await tester.pumpAndSettle();
+      expect(find.text('Reto 2 · Área del rectángulo'), findsOneWidget);
       await tester.tap(find.text('Retos'));
       await tester.pumpAndSettle();
       expect(find.textContaining('Llevas 1 de 10'), findsOneWidget);

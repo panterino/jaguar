@@ -22,6 +22,10 @@ class Cloud extends ChangeNotifier {
     if (raw != null) _links.addAll((jsonDecode(raw) as Map).cast<String, String>());
   }
 
+  /// The profile chosen on this device is a teacher's: "Entrar en línea"
+  /// starts on Profesor.
+  bool prefersTeacher = false;
+
   static const _linksKey = 'jaguar.cloud.assignments';
 
   final CloudBackend backend;

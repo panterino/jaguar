@@ -65,7 +65,7 @@ List<BlockField> fieldsFor(BlockKind kind, {Stmt? stmt, Notation notation = Nota
       BlockField(
         'Qué mostrar',
         initial: stmt is WriteStmt ? list(stmt.values) : '',
-        hint: notation == Notation.dfd ? "'Hola, ', nombre" : '"Hola, ", nombre',
+        hint: notation == Notation.dfd ? "'Total: ', total" : '"Total: ", total',
         help: notation == Notation.dfd
             ? "Textos entre comillas simples; separa con comas: 'Total: ', total"
             : 'Textos entre comillas; separa con comas: "Total: ", total',
@@ -226,7 +226,14 @@ class _BlockDialogState extends State<_BlockDialog> {
                 style: monoStyle.copyWith(letterSpacing: 0),
                 decoration: InputDecoration(
                   labelText: field.label,
-                  hintText: field.hint,
+                  // "Ej.:" and a lighter, italic text, so the example is not
+                  // mistaken for something already written.
+                  hintText: field.hint == null ? null : 'Ej.: ${field.hint}',
+                  hintStyle: monoStyle.copyWith(
+                    letterSpacing: 0,
+                    fontStyle: FontStyle.italic,
+                    color: scheme.onSurfaceVariant.withValues(alpha: 0.5),
+                  ),
                   helperText: field.help,
                   helperMaxLines: 2,
                 ),

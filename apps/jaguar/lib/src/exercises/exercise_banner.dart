@@ -11,6 +11,7 @@ class ExerciseBanner extends StatefulWidget {
     this.showCheckButton = true,
     this.onPlan,
     this.onHints,
+    this.challenge = false,
   });
 
   final Exercise exercise;
@@ -25,6 +26,9 @@ class ExerciseBanner extends StatefulWidget {
 
   /// Challenges have hints.
   final VoidCallback? onHints;
+
+  /// A reto: its tests were written by us, not by a teacher.
+  final bool challenge;
 
   @override
   State<ExerciseBanner> createState() => _ExerciseBannerState();
@@ -41,6 +45,17 @@ class _ExerciseBannerState extends State<ExerciseBanner> {
     final visibleCases = exercise.cases.where((c) => !c.hidden).length;
     final hiddenCases = exercise.cases.length - visibleCases;
 
+    final title = Text(
+      exercise.title,
+      style: theme.textTheme.titleMedium?.copyWith(color: scheme.onPrimaryContainer),
+      overflow: TextOverflow.ellipsis,
+      maxLines: 2,
+    );
+    // On a phone the buttons leave no room: the title goes on its own line.
+    final narrow = MediaQuery.sizeOf(context).width < 480;
+    // While typing on a phone the code needs the room: only the title and buttons.
+    final typing = narrow && MediaQuery.viewInsetsOf(context).bottom > 0;
+
     return Material(
       color: scheme.primaryContainer,
       child: Padding(
@@ -48,17 +63,25 @@ class _ExerciseBannerState extends State<ExerciseBanner> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            if (narrow)
+              Padding(
+                padding: const EdgeInsets.only(top: 4, right: 8),
+                child: Row(
+                  children: [
+                    Icon(Icons.assignment_outlined, color: scheme.onPrimaryContainer),
+                    const SizedBox(width: 8),
+                    Expanded(child: title),
+                  ],
+                ),
+              ),
             Row(
               children: [
-                Icon(Icons.assignment_outlined, color: scheme.onPrimaryContainer),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    exercise.title,
-                    style: theme.textTheme.titleMedium?.copyWith(color: scheme.onPrimaryContainer),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
+                if (!narrow) ...[
+                  Icon(Icons.assignment_outlined, color: scheme.onPrimaryContainer),
+                  const SizedBox(width: 8),
+                  Expanded(child: title),
+                ] else
+                  const Spacer(),
                 if (exercise.statement.isNotEmpty)
                   IconButton(
                     tooltip: _expanded ? 'Ocultar enunciado' : 'Ver enunciado',
@@ -91,7 +114,7 @@ class _ExerciseBannerState extends State<ExerciseBanner> {
                   ),
               ],
             ),
-            if (_expanded && exercise.statement.isNotEmpty)
+            if (_expanded && !typing && exercise.statement.isNotEmpty)
               ConstrainedBox(
                 constraints: const BoxConstraints(maxHeight: 160),
                 child: SingleChildScrollView(
@@ -99,16 +122,18 @@ class _ExerciseBannerState extends State<ExerciseBanner> {
                   child: SelectableText(exercise.statement, style: TextStyle(color: scheme.onPrimaryContainer)),
                 ),
               ),
-            Padding(
-              padding: const EdgeInsets.only(top: 2),
-              child: Text(
-                [
-                  '${exercise.cases.length} ${exercise.cases.length == 1 ? 'prueba' : 'pruebas'} del profesor',
-                  if (hiddenCases > 0) '$hiddenCases ${hiddenCases == 1 ? 'oculta' : 'ocultas'}',
-                ].join(' · '),
-                style: theme.textTheme.bodySmall?.copyWith(color: scheme.onPrimaryContainer.withValues(alpha: 0.75)),
+            if (!typing)
+              Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: Text(
+                  [
+                    '${exercise.cases.length} ${exercise.cases.length == 1 ? 'prueba' : 'pruebas'}'
+                        '${widget.challenge ? '' : ' del profesor'}',
+                    if (hiddenCases > 0) '$hiddenCases ${hiddenCases == 1 ? 'oculta' : 'ocultas'}',
+                  ].join(' · '),
+                  style: theme.textTheme.bodySmall?.copyWith(color: scheme.onPrimaryContainer.withValues(alpha: 0.75)),
+                ),
               ),
-            ),
           ],
         ),
       ),

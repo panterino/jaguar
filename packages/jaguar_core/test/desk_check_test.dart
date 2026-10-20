@@ -30,7 +30,10 @@ FinAlgoritmo
 FinAlgoritmo
 ''';
     final check = await deskCheck(source);
-    final assignments = [for (var r = 0; r < check.rows.length; r++) if (check.rows[r].line == 3) check.value(r, 's')];
+    final assignments = [
+      for (var r = 0; r < check.rows.length; r++)
+        if (check.rows[r].line == 3) check.value(r, 's'),
+    ];
     expect(assignments, ['1', '2', '3']);
   });
 
@@ -40,7 +43,10 @@ FinAlgoritmo
   });
 
   test('un ciclo infinito se corta', () async {
-    final check = await deskCheck('Algoritmo a\n    Mientras Verdadero Hacer\n        x <- 1\n    FinMientras\nFinAlgoritmo\n', maxRows: 20);
+    final check = await deskCheck(
+      'Algoritmo a\n    Mientras Verdadero Hacer\n        x <- 1\n    FinMientras\nFinAlgoritmo\n',
+      maxRows: 20,
+    );
     expect(check.truncated, isTrue);
     expect(check.rows.length, 20);
   });
