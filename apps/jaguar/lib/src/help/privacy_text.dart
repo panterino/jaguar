@@ -17,7 +17,8 @@ const privacySections = <(String, String)>[
   (
     'Sin cuenta no hay datos',
     'Puedes usar Jaguar sin entrar en línea. Tus programas, los ejercicios, tu avance en los retos y el nombre que '
-        'escribas para mostrar un ejercicio se guardan solo en tu equipo y no se mandan a ningún lado.',
+        'escribas para mostrar un ejercicio se guardan solo en tu equipo y no se mandan a ningún lado. '
+        'Si usas la cámara para escanear un QR, la imagen no se guarda ni sale de tu celular.',
   ),
   (
     'Si entras en línea',

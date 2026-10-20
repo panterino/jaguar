@@ -11,6 +11,7 @@ class ProgramsDrawer extends StatelessWidget {
     required this.exercises,
     required this.onSelect,
     required this.onNew,
+    this.onScan,
     required this.cloud,
     required this.onOpenCommunity,
     required this.onOpenChallenges,
@@ -31,6 +32,9 @@ class ProgramsDrawer extends StatelessWidget {
   final ExerciseStore exercises;
   final ValueChanged<SavedProgram> onSelect;
   final VoidCallback onNew;
+
+  /// Opens the camera to read an exercise's QR (phone apps only).
+  final VoidCallback? onScan;
   final Cloud? cloud;
   final VoidCallback onOpenCommunity;
   final VoidCallback onOpenChallenges;
@@ -80,13 +84,29 @@ class ProgramsDrawer extends StatelessWidget {
                 Padding(padding: const EdgeInsets.fromLTRB(16, 4, 16, 4), child: modeSwitch),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  child: FilledButton.tonalIcon(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      onNew();
-                    },
-                    icon: const Icon(Icons.add),
-                    label: const Text('Nuevo programa'),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      FilledButton.tonalIcon(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          onNew();
+                        },
+                        icon: const Icon(Icons.add),
+                        label: const Text('Nuevo programa'),
+                      ),
+                      if (onScan case final scan?) ...[
+                        const SizedBox(height: 8),
+                        OutlinedButton.icon(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            scan();
+                          },
+                          icon: const Icon(Icons.qr_code_scanner),
+                          label: const Text('Escanear QR del ejercicio'),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
                 const Divider(),

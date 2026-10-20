@@ -1,6 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Clases y comunidad en línea. -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Escanear el QR que proyecta el profe. Solo se usa para leer el código. -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
     <application
         android:label="Jaguar"
         android:name="${applicationName}"
