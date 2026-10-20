@@ -64,6 +64,7 @@ class Submission {
     required this.passed,
     required this.total,
     this.updatedAt,
+    this.pastedLines = 0,
   });
 
   final String uid;
@@ -72,6 +73,9 @@ class Submission {
   final int passed;
   final int total;
   final DateTime? updatedAt;
+
+  /// The most lines the student pasted at once while writing it.
+  final int pastedLines;
 
   bool get complete => total > 0 && passed == total;
 }
@@ -177,6 +181,7 @@ abstract class CloudBackend {
     required String source,
     required int passed,
     required int total,
+    int pastedLines = 0,
   });
   Future<Map<String, Submission>> submissions(String classId, String assignmentId);
   Future<Submission?> mySubmission(String classId, String assignmentId);

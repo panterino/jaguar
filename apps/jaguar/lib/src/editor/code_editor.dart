@@ -8,6 +8,7 @@ import 'package:jaguar_core/jaguar_core.dart';
 import '../settings.dart';
 import '../theme.dart';
 import 'auto_indent.dart';
+import 'paste_watch.dart';
 import 'completions.dart';
 import 'editor_rules.dart';
 import 'syntax_controller.dart';
@@ -29,6 +30,7 @@ class CodeEditor extends StatefulWidget {
     this.fontSize = 14,
     this.highlightCurrentLine = false,
     this.inlineErrors = true,
+    this.onLargePaste,
     this.undoController,
     this.executingLine,
     this.diagnostics,
@@ -44,6 +46,9 @@ class CodeEditor extends StatefulWidget {
   /// The error message at the end of its line. Phones show it below the
   /// editor instead, where it fits.
   final bool inlineErrors;
+
+  /// Called when many lines arrive at once (see [PasteWatch]).
+  final void Function(int lines)? onLargePaste;
 
   /// Lets the Editar menu undo and redo.
   final UndoHistoryController? undoController;
@@ -62,6 +67,8 @@ class CodeEditor extends StatefulWidget {
 }
 
 class CodeEditorState extends State<CodeEditor> {
+  late final _pasteWatch = PasteWatch((lines) => widget.onLargePaste?.call(lines));
+
   final _vertical = ScrollController();
   final _horizontal = ScrollController();
   final _findField = TextEditingController();
@@ -499,7 +506,7 @@ class CodeEditorState extends State<CodeEditor> {
                                               smartQuotesType: SmartQuotesType.disabled,
                                               smartDashesType: SmartDashesType.disabled,
                                               textCapitalization: TextCapitalization.none,
-                                              inputFormatters: [PairFormatter(), AutoIndentFormatter()],
+                                              inputFormatters: [_pasteWatch, PairFormatter(), AutoIndentFormatter()],
                                               decoration: const InputDecoration.collapsed(
                                                 hintText: 'Escribe tu algoritmo aquí…',
                                               ).copyWith(contentPadding: _padding),

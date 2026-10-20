@@ -24,7 +24,8 @@ const privacySections = <(String, String)>[
     'Alumnos y quienes aprenden por su cuenta: un alias y el tipo de cuenta. La cuenta es anónima, sin correo. '
         'Profesores: su correo, su contraseña (la guarda Firebase Authentication; nosotros nunca la vemos) y el nombre '
         'que verán sus alumnos. En las clases: el nombre con el que te unes, que solo ve tu profesor, y tus entregas '
-        '(el programa y cuántas pruebas pasó). En la comunidad: lo que publicas, con tu alias y bajo la licencia '
+        '(el programa, cuántas pruebas pasó y, si pegaste muchas líneas de golpe, cuántas). '
+        'En la comunidad: lo que publicas, con tu alias y bajo la licencia '
         'CC BY-SA, los "me sirvió" y los reportes.',
   ),
   (

@@ -1,0 +1,814 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manual de Jaguar: pseudocódigo y diagramas en celular y compu</title>
+<meta name="description" content="Manual de Jaguar para alumnos y profes: cómo escribir y ejecutar pseudocódigo, dibujar diagramas de flujo, hacer retos y prueba de escritorio, y trabajar con tu clase, en el celular y en la computadora.">
+<link rel="canonical" href="https://pseudocodigo-jaguar.web.app/manual">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="favicon.png">
+<link rel="icon" type="image/svg+xml" href="logo.svg">
+<link rel="apple-touch-icon" href="icono.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Jaguar">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://pseudocodigo-jaguar.web.app/manual">
+<meta property="og:title" content="Manual de Jaguar: pseudocódigo y diagramas en el celular y la computadora">
+<meta property="og:description" content="Cómo usar Jaguar paso a paso, para alumnos y para profes, en el celular y en la computadora.">
+<meta property="og:image" content="https://pseudocodigo-jaguar.web.app/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+:root {
+  --cafe: #3B2410; --amarillo: #F4B723; --azul: #00A8F0;
+  --fondo: #FFF8F0; --superficie: #FFFFFF; --superficie-2: #FBF1E4;
+  --texto: #2A1A0B; --suave: #6B5645; --borde: #EADBC8; --enlace: #8A4B00;
+  --portada: #3B2410; --portada-texto: #FFF3E0; --portada-suave: #E6CFB4;
+  --eti: #A06A00; --chip: #FFF1CC; --chip-texto: #4A2E10; --kbd: #FFFFFF;
+  --sombra: 0 10px 30px rgba(59,36,16,.14);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fondo: #1A120B; --superficie: #241810; --superficie-2: #20150D;
+    --texto: #F5EADF; --suave: #C9B6A2; --borde: #3E2C1C; --enlace: #F4B723;
+    --portada: #24170B; --eti: #F4B723; --chip: #3A2813; --chip-texto: #FFE3A3; --kbd: #2E2015;
+    --sombra: 0 10px 30px rgba(0,0,0,.4);
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--fondo); color: var(--texto);
+  font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  overflow-x: hidden;
+}
+a { color: var(--enlace); text-underline-offset: 3px; }
+:focus-visible { outline: 3px solid var(--azul); outline-offset: 3px; border-radius: 6px; }
+img { max-width: 100%; height: auto; display: block; }
+.ancho { max-width: 1000px; margin: 0 auto; padding: 0 16px; }
+
+/* Portada */
+.portada { background: var(--portada); color: var(--portada-texto); padding: 18px 0 52px; }
+.barra-sup { display: flex; align-items: center; gap: 10px; margin-bottom: 40px; }
+.barra-sup img { width: 46px; height: auto; }
+.barra-sup .nombre { font-size: 22px; font-weight: 800; margin-right: auto; color: inherit; text-decoration: none; }
+.barra-sup a:not(.nombre) { color: var(--portada-texto); text-decoration: none; font-size: 15px; opacity: .9; }
+.barra-sup a:not(.nombre):hover { opacity: 1; text-decoration: underline; }
+.barra-sup a + a { margin-left: 14px; }
+.pronto {
+  display: inline-block; background: var(--amarillo); color: var(--cafe);
+  font-weight: 800; font-size: 13px; letter-spacing: .12em; text-transform: uppercase;
+  padding: 6px 14px; border-radius: 999px; margin: 0;
+}
+h1 { font-size: clamp(32px, 5.6vw, 50px); line-height: 1.08; margin: 18px 0 16px; letter-spacing: -.02em; }
+h1 span { color: var(--amarillo); }
+.lema { font-size: 19px; color: var(--portada-suave); margin: 0 0 26px; max-width: 36em; }
+.dispositivos { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.dispositivos li {
+  display: inline-flex; align-items: center; gap: 8px; font-size: 15px;
+  padding: 7px 14px; border-radius: 999px; box-shadow: inset 0 0 0 1.5px #7A5C40; color: var(--portada-texto);
+}
+.dispositivos svg { width: 18px; height: 18px; flex: none; }
+
+/* Índice */
+.indice { padding: 40px 0 8px; }
+.indice-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.indice nav { background: var(--superficie); border: 1px solid var(--borde); border-radius: 16px; padding: 18px 20px; }
+.indice h2 { font-size: 15px; letter-spacing: .1em; text-transform: uppercase; color: var(--eti); margin: 0 0 8px; }
+.indice ol { margin: 0; padding-left: 22px; }
+.indice li { margin: 4px 0; font-size: 16px; }
+.indice li::marker { color: var(--suave); font-size: 14px; }
+
+/* Partes */
+.parte { padding: 48px 0 8px; }
+.parte-cab { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+.parte-cab img { width: 64px; height: auto; flex: none; }
+.eti { margin: 0 0 2px; font-size: 13px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--eti); }
+h2 { font-size: clamp(28px, 4.2vw, 38px); line-height: 1.12; margin: 0; letter-spacing: -.01em; }
+.parte > .ancho > .intro { color: var(--suave); max-width: 40em; font-size: 18px; margin: 10px 0 0; }
+
+.tema { padding: 34px 0 30px; border-bottom: 1px solid var(--borde); scroll-margin-top: 12px; }
+.tema:last-child { border-bottom: 0; }
+h3 { font-size: 24px; line-height: 1.2; margin: 0 0 10px; letter-spacing: -.01em; }
+h3 .num {
+  display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 50%;
+  background: var(--amarillo); color: var(--cafe); font-size: 16px; font-weight: 800;
+  margin-right: 10px; vertical-align: 3px;
+}
+h4 { font-size: 17px; margin: 18px 0 6px; }
+p { margin: 0 0 12px; }
+.tema ul, .tema ol { margin: 0 0 12px; padding-left: 22px; }
+.tema li { margin: 5px 0; }
+.suave { color: var(--suave); }
+
+.con-foto { display: grid; grid-template-columns: minmax(0, 1fr) 250px; gap: 32px; align-items: start; }
+.con-foto.dos-fotos { grid-template-columns: minmax(0, 1fr) 420px; }
+
+/* Celular y computadora */
+.como { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 14px 0 14px; }
+.disp { background: var(--superficie); border: 1px solid var(--borde); border-radius: 14px; padding: 14px 16px; }
+.disp p:last-child, .disp ul:last-child, .disp ol:last-child { margin-bottom: 0; }
+.disp-t { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 14px; letter-spacing: .06em; text-transform: uppercase; color: var(--eti); margin: 0 0 6px; }
+.disp-t svg { width: 18px; height: 18px; flex: none; }
+.disp ol, .disp ul { padding-left: 20px; }
+
+/* Botones y teclas dentro del texto */
+.ui {
+  display: inline; background: var(--chip); color: var(--chip-texto); font-weight: 650;
+  padding: 0 7px; border-radius: 6px; font-size: .94em; line-height: 1.5;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
+kbd {
+  font: 600 .86em/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  background: var(--kbd); border: 1px solid var(--borde); border-bottom-width: 2px;
+  padding: 1px 6px; border-radius: 6px; white-space: nowrap;
+}
+code { font: .92em ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: var(--superficie-2); padding: 1px 5px; border-radius: 5px; }
+
+.nota { background: var(--superficie-2); border-left: 4px solid var(--amarillo); border-radius: 0 12px 12px 0; padding: 12px 16px; margin: 14px 0; }
+.nota p:last-child { margin: 0; }
+
+/* Capturas */
+figure { margin: 0; }
+.cel img {
+  width: 100%; border-radius: 20px; border: 1px solid var(--borde);
+  box-shadow: var(--sombra); background: #FFF8F0;
+}
+figcaption { font-size: 14px; color: var(--suave); margin-top: 10px; line-height: 1.45; }
+.fotos { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.fotos.tres { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 640px; margin-top: 8px; }
+.compu { margin: 18px 0 6px; }
+.compu .marco {
+  border: 1px solid var(--borde); border-radius: 12px; overflow: hidden; box-shadow: var(--sombra); background: var(--superficie-2);
+}
+.compu .marco::before {
+  content: ""; display: block; height: 22px; background:
+    radial-gradient(circle at 14px 11px, #E86A5A 4px, transparent 4.5px),
+    radial-gradient(circle at 30px 11px, #F4B723 4px, transparent 4.5px),
+    radial-gradient(circle at 46px 11px, #5DBB63 4px, transparent 4.5px), var(--superficie-2);
+  border-bottom: 1px solid var(--borde);
+}
+
+/* Tabla de atajos */
+.tabla { background: var(--superficie); border: 1px solid var(--borde); border-radius: 14px; overflow: hidden; }
+table { border-collapse: collapse; width: 100%; font-size: 16px; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--borde); vertical-align: top; }
+th { font-size: 13px; color: var(--suave); text-transform: uppercase; letter-spacing: .06em; background: var(--superficie-2); }
+tr:last-child td { border-bottom: 0; }
+td:last-child { white-space: nowrap; }
+
+/* Problemas comunes */
+details { border-bottom: 1px solid var(--borde); }
+details:first-of-type { border-top: 1px solid var(--borde); }
+summary { cursor: pointer; list-style: none; padding: 16px 36px 16px 0; position: relative; font-weight: 700; font-size: 17.5px; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; position: absolute; right: 6px; top: 50%; transform: translateY(-50%); font-size: 26px; font-weight: 400; color: var(--enlace); }
+details[open] summary::after { content: "−"; }
+details > div { padding: 0 0 8px; color: var(--suave); }
+
+.arriba { display: inline-block; margin-top: 18px; font-size: 15px; }
+
+footer { padding: 28px 0 40px; color: var(--suave); font-size: 15px; border-top: 1px solid var(--borde); margin-top: 48px; }
+footer .ancho { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; }
+footer span { margin-right: auto; }
+
+@media (max-width: 860px) {
+  .indice-grid { grid-template-columns: minmax(0, 1fr); }
+  .con-foto, .con-foto.dos-fotos { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .con-foto > figure.cel { max-width: 250px; margin: 0 auto; }
+  .con-foto > .fotos { max-width: 440px; margin: 0 auto; width: 100%; }
+}
+@media (max-width: 640px) {
+  body { font-size: 16px; }
+  .barra-sup { margin-bottom: 28px; }
+  .barra-sup a + a { margin-left: 4px; }
+  .como { grid-template-columns: minmax(0, 1fr); }
+  h3 { font-size: 21px; }
+  .parte-cab img { width: 52px; }
+  .fotos { gap: 10px; }
+  .fotos.tres { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .solo-ancho { display: none; }
+  .cel img { border-radius: 14px; }
+  table { font-size: 15px; }
+  th, td { padding: 9px 10px; }
+  td:last-child { white-space: normal; }
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-cel" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10.5 18.5h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-compu" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M1.5 20h21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-android" viewBox="0 0 24 24"><path d="M5 11a7 7 0 0 1 14 0v6H5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M7.5 5.5 6 3.5m10.5 2 1.5-2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="9.5" cy="9" r="1" fill="currentColor"/><circle cx="14.5" cy="9" r="1" fill="currentColor"/></symbol>
+</svg>
+
+<header class="portada">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="logo.svg" alt="" width="46" height="40">
+      <a class="nombre" href="/">Jaguar</a>
+      <a href="/">Inicio</a>
+      <a href="/profes">Para profes</a>
+    </div>
+    <p class="pronto">Manual de uso</p>
+    <h1>Manual de <span>Jaguar</span></h1>
+    <p class="lema">Cómo escribir pseudocódigo, dibujar diagramas de flujo, practicar con retos y trabajar con tu clase. Para alumnos y para profes, en el celular y en la computadora.</p>
+    <ul class="dispositivos" aria-label="Dónde funciona Jaguar">
+      <li><svg aria-hidden="true"><use href="#i-android"/></svg>App de Android</li>
+      <li><svg aria-hidden="true"><use href="#i-cel"/></svg>Navegador del celular</li>
+      <li><svg aria-hidden="true"><use href="#i-compu"/></svg>Navegador de la computadora</li>
+    </ul>
+  </div>
+</header>
+
+<main>
+
+<section class="indice" aria-label="Contenido">
+  <div class="ancho">
+    <div class="nota">
+      <p>Jaguar es el mismo en todos lados; lo que cambia es dónde están los botones. Cuando algo se hace distinto, verás dos cajas: <b>En el celular</b> y <b>En la computadora</b>. Si la ventana del navegador es angosta, Jaguar se ve como en el celular.</p>
+    </div>
+    <div class="indice-grid">
+      <nav aria-labelledby="ind-alumnos">
+        <h2 id="ind-alumnos">Para alumnos</h2>
+        <ol>
+          <li><a href="#primera-vez">La primera vez</a></li>
+          <li><a href="#ejecutar">Escribe y ejecuta</a></li>
+          <li><a href="#barra-teclas">La barra de teclas</a></li>
+          <li><a href="#diagrama">Código y diagrama</a></li>
+          <li><a href="#dibujar">Dibuja tu diagrama</a></li>
+          <li><a href="#errores">Cuando hay un error</a></li>
+          <li><a href="#retos">Retos con pistas</a></li>
+          <li><a href="#planteamiento">Planteamiento</a></li>
+          <li><a href="#prueba-escritorio">Prueba de escritorio</a></li>
+          <li><a href="#guardar">Guardar y compartir</a></li>
+        </ol>
+      </nav>
+      <nav aria-labelledby="ind-alumnos-2">
+        <h2 id="ind-alumnos-2">Alumnos: más</h2>
+        <ol start="11">
+          <li><a href="#basico-completo">Básico y Completo</a></li>
+          <li><a href="#perfil">Cambiar de perfil</a></li>
+          <li><a href="#unirse">Unirte a una clase</a></li>
+          <li><a href="#mostrar">Mostrar al profesor</a></li>
+          <li><a href="#atras">El botón Atrás en Android</a></li>
+          <li><a href="#instalar">Instalar y usar sin internet</a></li>
+        </ol>
+      </nav>
+      <nav aria-labelledby="ind-profes">
+        <h2 id="ind-profes">Para profes</h2>
+        <ol start="17">
+          <li><a href="#soy-profesor">Elige «Soy profesor»</a></li>
+          <li><a href="#crear-ejercicio">Crea un ejercicio</a></li>
+          <li><a href="#proyectar">Compártelo con QR o enlace</a></li>
+          <li><a href="#cuenta-profe">Entra en línea</a></li>
+          <li><a href="#clase">Crea tu clase y asigna</a></li>
+          <li><a href="#entregas">Revisa las entregas</a></li>
+        </ol>
+        <h2 style="margin-top:14px">Y también</h2>
+        <ul style="padding-left:20px;margin:0">
+          <li><a href="#atajos">Atajos de teclado</a></li>
+          <li><a href="#problemas">Problemas comunes</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ ALUMNOS ============================ -->
+<section class="parte" id="alumnos" aria-labelledby="t-alumnos">
+  <div class="ancho">
+    <div class="parte-cab">
+      <img src="mascota.png" alt="" width="64" height="64">
+      <div>
+        <p class="eti">Primera parte</p>
+        <h2 id="t-alumnos">Para alumnos</h2>
+      </div>
+    </div>
+    <p class="intro">Todo lo que necesitas para hacer tus programas y tus tareas. No necesitas cuenta ni correo para usar Jaguar.</p>
+
+    <article class="tema" id="primera-vez">
+      <div class="con-foto">
+        <div>
+          <h3><span class="num">1</span>La primera vez</h3>
+          <p>Al abrir Jaguar por primera vez te pregunta cómo quieres empezar. Elige <span class="ui">Estoy aprendiendo</span>.</p>
+          <p>Así entras en modo <b>Básico</b>: solo ves lo necesario para escribir y ejecutar tus programas. Lo puedes cambiar cuando quieras.</p>
+          <div class="como">
+            <div class="disp">
+              <p class="disp-t"><svg aria-hidden="true"><use href="#i-cel"/></svg>En el celular</p>
+              <p>Empiezas en el código. Un aviso arriba te dice dónde está el diagrama de flujo.</p>
+            </div>
+            <div class="disp">
+              <p class="disp-t"><svg aria-hidden="true"><use href="#i-compu"/></svg>En la computadora</p>
+              <p>Empiezas en el diagrama de flujo, como en clase.</p>
+            </div>
+          </div>
+          <p>Si no sabes por dónde empezar, toca <span class="ui">Empezar el Reto 1</span> en ese aviso. Viene con pistas.</p>
+        </div>
+        <figure class="cel">
+          <img src="manual/bienvenida.webp" width="540" height="1110" alt="Pantalla de bienvenida de Jaguar en un celular con tres opciones: Estoy aprendiendo, Ya sé programar y Soy profesor." fetchpriority="high">
+          <figcaption>Lo primero que ves al abrir Jaguar.</figcaption>
+        </figure>
+      </div>
+    </article>
+
+    <article class="tema" id="ejecutar">
+      <div class="con-foto dos-fotos">
+        <div>
+          <h3><span class="num">2</span>Escribe y ejecuta tu programa</h3>
+          <p>Escribe como en PSeInt: <code>Algoritmo</code>, <code>Escribir</code>, <code>Leer</code>, <code>Si</code>, <code>Mientras</code>… Al escribir, Jaguar cierra solo los paréntesis, las comillas y los bloques como <code>FinSi</code>.</p>
+          <div class="como">
+            <div class="disp">
+              <p class="disp-t"><svg aria-hidden="true"><use href="#i-cel"/></svg>En el celular</p>
+              <p>Toca el botón redondo <span class="ui">▶</span> de arriba a la derecha. Jaguar pasa solo a la pestaña <span class="ui">Consola</span>. Mientras el programa corre, el botón se pone rojo <span class="ui">■</span> y sirve para detenerlo.</p>
+            </div>
+            <div class="disp">
+              <p class="disp-t"><svg aria-hidden="true"><use href="#i-compu"/></svg>En la computadora</p>
+              <p>Presiona <span class="ui">▶ Ejecutar</span> en la barra de arriba, o <kbd>Ctrl</kbd>+<kbd>Enter</kbd> o <kbd>F9</kbd>. La consola está debajo del código. Para detener: <kbd>Shift</kbd>+<kbd>F9</kbd>.</p>
+            </div>
+          </div>
+          <h4>Cuando tu programa usa Leer</h4>
+          <p>La consola dice <i>«El programa espera un dato (Leer)…»</i>. Escribe el dato abajo y presiona <kbd>Enter</kbd> o la flecha de enviar. Lo que escribiste aparece en azul.</p>
+        </div>
+        <div class="fotos">
+          <figure class="cel">
+            <img src="manual/codigo-celular.webp" width="540" height="1110" loading="lazy" alt="Editor de Jaguar en el celular con un programa que pide un nombre; abajo, la barra de teclas y las pestañas Código y Consola.">
+            <figcaption>El código y la barra de teclas.</figcaption>
+          </figure>
+          <figure class="cel">
+            <img src="manual/consola-leer.webp" width="540" height="1110" loading="lazy" alt="Consola de Jaguar en el celular esperando un dato: muestra la pregunta ¿Cómo te llamas? y abajo el campo con el nombre Ana.">
+            <figcaption>La consola espera un dato.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </article>
+
+    <article class="tema" id="barra-teclas">
+      <h3><span class="num">3</span>La barra de teclas del celular</h3>
+      <p>Debajo del código hay una barra con lo que más cuesta escribir en el teclado del celular: <code>&lt;-</code>, comillas, paréntesis, corchetes, <code>=</code>, <code>&lt;</code>, <code>&gt;</code>, operadores, <code>Y</code>, <code>O</code>, <code>NO</code>, <code>MOD</code> y palabras como <code>Escribir</code>, <code>Leer</code>, <code>Definir</code>, <code>Si</code>, <code>Para</code>, <code>Mientras</code>, <code>Repetir</code> y <code>Segun</code>.</p>
+      <ul>
+        <li>Desliza la barra hacia un lado para ver más teclas.</li>
+        <li>Las palabras de bloque escriben todo el bloque. Por ejemplo, <code>Si</code> pone <code>Si … Entonces</code> y su <code>FinSi</code>, con el cursor donde va la condición.</li>
+        <li>Las flechas <span class="ui">‹</span> <span class="ui">›</span> mueven el cursor y <span class="ui">⇥</span> agrega sangría.</li>
+      </ul>
+      <p class="suave">En la computadora la barra aparece en modo Básico. En modo Completo la prendes en <span class="ui">Ver → Barra de palabras clave</span>.</p>
+    </article>
+
+    <article class="tema" id="diagrama">
+      <h3><span class="num">4</span>Código y diagrama de flujo</h3>
+      <p>El pseudocódigo y el diagrama son el mismo programa. Lo que cambias en uno aparece en el otro.</p>
+      <div class="como">
+        <div class="disp">
+          <p class="disp-t"><svg aria-hidden="true"><use href="#i-cel"/></svg>En el celular</p>
+          <p>Toca el botón de diagrama de arriba, el que está junto al QR. Cambia entre el código y el diagrama. La pestaña de abajo dice <span class="ui">Código</span> o <span class="ui">Diagrama</span> según lo que estés viendo.</p>
+        </div>
+        <div class="disp">
+          <p class="disp-t"><svg aria-hidden="true"><use href="#i-compu"/></svg>En la computadora</p>
+          <p>En la barra de arriba hay tres botones: <span class="ui">Pseudocódigo</span>, <span class="ui">Diagrama</span> y <span class="ui">Ambos</span>. Con Ambos ves el código y el diagrama lado a lado. Atajos: <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>1</kbd>, <kbd>2</kbd> y <kbd>3</kbd>.</p>
+        </div>
+      </div>
+      <p>Abajo del diagrama puedes elegir cómo se escriben las expresiones: como en <b>PSeInt</b> (<code>x &lt;- a + 1</code>) o como en <b>DFD</b> (<code>x ← a + 1</code>).</p>
+      <figure class="compu">
+        <div class="marco">
+          <img src="manual/computadora.webp" width="1366" height="768" loading="lazy" alt="Jaguar en la computadora: a la izquierda la lista de programas, al centro el pseudocódigo de un promedio, a la derecha su diagrama de flujo y abajo la consola con el resultado Aprobado con 7.5.">
+        </div>
+        <figcaption>En la computadora, con la vista <b>Ambos</b>: el código, su diagrama y la consola abajo.</figcaption>
+      </figure>
+    </article>
+
+    <article class="tema" id="dibujar">
+      <div class="con-foto">
+        <div>
+          <h3><span class="num">5</span>Dibuja tu diagrama</h3>
+          <p>Arriba del diagrama está la paleta de figuras: Asignación, Lectura, Salida, Decisión, Ciclo Mientras, Ciclo Para, Repetir, Según y Llamada.</p>
+          <ol>
+            <li>Elige una figura de la paleta.</li>
+            <li>Toca un <span class="ui">＋</span> en una flecha del diagrama, donde quieres que vaya.</li>
+            <li>Llena lo que pide (por ejemplo, la variable a leer) y toca <span class="ui">Agregar</span>.</li>
+          </ol>
+          <p>También puedes tocar un <span class="ui">＋</span> directamente y elegir la figura de una lista.</p>
+          <div class="como">
+            <div class="disp">
+              <p class="disp-t"><svg aria-hidden="true"><use href="#i-cel"/></svg>En el celular</p>
+              <p>Mantén presionada una figura para <span class="ui">Editar</span> o <span class="ui">Eliminar</span>. Acerca o aleja con dos dedos.</p>
+            </div>
+            <div class="disp">
+              <p class="disp-t"><svg aria-hidden="true"><use href="#i-compu"/></svg>En la computadora</p>
+              <p>Doble clic en una figura para editarla. Clic derecho para editar o eliminar.</p>
+            </div>
+          </div>
+          <p>Si te equivocas, usa <span class="ui">Deshacer</span> en la barra de abajo del diagrama. Ahí mismo puedes guardar el diagrama como imagen para tu tarea.</p>
+          <p class="suave">Si el código tiene un error, el diagrama te pide corregirlo antes de seguir editando.</p>
+        </div>
+        <figure class="cel">
+          <img src="manual/diagrama-celular.webp" width="540" height="1110" loading="lazy" alt="Diagrama de flujo en el celular con la figura Lectura elegida; un aviso dice: toca un + del diagrama para colocar Lectura.">
+          <figcaption>Elegiste Lectura: ahora toca un ＋.</figcaption>
+        </figure>
+      </div>
+    </article>
+
+    <article class="tema" id="errores">
+      <div class="con-foto">
+        <div>
+          <h3><span class="num">6</span>Cuando hay un error</h3>
+          <p>Mientras escribes, Jaguar subraya en rojo lo que está mal. Los errores están en español y te dicen en qué línea están y cómo arreglarlos.</p>
+          <div class="como">
+            <div class="disp">
+              <p class="disp-t"><svg aria-hidden="true"><use href="#i-cel"/></svg>En el celular</p>
+              <p>El error aparece completo en una franja roja <b>debajo del código</b>. Tócala y Jaguar te lleva a esa línea.</p>
+            </div>
+            <div class="disp">
+              <p class="disp-t"><svg aria-hidden="true"><use href="#i-compu"/></svg>En la computadora</p>
+              <p>La explicación aparece al final de la línea. En la barra de abajo ves cuántos problemas hay; haz clic para ir a la línea.</p>
+            </div>
+          </div>
+          <p>Si el error pasa al ejecutar, la consola lo muestra con un botón <span class="ui">Ir a la línea</span>.</p>
+          <h4>Cómo leerlo</h4>
+          <p>Primero ve el número de línea. Luego lee la sugerencia: casi siempre trae el código ya corregido, como en la captura, donde falta poner el texto entre comillas.</p>
+        </div>
+        <figure class="cel">
+          <img src="manual/error-celular.webp" width="540" height="1110" loading="lazy" alt="Programa con un error en el celular. La franja roja dice: Línea 5: Parece un texto sin comillas. Los textos van entre comillas: Escribir &quot;Mayor de edad&quot;.">
+          <figcaption>El error con su sugerencia, debajo del código.</figcaption>
+        </figure>
+      </div>
+    </article>
+
+    <article class="tema" id="retos">
+      <h3><span class="num">7</span>Retos con pistas</h3>
+      <p>Hay 10 retos para practicar por tu cuenta, uno por tema y en orden: variables, operadores, Si, Según, Mientras, Para y Repetir. Funcionan sin internet.</p>
+      <div class="como">
+        <div class="disp">
+          <p class="disp-t"><svg aria-hidden="true"><use href="#i-cel"/></svg>En el celular</p>
+          <p>Abre el menú <span class="ui">☰</span> y toca <span class="ui">Retos</span>. Dentro del reto, <span class="ui">Probar</span> está en la franja del enunciado y los resultados salen en la pestaña <span class="ui">Pruebas</span>.</p>
+        </div>
+        <div class="disp">
+          <p class="disp-t"><svg aria-hidden="true"><use href="#i-compu"/></svg>En la computadora</p>
+          <p>Haz clic en <span class="ui">Retos</span> en el panel de la izquierda, o en <span class="ui">Ayuda → Retos para practicar</span>. El botón <span class="ui">Probar</span> está junto a Ejecutar (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Enter</kbd>).</p>
+        </div>
+      </div>
+      <ol>
+        <li>Lee el enunciado. Lo ocultas o lo muestras con la flecha.</li>
+        <li>Si te atoras, toca el foco <span class="ui">💡</span> para ver una pista. Con <span class="ui">Otra pista</span> ves la siguiente. Van de una idea a un ejemplo, sin darte la respuesta.</li>
+        <li>Escribe tu programa y toca <span class="ui">Probar</span>. Jaguar lo revisa con varias pruebas. Algunas son ocultas: sus datos son secretos para que tu programa funcione con cualquier dato.</li>
+        <li>Si una prueba falla, ves qué datos usó, qué debía mostrar y qué mostró tu programa. Con <span class="ui">Ver esta prueba en la consola</span> la ves correr.</li>
+        <li>Si pasa todo, sale <b>¡Reto superado!</b> y el botón <span class="ui">Siguiente reto</span>.</li>
+      </ol>
+      <div class="fotos tres">
+        <figure class="cel solo-ancho">
+          <img src="manual/retos.webp" width="540" height="1110" loading="lazy" alt="Lista de retos del nivel 1: Saludo ya resuelto, Área del rectángulo, Precio con IVA, Minutos a horas y más.">
+          <figcaption>La lista de retos.</figcaption>
+        </figure>
+        <figure class="cel">
+          <img src="manual/reto.webp" width="540" height="1110" loading="lazy" alt="Reto 1 abierto en el celular: arriba el enunciado con los botones de pistas, planteamiento y Probar; abajo el código.">
+          <figcaption>El reto con su enunciado.</figcaption>
+        </figure>
+        <figure class="cel">
+          <img src="manual/reto-superado.webp" width="540" height="1110" loading="lazy" alt="Pestaña Pruebas con las tres pruebas en verde, el mensaje Reto superado y el botón Siguiente reto.">
+          <figcaption>Pasaste todas las pruebas.</figcaption>
+        </figure>
+      </div>
+    </article>
+
+    <article class="tema" id="planteamiento">
+      <h3><span class="num">8</span>Planteamiento: entrada, proceso y salida</h3>
+      <p>Antes de programar, piensa el problema. El planteamiento te pide tres cosas: qué datos entran, qué haces con ellos y qué muestras al final. Se guarda como comentario al inicio del programa, así que tu profe también lo ve y PSeInt lo abre igual.</p>
+      <div class="como">
+        <div class="disp">
+          <p class="disp-t"><svg aria-hidden="true"><use href="#i-cel"/></svg>En el celular</p>
+          <p>Menú <span class="ui">⋮</span> de arriba → <span class="ui">Planteamiento</span>.</p>
+        </div>
+        <div class="disp">
+          <p class="disp-t"><svg aria-hidden="true"><use href="#i-compu"/></svg>En la computadora</p>
+          <p><span class="ui">Archivo → Planteamiento (entrada, proceso, salida)</span>.</p>
+        </div>
+      </div>
+      <p>En un reto o ejercicio también está el botón de la libreta, junto al foco de las pistas.</p>
+    </article>
+
+    <article class="tema" id="prueba-escritorio">
+      <div class="con-foto">
+        <div>
+          <h3><span class="num">9</span>Prueba de escritorio</h3>
+          <p>Jaguar arma la tabla de la prueba de escritorio: una fila por cada paso y una columna por cada variable.</p>
+          <div class="como">
+            <div class="disp">
+              <p class="disp-t"><svg aria-hidden="true"><use href="#i-cel"/></svg>En el celular</p>
+              <p>Menú <span class="ui">⋮</span> de arriba → <span class="ui">Prueba de escritorio</span>.</p>
+            </div>
+            <div class="disp">
+              <p class="disp-t"><svg aria-hidden="true"><use href="#i-compu"/></svg>En la computadora</p>
+              <p>Menú <span class="ui">Ejecutar → Prueba de escritorio</span>.</p>
+            </div>
+          </div>
+          <ol>
+            <li>En <b>Datos de entrada</b> escribe los datos que va a leer el programa, separados por comas y en orden. Por ejemplo: <code>7, 10</code>.</li>
+            <li>Toca <span class="ui">Hacer la tabla</span>. Los valores que cambian en cada paso se marcan.</li>
+            <li>Para practicar, toca <span class="ui">Practicar: yo la lleno</span>. Llena la tabla tú y toca <span class="ui">Revisar</span>: Jaguar te dice cuántos acertaste y marca en rojo los que no.</li>
+          </ol>
+          <p>Con el botón de copiar de arriba pegas la tabla en tu documento o en una hoja de cálculo.</p>
+          <p class="suave">En la computadora también puedes ir paso a paso: <span class="ui">Ejecutar → Paso a paso</span> (<kbd>F10</kbd> o <kbd>F7</kbd>). Cada instrucción se ilumina en el código y en el diagrama, y abajo ves el valor de cada variable.</p>
+        </div>
+        <figure class="cel">
+          <img src="manual/prueba-escritorio.webp" width="540" height="1110" loading="lazy" alt="Prueba de escritorio de un promedio con los datos 7 y 10: tabla con los pasos y los valores de a, b, s y p.">
+          <figcaption>La tabla con los datos 7 y 10.</figcaption>
+        </figure>
+      </div>
+    </article>
+
+    <article class="tema" id="guardar">
+      <div class="con-foto dos-fotos">
+        <div>
+          <h3><span class="num">10</span>Guardar, abrir y compartir</h3>
+          <p>Tus programas se guardan solos en tu celular o en tu navegador, sin cuenta. Los encuentras en la lista de programas.</p>
+          <div class="como">
+            <div class="disp">
+              <p class="disp-t"><svg aria-hidden="true"><use href="#i-cel"/></svg>En el celular</p>
+              <ul>
+                <li>Tus programas: menú <span class="ui">☰</span>. Ahí está <span class="ui">Nuevo programa</span> y el bote para eliminar.</li>
+                <li>Archivos .psc: menú <span class="ui">⋮</span> → <span class="ui">Guardar como .psc</span>, <span class="ui">Abrir archivo .psc</span> o <span class="ui">Enviar .psc (WhatsApp, correo…)</span>.</li>
+                <li>QR o enlace: el botón del QR de arriba.</li>
+              </ul>
+            </div>
+            <div class="disp">
+              <p class="disp-t"><svg aria-hidden="true"><use href="#i-compu"/></svg>En la computadora</p>
+              <ul>
+                <li>Tus programas: panel <b>Mis programas</b> a la izquierda.</li>
+                <li>Archivos .psc: <span class="ui">Guardar</span> (<kbd>Ctrl</kbd>+<kbd>S</kbd>) y <span class="ui">Abrir</span> (<kbd>Ctrl</kbd>+<kbd>O</kbd>) en la barra.</li>
+                <li>QR o enlace: <span class="ui">Compartir</span> en la barra.</li>
+              </ul>
+            </div>
+          </div>
+          <p>Los archivos <b>.psc</b> se abren en PSeInt, y Jaguar abre los .psc de PSeInt. Sirven para entregar tareas o para pasar tu programa a la sala de cómputo.</p>
+          <p>Con <b>Compartir</b> sale un QR. Escanéalo con la cámara de otro celular para abrir ahí el programa, o toca <span class="ui">Copiar enlace</span> y mándalo por WhatsApp. Para abrir un enlace que te pasaron: <span class="ui">⋮ → Abrir enlace</span> en el celular o <span class="ui">Archivo → Abrir enlace</span> en la computadora.</p>
+        </div>
+        <div class="fotos">
+          <figure class="cel">
+            <img src="manual/menu.webp" width="540" height="1110" loading="lazy" alt="Menú lateral de Jaguar en el celular: interruptor Básico y Completo, Nuevo programa, la lista de programas guardados, Retos, Comunidad y Escribe tu nombre.">
+            <figcaption>El menú ☰ con tus programas.</figcaption>
+          </figure>
+          <figure class="cel">
+            <img src="manual/compartir.webp" width="540" height="1110" loading="lazy" alt="Ventana Compartir con un código QR del programa y el botón Copiar enlace.">
+            <figcaption>Compartir con QR o enlace.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </article>
+
+    <article class="tema" id="basico-completo">
+      <h3><span class="num">11</span>Modo Básico y modo Completo</h3>
+      <p><b>Básico</b> muestra solo lo necesario para empezar. <b>Completo</b> agrega todos los menús (como Editar y Ver), más opciones y la posibilidad de crear tus propias pruebas. Puedes ir y venir sin perder nada, y los atajos de teclado funcionan en los dos.</p>
+      <div class="como">
+        <div class="disp">
+          <p class="disp-t"><svg aria-hidden="true"><use href="#i-cel"/></svg>En el celular</p>
+          <p>Arriba del menú <span class="ui">☰</span>, en los botones <span class="ui">Básico</span> y <span class="ui">Completo</span>.</p>
+        </div>
+        <div class="disp">
+          <p class="disp-t"><svg aria-hidden="true"><use href="#i-compu"/></svg>En la computadora</p>
+          <p>A la derecha de la barra de arriba.</p>
+        </div>
+      </div>
+      <p class="suave">Cuando ya llevas varios programas con ciclos sin errores, Jaguar te sugiere una vez probar el modo Completo. Nunca cambia solo.</p>
+    </article>
+
+    <article class="tema" id="perfil">
+      <h3><span class="num">12</span>Cambiar de perfil</h3>
+      <p>Si elegiste mal al principio, o si un profe quiere probar como alumno, cambia el perfil: <i>Estoy aprendiendo</i>, <i>Ya sé programar</i> o <i>Soy profesor</i>.</p>
+      <div class="como">
+        <div class="disp">
+          <p class="disp-t"><svg aria-hidden="true"><use href="#i-cel"/></svg>En el celular</p>
+          <p>Al final del menú <span class="ui">☰</span>: <span class="ui">¿Eres profesor? Cambiar perfil</span>.</p>
+        </div>
+        <div class="disp">
+          <p class="disp-t"><svg aria-hidden="true"><use href="#i-compu"/></svg>En la computadora</p>
+          <p>Abajo del panel de la izquierda (<span class="ui">Alumno · cambiar</span>), o en <span class="ui">Ayuda → Cambiar cómo uso Jaguar</span>.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="tema" id="unirse">
+      <h3><span class="num">13</span>Unirte a la clase de tu profe</h3>
+      <p>Las clases en línea necesitan internet. Tu profe te da un código como <code>JAG-4K7Q</code>.</p>
+      <ol>
+        <li>Abre <span class="ui">Mis clases</span>: en el menú <span class="ui">☰</span> del celular o en el panel de la izquierda en la computadora.</li>
+        <li>Toca <span class="ui">Entrar</span>, elige <span class="ui">Alumno</span> y escribe un alias. No uses tu nombre completo ni datos personales. No necesitas correo.</li>
+        <li>Toca <span class="ui">Unirme con un código</span>. Escribe el código de la clase y tu nombre. Tu nombre solo lo ve tu profe, para saber de quién es cada entrega.</li>
+        <li>Abre la clase. En <b>Tareas</b> toca <span class="ui">Resolver</span>.</li>
+        <li>Cada vez que presionas <span class="ui">Probar</span>, tu resultado le llega a tu profe. Jaguar te avisa: <i>«Tu resultado llegó a tu profesor: 3 de 4.»</i> Puedes seguir mejorando y volver a probar.</li>
+      </ol>
+      <div class="nota">
+        <p><b>¿Sin internet en el salón?</b> Tu profe también puede proyectar un ejercicio como QR. Escanéalo con la cámara del celular, o abre el enlace que te mandó. El ejercicio queda guardado en tus programas y lo resuelves sin conexión.</p>
+      </div>
+    </article>
+
+    <article class="tema" id="mostrar">
+      <div class="con-foto">
+        <div>
+          <h3><span class="num">14</span>Mostrar al profesor</h3>
+          <p>Cuando un ejercicio de tu profe pasa todas las pruebas, aparece el botón <span class="ui">Mostrar al profesor</span>.</p>
+          <p>La primera vez te pide tu nombre y apellido. Luego sale una pantalla verde con tu nombre, el ejercicio, cuántos casos pasaron y la hora en que se verificó. Abajo hay un reloj que sigue corriendo, así tu profe sabe que es de ahora.</p>
+          <p>Se ve bien desde lejos: levanta tu celular y listo. Con <span class="ui">Ver el código</span> le enseñas tu programa.</p>
+          <p class="suave">Para cambiar tu nombre: menú <span class="ui">☰</span> → <span class="ui">Escribe tu nombre</span> en el celular, o en el panel de la izquierda en la computadora.</p>
+        </div>
+        <figure class="cel">
+          <img src="manual/mostrar-al-profe.webp" width="540" height="1110" loading="lazy" alt="Pantalla verde de ejercicio verificado con el nombre Ana López, el ejercicio Par o impar, 4 de 4 casos correctos y la hora.">
+          <figcaption>La pantalla verde para enseñar desde tu lugar.</figcaption>
+        </figure>
+      </div>
+    </article>
+
+    <article class="tema" id="atras">
+      <h3><span class="num">15</span>El botón Atrás en Android</h3>
+      <p>Para que no salgas por accidente, Atrás primero cierra el menú, luego te regresa al código. Si ya estás en el código, Jaguar dice <i>«Presiona Atrás otra vez para salir»</i>. Solo sale si lo presionas otra vez enseguida.</p>
+      <p class="suave">Tu programa ya está guardado; al volver lo encuentras igual.</p>
+    </article>
+
+    <article class="tema" id="instalar">
+      <h3><span class="num">16</span>Instala Jaguar desde el navegador y úsalo sin internet</h3>
+      <p>Si no tienes la app de Android, puedes instalar Jaguar desde el navegador. Queda con su ícono, como cualquier app.</p>
+      <div class="como">
+        <div class="disp">
+          <p class="disp-t"><svg aria-hidden="true"><use href="#i-cel"/></svg>En el celular</p>
+          <p>Abre Jaguar en Chrome. Toca el menú <span class="ui">⋮</span> de Chrome y elige <span class="ui">Instalar app</span> o <span class="ui">Agregar a pantalla principal</span>.</p>
+        </div>
+        <div class="disp">
+          <p class="disp-t"><svg aria-hidden="true"><use href="#i-compu"/></svg>En la computadora</p>
+          <p>En Chrome o Edge, busca el ícono de instalar en la barra de direcciones, o la opción para instalar en el menú del navegador.</p>
+        </div>
+      </div>
+      <h4>Sin internet</h4>
+      <p>Después de abrir Jaguar una vez, funciona sin conexión. Puedes escribir, ejecutar, dibujar diagramas, hacer retos, prueba de escritorio y resolver los ejercicios que ya abriste. Solo las clases en línea y la comunidad necesitan internet.</p>
+      <p class="suave">Ojo: tus programas viven en ese dispositivo. Si borras los datos del navegador o desinstalas la app, se borran. Guarda como .psc lo que no quieras perder.</p>
+    </article>
+
+    <a class="arriba" href="#">↑ Volver al inicio</a>
+  </div>
+</section>
+
+<!-- ============================ PROFES ============================ -->
+<section class="parte" id="profes" aria-labelledby="t-profes" style="background:var(--superficie-2);border-top:1px solid var(--borde);margin-top:40px">
+  <div class="ancho">
+    <div class="parte-cab">
+      <img src="logo.svg" alt="" width="64" height="56">
+      <div>
+        <p class="eti">Segunda parte</p>
+        <h2 id="t-profes">Para profes</h2>
+      </div>
+    </div>
+    <p class="intro">Cómo crear ejercicios con pruebas, compartirlos con o sin internet y ver lo que entregan tus alumnos. Si quieres saber qué cubre del programa, lee la <a href="/profes">guía para profes</a>.</p>
+
+    <article class="tema" id="soy-profesor">
+      <h3><span class="num">17</span>Elige «Soy profesor»</h3>
+      <p>Al abrir Jaguar por primera vez, elige <span class="ui">Soy profesor</span>. Si ya habías elegido otra opción, <a href="#perfil">cambia de perfil</a>.</p>
+      <p>Jaguar abre <b>Mis ejercicios</b> y quedan a la mano tus herramientas:</p>
+      <div class="como">
+        <div class="disp">
+          <p class="disp-t"><svg aria-hidden="true"><use href="#i-cel"/></svg>En el celular</p>
+          <p><span class="ui">Mis ejercicios</span> aparece primero en el menú <span class="ui">☰</span>.</p>
+        </div>
+        <div class="disp">
+          <p class="disp-t"><svg aria-hidden="true"><use href="#i-compu"/></svg>En la computadora</p>
+          <p>Aparece el menú <span class="ui">Profesor</span> (en modo Completo) y <b>Mis ejercicios</b> en el panel de la izquierda.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="tema" id="crear-ejercicio">
+      <div class="con-foto">
+        <div>
+          <h3><span class="num">18</span>Crea un ejercicio</h3>
+          <p>Hay dos caminos:</p>
+          <ul>
+            <li>En <b>Mis ejercicios</b>, toca <span class="ui">Nuevo ejercicio</span>.</li>
+            <li>En la computadora, también puedes escribir tu solución en el editor y usar <span class="ui">Profesor → Crear ejercicio con este programa</span>. Está igual en el menú de cada programa del panel.</li>
+          </ul>
+          <ol>
+            <li>Escribe el <b>título</b> y el <b>enunciado</b>.</li>
+            <li>En <b>Tu solución</b> escribe el programa como si fueras el alumno. Nunca se comparte.</li>
+            <li>Toca <span class="ui">Generar casos con mi solución</span>. Jaguar propone casos de prueba que recorren los caminos de tu solución.</li>
+            <li>Revísalos. Puedes editarlos, agregar más o marcar uno como <span class="ui">Oculto</span>: el alumno sabe que existe pero no ve sus datos. Así no programan solo para el ejemplo.</li>
+            <li>Elige cómo se compara la salida. <b>Flexible</b>: no importan mayúsculas, acentos, espacios ni los mensajes que piden datos. <b>Exacta</b>: debe salir igual, línea por línea.</li>
+            <li>Toca <span class="ui">Guardar</span>.</li>
+          </ol>
+          <p class="suave">Si cambias tu solución, <span class="ui">Recalcular salidas</span> actualiza lo esperado y <span class="ui">Comprobar mi solución</span> la corre contra los casos.</p>
+        </div>
+        <figure class="cel">
+          <img src="manual/ejercicio-profe.webp" width="540" height="1650" loading="lazy" alt="Pantalla Nuevo ejercicio en el celular: título Par impar, enunciado, la solución del profe, el botón Generar casos con mi solución y el aviso Listo: 5 casos que recorren los caminos de tu solución.">
+          <figcaption>Jaguar propone los casos a partir de tu solución.</figcaption>
+        </figure>
+      </div>
+    </article>
+
+    <article class="tema" id="proyectar">
+      <h3><span class="num">19</span>Compártelo con QR o enlace (sin internet)</h3>
+      <p>No necesitas cuenta para esto. En el editor del ejercicio toca <span class="ui">Proyectar</span>, o en <b>Mis ejercicios</b> abre el menú del ejercicio y elige <span class="ui">Proyectar</span>.</p>
+      <ul>
+        <li>Sale un QR grande para el proyector. Tus alumnos lo escanean con la cámara del celular.</li>
+        <li><span class="ui">Copiar enlace</span> te da un enlace para WhatsApp o Classroom.</li>
+        <li>El alumno resuelve, presiona Probar y, si todo pasa, te enseña la <a href="#mostrar">pantalla verde</a> con su nombre y la hora.</li>
+      </ul>
+      <p>En el mismo menú del ejercicio están <span class="ui">Probar como alumno</span>, para verlo como lo verán ellos, y <span class="ui">Compartir en el banco</span>, para que otros profes lo usen (este necesita estar en línea).</p>
+    </article>
+
+    <article class="tema" id="cuenta-profe">
+      <h3><span class="num">20</span>Entra en línea con tu correo</h3>
+      <p>Para tener clases en línea necesitas una cuenta de profesor.</p>
+      <ol>
+        <li>Abre <span class="ui">Entrar en línea</span>: en el menú <span class="ui">☰</span> del celular o en el panel de la izquierda en la computadora.</li>
+        <li>Elige <span class="ui">Profesor</span>.</li>
+        <li>La primera vez toca <span class="ui">¿Primera vez? Crear cuenta de profesor</span>. Escribe el nombre que verán tus alumnos (por ejemplo, «Profa. López»), tu correo y una contraseña.</li>
+      </ol>
+      <p class="suave">Si la olvidas, usa <span class="ui">Olvidé mi contraseña</span> y te llega un enlace a tu correo.</p>
+    </article>
+
+    <article class="tema" id="clase">
+      <h3><span class="num">21</span>Crea tu clase y asigna ejercicios</h3>
+      <ol>
+        <li>Abre <span class="ui">Mis clases</span> y toca <span class="ui">Crear clase</span>. Ponle un nombre, como «1° A · Lógica».</li>
+        <li>Jaguar te da un código como <code>JAG-4K7Q</code>. Con <span class="ui">Copiar código</span> lo pegas en tu grupo de WhatsApp, o escríbelo en el pizarrón.</li>
+        <li>Dentro de la clase, toca <span class="ui">Asignar ejercicio</span> y elige uno de <b>Mis ejercicios</b> o del banco de la comunidad.</li>
+      </ol>
+      <p>Tus alumnos lo ven en <b>Tareas</b> en cuanto actualizan su clase.</p>
+    </article>
+
+    <article class="tema" id="entregas">
+      <h3><span class="num">22</span>Revisa las entregas</h3>
+      <p>En tu clase ves una tabla con cada alumno y cada tarea. Cada vez que un alumno presiona Probar, su resultado llega solo: cuántas pruebas pasó y a qué hora. Usa <span class="ui">Actualizar</span> para ver lo más reciente.</p>
+      <p>Toca una celda para ver el programa del alumno. Con <span class="ui">Abrir una copia</span> lo abres en tu editor para ejecutarlo o hacer su prueba de escritorio.</p>
+      <div class="nota">
+        <p><b>La calificación la pones tú.</b> Jaguar te dice qué pruebas pasó cada programa. La rúbrica, la lista de cotejo y la calificación son tuyas.</p>
+      </div>
+    </article>
+
+    <a class="arriba" href="#">↑ Volver al inicio</a>
+  </div>
+</section>
+
+<!-- ============================ ATAJOS ============================ -->
+<section class="parte" id="atajos" aria-labelledby="t-atajos">
+  <div class="ancho">
+    <p class="eti">En la computadora</p>
+    <h2 id="t-atajos">Atajos de teclado</h2>
+    <p class="intro" style="margin-bottom:20px">Funcionan en Básico y en Completo. En Mac usa <kbd>⌘</kbd> en lugar de <kbd>Ctrl</kbd>. Con <kbd>F1</kbd> abres la guía rápida dentro de Jaguar.</p>
+    <div class="tabla">
+      <table>
+        <thead><tr><th>Para</th><th>Teclas</th></tr></thead>
+        <tbody>
+          <tr><td>Ejecutar</td><td><kbd>Ctrl</kbd>+<kbd>Enter</kbd> · <kbd>F9</kbd></td></tr>
+          <tr><td>Detener</td><td><kbd>Shift</kbd>+<kbd>F9</kbd></td></tr>
+          <tr><td>Paso a paso (siguiente paso)</td><td><kbd>F10</kbd> · <kbd>F7</kbd></td></tr>
+          <tr><td>Ejecutar hasta la línea del cursor</td><td><kbd>F4</kbd></td></tr>
+          <tr><td>Probar un ejercicio o reto</td><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Enter</kbd></td></tr>
+          <tr><td>Guardar como .psc · Abrir .psc</td><td><kbd>Ctrl</kbd>+<kbd>S</kbd> · <kbd>Ctrl</kbd>+<kbd>O</kbd></td></tr>
+          <tr><td>Ver pseudocódigo · diagrama · ambos</td><td><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>1</kbd> · <kbd>2</kbd> · <kbd>3</kbd></td></tr>
+          <tr><td>Buscar · Reemplazar</td><td><kbd>Ctrl</kbd>+<kbd>F</kbd> · <kbd>Ctrl</kbd>+<kbd>H</kbd></td></tr>
+          <tr><td>Ir a una línea</td><td><kbd>Ctrl</kbd>+<kbd>G</kbd></td></tr>
+          <tr><td>Comentar o descomentar líneas</td><td><kbd>Ctrl</kbd>+<kbd>/</kbd></td></tr>
+          <tr><td>Mover línea · Duplicar línea</td><td><kbd>Alt</kbd>+<kbd>↑</kbd>/<kbd>↓</kbd> · <kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>↓</kbd></td></tr>
+          <tr><td>Ordenar la sangría</td><td><kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>F</kbd></td></tr>
+          <tr><td>Renombrar variable</td><td><kbd>F2</kbd></td></tr>
+          <tr><td>Sugerencias</td><td><kbd>Ctrl</kbd>+<kbd>Espacio</kbd></td></tr>
+          <tr><td>Letra más grande · más chica</td><td><kbd>Ctrl</kbd>+<kbd>+</kbd> · <kbd>Ctrl</kbd>+<kbd>-</kbd></td></tr>
+          <tr><td>Guía rápida</td><td><kbd>F1</kbd></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ PROBLEMAS ============================ -->
+<section class="parte" id="problemas" aria-labelledby="t-problemas" style="padding-bottom:0">
+  <div class="ancho">
+    <p class="eti">Si algo no sale</p>
+    <h2 id="t-problemas" style="margin-bottom:20px">Problemas comunes</h2>
+    <details><summary>Mi programa no avanza</summary><div><p>Seguro está en un <code>Leer</code> esperando un dato. En el celular la pestaña Consola tiene un punto: ábrela, escribe el dato y presiona Enter. Si es un ciclo que nunca termina, detenlo con el botón rojo (o <kbd>Shift</kbd>+<kbd>F9</kbd>) y revisa la condición.</p></div></details>
+    <details><summary>Dice «Parece un texto sin comillas»</summary><div><p>Los textos van entre comillas: <code>Escribir "Hola"</code>. Sin comillas, Jaguar piensa que <code>Hola</code> es una variable. La sugerencia del error trae la línea ya corregida.</p></div></details>
+    <details><summary>No veo el diagrama</summary><div><p>En el celular toca el botón de diagrama de arriba, junto al QR. En la computadora elige <span class="ui">Diagrama</span> o <span class="ui">Ambos</span> en la barra. Si el código tiene un error, corrígelo y el diagrama se actualiza.</p></div></details>
+    <details><summary>Perdí mi programa</summary><div><p>Búscalo en el menú <span class="ui">☰</span> (celular) o en <b>Mis programas</b> (computadora): Jaguar guarda todo solo. Recuerda que se guarda en ese dispositivo y en ese navegador. Si cambiaste de celular o borraste los datos del navegador, no estará; por eso conviene guardar como .psc o compartirlo con un enlace.</p></div></details>
+    <details><summary>Una prueba oculta falla y no sé por qué</summary><div><p>Sus datos son secretos. Prueba tu programa con otros valores: cero, negativos, números grandes o iguales. Casi siempre ahí está el detalle.</p></div></details>
+    <details><summary>No me sale el QR</summary><div><p>Si el programa es muy largo no cabe en un QR. Usa <span class="ui">Copiar enlace</span> o guárdalo como .psc.</p></div></details>
+    <details><summary>No encuentro «Mis clases»</summary><div><p>Las clases necesitan internet. Conéctate y vuelve a abrir Jaguar. Lo demás funciona sin conexión.</p></div></details>
+    <details><summary>No veo el menú Editar, Ver o Profesor</summary><div><p>Están en modo <a href="#basico-completo">Completo</a>. El menú Profesor aparece si tu perfil es <i>Soy profesor</i>.</p></div></details>
+    <details><summary>En la computadora se ve como en el celular</summary><div><p>La ventana es angosta. Maximízala o hazla más ancha y Jaguar cambia a la vista de computadora.</p></div></details>
+    <a class="arriba" href="#">↑ Volver al inicio</a>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="ancho">
+    <span>Jaguar es un proyecto de Panterino, hecho en México.</span>
+    <a href="/">Inicio</a>
+    <a href="/profes">Para profes</a>
+    <a href="https://www.facebook.com/jaguareducation">Facebook</a>
+    <a href="https://github.com/panterino/jaguar">GitHub</a>
+  </div>
+</footer>
+
+</body>
+</html>

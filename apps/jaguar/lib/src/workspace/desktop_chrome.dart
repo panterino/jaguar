@@ -61,91 +61,105 @@ class DesktopToolbar extends StatelessWidget {
         ),
         child: Row(
           children: [
-            if (basic) ...[
-              _LabeledTool(icon: Icons.note_add_outlined, label: 'Nuevo', tooltip: 'Nuevo programa', onPressed: onNew),
-              _LabeledTool(
-                icon: Icons.folder_open_outlined,
-                label: 'Abrir',
-                tooltip: 'Abrir un archivo .psc de PSeInt o Jaguar',
-                onPressed: onOpenFile,
-              ),
-              _LabeledTool(
-                icon: Icons.save_alt,
-                label: 'Guardar',
-                tooltip: 'Guardar como .psc (${shortcutLabel('S')})',
-                onPressed: onSaveFile,
-              ),
-            ] else ...[
-              ToolbarIcon(
-                icon: sidebarVisible ? Icons.view_sidebar : Icons.view_sidebar_outlined,
-                tooltip: '${sidebarVisible ? 'Ocultar' : 'Mostrar'} programas (${shortcutLabel('B')})',
-                onPressed: onToggleSidebar,
-              ),
-              const _ToolbarSeparator(),
-              ToolbarIcon(icon: Icons.note_add_outlined, tooltip: 'Nuevo programa', onPressed: onNew),
-              ToolbarIcon(
-                icon: Icons.folder_open_outlined,
-                tooltip: 'Abrir archivo .psc (${shortcutLabel('O')})',
-                onPressed: onOpenFile,
-              ),
-              ToolbarIcon(
-                icon: Icons.save_alt,
-                tooltip: 'Guardar como .psc (${shortcutLabel('S')})',
-                onPressed: onSaveFile,
-              ),
-            ],
-            const _ToolbarSeparator(),
-            Tooltip(
-              message: running ? 'Detener (Shift+F9)' : 'Ejecutar (${shortcutLabel('Enter')} o F9)',
-              child: FilledButton.icon(
-                onPressed: onRun,
-                icon: Icon(running ? Icons.stop : Icons.play_arrow, size: 18),
-                label: Text(running ? 'Detener' : 'Ejecutar'),
-                style: FilledButton.styleFrom(
-                  visualDensity: VisualDensity.compact,
-                  padding: const EdgeInsets.symmetric(horizontal: 14),
-                  backgroundColor: running ? scheme.error : null,
-                  foregroundColor: running ? scheme.onError : null,
+            // On a narrow window the left tools scroll instead of overflowing.
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    if (basic) ...[
+                      _LabeledTool(
+                        icon: Icons.note_add_outlined,
+                        label: 'Nuevo',
+                        tooltip: 'Nuevo programa',
+                        onPressed: onNew,
+                      ),
+                      _LabeledTool(
+                        icon: Icons.folder_open_outlined,
+                        label: 'Abrir',
+                        tooltip: 'Abrir un archivo .psc de PSeInt o Jaguar',
+                        onPressed: onOpenFile,
+                      ),
+                      _LabeledTool(
+                        icon: Icons.save_alt,
+                        label: 'Guardar',
+                        tooltip: 'Guardar como .psc (${shortcutLabel('S')})',
+                        onPressed: onSaveFile,
+                      ),
+                    ] else ...[
+                      ToolbarIcon(
+                        icon: sidebarVisible ? Icons.view_sidebar : Icons.view_sidebar_outlined,
+                        tooltip: '${sidebarVisible ? 'Ocultar' : 'Mostrar'} programas (${shortcutLabel('B')})',
+                        onPressed: onToggleSidebar,
+                      ),
+                      const _ToolbarSeparator(),
+                      ToolbarIcon(icon: Icons.note_add_outlined, tooltip: 'Nuevo programa', onPressed: onNew),
+                      ToolbarIcon(
+                        icon: Icons.folder_open_outlined,
+                        tooltip: 'Abrir archivo .psc (${shortcutLabel('O')})',
+                        onPressed: onOpenFile,
+                      ),
+                      ToolbarIcon(
+                        icon: Icons.save_alt,
+                        tooltip: 'Guardar como .psc (${shortcutLabel('S')})',
+                        onPressed: onSaveFile,
+                      ),
+                    ],
+                    const _ToolbarSeparator(),
+                    Tooltip(
+                      message: running ? 'Detener (Shift+F9)' : 'Ejecutar (${shortcutLabel('Enter')} o F9)',
+                      child: FilledButton.icon(
+                        onPressed: onRun,
+                        icon: Icon(running ? Icons.stop : Icons.play_arrow, size: 18),
+                        label: Text(running ? 'Detener' : 'Ejecutar'),
+                        style: FilledButton.styleFrom(
+                          visualDensity: VisualDensity.compact,
+                          padding: const EdgeInsets.symmetric(horizontal: 14),
+                          backgroundColor: running ? scheme.error : null,
+                          foregroundColor: running ? scheme.onError : null,
+                        ),
+                      ),
+                    ),
+                    if (onPause != null) ...[
+                      const SizedBox(width: 6),
+                      Tooltip(
+                        message: 'Pausar y seguir paso a paso',
+                        child: OutlinedButton.icon(
+                          onPressed: onPause,
+                          icon: const Icon(Icons.pause, size: 18),
+                          label: const Text('Pausar'),
+                          style: OutlinedButton.styleFrom(
+                            visualDensity: VisualDensity.compact,
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                          ),
+                        ),
+                      ),
+                    ],
+                    if (onCheck != null) ...[
+                      const SizedBox(width: 6),
+                      Tooltip(
+                        message: basic
+                            ? 'Revisa tu programa con las pruebas del profesor'
+                            : 'Revisa tu programa con las pruebas del profesor (${shortcutLabel('Enter', shift: true)})',
+                        child: OutlinedButton.icon(
+                          onPressed: checking ? null : onCheck,
+                          icon: checking
+                              ? const SizedBox.square(dimension: 14, child: CircularProgressIndicator(strokeWidth: 2))
+                              : const Icon(Icons.fact_check_outlined, size: 18),
+                          label: const Text('Probar'),
+                          style: OutlinedButton.styleFrom(
+                            visualDensity: VisualDensity.compact,
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                          ),
+                        ),
+                      ),
+                    ],
+                    const _ToolbarSeparator(),
+                    viewSwitch,
+                  ],
                 ),
               ),
             ),
-            if (onPause != null) ...[
-              const SizedBox(width: 6),
-              Tooltip(
-                message: 'Pausar y seguir paso a paso',
-                child: OutlinedButton.icon(
-                  onPressed: onPause,
-                  icon: const Icon(Icons.pause, size: 18),
-                  label: const Text('Pausar'),
-                  style: OutlinedButton.styleFrom(
-                    visualDensity: VisualDensity.compact,
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                  ),
-                ),
-              ),
-            ],
-            if (onCheck != null) ...[
-              const SizedBox(width: 6),
-              Tooltip(
-                message: basic
-                    ? 'Revisa tu programa con las pruebas del profesor'
-                    : 'Revisa tu programa con las pruebas del profesor (${shortcutLabel('Enter', shift: true)})',
-                child: OutlinedButton.icon(
-                  onPressed: checking ? null : onCheck,
-                  icon: checking
-                      ? const SizedBox.square(dimension: 14, child: CircularProgressIndicator(strokeWidth: 2))
-                      : const Icon(Icons.fact_check_outlined, size: 18),
-                  label: const Text('Probar'),
-                  style: OutlinedButton.styleFrom(
-                    visualDensity: VisualDensity.compact,
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                  ),
-                ),
-              ),
-            ],
-            const _ToolbarSeparator(),
-            viewSwitch,
-            const Spacer(),
             if (basic)
               _LabeledTool(
                 icon: Icons.qr_code_2,

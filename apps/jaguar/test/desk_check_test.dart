@@ -11,7 +11,11 @@ FinAlgoritmo
 
 void main() {
   testWidgets('la prueba de escritorio llena la tabla con los datos de entrada', (tester) async {
-    await tester.pumpWidget(const MaterialApp(home: DeskCheckScreen(name: 'doble', source: _source)));
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: DeskCheckScreen(name: 'doble', source: _source),
+      ),
+    );
     await tester.enterText(find.byType(TextField), '4');
     await tester.tap(find.text('Hacer la tabla'));
     await tester.pumpAndSettle();
@@ -20,7 +24,11 @@ void main() {
   });
 
   testWidgets('practicar: el alumno llena y Jaguar revisa', (tester) async {
-    await tester.pumpWidget(const MaterialApp(home: DeskCheckScreen(name: 'doble', source: _source)));
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: DeskCheckScreen(name: 'doble', source: _source),
+      ),
+    );
     await tester.enterText(find.byType(TextField), '4');
     await tester.tap(find.text('Hacer la tabla'));
     await tester.pumpAndSettle();
