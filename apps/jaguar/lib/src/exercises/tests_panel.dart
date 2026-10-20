@@ -17,6 +17,8 @@ class TestsPanel extends StatelessWidget {
     required this.onGoToLine,
     required this.onReplay,
     required this.onShowTeacher,
+    this.challenge = false,
+    this.onNextChallenge,
   });
 
   final Exercise exercise;
@@ -34,6 +36,12 @@ class TestsPanel extends StatelessWidget {
   final ValueChanged<TestCase> onReplay;
   final VoidCallback onShowTeacher;
 
+  /// A reto for practicing alone: there is no teacher to show it to.
+  final bool challenge;
+
+  /// Opens the next reto; null on the last one.
+  final VoidCallback? onNextChallenge;
+
   @override
   Widget build(BuildContext context) {
     final result = this.result;
@@ -46,7 +54,7 @@ class TestsPanel extends StatelessWidget {
         _Summary(result: result, total: tests.length, running: running, stale: stale, onRunTests: onRunTests),
         const SizedBox(height: 12),
         if (result != null && result.passed && !stale) ...[
-          _AllPassed(onShowTeacher: onShowTeacher),
+          _AllPassed(onShowTeacher: onShowTeacher, challenge: challenge, onNextChallenge: onNextChallenge),
           const SizedBox(height: 12),
         ],
         if (syntaxError != null) ...[
@@ -65,6 +73,7 @@ class TestsPanel extends StatelessWidget {
             result: result == null || syntaxError != null ? null : result.cases[i],
             onGoToLine: onGoToLine,
             onReplay: () => onReplay(tests[i]),
+            challenge: challenge,
           ),
         const SizedBox(height: 8),
         Text(
@@ -138,9 +147,11 @@ class _Summary extends StatelessWidget {
 }
 
 class _AllPassed extends StatelessWidget {
-  const _AllPassed({required this.onShowTeacher});
+  const _AllPassed({required this.onShowTeacher, required this.challenge, required this.onNextChallenge});
 
   final VoidCallback onShowTeacher;
+  final bool challenge;
+  final VoidCallback? onNextChallenge;
 
   @override
   Widget build(BuildContext context) {
@@ -157,17 +168,27 @@ class _AllPassed extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                '¡Todo correcto! Ya puedes mostrárselo al profesor.',
+                challenge
+                    ? (onNextChallenge == null ? '¡Reto superado! Terminaste el nivel 1.' : '¡Reto superado!')
+                    : '¡Todo correcto! Ya puedes mostrárselo al profesor.',
                 style: TextStyle(color: green, fontWeight: FontWeight.w600),
               ),
             ),
             const SizedBox(width: 8),
-            FilledButton.icon(
-              onPressed: onShowTeacher,
-              icon: const Icon(Icons.school_outlined, size: 18),
-              label: const Text('Mostrar al profesor'),
-              style: FilledButton.styleFrom(backgroundColor: green, foregroundColor: Colors.white),
-            ),
+            if (!challenge)
+              FilledButton.icon(
+                onPressed: onShowTeacher,
+                icon: const Icon(Icons.school_outlined, size: 18),
+                label: const Text('Mostrar al profesor'),
+                style: FilledButton.styleFrom(backgroundColor: green, foregroundColor: Colors.white),
+              )
+            else if (onNextChallenge case final next?)
+              FilledButton.icon(
+                onPressed: next,
+                icon: const Icon(Icons.arrow_forward, size: 18),
+                label: const Text('Siguiente reto'),
+                style: FilledButton.styleFrom(backgroundColor: green, foregroundColor: Colors.white),
+              ),
           ],
         ),
       ),
@@ -183,8 +204,10 @@ class _TestTile extends StatelessWidget {
     required this.result,
     required this.onGoToLine,
     required this.onReplay,
+    required this.challenge,
   });
 
+  final bool challenge;
   final int number;
   final int hiddenNumber;
   final TestCase test;
@@ -220,7 +243,9 @@ class _TestTile extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(child: Text(name, style: theme.textTheme.titleSmall)),
                 Tooltip(
-                  message: 'Prueba del profesor: no se puede cambiar',
+                  message: challenge
+                      ? 'Prueba del reto: no se puede cambiar'
+                      : 'Prueba del profesor: no se puede cambiar',
                   child: Icon(Icons.lock_outline, size: 16, color: scheme.onSurfaceVariant),
                 ),
               ],

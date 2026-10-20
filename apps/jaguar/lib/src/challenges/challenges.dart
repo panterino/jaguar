@@ -233,3 +233,10 @@ Challenge? challengeById(String id) {
   }
   return null;
 }
+
+/// The reto after [id] in level 1, or null if [id] is the last one (or not a
+/// reto).
+Challenge? nextChallenge(String id) {
+  final i = challenges.indexWhere((c) => c.id == id);
+  return i < 0 || i + 1 >= challenges.length ? null : challenges[i + 1];
+}

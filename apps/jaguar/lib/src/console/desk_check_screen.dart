@@ -101,9 +101,13 @@ class _DeskCheckScreenState extends State<DeskCheckScreen> {
                     width: 260,
                     child: TextField(
                       controller: _inputs,
+                      // The table needs the data first: start typing right away.
+                      autofocus: check == null,
+                      textInputAction: TextInputAction.done,
                       decoration: const InputDecoration(
                         labelText: 'Datos de entrada',
                         helperText: 'Separados por comas, en el orden en que se leen',
+                        helperMaxLines: 2,
                         isDense: true,
                       ),
                       onSubmitted: (_) => _fill(),

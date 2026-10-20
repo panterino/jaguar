@@ -115,6 +115,17 @@ class ProgramsDrawer extends StatelessWidget {
                   ),
                 ),
                 const Divider(height: 1),
+                // A teacher's main tool goes first.
+                if (onOpenTeacher case final openTeacher?)
+                  ListTile(
+                    leading: const Icon(Icons.school_outlined),
+                    title: const Text('Mis ejercicios'),
+                    subtitle: const Text('Pruebas que se generan solas'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      openTeacher();
+                    },
+                  ),
                 ListTile(
                   leading: const Icon(Icons.flag_outlined),
                   title: const Text('Retos'),
@@ -185,16 +196,6 @@ class ProgramsDrawer extends StatelessWidget {
                     ),
                   ],
                 ),
-                if (onOpenTeacher case final openTeacher?)
-                  ListTile(
-                    leading: const Icon(Icons.school_outlined),
-                    title: const Text('Mis ejercicios'),
-                    subtitle: const Text('Pruebas que se generan solas'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      openTeacher();
-                    },
-                  ),
                 TextButton(
                   onPressed: () {
                     Navigator.pop(context);
