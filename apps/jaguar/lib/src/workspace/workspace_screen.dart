@@ -604,7 +604,19 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
     );
   }
 
-  void _showGuide() => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const GuideScreen()));
+  void _showGuide() => Navigator.push(
+    context,
+    MaterialPageRoute<void>(
+      builder: (_) => GuideScreen(
+        teacher: _settings.teacher,
+        onOpenChallenges: _openChallenges,
+        onDeskCheck: _deskCheck,
+        onPlan: _plan,
+        onOpenClasses: widget.cloud == null ? null : _openClasses,
+        onOpenTeacher: _settings.teacher ? _openTeacher : null,
+      ),
+    ),
+  );
 
   void _toast(String message) {
     if (!mounted) return;
@@ -922,7 +934,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
         ]),
       AppMenu('Ayuda', [
         AppMenuItem(
-          'Guía rápida',
+          'Guía',
           icon: Icons.menu_book_outlined,
           onSelected: _showGuide,
           shortcut: const SingleActivator(LogicalKeyboardKey.f1),
