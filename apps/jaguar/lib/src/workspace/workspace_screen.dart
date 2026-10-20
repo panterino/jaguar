@@ -1448,6 +1448,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
       onScan: canScanQr ? wrap(_scanQr) : null,
       onOpenTeacher: _settings.teacher ? wrap(_openTeacher) : null,
       onOpenGuide: wrap(_showGuide),
+      onOpenSettings: wrap(_openSettings),
     );
   }
 
