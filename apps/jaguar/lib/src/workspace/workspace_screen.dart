@@ -72,7 +72,7 @@ class WorkspaceScreen extends StatefulWidget {
   State<WorkspaceScreen> createState() => _WorkspaceScreenState();
 }
 
-class _WorkspaceScreenState extends State<WorkspaceScreen> {
+class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingObserver {
   late final SyntaxController _code = SyntaxController(text: widget.store.current.source);
 
   /// The program shown in the editor. Saving goes by id so a pending save
@@ -116,6 +116,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _code.addListener(_scheduleSave);
     _code.addListener(_onTyped);
     _session.addListener(_onSessionChanged);
@@ -124,8 +125,16 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _restoreTests(_store.current));
   }
 
+  /// Android can end the process right after the app goes to the background,
+  /// before the delayed save of [_scheduleSave] runs.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) _saveNow();
+  }
+
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _saveNow();
     _saveTimer?.cancel();
     _hintTimer?.cancel();
