@@ -11,7 +11,10 @@ enum IntroResult { done, openGuide }
 Future<IntroResult?> showIntro(BuildContext context, {required bool beginner}) => showDialog<IntroResult>(
   context: context,
   barrierDismissible: false,
-  builder: (context) => _IntroDialog(pages: beginner ? _beginnerPages : _expertPages, beginner: beginner),
+  builder: (context) => _IntroDialog(
+    pages: beginner ? _beginnerPages : _expertPages(phone: MediaQuery.sizeOf(context).width < 600),
+    beginner: beginner,
+  ),
 );
 
 class _IntroPage {
@@ -62,16 +65,20 @@ const _beginnerPages = [
   ),
 ];
 
-const _expertPages = [
+List<_IntroPage> _expertPages({required bool phone}) => [
   _IntroPage(
     icon: Icons.travel_explore_outlined,
     title: 'Así funciona Jaguar',
     body: [
       'Pseudocódigo en español: Algoritmo … FinAlgoritmo, Definir es opcional, los arreglos empiezan en 1 y la '
           'asignación es <- (o =).',
-      'Ejecutar con el botón de la barra (Ctrl+Enter o F9). Paso a paso con F10, con tabla de variables, y prueba de escritorio '
-          'desde el menú.',
-      'Código | Diagrama | Ambos: el diagrama se dibuja del código y también se puede editar desde él.',
+      if (phone)
+        'Toca Ejecutar, el triángulo de arriba. Los símbolos y las instrucciones están en la barra sobre el teclado; '
+            'el paso a paso y la prueba de escritorio, en el menú de tres puntos.'
+      else
+        'Ejecutar con el botón de la barra (Ctrl+Enter o F9). Paso a paso con F10, con tabla de variables, y prueba de '
+            'escritorio desde el menú.',
+      'Código | Diagrama${phone ? '' : ' | Ambos'}: el diagrama se dibuja del código y también se puede editar desde él.',
       'Retos y ejercicios traen pruebas: Probar compara entrada y salida. Los programas se guardan en este '
           'dispositivo y abre y guarda archivos .psc.',
       'Modo Completo muestra todos los menús y atajos; puedes cambiarlo en Ajustes.',
