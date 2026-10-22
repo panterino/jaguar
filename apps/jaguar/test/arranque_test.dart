@@ -36,6 +36,16 @@ Future<ProgramStore> _pumpPhone(
 }
 
 void main() {
+  testWidgets('lo escrito se guarda al pasar a segundo plano, sin esperar al temporizador', (tester) async {
+    final store = await _pumpPhone(tester, source: 'Algoritmo x\nFinAlgoritmo\n');
+    await tester.enterText(find.byType(EditableText).first, 'Algoritmo x\n    Escribir 1\nFinAlgoritmo\n');
+    // No pump: the delayed save has not run yet.
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+    expect(ProgramStore(_prefs).current.source, contains('Escribir 1'));
+    expect(store.current.source, contains('Escribir 1'));
+    await tester.pumpAndSettle(const Duration(seconds: 1));
+  });
+
   group('borrar programas', () {
     test('se puede borrar el único y hay forma de deshacer', () async {
       await _prefsWith({});
