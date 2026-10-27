@@ -18,6 +18,8 @@ import 'package:jaguar/src/workspace/app_menus.dart';
 import 'package:jaguar/src/workspace/programs_sidebar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'ayudas.dart';
+
 late SharedPreferences _prefs;
 
 Future<ProgramStore> _store([String? source, String? mode = 'full']) async {
@@ -262,8 +264,8 @@ void main() {
       JaguarApp(store: store, exercises: ExerciseStore(_prefs), settings: ViewSettings(_prefs), openEditor: true),
     );
 
-    await tester.tap(find.byTooltip('Abrir menú de navegación'));
-    await tester.pumpAndSettle();
+    // Comunidad is at the bottom of the side rail (no hamburger menu any more).
+    expect(find.byTooltip('Abrir menú de navegación'), findsNothing);
     await tester.tap(find.text('Comunidad'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Tabla de multiplicar'));
@@ -279,6 +281,28 @@ void main() {
     await tester.pumpAndSettle();
     expect(store.current.source, newProgramTemplate);
     expect(store.programs.where((p) => p.name == 'tabla'), hasLength(1));
+  });
+
+  testWidgets('la barra lateral lleva las herramientas: Ayuda, Ajustes y Comunidad', (tester) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final store = await _store('Algoritmo hola\nFinAlgoritmo\n');
+    await tester.pumpWidget(
+      JaguarApp(store: store, exercises: ExerciseStore(_prefs), settings: ViewSettings(_prefs), openEditor: true),
+    );
+    await tester.pumpAndSettle();
+    final rail = find.byType(NavigationRail);
+    for (final name in ['Inicio', 'Ruta', 'Clases', 'Taller', 'Comunidad', 'Ayuda', 'Ajustes']) {
+      expect(
+        find.descendant(of: rail, matching: find.text(name)),
+        findsOneWidget,
+        reason: name,
+      );
+    }
+    await tester.tap(find.text('Ajustes'));
+    await tester.pumpAndSettle();
+    expect(find.text('Mostrar la vista Python'), findsOneWidget);
   });
 
   group('escritorio', () {
@@ -456,6 +480,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byType(BackButton));
       await tester.pumpAndSettle();
+      await irASala(tester, 'Clases');
       expect(find.text('Mis ejercicios'), findsOneWidget);
       debugDefaultTargetPlatformOverride = null;
     });
@@ -463,9 +488,8 @@ void main() {
     testWidgets('retos: abrir, ver pistas, resolver y quedar marcado', (tester) async {
       await pumpDesktop(tester, 'Algoritmo hola\nFinAlgoritmo\n');
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Retos'));
-      await tester.pumpAndSettle();
-      expect(find.text('Llevas 0 de 12.', findRichText: true), findsNothing);
+      await irASala(tester, 'Ruta');
+      expect(find.text('0 de 2'), findsWidgets);
       await tester.tap(find.text('Saludo'));
       await tester.pumpAndSettle();
       expect(find.text('Reto 1 · Saludo'), findsOneWidget);
@@ -483,9 +507,9 @@ void main() {
       await tester.tap(find.text('Siguiente reto'));
       await tester.pumpAndSettle();
       expect(find.text('Reto 2 · Área del rectángulo'), findsOneWidget);
-      await tester.tap(find.text('Retos'));
-      await tester.pumpAndSettle();
-      expect(find.textContaining('Llevas 1 de 12'), findsOneWidget);
+      await irASala(tester, 'Ruta');
+      // The first unit shows its first challenge done.
+      expect(find.text('1 de 2'), findsWidgets);
       debugDefaultTargetPlatformOverride = null;
     });
 

@@ -1324,13 +1324,6 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
       onSaveFile: _saveFile,
       onMakeExercise: _settings.teacher ? _exerciseFromProgram : null,
       cloud: widget.cloud,
-      onOpenCommunity: _openCommunity,
-      onOpenChallenges: _openChallenges,
-      onOpenClasses: _openClasses,
-      onAccount: _account,
-      onOpenTeacher: _settings.teacher ? _openTeacher : null,
-      onHome: _openHome,
-      onSettings: _openSettings,
     );
 
     return Scaffold(
@@ -1568,18 +1561,6 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
     return 'Ruta · Nivel ${challenges[index].level} · Reto ${index + 1}';
   }
 
-  void _openHome() {
-    Navigator.push(
-      context,
-      MaterialPageRoute<void>(
-        builder: (context) => Scaffold(
-          appBar: AppBar(title: const Text('Jaguar Code')),
-          body: _startPanel(afterAction: () => Navigator.pop(context)),
-        ),
-      ),
-    );
-  }
-
   /// What the content area shows with no program open.
   Widget _startPanel({VoidCallback? afterAction}) {
     VoidCallback wrap(VoidCallback action) => () {
@@ -1625,25 +1606,6 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
       ),
     );
   }
-
-  Widget _drawer() => ProgramsDrawer(
-    store: _store,
-    cloud: widget.cloud,
-    settings: _settings,
-    onOpenCommunity: _openCommunity,
-    onOpenChallenges: _openChallenges,
-    onOpenClasses: _openClasses,
-    onAccount: _account,
-    onGuide: _showGuide,
-    onAbout: _showAbout,
-    onHome: _openHome,
-    onSettings: _openSettings,
-    exercises: widget.exercises,
-    onSelect: _load,
-    onNew: _newProgram,
-    onScan: canScanQr && !_settings.isBasic ? _scanQr : null,
-    onOpenTeacher: _settings.teacher ? _openTeacher : null,
-  );
 
   Future<void> _exportAll() async {
     _saveNow();
@@ -1734,7 +1696,16 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
     final inner = _room == Room.workshop ? (desktop ? _buildDesktop(menus) : _buildTouch()) : _buildRoomsWide();
     return Row(
       children: [
-        RoomsRail(room: _room, onRoom: _goRoom),
+        RoomsRail(
+          room: _room,
+          onRoom: _goRoom,
+          onSettings: _openSettings,
+          onGuide: _showGuide,
+          onCommunity: _openCommunity,
+          onAccount: widget.cloud == null ? null : _account,
+          accountLabel: widget.cloud?.user?.alias ?? 'Entrar',
+          signedIn: widget.cloud?.signedIn ?? false,
+        ),
         const VerticalDivider(width: 1),
         Expanded(
           child: AnimatedSwitcher(
@@ -1982,7 +1953,6 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
                   ),
                 ],
         ),
-        drawer: wide ? _drawer() : null,
         body: empty
             ? _startPanel()
             : wide

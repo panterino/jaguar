@@ -132,13 +132,15 @@ class RoomsScaffold extends StatelessWidget {
               )
             : Text(room == Room.home ? 'Inicio' : _titles[room]!),
         actions: [
-          if (room == Room.home)
+          // On a wide screen the rail has these.
+          if (room == Room.home && !_isWide(context))
             IconButton(
               tooltip: 'Cómo funciona Jaguar Code',
               icon: const Icon(Icons.help_outline_rounded),
               onPressed: actions.onOpenGuide,
             ),
-          if (room == Room.home)
+          // On a wide screen the rail has these.
+          if (room == Room.home && !_isWide(context))
             IconButton(
               tooltip: 'Ajustes',
               icon: const Icon(Icons.settings_outlined),
@@ -1949,10 +1951,28 @@ class _RoomCard extends StatelessWidget {
 /// The rooms as a rail at the left, for a computer or a tablet: always there,
 /// like the activity bar of a code editor.
 class RoomsRail extends StatelessWidget {
-  const RoomsRail({super.key, required this.room, required this.onRoom});
+  const RoomsRail({
+    super.key,
+    required this.room,
+    required this.onRoom,
+    required this.onSettings,
+    required this.onGuide,
+    this.onCommunity,
+    this.onAccount,
+    this.accountLabel = 'Entrar',
+    this.signedIn = false,
+  });
 
   final Room room;
   final ValueChanged<Room> onRoom;
+
+  /// The tools that are not a place: at the bottom of the rail.
+  final VoidCallback onSettings;
+  final VoidCallback onGuide;
+  final VoidCallback? onCommunity;
+  final VoidCallback? onAccount;
+  final String accountLabel;
+  final bool signedIn;
 
   @override
   Widget build(BuildContext context) {
@@ -1962,10 +1982,32 @@ class RoomsRail extends StatelessWidget {
       onDestinationSelected: (index) => onRoom(Room.values[index]),
       labelType: NavigationRailLabelType.all,
       backgroundColor: scheme.surfaceContainer,
-      minWidth: 76,
+      minWidth: 72,
       leading: Padding(
-        padding: const EdgeInsets.only(top: 10, bottom: 14),
-        child: Image.asset('assets/images/mascota.png', width: 36, height: 36, excludeFromSemantics: true),
+        padding: const EdgeInsets.only(top: 8, bottom: 10),
+        child: Image.asset('assets/images/mascota.png', width: 34, height: 34, excludeFromSemantics: true),
+      ),
+      trailing: Expanded(
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (onCommunity != null) _RailTool(icon: Icons.public, label: 'Comunidad', onTap: onCommunity!),
+                if (onAccount != null)
+                  _RailTool(
+                    icon: signedIn ? Icons.account_circle : Icons.login,
+                    label: accountLabel,
+                    onTap: onAccount!,
+                  ),
+                _RailTool(icon: Icons.help_outline_rounded, label: 'Ayuda', onTap: onGuide),
+                _RailTool(icon: Icons.settings_outlined, label: 'Ajustes', onTap: onSettings),
+              ],
+            ),
+          ),
+        ),
       ),
       destinations: const [
         NavigationRailDestination(
@@ -1985,6 +2027,44 @@ class RoomsRail extends StatelessWidget {
           label: Text('Taller'),
         ),
       ],
+    );
+  }
+}
+
+/// A tool at the bottom of the rail: an icon and a small name.
+class _RailTool extends StatelessWidget {
+  const _RailTool({required this.icon, required this.label, required this.onTap});
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Tooltip(
+      message: label,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: SizedBox(
+          width: 68,
+          height: 52,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 22, color: scheme.onSurfaceVariant),
+              const SizedBox(height: 2),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: scheme.onSurfaceVariant),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
