@@ -164,6 +164,7 @@ class RoomsScaffold extends StatelessWidget {
             key: ValueKey(room),
             child: switch (room) {
               Room.home => _HomeRoom(
+                cloud: cloud,
                 settings: settings,
                 store: store,
                 exercises: exercises,
@@ -312,20 +313,82 @@ class _Page extends StatelessWidget {
   );
 }
 
-class _HomeRoom extends StatelessWidget {
+class _HomeRoom extends StatefulWidget {
   const _HomeRoom({
     required this.settings,
     required this.store,
     required this.exercises,
     required this.actions,
     required this.onRoom,
+    this.cloud,
   });
 
+  final Cloud? cloud;
   final ViewSettings settings;
   final ProgramStore store;
   final ExerciseStore exercises;
   final RoomActions actions;
   final ValueChanged<Room> onRoom;
+
+  @override
+  State<_HomeRoom> createState() => _HomeRoomState();
+}
+
+/// How many classes there are and how many tasks wait, for the Clases card.
+class _ClassStatus {
+  const _ClassStatus(this.classes, this.pending);
+
+  final int classes;
+  final int pending;
+}
+
+class _HomeRoomState extends State<_HomeRoom> {
+  _ClassStatus? _status;
+  String? _loadedFor;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.cloud?.addListener(_load);
+    _load();
+  }
+
+  @override
+  void dispose() {
+    widget.cloud?.removeListener(_load);
+    super.dispose();
+  }
+
+  Future<void> _load() async {
+    final cloud = widget.cloud;
+    final user = cloud?.user;
+    if (cloud == null || user == null) {
+      _loadedFor = null;
+      if (_status != null && mounted) setState(() => _status = null);
+      return;
+    }
+    _loadedFor = user.uid;
+    try {
+      final rooms = await cloud.backend.myClasses();
+      var pending = 0;
+      for (final room in rooms) {
+        if (room.ownerId == user.uid) continue;
+        for (final assignment in await cloud.backend.assignments(room.id)) {
+          if (await cloud.backend.mySubmission(room.id, assignment.id) == null) pending++;
+        }
+      }
+      if (mounted && _loadedFor == user.uid) setState(() => _status = _ClassStatus(rooms.length, pending));
+    } on Object {
+      // Without a connection the card says nothing about classes.
+      if (mounted) setState(() => _status = null);
+    }
+  }
+
+  ViewSettings get settings => widget.settings;
+  ProgramStore get store => widget.store;
+  ExerciseStore get exercises => widget.exercises;
+  RoomActions get actions => widget.actions;
+  ValueChanged<Room> get onRoom => widget.onRoom;
 
   @override
   Widget build(BuildContext context) {
@@ -338,6 +401,7 @@ class _HomeRoom extends StatelessWidget {
     final task = exercises.received.lastOrNull;
     final programs = store.programs.length;
     final teacher = settings.teacher;
+    final status = _status;
     final nextIndex = next == null ? -1 : steps.indexWhere((s) => s.id == next.id);
 
     final route = _Place(
@@ -363,9 +427,18 @@ class _HomeRoom extends StatelessWidget {
       kicker: teacher ? 'CON TU GRUPO' : 'CON TU PROFE',
       title: 'Clases',
       phrase: teacher ? 'Tus grupos y sus entregas.' : 'Los ejercicios de tu profe.',
-      state: task != null ? 'Tarea nueva: ${task.title}' : (teacher ? 'Tus clases' : 'Sin clase'),
+      state: task != null
+          ? 'Tarea nueva: ${task.title}'
+          : switch (status) {
+              null => teacher ? 'Tus clases' : 'Sin clase',
+              _ClassStatus(classes: 0) => 'Sin clase',
+              _ClassStatus(:final pending) when pending > 0 && !teacher =>
+                pending == 1 ? '1 tarea por hacer' : '$pending tareas por hacer',
+              _ClassStatus(:final classes) => classes == 1 ? '1 clase' : '$classes clases',
+            },
       icon: Icons.school_rounded,
-      badge: task != null,
+      badge: task != null || (status?.pending ?? 0) > 0 && !teacher,
+      badgeCount: task != null ? 1 : (status?.pending ?? 1),
     );
     final primaryRoom = teacher ? Room.classes : (next != null ? Room.route : Room.workshop);
     final places = {Room.route: route, Room.workshop: workshop, Room.classes: classes};
@@ -471,6 +544,7 @@ class _Place {
     required this.state,
     required this.icon,
     this.badge = false,
+    this.badgeCount = 1,
   });
 
   final Room room;
@@ -482,6 +556,7 @@ class _Place {
 
   /// Something is waiting there (a task from the teacher).
   final bool badge;
+  final int badgeCount;
 }
 
 PlaceColors _colorsOf(BuildContext context, Room room) => switch (room) {
@@ -588,9 +663,9 @@ class _PortalTile extends StatelessWidget {
                       height: 20,
                       alignment: Alignment.center,
                       decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                      child: const Text(
-                        '1',
-                        style: TextStyle(color: Color(0xFF2A1B0F), fontSize: 12, fontWeight: FontWeight.w900),
+                      child: Text(
+                        '${place.badgeCount}',
+                        style: const TextStyle(color: Color(0xFF2A1B0F), fontSize: 12, fontWeight: FontWeight.w900),
                       ),
                     )
                   else

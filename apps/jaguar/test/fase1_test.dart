@@ -152,6 +152,8 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
+      // The portal already says there is a task waiting in the class.
+      expect(find.text('1 tarea por hacer'), findsOneWidget);
       await irASala(tester, 'Clases');
 
       expect(find.text('Programación 3A'), findsOneWidget);
@@ -184,6 +186,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
+      expect(find.text('1 clase'), findsOneWidget);
       await irASala(tester, 'Clases');
       expect(find.textContaining('Tu clase · código JAG-'), findsOneWidget);
       expect(find.text('Ver entregas'), findsOneWidget);
