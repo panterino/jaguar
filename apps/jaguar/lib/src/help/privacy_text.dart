@@ -17,11 +17,13 @@ const privacySections = <(String, String)>[
     'Qué datos usamos',
     'Sin entrar en línea, nada sale de tu equipo. Si entras en línea, guardamos solo lo necesario para las '
         'clases y la comunidad: un alias, lo que publicas y tus entregas. A los profesores, además, su correo. '
-        'No pedimos nombre real ni foto a los alumnos.',
+        'No pedimos nombre real ni foto a los alumnos. Si pides acceso anticipado en la página, guardamos el '
+        'correo que escribas.',
   ),
   (
     'Para qué',
-    'Solo para que funcionen las clases y la comunidad. No hay publicidad ni vendemos tus datos.',
+    'Para que funcionen las clases y la comunidad. El correo del acceso anticipado es solo para darte entrada '
+        'a la app y avisarte de novedades. No hay publicidad ni vendemos tus datos.',
   ),
   (
     'Menores de edad',

@@ -4,11 +4,12 @@
   "name": "jaguar-landing",
   "compatibility_date": "2026-10-01",
   "assets": {
-    // /profes y /profes.html abren profes.html.
-    "directory": "../../sitio"
+    // Direcciones sin diagonal ni .html: /profes, /guias y /guias/que-es-un-algoritmo.
+    // Las que terminan en / o en .html redirigen a ellas.
+    "directory": "../../sitio",
+    "html_handling": "drop-trailing-slash",
+    // Una página que no existe muestra 404.html (con noindex) y responde 404.
+    "not_found_handling": "404-page"
   },
-  "routes": [
-    { "pattern": "jaguarcode.org", "custom_domain": true },
-    { "pattern": "www.jaguarcode.org", "custom_domain": true }
-  ]
+  "routes": [{ "pattern": "jaguarcode.org", "custom_domain": true }]
 }

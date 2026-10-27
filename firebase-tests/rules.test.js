@@ -207,3 +207,28 @@ describe('mensajes de la página', () => {
     await assertFails(setDoc(doc(db(null), 'mensajes/m6'), { ...base, creado: new Date(0) }));
   });
 });
+
+describe('acceso anticipado de la página', () => {
+  test('cualquiera deja su correo una vez; nadie lo lee ni lo cambia', async () => {
+    const entry = { correo: 'ana@correo.mx', origen: 'acceso', creado: serverTimestamp() };
+    await assertSucceeds(setDoc(doc(db(null), 'accesoAnticipado/a1'), entry));
+    await assertFails(getDoc(doc(db(null), 'accesoAnticipado/a1')));
+    await assertFails(getDocs(collection(db('ana'), 'accesoAnticipado')));
+    // The same address again lands on the same id: it is an update, refused.
+    await assertFails(setDoc(doc(db(null), 'accesoAnticipado/a1'), { ...entry, origen: 'inicio' }));
+    await assertFails(deleteDoc(doc(db(null), 'accesoAnticipado/a1')));
+  });
+
+  test('solo correos con forma de correo, y los campos permitidos', async () => {
+    const base = { correo: 'leo@escuela.edu.mx', origen: 'inicio', creado: serverTimestamp() };
+    await assertSucceeds(setDoc(doc(db(null), 'accesoAnticipado/b1'), base));
+    await assertFails(setDoc(doc(db(null), 'accesoAnticipado/b2'), { ...base, correo: 'sin-arroba' }));
+    await assertFails(setDoc(doc(db(null), 'accesoAnticipado/b3'), { ...base, correo: 'dos@@x.mx' }));
+    await assertFails(setDoc(doc(db(null), 'accesoAnticipado/b4'), { ...base, correo: 'con espacio@x.mx' }));
+    await assertFails(setDoc(doc(db(null), 'accesoAnticipado/b5'), { ...base, correo: 'a@b' }));
+    await assertFails(setDoc(doc(db(null), 'accesoAnticipado/b6'), { ...base, correo: `${'x'.repeat(200)}@x.mx` }));
+    await assertFails(setDoc(doc(db(null), 'accesoAnticipado/b7'), { ...base, origen: 'otro' }));
+    await assertFails(setDoc(doc(db(null), 'accesoAnticipado/b8'), { ...base, nombre: 'Ana' }));
+    await assertFails(setDoc(doc(db(null), 'accesoAnticipado/b9'), { ...base, creado: new Date(0) }));
+  });
+});

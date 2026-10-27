@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Qué es un algoritmo: definición, partes y ejemplos fáciles</title>
+<meta name="description" content="Un algoritmo es una lista ordenada de pasos para resolver un problema. Conoce sus partes (entrada, proceso y salida), ejemplos de la vida diaria y uno en pseudocódigo.">
+<link rel="canonical" href="https://jaguarcode.org/guias/que-es-un-algoritmo">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="apple-touch-icon" href="/icono.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Jaguar">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://jaguarcode.org/guias/que-es-un-algoritmo">
+<meta property="og:title" content="Qué es un algoritmo: definición, partes y ejemplos fáciles">
+<meta property="og:description" content="Un algoritmo es una lista ordenada de pasos para resolver un problema. Conoce sus partes (entrada, proceso y salida), ejemplos de la vida diaria y uno en pseudocódigo.">
+<meta property="og:image" content="https://jaguarcode.org/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Qué es un algoritmo: definición, partes y ejemplos fáciles">
+<meta name="twitter:description" content="Un algoritmo es una lista ordenada de pasos para resolver un problema. Conoce sus partes (entrada, proceso y salida), ejemplos de la vida diaria y uno en pseudocódigo.">
+<meta name="twitter:image" content="https://jaguarcode.org/compartir.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://jaguarcode.org/guias/que-es-un-algoritmo#articulo",
+      "headline": "Qué es un algoritmo: definición, partes y ejemplos fáciles",
+      "description": "Un algoritmo es una lista ordenada de pasos para resolver un problema. Conoce sus partes (entrada, proceso y salida), ejemplos de la vida diaria y uno en pseudocódigo.",
+      "inLanguage": "es-MX",
+      "datePublished": "2026-10-26",
+      "dateModified": "2026-10-26",
+      "mainEntityOfPage": "https://jaguarcode.org/guias/que-es-un-algoritmo",
+      "image": "https://jaguarcode.org/compartir.png",
+      "author": { "@type": "Organization", "name": "Panterino", "url": "https://jaguarcode.org/" },
+      "publisher": { "@type": "Organization", "name": "Panterino", "logo": { "@type": "ImageObject", "url": "https://jaguarcode.org/icono.png" } }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Jaguar", "item": "https://jaguarcode.org/" },
+        { "@type": "ListItem", "position": 2, "name": "Guías", "item": "https://jaguarcode.org/guias" },
+        { "@type": "ListItem", "position": 3, "name": "Qué es un algoritmo", "item": "https://jaguarcode.org/guias/que-es-un-algoritmo" }
+      ]
+    },
+    { "@type": "FAQPage", "mainEntity": [{"@type":"Question","name":"¿Un algoritmo es lo mismo que un programa?","acceptedAnswer":{"@type":"Answer","text":"No. El algoritmo es la idea: los pasos para resolver el problema. El programa es esa idea escrita en un lenguaje que una computadora entiende."}},{"@type":"Question","name":"¿Necesito una computadora para hacer un algoritmo?","acceptedAnswer":{"@type":"Answer","text":"No. Puedes escribirlo en papel, con frases o con un diagrama. La computadora hace falta cuando quieres ejecutarlo y ver el resultado."}},{"@type":"Question","name":"¿Cuántos pasos debe tener un algoritmo?","acceptedAnswer":{"@type":"Answer","text":"Los que hagan falta, pero siempre un número finito. Un buen algoritmo es tan corto como se pueda sin dejar pasos ambiguos."}}] }
+  ]
+}
+</script>
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/estilos.css">
+</head>
+<body>
+<header class="sitio-barra">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="/logo.svg" alt="" width="46" height="40">
+      <a class="nombre" href="/">Jaguar</a>
+      <a href="/guias">Guías</a>
+      <a href="/profes">Para profes</a>
+      <a href="https://github.com/panterino/jaguar">GitHub</a>
+    </div>
+  </div>
+</header>
+<main class="guia">
+  <div class="ancho angosto">
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › <a href="/guias">Guías</a> › Qué es un algoritmo</nav>
+    <h1>Qué es un algoritmo</h1>
+    <p class="resumen">Un algoritmo es una lista ordenada y finita de pasos que resuelve un problema o hace una tarea. Tiene una entrada (lo que necesita), un proceso (lo que hace) y una salida (el resultado).</p>
+    <nav class="contenido" aria-label="Contenido de la guía"><b>En esta guía</b>
+      <ol>
+        <li><a href="#vida-diaria">Un ejemplo de la vida diaria</a></li>
+        <li><a href="#partes">Las tres partes de un algoritmo</a></li>
+        <li><a href="#buen-algoritmo">Qué debe cumplir un buen algoritmo</a></li>
+        <li><a href="#en-programa">De la idea al programa</a></li>
+        <li><a href="#formas">Formas de representar un algoritmo</a></li>
+        <li><a href="#errores">Errores comunes</a></li>
+        <li><a href="#preguntas">Preguntas frecuentes</a></li>
+      </ol>
+    </nav>
+    <article>
+      <section id="vida-diaria">
+        <h2>Un ejemplo de la vida diaria</h2>
+<p>Una receta es un algoritmo. Para preparar un té, por ejemplo:</p>
+<ol>
+  <li>Hervir agua.</li>
+  <li>Poner una bolsita de té en una taza.</li>
+  <li>Verter el agua caliente en la taza.</li>
+  <li>Esperar tres minutos.</li>
+  <li>Retirar la bolsita.</li>
+</ol>
+<p>Si cambias el orden (verter el agua antes de hervirla) el resultado ya no es el mismo. Esa es la primera idea: <b>el orden de los pasos importa</b>.</p>
+      </section>
+      <section id="partes">
+        <h2>Las tres partes de un algoritmo</h2>
+<p>Todo algoritmo se puede ver como una caja con tres partes:</p>
+<div class="tabla"><table><caption>Entrada, proceso y salida</caption><thead><tr><th scope="col">Parte</th><th scope="col">Qué es</th><th scope="col">En el té</th><th scope="col">En un promedio</th></tr></thead><tbody><tr><td><b>Entrada</b></td><td>Los datos con los que empieza</td><td>Agua, té y taza</td><td>Dos calificaciones</td></tr><tr><td><b>Proceso</b></td><td>Lo que se hace con los datos</td><td>Hervir, verter, esperar</td><td>Sumar y dividir entre 2</td></tr><tr><td><b>Salida</b></td><td>El resultado</td><td>Una taza de té</td><td>El promedio</td></tr></tbody></table></div>
+<p>Antes de escribir un programa conviene responder estas tres preguntas. En la escuela se le llama <i>planteamiento</i> del problema.</p>
+      </section>
+      <section id="buen-algoritmo">
+        <h2>Qué debe cumplir un buen algoritmo</h2>
+<ul>
+  <li><b>Ser preciso:</b> cada paso dice exactamente qué hacer. «Agrega un poco de sal» es ambiguo; «agrega una cucharadita de sal» no.</li>
+  <li><b>Ser finito:</b> termina. Un algoritmo que se repite para siempre no resuelve nada.</li>
+  <li><b>Estar ordenado:</b> los pasos van en una secuencia clara.</li>
+  <li><b>Funcionar para varios datos:</b> el mismo algoritmo del promedio sirve para cualquier par de calificaciones, no solo para 7 y 10.</li>
+</ul>
+      </section>
+      <section id="en-programa">
+        <h2>De la idea al programa</h2>
+<p>Para que una computadora siga un algoritmo hay que escribirlo con reglas claras. Una forma de hacerlo es con <a href="/guias/que-es-el-pseudocodigo">pseudocódigo</a>. Este algoritmo calcula el área de un rectángulo: la entrada son la base y la altura, el proceso es multiplicarlas y la salida es el área.</p>
+<pre class="codigo" data-entradas="4|3" data-salida="Base:&#10;Altura:&#10;Área: 12" tabindex="0"><code>Algoritmo area_rectangulo
+    Escribir "Base:"
+    Leer base
+    Escribir "Altura:"
+    Leer altura
+    area &lt;- base * altura
+    Escribir "Área: ", area
+FinAlgoritmo</code></pre>
+<p>Con base 4 y altura 3 muestra <code>Área: 12</code>. Cambia los datos y el mismo algoritmo da otro resultado.</p>
+      </section>
+      <section id="formas">
+        <h2>Formas de representar un algoritmo</h2>
+<ul>
+  <li><b>Lenguaje natural:</b> frases como las de la receta.</li>
+  <li><b><a href="/guias/que-es-el-pseudocodigo">Pseudocódigo</a>:</b> frases cortas con palabras como <code>Leer</code>, <code>Escribir</code> y <code>Si</code>.</li>
+  <li><b><a href="/guias/como-hacer-un-diagrama-de-flujo">Diagrama de flujo</a>:</b> figuras unidas con flechas.</li>
+  <li><b>Código:</b> un lenguaje de programación como Python, C o Java.</li>
+</ul>
+<p>Son formas distintas de contar lo mismo. Para comprobar que un algoritmo funciona, puedes hacer su <a href="/guias/prueba-de-escritorio">prueba de escritorio</a>.</p>
+      </section>
+      <section id="errores">
+        <h2>Errores comunes</h2>
+<ul>
+  <li><b>Pasos ambiguos:</b> «calcula el total» sin decir de qué.</li>
+  <li><b>Olvidar un caso:</b> dividir entre un número que puede ser cero.</li>
+  <li><b>No terminar:</b> una repetición que nunca llega a su condición de salida.</li>
+  <li><b>Mezclar el orden:</b> usar un dato antes de leerlo.</li>
+</ul>
+      </section>
+      <section id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+        <details><summary>¿Un algoritmo es lo mismo que un programa?</summary><p>No. El algoritmo es la idea: los pasos para resolver el problema. El programa es esa idea escrita en un lenguaje que una computadora entiende.</p></details>
+        <details><summary>¿Necesito una computadora para hacer un algoritmo?</summary><p>No. Puedes escribirlo en papel, con frases o con un diagrama. La computadora hace falta cuando quieres ejecutarlo y ver el resultado.</p></details>
+        <details><summary>¿Cuántos pasos debe tener un algoritmo?</summary><p>Los que hagan falta, pero siempre un número finito. Un buen algoritmo es tan corto como se pueda sin dejar pasos ambiguos.</p></details>
+      </section>
+    </article>
+<aside class="cta-guia" aria-labelledby="cta-t">
+  <h2 id="cta-t">Practica esto en Jaguar</h2>
+  <p>Escribe pseudocódigo, mira su diagrama y haz la prueba de escritorio desde el celular. Gratis y sin anuncios. Deja tu correo y te damos entrada a la app.</p>
+  <div class="acceso" data-origen="guia">
+    <form novalidate>
+      <div class="fila">
+        <label class="campo-correo"><span class="oculto">Tu correo</span>
+          <input type="email" name="correo" placeholder="Tu correo" autocomplete="email" inputmode="email" maxlength="200" required></label>
+        <button class="boton principal" type="submit">Quiero entrar primero</button>
+      </div>
+      <label class="oculto" aria-hidden="true">No llenar <input name="sitio" tabindex="-1" autocomplete="off"></label>
+      <p class="estado" role="status" aria-live="polite"></p>
+      <p class="letra-chica">Solo lo usamos para darte entrada a la app y avisarte de novedades. Sin spam. <a href="https://app.jaguarcode.org/privacidad">Aviso de privacidad</a>.</p>
+    </form>
+    <div class="dentro" hidden>
+      <h3>¡Listo, ya estás dentro!</h3>
+      <p>Ya puedes abrir la app. Te escribiremos cuando haya novedades.</p>
+      <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Entrar a la app</a></div>
+    </div>
+  </div>
+</aside>
+    <h2 style="margin-top:44px">Sigue aprendiendo</h2>
+    <div class="relacionadas">
+      <a href="/guias/que-es-el-pseudocodigo">Qué es el pseudocódigo<small>El pseudocódigo es una forma de escribir un algoritmo con palabras parecidas a las de un lenguaje de programación, pero sin reglas estrictas de sintaxis.</small></a>
+      <a href="/guias/como-hacer-un-diagrama-de-flujo">Cómo hacer un diagrama de flujo<small>Un diagrama de flujo representa un algoritmo con figuras unidas por flechas.</small></a>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="ancho">
+    <span class="quien"><img src="/logo.svg" alt="" width="30" height="26">Un proyecto de Panterino · hecho en México</span>
+    <a href="/guias">Guías</a>
+    <a href="/manual">Manual</a>
+    <a href="https://www.facebook.com/jaguareducation">Facebook</a>
+    <a href="https://github.com/panterino/jaguar">Código en GitHub</a>
+  </div>
+</footer>
+<script src="/acceso.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cómo hacer un diagrama de flujo paso a paso (símbolos y ejemplo)</title>
+<meta name="description" content="Aprende a hacer un diagrama de flujo: los símbolos que se usan, los pasos para dibujarlo, un ejemplo completo con su pseudocódigo y los errores más comunes.">
+<link rel="canonical" href="https://jaguarcode.org/guias/como-hacer-un-diagrama-de-flujo">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="apple-touch-icon" href="/icono.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Jaguar">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://jaguarcode.org/guias/como-hacer-un-diagrama-de-flujo">
+<meta property="og:title" content="Cómo hacer un diagrama de flujo paso a paso (símbolos y ejemplo)">
+<meta property="og:description" content="Aprende a hacer un diagrama de flujo: los símbolos que se usan, los pasos para dibujarlo, un ejemplo completo con su pseudocódigo y los errores más comunes.">
+<meta property="og:image" content="https://jaguarcode.org/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Cómo hacer un diagrama de flujo paso a paso (símbolos y ejemplo)">
+<meta name="twitter:description" content="Aprende a hacer un diagrama de flujo: los símbolos que se usan, los pasos para dibujarlo, un ejemplo completo con su pseudocódigo y los errores más comunes.">
+<meta name="twitter:image" content="https://jaguarcode.org/compartir.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://jaguarcode.org/guias/como-hacer-un-diagrama-de-flujo#articulo",
+      "headline": "Cómo hacer un diagrama de flujo paso a paso (símbolos y ejemplo)",
+      "description": "Aprende a hacer un diagrama de flujo: los símbolos que se usan, los pasos para dibujarlo, un ejemplo completo con su pseudocódigo y los errores más comunes.",
+      "inLanguage": "es-MX",
+      "datePublished": "2026-10-26",
+      "dateModified": "2026-10-26",
+      "mainEntityOfPage": "https://jaguarcode.org/guias/como-hacer-un-diagrama-de-flujo",
+      "image": "https://jaguarcode.org/compartir.png",
+      "author": { "@type": "Organization", "name": "Panterino", "url": "https://jaguarcode.org/" },
+      "publisher": { "@type": "Organization", "name": "Panterino", "logo": { "@type": "ImageObject", "url": "https://jaguarcode.org/icono.png" } }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Jaguar", "item": "https://jaguarcode.org/" },
+        { "@type": "ListItem", "position": 2, "name": "Guías", "item": "https://jaguarcode.org/guias" },
+        { "@type": "ListItem", "position": 3, "name": "Cómo hacer un diagrama de flujo", "item": "https://jaguarcode.org/guias/como-hacer-un-diagrama-de-flujo" }
+      ]
+    },
+    { "@type": "FAQPage", "mainEntity": [{"@type":"Question","name":"¿Qué programa uso para hacer un diagrama de flujo?","acceptedAnswer":{"@type":"Answer","text":"Puedes dibujarlo a mano o con cualquier programa de dibujo. Con Jaguar lo armas con las figuras y la app escribe el pseudocódigo, o escribes el pseudocódigo y te muestra el diagrama."}},{"@type":"Question","name":"¿Cuál es la diferencia entre un diagrama de flujo y el pseudocódigo?","acceptedAnswer":{"@type":"Answer","text":"Dicen lo mismo con otra forma. El diagrama es visual y deja ver las decisiones y los ciclos de un vistazo; el pseudocódigo es texto y se acerca más a un programa real."}},{"@type":"Question","name":"¿Todos los diagramas llevan las mismas figuras?","acceptedAnswer":{"@type":"Answer","text":"Las más importantes son las mismas en casi todos lados: óvalo, paralelogramo, rectángulo, rombo y flechas. Algunas materias agregan figuras para ciclos o conectores; sigue las de tu profesor."}}] }
+  ]
+}
+</script>
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/estilos.css">
+</head>
+<body>
+<header class="sitio-barra">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="/logo.svg" alt="" width="46" height="40">
+      <a class="nombre" href="/">Jaguar</a>
+      <a href="/guias">Guías</a>
+      <a href="/profes">Para profes</a>
+      <a href="https://github.com/panterino/jaguar">GitHub</a>
+    </div>
+  </div>
+</header>
+<main class="guia">
+  <div class="ancho angosto">
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › <a href="/guias">Guías</a> › Cómo hacer un diagrama de flujo</nav>
+    <h1>Cómo hacer un diagrama de flujo</h1>
+    <p class="resumen">Un diagrama de flujo representa un algoritmo con figuras unidas por flechas. Para hacerlo: marca el inicio, dibuja cada paso con su figura, usa un rombo en cada decisión y cierra con el fin.</p>
+    <nav class="contenido" aria-label="Contenido de la guía"><b>En esta guía</b>
+      <ol>
+        <li><a href="#simbolos">Los símbolos principales</a></li>
+        <li><a href="#pasos">Cómo dibujarlo, paso a paso</a></li>
+        <li><a href="#ejemplo">Ejemplo: promedio de dos calificaciones</a></li>
+        <li><a href="#ciclos">Cómo se dibuja una repetición</a></li>
+        <li><a href="#reglas">Reglas para que se entienda</a></li>
+        <li><a href="#errores">Errores comunes</a></li>
+        <li><a href="#preguntas">Preguntas frecuentes</a></li>
+      </ol>
+    </nav>
+    <article>
+      <section id="simbolos">
+        <h2>Los símbolos principales</h2>
+<div class="tabla"><table><caption>Figuras del diagrama de flujo</caption><thead><tr><th scope="col">Figura</th><th scope="col">Nombre</th><th scope="col">Se usa para</th></tr></thead><tbody><tr><td><svg viewBox="0 0 56 30" width="56" height="30" role="img" aria-label="Óvalo"><rect class="f" x="3" y="4" width="50" height="22" rx="11"/></svg></td><td>Óvalo</td><td>Inicio y fin</td></tr><tr><td><svg viewBox="0 0 56 30" width="56" height="30" role="img" aria-label="Paralelogramo"><path class="f" d="M12 4h42l-10 22H2z"/></svg></td><td>Paralelogramo</td><td>Entrada y salida de datos (Leer, Escribir)</td></tr><tr><td><svg viewBox="0 0 56 30" width="56" height="30" role="img" aria-label="Rectángulo"><rect class="f" x="4" y="4" width="48" height="22" rx="2"/></svg></td><td>Rectángulo</td><td>Proceso: cálculos y asignaciones</td></tr><tr><td><svg viewBox="0 0 56 30" width="56" height="30" role="img" aria-label="Rombo"><path class="f" d="M28 2l25 13-25 13L3 15z"/></svg></td><td>Rombo</td><td>Decisión: una pregunta con dos salidas, Sí y No</td></tr><tr><td><svg viewBox="0 0 56 30" width="56" height="30" role="img" aria-label="Flecha"><path class="l" d="M4 15h42M40 9l8 6-8 6"/></svg></td><td>Flecha</td><td>Indica el orden en que se sigue el diagrama</td></tr></tbody></table></div>
+<p>Los libros de cada materia pueden usar variaciones (por ejemplo, otra figura para repetir), pero estas cinco bastan para casi todos los ejercicios de un primer curso.</p>
+      </section>
+      <section id="pasos">
+        <h2>Cómo dibujarlo, paso a paso</h2>
+<ol>
+  <li><b>Entiende el problema.</b> Escríbelo con tus palabras y decide qué entra y qué debe salir.</li>
+  <li><b>Piensa los pasos</b> en una lista corta, en el orden en que ocurren.</li>
+  <li><b>Dibuja el inicio</b> con un óvalo.</li>
+  <li><b>Agrega cada paso con su figura:</b> paralelogramo para leer y escribir, rectángulo para calcular.</li>
+  <li><b>Usa un rombo cuando haya una decisión.</b> Escribe la pregunta dentro y rotula las dos salidas con Sí y No.</li>
+  <li><b>Une todo con flechas,</b> de arriba hacia abajo, y junta las ramas cuando terminen.</li>
+  <li><b>Cierra con un óvalo de fin</b> y revisa que todo camino llegue a él.</li>
+</ol>
+      </section>
+      <section id="ejemplo">
+        <h2>Ejemplo: promedio de dos calificaciones</h2>
+<p>El problema: leer dos calificaciones, calcular el promedio y decir si el alumno pasó (promedio de 6 o más).</p>
+<figure class="diagrama">
+  <svg viewBox="0 0 320 380" role="img" aria-labelledby="diag-tit">
+          <title id="diag-tit">Diagrama de flujo del programa promedio: leer a y b, calcular el promedio p y decidir si p es mayor o igual a 6</title>
+          <g class="linea" stroke-width="1.5" fill="none">
+            <path d="M160 40v20M160 92v20M160 144v22M100 190H60v40M220 190h40v40M60 262v48h100M260 262v48h-100M160 310v26"/>
+          </g>
+          <rect class="ini fig" x="115" y="10" width="90" height="30" rx="15"/>
+          <text x="160" y="30" text-anchor="middle">Inicio</text>
+          <path class="io fig" d="M70 60h190l-20 32H50z"/>
+          <text x="155" y="81" text-anchor="middle">Leer a, b</text>
+          <rect class="proc fig" x="70" y="112" width="180" height="32" rx="3"/>
+          <text x="160" y="133" text-anchor="middle">p &lt;- (a + b) / 2</text>
+          <path class="dec fig" d="M160 166l60 24-60 24-60-24z"/>
+          <text x="160" y="195" text-anchor="middle">p &gt;= 6</text>
+          <text x="40" y="182" font-size="11">No</text>
+          <text x="262" y="182" font-size="11">Sí</text>
+          <path class="sal fig" d="M14 230h112l-10 32H4z"/>
+          <text x="63" y="251" text-anchor="middle" font-size="11">"Casi"</text>
+          <path class="sal fig" d="M204 230h112l-10 32H194z"/>
+          <text x="255" y="251" text-anchor="middle" font-size="11">"Pasaste"</text>
+          <circle cx="160" cy="310" r="4" fill="var(--fig-linea)"/>
+          <rect class="ini fig" x="115" y="336" width="90" height="30" rx="15"/>
+          <text x="160" y="356" text-anchor="middle">Fin</text>
+          <circle class="ficha" r="6">
+            <animateMotion dur="6s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;1" keyTimes="0;.8;1" path="M160 40V190H260V246V310H160V336"/>
+          </circle>
+        </svg>
+  <figcaption>El diagrama del programa del promedio: lectura, cálculo, decisión y dos salidas.</figcaption>
+</figure>
+<p>El mismo algoritmo en pseudocódigo, figura por figura:</p>
+<pre class="codigo" data-entradas="7|10" data-salida="Pasaste con 8.5" tabindex="0"><code>Algoritmo promedio
+    Leer a, b
+    p &lt;- (a + b) / 2
+    Si p &gt;= 6 Entonces
+        Escribir "Pasaste con ", p
+    SiNo
+        Escribir "Casi, sacaste ", p
+    FinSi
+FinAlgoritmo</code></pre>
+<p>Fíjate que cada línea del programa tiene su figura: <code>Leer</code> es el paralelogramo de entrada, la asignación es el rectángulo, el <code>Si</code> es el rombo y cada <code>Escribir</code> es un paralelogramo de salida.</p>
+      </section>
+      <section id="ciclos">
+        <h2>Cómo se dibuja una repetición</h2>
+<p>Un ciclo se dibuja con un rombo y una flecha que <b>regresa</b>: mientras la pregunta se cumple (Sí), el flujo vuelve a la parte de arriba; cuando no (No), sigue hacia adelante. Por eso el rombo de un ciclo tiene siempre una flecha que sube.</p>
+<pre class="codigo" data-salida="3&#10;2&#10;1&#10;¡Despegue!" tabindex="0"><code>Algoritmo cuenta
+    n &lt;- 3
+    Mientras n &gt; 0 Hacer
+        Escribir n
+        n &lt;- n - 1
+    FinMientras
+    Escribir "¡Despegue!"
+FinAlgoritmo</code></pre>
+      </section>
+      <section id="reglas">
+        <h2>Reglas para que se entienda</h2>
+<ul>
+  <li>Un solo inicio y, normalmente, un solo fin.</li>
+  <li>El flujo va de arriba hacia abajo y de izquierda a derecha.</li>
+  <li>Cada rombo tiene dos salidas rotuladas.</li>
+  <li>Dentro de cada figura, texto corto: <code>Leer a, b</code> y no «aquí el programa le pide al usuario dos números».</li>
+  <li>Evita que las flechas se crucen; si pasa, reacomoda las figuras.</li>
+</ul>
+      </section>
+      <section id="errores">
+        <h2>Errores comunes</h2>
+<ul>
+  <li>Un rombo con una sola salida, o con salidas sin rotular.</li>
+  <li>Una figura sin flecha de salida (el diagrama «se queda colgado»).</li>
+  <li>Usar un rectángulo para leer datos en lugar del paralelogramo.</li>
+  <li>Olvidar la flecha que regresa en un ciclo, de modo que solo se ejecuta una vez.</li>
+</ul>
+      </section>
+      <section id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+        <details><summary>¿Qué programa uso para hacer un diagrama de flujo?</summary><p>Puedes dibujarlo a mano o con cualquier programa de dibujo. Con Jaguar lo armas con las figuras y la app escribe el pseudocódigo, o escribes el pseudocódigo y te muestra el diagrama.</p></details>
+        <details><summary>¿Cuál es la diferencia entre un diagrama de flujo y el pseudocódigo?</summary><p>Dicen lo mismo con otra forma. El diagrama es visual y deja ver las decisiones y los ciclos de un vistazo; el pseudocódigo es texto y se acerca más a un programa real.</p></details>
+        <details><summary>¿Todos los diagramas llevan las mismas figuras?</summary><p>Las más importantes son las mismas en casi todos lados: óvalo, paralelogramo, rectángulo, rombo y flechas. Algunas materias agregan figuras para ciclos o conectores; sigue las de tu profesor.</p></details>
+      </section>
+    </article>
+<aside class="cta-guia" aria-labelledby="cta-t">
+  <h2 id="cta-t">Practica esto en Jaguar</h2>
+  <p>Escribe pseudocódigo, mira su diagrama y haz la prueba de escritorio desde el celular. Gratis y sin anuncios. Deja tu correo y te damos entrada a la app.</p>
+  <div class="acceso" data-origen="guia">
+    <form novalidate>
+      <div class="fila">
+        <label class="campo-correo"><span class="oculto">Tu correo</span>
+          <input type="email" name="correo" placeholder="Tu correo" autocomplete="email" inputmode="email" maxlength="200" required></label>
+        <button class="boton principal" type="submit">Quiero entrar primero</button>
+      </div>
+      <label class="oculto" aria-hidden="true">No llenar <input name="sitio" tabindex="-1" autocomplete="off"></label>
+      <p class="estado" role="status" aria-live="polite"></p>
+      <p class="letra-chica">Solo lo usamos para darte entrada a la app y avisarte de novedades. Sin spam. <a href="https://app.jaguarcode.org/privacidad">Aviso de privacidad</a>.</p>
+    </form>
+    <div class="dentro" hidden>
+      <h3>¡Listo, ya estás dentro!</h3>
+      <p>Ya puedes abrir la app. Te escribiremos cuando haya novedades.</p>
+      <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Entrar a la app</a></div>
+    </div>
+  </div>
+</aside>
+    <h2 style="margin-top:44px">Sigue aprendiendo</h2>
+    <div class="relacionadas">
+      <a href="/guias/que-es-el-pseudocodigo">Qué es el pseudocódigo<small>El pseudocódigo es una forma de escribir un algoritmo con palabras parecidas a las de un lenguaje de programación, pero sin reglas estrictas de sintaxis.</small></a>
+      <a href="/guias/prueba-de-escritorio">La prueba de escritorio<small>La prueba de escritorio es seguir un algoritmo a mano, línea por línea, anotando en una tabla cuánto vale cada variable en cada paso.</small></a>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="ancho">
+    <span class="quien"><img src="/logo.svg" alt="" width="30" height="26">Un proyecto de Panterino · hecho en México</span>
+    <a href="/guias">Guías</a>
+    <a href="/manual">Manual</a>
+    <a href="https://www.facebook.com/jaguareducation">Facebook</a>
+    <a href="https://github.com/panterino/jaguar">Código en GitHub</a>
+  </div>
+</footer>
+<script src="/acceso.js" defer></script>
+</body>
+</html>
