@@ -1,0 +1,14 @@
+{
+  // La página de presentación: HTML suelto de la carpeta sitio/.
+  "$schema": "https://workers.cloudflare.com/schemas/wrangler.json",
+  "name": "jaguar-landing",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    // /profes y /profes.html abren profes.html.
+    "directory": "../../sitio"
+  },
+  "routes": [
+    { "pattern": "jaguarcode.org", "custom_domain": true },
+    { "pattern": "www.jaguarcode.org", "custom_domain": true }
+  ]
+}

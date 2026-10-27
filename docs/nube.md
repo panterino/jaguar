@@ -5,10 +5,14 @@ que involucra a más de una persona: clases, tareas, entregas y la comunidad.
 Si no hay conexión (o en Windows y Linux, que todavía no están configurados),
 esas opciones simplemente no aparecen.
 
-Usamos Firebase, en el proyecto `jaguarapp-50a15` (plan gratuito). La web se
-sirve en https://jaguar-edu.web.app y la dirección vieja
-(`jaguarapp-50a15.web.app`) redirige ahí. Cuando haya dominio propio se
-conecta en Hosting.
+Usamos Firebase, en el proyecto `jaguarapp-50a15` (plan gratuito), para las
+clases, la comunidad y las cuentas. La web se sirve desde Cloudflare: la app en
+https://app.jaguarcode.org y la página de presentación en
+https://jaguarcode.org. Las direcciones viejas de Firebase
+(`jaguar-edu.web.app`, `pseudocodigo-jaguar.web.app` y `jaguarapp-50a15.web.app`)
+redirigen a las nuevas conservando lo que va después del `#`, para que los
+enlaces ya compartidos sigan abriendo. En Firebase Authentication, los dominios
+`jaguarcode.org` y `app.jaguarcode.org` deben estar en Dominios autorizados.
 
 ## Cuentas
 

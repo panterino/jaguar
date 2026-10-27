@@ -620,7 +620,7 @@ class _Page extends StatelessWidget {
             ...extra,
             const SizedBox(height: 16),
             Text(
-              'Este manual también está en jaguar-edu.web.app/manual',
+              'Este manual también está en jaguarcode.org/manual',
               textAlign: TextAlign.center,
               style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
             ),

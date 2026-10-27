@@ -5,7 +5,7 @@ import 'package:jaguar_core/jaguar_core.dart';
 
 /// Where the web version is published. Links open there, so a QR scanned
 /// with any phone camera works without installing anything.
-const shareBaseUrl = 'https://jaguar-edu.web.app/';
+const shareBaseUrl = 'https://app.jaguarcode.org/';
 
 /// What a Jaguar link carries.
 sealed class SharedContent {
