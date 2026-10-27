@@ -119,11 +119,14 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
   /// Phones: the room on screen, and whether the editor covers the rooms.
   Room? _roomChoice;
 
-  /// The room on screen. Until one is picked: the Taller on a wide screen (the
-  /// editor, as always) or when a link brought a program; Inicio on a phone.
+  /// The room on screen. Until one is picked: Inicio on the web and on a phone;
+  /// the Taller on a wide native window (the editor, as always) or when a link
+  /// brought a program.
   Room get _room =>
       _roomChoice ??
-      (widget.startInEditor || MediaQuery.sizeOf(context).width >= _wideLayoutWidth ? Room.workshop : Room.home);
+      (widget.startInEditor || (!kIsWeb && MediaQuery.sizeOf(context).width >= _wideLayoutWidth)
+          ? Room.workshop
+          : Room.home);
   late bool _inEditor = widget.startInEditor;
   _Panel _panel = _Panel.console; // wide layouts
   double _diagramSplit = 0.5; // code | diagram, in "Ambos"
