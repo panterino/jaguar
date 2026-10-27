@@ -31,6 +31,9 @@ const wrong = {
   // Divide sin revisar que haya datos.
   'reto-2-06':
       'Algoritmo s\n suma <- 0\n cuenta <- 0\n Leer c\n Mientras c <> -1 Hacer\n  suma <- suma + c\n  cuenta <- cuenta + 1\n  Leer c\n FinMientras\n Escribir "Promedio: ", suma / cuenta\nFinAlgoritmo',
+  // Un Para de 2 hasta 1 cuenta hacia atrás: con un solo número se sale del arreglo.
+  'reto-3-04':
+      'Algoritmo s\n Leer n\n Dimension a[n]\n Para i <- 1 Hasta n Hacer\n  Leer a[i]\n FinPara\n mayor <- a[1]\n pos <- 1\n Para i <- 2 Hasta n Hacer\n  Si a[i] > mayor Entonces\n   mayor <- a[i]\n   pos <- i\n  FinSi\n FinPara\n Escribir "Mayor: ", mayor, " en la posición ", pos\nFinAlgoritmo',
 };
 
 void main() {

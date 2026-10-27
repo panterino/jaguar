@@ -1,8 +1,10 @@
 import 'package:jaguar_core/jaguar_core.dart';
 
 import 'challenges_nivel2.dart';
+import 'challenges_nivel3.dart';
 
 export 'challenges_nivel2.dart';
+export 'challenges_nivel3.dart';
 
 /// A practice exercise for people learning on their own. The tests check it
 /// like a teacher's exercise; the hints go from an idea to a sketch, never
@@ -380,7 +382,7 @@ const blockChallenges = <Challenge>[
 ];
 
 /// Every challenge of the path, whatever its level.
-final everyChallenge = <Challenge>[...blockChallenges, ...challenges, ...challengesNivel2];
+final everyChallenge = <Challenge>[...blockChallenges, ...challenges, ...challengesNivel2, ...challengesNivel3];
 
 Challenge? challengeById(String id) {
   for (final challenge in everyChallenge) {

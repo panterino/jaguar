@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'lessons_nivel2.dart';
+import 'lessons_nivel3.dart';
 
 export 'ruta.dart';
 
@@ -572,6 +573,7 @@ const allLessons = [
   lessonDeskCheck,
   lessonLoops,
   ...lessonsNivel2,
+  ...lessonsNivel3,
 ];
 
 Lesson? lessonById(String id) {
