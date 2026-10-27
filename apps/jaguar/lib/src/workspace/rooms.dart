@@ -363,8 +363,7 @@ class _HomeRoom extends StatelessWidget {
               style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
             ),
             const SizedBox(height: 10),
-            _Bar(value: solved / steps.length),
-            const SizedBox(height: 12),
+            if (!fresh) ...[_Bar(value: solved / steps.length), const SizedBox(height: 12)],
             if (next != null)
               FilledButton(
                 onPressed: () => actions.onOpenStep(next),

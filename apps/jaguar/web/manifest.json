@@ -1,11 +1,11 @@
 {
-    "name": "Jaguar",
-    "short_name": "Jaguar",
+    "name": "Jaguar Code",
+    "short_name": "Jaguar Code",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#3B2410",
     "theme_color": "#F4B723",
-    "description": "Jaguar: escribe y ejecuta pseudocódigo compatible con PSeInt en la web, el celular y la computadora.",
+    "description": "Jaguar Code: aprende lógica de programación con lecciones, retos y diagramas de flujo, en español. Gratis, en la web, el celular y la computadora.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

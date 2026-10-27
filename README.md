@@ -1,6 +1,6 @@
-# Jaguar
+# Jaguar Code
 
-Jaguar es una app para aprender lógica de programación: diagramas de flujo,
+Jaguar Code es una app para aprender lógica de programación: diagramas de flujo,
 pseudocódigo, ejercicios que se revisan solos y
 clases en línea para profesores y alumnos. Corre en el navegador, en Android
 y en escritorio, y lo básico funciona sin internet y sin cuenta.

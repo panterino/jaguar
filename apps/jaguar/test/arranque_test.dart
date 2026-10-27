@@ -4,7 +4,6 @@ import 'package:jaguar/main.dart';
 import 'package:jaguar/src/editor/code_editor.dart';
 import 'package:jaguar/src/exercises/exercise_store.dart';
 import 'package:jaguar/src/lessons/lesson_screen.dart';
-import 'package:jaguar/src/lessons/lessons.dart';
 import 'package:jaguar/src/programs/program_store.dart';
 import 'package:jaguar/src/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
