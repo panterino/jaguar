@@ -274,11 +274,13 @@ void main() {
       expect(tester.getSize(banner).height, greaterThan(folded));
     });
 
-    testWidgets('la prueba de escritorio tiene su lugar en la barra de abajo', (tester) async {
+    testWidgets('la prueba de escritorio se ofrece en la consola, a la vista', (tester) async {
       await _pumpPhone(tester, source: 'Algoritmo hola\n    Escribir "hola"\nFinAlgoritmo\n');
-      final tab = find.descendant(of: find.byType(NavigationBar), matching: find.text('Escritorio'));
-      expect(tab, findsOneWidget);
-      await tester.tap(tab);
+      await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Consola')));
+      await tester.pumpAndSettle();
+      final button = find.text('Prueba de escritorio: mira cambiar las variables');
+      expect(button, findsOneWidget);
+      await tester.tap(button);
       await tester.pumpAndSettle();
       expect(find.byType(DeskCheckScreen), findsOneWidget);
     });

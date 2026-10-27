@@ -1847,7 +1847,24 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
         ),
       ],
     );
-    final console = _console();
+    // The desk check is one of the best things of the app: it is offered right
+    // where the program runs, not hidden in a menu.
+    final console = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (_code.text.trim().isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8, 6, 8, 2),
+            child: FilledButton.tonalIcon(
+              style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(44)),
+              onPressed: _deskCheck,
+              icon: const Icon(Icons.table_chart_outlined),
+              label: const Text('Prueba de escritorio: mira cambiar las variables'),
+            ),
+          ),
+        Expanded(child: _console()),
+      ],
+    );
     // Phones: Pruebas is a third tab at the bottom.
     final tab = exercise == null && _tab == 2 ? 1 : _tab;
 
@@ -1972,18 +1989,11 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
                   NavigationBar(
                     selectedIndex: tab,
                     labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-                    onDestinationSelected: (tab) {
-                      // The desk check is a screen of its own: it does not change the tab.
-                      if (tab == (exercise != null ? 3 : 2)) {
-                        _deskCheck();
-                        return;
-                      }
-                      setState(() {
-                        if (tab == 2) _tourAdvance(2);
-                        _tab = tab;
-                        if (tab > 0) _panel = tab == 1 ? _Panel.console : _Panel.tests;
-                      });
-                    },
+                    onDestinationSelected: (tab) => setState(() {
+                      if (tab == 2) _tourAdvance(2);
+                      _tab = tab;
+                      if (tab > 0) _panel = tab == 1 ? _Panel.console : _Panel.tests;
+                    }),
                     destinations: [
                       const NavigationDestination(icon: Icon(Icons.code), label: 'Programa'),
                       NavigationDestination(
@@ -2003,7 +2013,6 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
                           ),
                           label: 'Pruebas',
                         ),
-                      const NavigationDestination(icon: Icon(Icons.table_chart_outlined), label: 'Escritorio'),
                     ],
                   ),
                 ],

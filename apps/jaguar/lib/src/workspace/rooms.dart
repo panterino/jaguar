@@ -455,14 +455,14 @@ class _HomeRoomState extends State<_HomeRoom> {
         final scale = MediaQuery.textScalerOf(context).scale(1);
         final tier = h < 560 ? 0 : (h <= 740 ? 1 : 2);
         final gap = const [10.0, 12.0, 16.0][tier];
-        final top = 4.0;
+        final top = 0.0;
         final bottom = const [12.0, 16.0, 16.0][tier];
         final showTask = task != null && h >= 560;
         final taskHeight = showTask ? 56.0 + gap : 0.0;
         final hero = (0.17 * h).clamp(72.0, 132.0);
         final room = h - top - bottom - hero - 2 * gap - taskHeight;
-        final primaryHeight = (0.55 * room).clamp(168.0, 320.0);
-        final rowHeight = (room - primaryHeight).clamp(150.0, 260.0);
+        final primaryHeight = (0.55 * room).clamp(168.0, 420.0);
+        final rowHeight = (room - primaryHeight).clamp(150.0, 320.0);
         final leftover = math.max(0.0, room - primaryHeight - rowHeight);
         final compact = scale > 1.15 || room < 360;
         final needsScroll = scale > 1.6 || h < 440;
@@ -525,7 +525,7 @@ class _HomeRoomState extends State<_HomeRoom> {
               padding: EdgeInsets.symmetric(horizontal: tier == 2 ? 20 : 16),
               child: needsScroll
                   ? SingleChildScrollView(child: column)
-                  : Column(children: [if (leftover > 0) Spacer(), column, if (leftover > 0) Spacer()]),
+                  : Column(children: [column, if (leftover > 0) const Spacer()]),
             ),
           ),
         );
@@ -1365,7 +1365,7 @@ class _PathGroup extends StatelessWidget {
   final String? nextId;
   final ValueChanged<RouteStep> onOpen;
 
-  static const rowHeight = 136.0;
+  static const rowHeight = 152.0;
   static const bannerHeight = 112.0;
   static const _nodeTop = 34.0;
   static const _nodeSize = 68.0;
