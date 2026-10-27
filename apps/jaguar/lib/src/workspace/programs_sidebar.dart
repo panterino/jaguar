@@ -19,13 +19,6 @@ class ProgramsSidebar extends StatefulWidget {
     required this.onSaveFile,
     this.onMakeExercise,
     required this.cloud,
-    required this.onOpenCommunity,
-    required this.onOpenChallenges,
-    required this.onOpenClasses,
-    required this.onAccount,
-    this.onOpenTeacher,
-    required this.onHome,
-    required this.onSettings,
   });
 
   final ProgramStore store;
@@ -38,16 +31,6 @@ class ProgramsSidebar extends StatefulWidget {
   /// Teachers only.
   final ValueChanged<SavedProgram>? onMakeExercise;
   final Cloud? cloud;
-  final VoidCallback onOpenCommunity;
-  final VoidCallback onOpenChallenges;
-  final VoidCallback onOpenClasses;
-  final VoidCallback onAccount;
-
-  /// Teachers only.
-  final VoidCallback? onOpenTeacher;
-
-  final VoidCallback onHome;
-  final VoidCallback onSettings;
 
   @override
   State<ProgramsSidebar> createState() => _ProgramsSidebarState();
@@ -115,44 +98,6 @@ class _ProgramsSidebarState extends State<ProgramsSidebar> {
                     ],
                   ),
                 ),
-                const Divider(height: 1),
-                const SizedBox(height: 4),
-                _SidebarRow(icon: Icons.home_outlined, label: 'Inicio', onTap: widget.onHome),
-                if (widget.onOpenTeacher case final openTeacher?)
-                  _SidebarRow(
-                    icon: Icons.school_outlined,
-                    label: 'Mis ejercicios',
-                    tooltip: 'Ejercicios con pruebas que se generan solas',
-                    onTap: openTeacher,
-                  ),
-                _SidebarRow(
-                  icon: Icons.flag_outlined,
-                  label: 'Retos',
-                  tooltip: 'Ejercicios para practicar por tu cuenta, con pistas',
-                  onTap: widget.onOpenChallenges,
-                ),
-                _SidebarRow(
-                  icon: Icons.public,
-                  label: 'Comunidad',
-                  tooltip: 'Programas y ejercicios que comparten otras personas, y ejemplos',
-                  onTap: widget.onOpenCommunity,
-                ),
-                if (widget.cloud != null) ...[
-                  _SidebarRow(
-                    icon: Icons.groups_outlined,
-                    label: 'Mis clases',
-                    tooltip: 'Únete con el código de tu profesor, o crea una clase si eres profesor',
-                    onTap: widget.onOpenClasses,
-                  ),
-                  _SidebarRow(
-                    icon: widget.cloud!.signedIn ? Icons.account_circle : Icons.login,
-                    label: widget.cloud!.user?.alias ?? 'Entrar en línea',
-                    tooltip: widget.cloud!.signedIn ? 'Tu cuenta' : 'Para clases y comunidad; no es obligatorio',
-                    onTap: widget.onAccount,
-                  ),
-                ],
-                const Divider(height: 9),
-                _SidebarRow(icon: Icons.settings_outlined, label: 'Ajustes', onTap: widget.onSettings),
                 const SizedBox(height: 6),
               ],
             );
