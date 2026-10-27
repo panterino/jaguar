@@ -1,0 +1,15 @@
+{
+  // La página de presentación: HTML suelto de la carpeta sitio/.
+  "$schema": "https://workers.cloudflare.com/schemas/wrangler.json",
+  "name": "jaguar-landing",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    // Direcciones sin diagonal ni .html: /profes, /guias y /guias/que-es-un-algoritmo.
+    // Las que terminan en / o en .html redirigen a ellas.
+    "directory": "../../sitio",
+    "html_handling": "drop-trailing-slash",
+    // Una página que no existe muestra 404.html (con noindex) y responde 404.
+    "not_found_handling": "404-page"
+  },
+  "routes": [{ "pattern": "jaguarcode.org", "custom_domain": true }]
+}

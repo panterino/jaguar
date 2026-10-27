@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://pseudocodigo-jaguar.web.app/</loc>
-    <lastmod>2026-10-19</lastmod>
-  </url>
-  <url>
-    <loc>https://pseudocodigo-jaguar.web.app/profes</loc>
-    <lastmod>2026-10-19</lastmod>
-  </url>
-  <url>
-    <loc>https://pseudocodigo-jaguar.web.app/manual</loc>
-    <lastmod>2026-10-19</lastmod>
-  </url>
+  <url><loc>https://jaguarcode.org/</loc><lastmod>2026-10-26</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://jaguarcode.org/guias</loc><lastmod>2026-10-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jaguarcode.org/guias/que-es-un-algoritmo</loc><lastmod>2026-10-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jaguarcode.org/guias/que-es-el-pseudocodigo</loc><lastmod>2026-10-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jaguarcode.org/guias/como-hacer-un-diagrama-de-flujo</loc><lastmod>2026-10-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jaguarcode.org/guias/prueba-de-escritorio</loc><lastmod>2026-10-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jaguarcode.org/profes</loc><lastmod>2026-10-26</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://jaguarcode.org/manual</loc><lastmod>2026-10-26</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
 </urlset>

@@ -44,7 +44,10 @@ import 'app_menus.dart';
 import 'intro_sheet.dart';
 import 'mode_widgets.dart';
 import 'desktop_chrome.dart';
+import '../lessons/lesson_screen.dart';
+import '../lessons/lessons.dart';
 import 'programs_drawer.dart';
+import 'rooms.dart';
 import 'programs_sidebar.dart';
 import 'settings_screen.dart';
 import 'start_panel.dart';
@@ -59,7 +62,14 @@ const _wideLayoutWidth = 900.0;
 enum _Panel { console, tests }
 
 class WorkspaceScreen extends StatefulWidget {
-  const WorkspaceScreen({super.key, required this.store, required this.exercises, required this.settings, this.cloud});
+  const WorkspaceScreen({
+    super.key,
+    required this.store,
+    required this.exercises,
+    required this.settings,
+    this.cloud,
+    this.startInEditor = false,
+  });
 
   final ProgramStore store;
   final ExerciseStore exercises;
@@ -67,6 +77,10 @@ class WorkspaceScreen extends StatefulWidget {
 
   /// Classes and community; null when Jaguar runs offline.
   final Cloud? cloud;
+
+  /// On a phone, open the editor instead of the rooms: the app was launched
+  /// with a program or an exercise from a link.
+  final bool startInEditor;
 
   @override
   State<WorkspaceScreen> createState() => _WorkspaceScreenState();
@@ -98,6 +112,16 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
   DateTime? _lastBack;
   Timer? _saveTimer;
   int _tab = 0; // narrow layout: 0 code, 1 console, 2 tests
+
+  /// Phones: the room on screen, and whether the editor covers the rooms.
+  Room? _roomChoice;
+
+  /// The room on screen. Until one is picked: the Taller on a wide screen (the
+  /// editor, as always) or when a link brought a program; Inicio on a phone.
+  Room get _room =>
+      _roomChoice ??
+      (widget.startInEditor || MediaQuery.sizeOf(context).width >= _wideLayoutWidth ? Room.workshop : Room.home);
+  late bool _inEditor = widget.startInEditor;
   _Panel _panel = _Panel.console; // wide layouts
   double _diagramSplit = 0.5; // code | diagram, in "Ambos"
   bool _checking = false;
@@ -155,8 +179,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
   // The first-launch balloons: write, run, tests. Each one goes away when
   // the person does what it says.
 
-  bool get _tourActive =>
-      _settings.tourStep < 3 && !_store.isEmpty && _exercise?.id == challenges.first.id;
+  bool get _tourActive => _settings.tourStep < 3 && !_store.isEmpty && _exercise?.id == challenges.first.id;
 
   void _tourAdvance(int from) {
     if (_settings.tourStep == from) _settings.tourStep = from + 1;
@@ -237,7 +260,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
         await _intro(beginner: false);
       case WelcomeChoice.teacher:
         _settings.tourStep = 3;
-        if (_store.isEmpty) _show(_store.current);
+        if (_store.isEmpty && wide) _show(_store.current);
     }
   }
 
@@ -276,7 +299,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
     _tab = panel == _Panel.console ? 1 : 2;
   });
 
-  void _show(SavedProgram program) {
+  void _show(SavedProgram program, {bool openEditor = true}) {
     _session.stop();
     final known = _results[program.id];
     _testResult = known?.$1;
@@ -288,7 +311,25 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
     _code.value = TextEditingValue(text: program.source);
     _loading = false;
     _undo.value = UndoHistoryValue.empty;
-    setState(() => _tab = 0);
+    final wide = MediaQuery.sizeOf(context).width >= _wideLayoutWidth;
+    setState(() {
+      _tab = 0;
+      if (openEditor) {
+        _inEditor = true;
+        // On a wide screen the editor is the Taller.
+        if (wide) _roomChoice = Room.workshop;
+      }
+    });
+  }
+
+  /// Phones: from the editor back to the room it was opened from.
+  void _leaveEditor() {
+    _saveNow();
+    _session.stop();
+    setState(() {
+      _inEditor = false;
+      _tab = 0;
+    });
   }
 
   /// After a restart only the counts were saved: running the tests again on
@@ -456,6 +497,34 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
     );
   }
 
+  /// A student opens a task from their class: the results of Probar go to the
+  /// teacher.
+  void _openAssignment(Assignment assignment) {
+    widget.cloud?.linkAssignment(assignment.exercise, assignment);
+    widget.exercises.saveReceived(assignment.exercise);
+    _openExercise(assignment.exercise);
+  }
+
+  void _openClass(ClassRoom room) {
+    final cloud = widget.cloud;
+    if (cloud == null) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (_) => ClassScreen(
+          cloud: cloud,
+          room: room,
+          exercises: widget.exercises,
+          onOpenAssignment: (assignment) {
+            widget.exercises.saveReceived(assignment.exercise);
+            _openExercise(assignment.exercise);
+          },
+          onOpenSource: _openSource,
+        ),
+      ),
+    );
+  }
+
   void _openClasses() {
     final cloud = widget.cloud;
     if (cloud == null) {
@@ -555,7 +624,12 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
 
   /// The console, with the step-by-step controls and variables when in use.
   Widget _console() {
-    final console = ConsoleView(session: _session, onGoToLine: _goToLine, fontSize: _settings.fontSize, settings: _settings);
+    final console = ConsoleView(
+      session: _session,
+      onGoToLine: _goToLine,
+      fontSize: _settings.fontSize,
+      settings: _settings,
+    );
     if (!_session.stepping) return console;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1077,7 +1151,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
         Widget screen = CallbackShortcuts(
           bindings: menuShortcuts(menus),
           // Shortcuts work as soon as the window opens, before any click.
-          child: Focus(autofocus: true, child: desktop ? _buildDesktop(shownMenus) : _buildTouch()),
+          child: Focus(autofocus: true, child: _content(desktop, shownMenus)),
         );
         // The browser tab and the task switcher show the program's name.
         screen = ListenableBuilder(
@@ -1401,8 +1475,19 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
       scaffold.closeDrawer();
       return;
     }
+    final phone = MediaQuery.sizeOf(context).width < _wideLayoutWidth;
     if (_tab != 0) {
       setState(() => _tab = 0);
+      return;
+    }
+    // Phones: the editor opens from a room; Atrás goes back to it, and from
+    // another room to Inicio, before it asks to leave.
+    if (phone && _inEditor) {
+      _leaveEditor();
+      return;
+    }
+    if (phone && _room != Room.home) {
+      setState(() => _roomChoice = Room.home);
       return;
     }
     final now = DateTime.now();
@@ -1422,8 +1507,17 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
   /// is in its statement.
   String _barTitle() {
     final exercise = _exercise;
-    if (exercise != null && challengeById(exercise.id) != null) return exercise.title.split(' · ').first;
+    if (exercise != null && challengeById(exercise.id) != null) return exercise.title.split(' · ').last;
     return programName(_code.text);
+  }
+
+  /// Where the program in the editor comes from, under its name.
+  String _barSubtitle() {
+    final exercise = _exercise;
+    if (exercise == null) return 'Taller';
+    final index = challenges.indexWhere((c) => c.id == exercise.id);
+    if (index < 0) return 'Ejercicio del profe';
+    return 'Ruta · Nivel ${challenges[index].level} · Reto ${index + 1}';
   }
 
   void _openHome() {
@@ -1476,6 +1570,9 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
             _settings.tourStep = 0;
             _openChallenge(challenges.first);
           },
+          onCommunity: widget.cloud == null ? null : _openCommunity,
+          onAccount: widget.cloud == null ? null : _account,
+          onAbout: _showAbout,
         ),
       ),
     );
@@ -1500,11 +1597,145 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
     onOpenTeacher: _settings.teacher ? _openTeacher : null,
   );
 
+  Future<void> _exportAll() async {
+    _saveNow();
+    final sources = [for (final program in _store.programs) program.source];
+    if (sources.isEmpty) return;
+    try {
+      if (await exportAllPrograms(sources, nameOf: programName)) {
+        _toast('Listo: ${sources.length} programas en un archivo');
+      }
+    } on Object catch (e) {
+      _toast('No se pudo guardar el archivo: $e');
+    }
+  }
+
+  /// Phones: deleting from the Taller keeps the rooms on screen; the editor
+  /// only follows the program that stays selected.
+  void _deleteFromWorkshop(SavedProgram program) {
+    confirmDeleteProgram(context, _store, program, (selected) {
+      if (_editingId != selected.id) _show(selected, openEditor: false);
+    });
+  }
+
+  RoomActions _roomActions() => RoomActions(
+    onOpenChallenge: _openChallenge,
+    onOpenStep: _openStep,
+    onOpenProgram: _load,
+    onOpenSource: _openSource,
+    onOpenExercise: _openExercise,
+    onDeleteProgram: _deleteFromWorkshop,
+    onNew: _newProgram,
+    onOpenFile: _openFile,
+    onExportAll: _exportAll,
+    onOpenLink: _openLink,
+    onOpenGuide: _showGuide,
+    onOpenSettings: _openSettings,
+    onScan: canScanQr ? _scanQr : null,
+    onOpenAssignment: widget.cloud == null ? null : _openAssignment,
+    onOpenClass: widget.cloud == null ? null : _openClass,
+    onOpenTeacher: _settings.teacher ? _openTeacher : null,
+  );
+
+  /// A step of the path: a lesson opens its own screen, a challenge the editor.
+  void _openStep(RouteStep step) {
+    switch (step) {
+      case LessonStep(:final lesson):
+        Navigator.push(
+          context,
+          MaterialPageRoute<void>(
+            builder: (_) => LessonScreen(lesson: lesson, settings: _settings, onOpenNext: _openStep),
+          ),
+        );
+      case ChallengeStep(:final challenge):
+        _openChallenge(challenge);
+    }
+  }
+
+  void _goRoom(Room room) => setState(() => _roomChoice = room);
+
+  /// Wide screens: the rooms other than the Taller, next to the rail.
+  Widget _buildRoomsWide() => RoomsScaffold(
+    room: _room,
+    onRoom: _goRoom,
+    settings: _settings,
+    store: _store,
+    exercises: widget.exercises,
+    cloud: widget.cloud,
+    actions: _roomActions(),
+    bottomNavigation: false,
+  );
+
+  /// What is on screen: on a phone, a room or the editor; on a wide screen a
+  /// rail with the rooms and, beside it, the room or the workspace.
+  Widget _content(bool desktop, List<AppMenu> menus) {
+    final wide = MediaQuery.sizeOf(context).width >= _wideLayoutWidth;
+    if (!wide) return _buildTouch();
+    final inner = _room == Room.workshop ? (desktop ? _buildDesktop(menus) : _buildTouch()) : _buildRoomsWide();
+    return Row(
+      children: [
+        RoomsRail(room: _room, onRoom: _goRoom),
+        const VerticalDivider(width: 1),
+        Expanded(
+          child: AnimatedSwitcher(
+            duration: motion(context, const Duration(milliseconds: 260)),
+            transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
+            child: KeyedSubtree(key: ValueKey(_room == Room.workshop ? 'taller' : 'sala'), child: inner),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRooms() => PopScope(
+    // The browser keeps its own Atrás.
+    canPop: kIsWeb,
+    onPopInvokedWithResult: (didPop, _) {
+      if (!didPop) _onBack();
+    },
+    child: RoomsScaffold(
+      room: _room,
+      onRoom: _goRoom,
+      settings: _settings,
+      store: _store,
+      exercises: widget.exercises,
+      cloud: widget.cloud,
+      actions: _roomActions(),
+    ),
+  );
+
   Widget _buildTouch() {
+    final phone = MediaQuery.sizeOf(context).width < _wideLayoutWidth;
+    if (!phone) return _buildEditorTouch();
+    // A room and the editor trade places: the editor slides in from the right
+    // and out the same way, so Atrás feels like going back.
+    return AnimatedSwitcher(
+      duration: motion(context, const Duration(milliseconds: 300)),
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      layoutBuilder: (current, previous) => Stack(children: [...previous, ?current]),
+      transitionBuilder: (child, animation) {
+        final editor = (child.key as ValueKey<String>).value == 'editor';
+        return FadeTransition(
+          opacity: animation,
+          child: SlideTransition(
+            position: Tween(begin: Offset(editor ? 0.12 : -0.06, 0), end: Offset.zero).animate(animation),
+            child: child,
+          ),
+        );
+      },
+      child: KeyedSubtree(
+        key: ValueKey(_inEditor ? 'editor' : 'salas'),
+        child: _inEditor ? _buildEditorTouch() : _buildRooms(),
+      ),
+    );
+  }
+
+  Widget _buildEditorTouch() {
     final width = MediaQuery.sizeOf(context).width;
     final wide = width >= _wideLayoutWidth;
     // On phones the program name needs the room: Ejecutar becomes an icon.
-    final compact = width < 480;
+    final compact = width < 340 || MediaQuery.textScalerOf(context).scale(1) > 1.2;
     final scheme = Theme.of(context).colorScheme;
     final empty = _store.isEmpty;
     // Two points smaller on phones, so most lines fit without scrolling.
@@ -1544,7 +1775,11 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
                 inlineErrors: wide,
               ),
               // Where the first balloon points: under the first lines.
-              Positioned(top: fontSize * 3, left: 16, child: SizedBox(key: _firstLineKey, width: 1, height: 1)),
+              Positioned(
+                top: fontSize * 3,
+                left: 16,
+                child: SizedBox(key: _firstLineKey, width: 1, height: 1),
+              ),
             ],
           ),
         ),
@@ -1587,14 +1822,31 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
         if (!didPop) _onBack();
       },
       child: Scaffold(
-        key: _scaffoldKey,
+        key: wide ? _scaffoldKey : null,
         appBar: AppBar(
           titleSpacing: 0,
+          // Phones open the editor from a room: the arrow goes back to it.
+          leading: wide
+              ? null
+              : IconButton(tooltip: 'Volver', icon: const Icon(Icons.arrow_back), onPressed: _leaveEditor),
           title: empty
               ? const Text('Jaguar')
               : ListenableBuilder(
                   listenable: _code,
-                  builder: (context, _) => Text(_barTitle(), overflow: TextOverflow.ellipsis),
+                  builder: (context, _) => Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(_barTitle(), overflow: TextOverflow.ellipsis),
+                      Text(
+                        _barSubtitle(),
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                      ),
+                    ],
+                  ),
                 ),
           // Three controls: the menu, play and the rest. What is used less
           // lives under the three dots.
@@ -1648,7 +1900,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
                   ),
                 ],
         ),
-        drawer: _drawer(),
+        drawer: wide ? _drawer() : null,
         body: empty
             ? _startPanel()
             : wide
@@ -1712,7 +1964,12 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
       ),
     );
     if (balloon == null) return scaffold;
-    return Stack(children: [scaffold, Positioned.fill(child: balloon)]);
+    return Stack(
+      children: [
+        scaffold,
+        Positioned.fill(child: balloon),
+      ],
+    );
   }
 
   /// "3" before the first Probar, "2/3" after. Never a failure before trying.

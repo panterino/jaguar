@@ -1,0 +1,16 @@
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
+/fuentes/*
+  Cache-Control: public, max-age=31536000, immutable
+/estilos.css
+  Cache-Control: public, max-age=3600
+/acceso.js
+  Cache-Control: public, max-age=3600
+/*.png
+  Cache-Control: public, max-age=86400
+/*.svg
+  Cache-Control: public, max-age=86400
+/manual/*
+  Cache-Control: public, max-age=86400

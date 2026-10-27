@@ -165,7 +165,9 @@ void main() {
     final store = await _store(
       'Algoritmo saludo\n    Escribir "¿Cómo te llamas?"\n    Leer nombre\n    Escribir "Hola, ", nombre\nFinAlgoritmo\n',
     );
-    await tester.pumpWidget(JaguarApp(store: store, exercises: ExerciseStore(_prefs), settings: ViewSettings(_prefs)));
+    await tester.pumpWidget(
+      JaguarApp(store: store, exercises: ExerciseStore(_prefs), settings: ViewSettings(_prefs), openEditor: true),
+    );
     expect(find.text('saludo'), findsOneWidget);
 
     await tester.tap(find.text('Ejecutar'));
@@ -186,7 +188,9 @@ void main() {
     addTearDown(tester.view.reset);
 
     final store = await _store('Algoritmo error\n    Escrivir "hola"\nFinAlgoritmo\n');
-    await tester.pumpWidget(JaguarApp(store: store, exercises: ExerciseStore(_prefs), settings: ViewSettings(_prefs)));
+    await tester.pumpWidget(
+      JaguarApp(store: store, exercises: ExerciseStore(_prefs), settings: ViewSettings(_prefs), openEditor: true),
+    );
     await tester.tap(find.text('Ejecutar'));
     await tester.pumpAndSettle();
 
@@ -200,23 +204,30 @@ void main() {
     expect(editor.controller!.text.substring(selection.start, selection.end), '    Escrivir "hola"');
   });
 
-  testWidgets('en celular Atrás cierra el menú y pide confirmar antes de salir', (tester) async {
+  testWidgets('en celular Atrás vuelve a las salas y pide confirmar antes de salir', (tester) async {
     tester.view.physicalSize = const Size(400, 800);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
     final store = await _store('Algoritmo hola\nFinAlgoritmo\n');
-    await tester.pumpWidget(JaguarApp(store: store, exercises: ExerciseStore(_prefs), settings: ViewSettings(_prefs)));
+    await tester.pumpWidget(
+      JaguarApp(store: store, exercises: ExerciseStore(_prefs), settings: ViewSettings(_prefs), openEditor: true),
+    );
     await tester.pumpAndSettle();
-    final scaffold = tester.firstState<ScaffoldState>(find.byType(Scaffold));
-    scaffold.openDrawer();
-    await tester.pumpAndSettle();
-    expect(scaffold.isDrawerOpen, isTrue);
+    expect(find.byType(CodeEditor), findsOneWidget);
 
+    // From the editor: back to the room it came from.
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
-    expect(scaffold.isDrawerOpen, isFalse);
+    expect(find.byType(CodeEditor), findsNothing);
+    expect(find.byType(NavigationBar), findsOneWidget);
 
+    // The Taller is where it was opened from; from another room, Atrás goes to Inicio.
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Soy Jaguar'), findsOneWidget);
+
+    // From Inicio: asks before leaving.
     await tester.binding.handlePopRoute();
     await tester.pump();
     expect(find.text('Presiona Atrás otra vez para salir'), findsOneWidget);
@@ -228,11 +239,14 @@ void main() {
     addTearDown(tester.view.reset);
 
     final store = await _store('Algoritmo hola\n    Escribir "hola desde el cel"\nFinAlgoritmo\n');
-    await tester.pumpWidget(JaguarApp(store: store, exercises: ExerciseStore(_prefs), settings: ViewSettings(_prefs)));
+    await tester.pumpWidget(
+      JaguarApp(store: store, exercises: ExerciseStore(_prefs), settings: ViewSettings(_prefs), openEditor: true),
+    );
     expect(find.text('Código'), findsOneWidget);
     expect(find.text('<-'), findsOneWidget); // keyword bar
 
-    await tester.tap(find.byTooltip('Ejecutar'));
+    // Ejecutar has its word on a phone, as in the design.
+    await tester.tap(find.text('Ejecutar'));
     await tester.pumpAndSettle();
     expect(_inConsole('hola desde el cel'), findsOneWidget);
   });
@@ -244,7 +258,9 @@ void main() {
 
     const mine = 'Algoritmo mio\n    Escribir 1\nFinAlgoritmo\n';
     final store = await _store(mine);
-    await tester.pumpWidget(JaguarApp(store: store, exercises: ExerciseStore(_prefs), settings: ViewSettings(_prefs)));
+    await tester.pumpWidget(
+      JaguarApp(store: store, exercises: ExerciseStore(_prefs), settings: ViewSettings(_prefs), openEditor: true),
+    );
 
     await tester.tap(find.byTooltip('Abrir menú de navegación'));
     await tester.pumpAndSettle();
@@ -273,7 +289,7 @@ void main() {
       addTearDown(tester.view.reset);
       final store = await _store(source, mode);
       await tester.pumpWidget(
-        JaguarApp(store: store, exercises: ExerciseStore(_prefs), settings: ViewSettings(_prefs)),
+        JaguarApp(store: store, exercises: ExerciseStore(_prefs), settings: ViewSettings(_prefs), openEditor: true),
       );
       return store;
     }
@@ -565,7 +581,9 @@ void main() {
       final exercises = ExerciseStore(_prefs)..saveReceived(parImpar);
       final program = store.openExercise(parImpar);
       store.update(program.id, solution);
-      await tester.pumpWidget(JaguarApp(store: store, exercises: exercises, settings: ViewSettings(_prefs)));
+      await tester.pumpWidget(
+        JaguarApp(store: store, exercises: exercises, settings: ViewSettings(_prefs), openEditor: true),
+      );
       return exercises;
     }
 
@@ -625,7 +643,9 @@ void main() {
       final store = await _store();
       final exercises = ExerciseStore(_prefs)..saveReceived(parImpar);
       store.openExercise(parImpar);
-      await tester.pumpWidget(JaguarApp(store: store, exercises: exercises, settings: ViewSettings(_prefs)));
+      await tester.pumpWidget(
+        JaguarApp(store: store, exercises: exercises, settings: ViewSettings(_prefs), openEditor: true),
+      );
       expect(find.text('Pruebas'), findsOneWidget);
       await tester.tap(find.text('Probar'));
       await tester.pumpAndSettle();

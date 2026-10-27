@@ -1,0 +1,52 @@
+{
+  "hosting": [
+    {
+      "target": "app",
+      "public": "cloudflare/redirect",
+      "redirects": [
+        {
+          "source": "/",
+          "destination": "https://app.jaguarcode.org",
+          "type": 301
+        },
+        {
+          "source": "/:path*",
+          "destination": "https://app.jaguarcode.org/:path",
+          "type": 301
+        }
+      ]
+    },
+    {
+      "target": "legacy",
+      "public": "cloudflare/redirect",
+      "redirects": [
+        {
+          "source": "/",
+          "destination": "https://app.jaguarcode.org",
+          "type": 301
+        },
+        {
+          "source": "/:path*",
+          "destination": "https://app.jaguarcode.org/:path",
+          "type": 301
+        }
+      ]
+    },
+    {
+      "target": "sitio",
+      "public": "cloudflare/redirect",
+      "redirects": [
+        {
+          "source": "/",
+          "destination": "https://jaguarcode.org",
+          "type": 301
+        },
+        {
+          "source": "/:path*",
+          "destination": "https://jaguarcode.org/:path",
+          "type": 301
+        }
+      ]
+    }
+  ]
+}

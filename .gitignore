@@ -33,3 +33,6 @@ node_modules/
 **/Pods/
 **/Flutter/ephemeral/
 apps/jaguar/tool/capturas/salida/
+
+# Cloudflare: estado local de wrangler dev
+.wrangler/

@@ -43,6 +43,13 @@ class ViewSettings extends ChangeNotifier {
     _set(() => _prefs.setStringList('jaguar.retos.hechos', [...doneChallenges, id]));
   }
 
+  /// Lessons finished on this device.
+  Set<String> get doneLessons => {...?_prefs.getStringList('jaguar.lecciones.hechas')};
+  void markLessonDone(String id) {
+    if (doneLessons.contains(id)) return;
+    _set(() => _prefs.setStringList('jaguar.lecciones.hechas', [...doneLessons, id]));
+  }
+
   /// Runs that finished without error in programs with loops or functions:
   /// a sign the student is ready for the full mode.
   int get fluentRuns => _prefs.getInt('jaguar.view.fluentRuns') ?? 0;

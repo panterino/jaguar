@@ -14,6 +14,7 @@ import 'package:jaguar/src/console/desk_check_screen.dart';
 import 'package:jaguar/src/editor/code_editor.dart';
 import 'package:jaguar/src/exercises/exercise_editor_screen.dart';
 import 'package:jaguar/src/exercises/exercise_store.dart';
+import 'package:jaguar/src/lessons/lessons.dart';
 import 'package:jaguar/src/exercises/verified_screen.dart';
 import 'package:jaguar/src/programs/program_store.dart';
 import 'package:jaguar/src/settings.dart';
@@ -74,6 +75,7 @@ Future<ProgramStore> _app(
   String? source,
   Size size = const Size(360, 740),
   bool desktop = false,
+  bool? openEditor,
 }) async {
   if (desktop) debugDefaultTargetPlatformOverride = TargetPlatform.linux;
   tester.view.physicalSize = size * 2;
@@ -90,7 +92,13 @@ Future<ProgramStore> _app(
   await tester.pumpWidget(
     RepaintBoundary(
       key: _boundary,
-      child: JaguarApp(store: store, exercises: ExerciseStore(_prefs), settings: ViewSettings(_prefs)),
+      child: JaguarApp(
+        store: store,
+        exercises: ExerciseStore(_prefs),
+        settings: ViewSettings(_prefs),
+        // A program in hand means the editor; without one, the rooms.
+        openEditor: openEditor ?? source != null,
+      ),
     ),
   );
   await tester.pumpAndSettle();
@@ -159,6 +167,144 @@ void main() {
     await _shot(tester, 'inicio');
   });
 
+  Future<void> abreLeccion(WidgetTester tester, Lesson leccion, {Map<String, Object> values = const {}}) async {
+    final fila = find.text('Lección · ${leccion.summary}');
+    await _app(tester, values: {'jaguar.view.mode': 'basic', ...values});
+    await tester.tap(find.text('Ruta'));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(fila, 200);
+    await tester.ensureVisible(fila);
+    await tester.pumpAndSettle();
+    await tester.tap(fila);
+    await tester.pumpAndSettle();
+  }
+
+  scene('leccion-pregunta', (tester) async {
+    await abreLeccion(tester, lessonOperations);
+    await tester.tap(find.text('12').last);
+    await tester.pumpAndSettle();
+    await _shot(tester, 'leccion-pregunta');
+  });
+
+  scene('leccion-acierto', (tester) async {
+    await abreLeccion(tester, lessonOperations);
+    await tester.tap(find.text('12').last);
+    await tester.pump();
+    await tester.tap(find.text('Comprobar'));
+    await tester.pump(const Duration(milliseconds: 900));
+    await _shot(tester, 'leccion-acierto');
+  });
+
+  scene('leccion-error', (tester) async {
+    await abreLeccion(tester, lessonOperations);
+    await tester.tap(find.text('7').last);
+    await tester.pump();
+    await tester.tap(find.text('Comprobar'));
+    await tester.pump(const Duration(milliseconds: 900));
+    await _shot(tester, 'leccion-error');
+  });
+
+  scene('leccion-figuras', (tester) async {
+    await abreLeccion(tester, lessonFlowcharts);
+    await tester.tap(find.byKey(const ValueKey(Figure.parallelogram)));
+    await tester.pumpAndSettle();
+    await _shot(tester, 'leccion-figuras');
+  });
+
+  scene('leccion-ordenar', (tester) async {
+    await abreLeccion(tester, lessonFirstProgram);
+    for (final q in lessonFirstProgram.questions.take(4)) {
+      final c = q as ChoiceQuestion;
+      await tester.tap(find.text(c.options[c.answer]).last);
+      await tester.pump();
+      await tester.tap(find.text('Comprobar'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Continuar'));
+      await tester.pumpAndSettle();
+    }
+    final orden = lessonFirstProgram.questions.last as OrderQuestion;
+    for (final line in [orden.lines[0], orden.lines[1]]) {
+      await tester.tap(find.text(line.trim()).last);
+      await tester.pump();
+    }
+    await tester.pumpAndSettle();
+    await _shot(tester, 'leccion-ordenar');
+  });
+
+  scene('leccion-final', (tester) async {
+    await abreLeccion(tester, lessonOperations);
+    for (final q in lessonOperations.questions) {
+      final c = q as ChoiceQuestion;
+      await tester.tap(find.text(c.options[c.answer]).last);
+      await tester.pump();
+      await tester.tap(find.text('Comprobar'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.textContaining(RegExp('Continuar|Terminar')));
+      await tester.pumpAndSettle();
+    }
+    await tester.pump(const Duration(milliseconds: 500));
+    await _shot(tester, 'leccion-final');
+  });
+
+  scene('ancha-inicio', (tester) async {
+    await _app(tester, values: {'jaguar.view.mode': 'basic'}, size: const Size(1280, 800), openEditor: false);
+    await tester.tap(find.text('Inicio'));
+    await tester.pumpAndSettle();
+    await _shot(tester, 'ancha-inicio', pixelRatio: 1);
+  });
+
+  scene('ancha-ruta', (tester) async {
+    await _app(
+      tester,
+      values: {
+        'jaguar.view.mode': 'basic',
+        'jaguar.lecciones.hechas': ['leccion-primer-programa'],
+        'jaguar.retos.hechos': ['reto-1-01'],
+      },
+      size: const Size(1280, 800),
+      openEditor: false,
+    );
+    await tester.tap(find.text('Ruta'));
+    await tester.pumpAndSettle();
+    await _shot(tester, 'ancha-ruta', pixelRatio: 1);
+  });
+
+  scene('ruta-celular', (tester) async {
+    await _app(
+      tester,
+      values: {
+        'jaguar.view.mode': 'basic',
+        'jaguar.lecciones.hechas': ['leccion-primer-programa', 'leccion-operaciones'],
+        'jaguar.retos.hechos': ['reto-1-01', 'reto-1-02'],
+      },
+    );
+    await tester.tap(find.text('Ruta'));
+    await tester.pumpAndSettle();
+    await _shot(tester, 'ruta-celular');
+  });
+
+  scene('sala-clases', (tester) async {
+    await _app(tester, values: {'jaguar.view.mode': 'basic'});
+    await tester.tap(find.text('Clases'));
+    await tester.pumpAndSettle();
+    await _shot(tester, 'sala-clases');
+  });
+
+  scene('sala-clases-profe', (tester) async {
+    await _app(tester, values: {'jaguar.view.mode': 'full', 'jaguar.view.teacher': true});
+    await tester.tap(find.text('Clases'));
+    await tester.pumpAndSettle();
+    await _shot(tester, 'sala-clases-profe');
+  });
+
+  scene('sala-taller', (tester) async {
+    final store = await _app(tester, values: {'jaguar.view.mode': 'basic'}, source: _saludo, openEditor: false);
+    store.create('Algoritmo promedio\n    Escribir 1\nFinAlgoritmo\n');
+    await tester.tap(find.text('Taller'));
+    await tester.pumpAndSettle();
+    await _shot(tester, 'sala-taller');
+  });
+
   scene('codigo', (tester) async {
     await _app(tester, values: {'jaguar.view.mode': 'basic'}, source: _saludo);
     await _shot(tester, 'codigo');
@@ -206,22 +352,6 @@ void main() {
     await _shot(tester, 'error');
   });
 
-  scene('menu', (tester) async {
-    await _app(tester, values: {'jaguar.view.mode': 'basic'}, source: _saludo);
-    await tester.tap(find.byIcon(Icons.menu));
-    await tester.pumpAndSettle();
-    await _shot(tester, 'menu');
-  });
-
-  scene('menu-mas', (tester) async {
-    await _app(tester, values: {'jaguar.view.mode': 'basic'}, source: _saludo);
-    await tester.tap(find.byIcon(Icons.menu));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Más'));
-    await tester.pumpAndSettle();
-    await _shot(tester, 'menu-mas');
-  });
-
   scene('mas-opciones', (tester) async {
     await _app(tester, values: {'jaguar.view.mode': 'basic'}, source: _saludo);
     await tester.tap(find.byTooltip('Más opciones'));
@@ -230,19 +360,21 @@ void main() {
   });
 
   scene('retos', (tester) async {
-    await _app(tester, values: {'jaguar.view.mode': 'basic', 'jaguar.retos.hechos': ['reto-1-01']}, source: _saludo);
-    await tester.tap(find.byIcon(Icons.menu));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Retos'));
+    await _app(
+      tester,
+      values: {
+        'jaguar.view.mode': 'basic',
+        'jaguar.retos.hechos': ['reto-1-01', 'reto-1-02', 'reto-1-03', 'reto-1-04'],
+      },
+    );
+    await tester.tap(find.text('Ruta'));
     await tester.pumpAndSettle();
     await _shot(tester, 'retos');
   });
 
   Future<void> openReto(WidgetTester tester) async {
-    await _app(tester, values: {'jaguar.view.mode': 'basic'}, source: _saludo);
-    await tester.tap(find.byIcon(Icons.menu));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Retos'));
+    await _app(tester, values: {'jaguar.view.mode': 'basic'}, source: _saludo, openEditor: false);
+    await tester.tap(find.text('Ruta'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Saludo'));
     await tester.pumpAndSettle();
@@ -277,7 +409,10 @@ void main() {
 
   scene('reto-superado', (tester) async {
     await openReto(tester);
-    await tester.enterText(_editor, 'Algoritmo saludo\n    Leer nombre\n    Escribir "Hola, " + nombre\nFinAlgoritmo\n');
+    await tester.enterText(
+      _editor,
+      'Algoritmo saludo\n    Leer nombre\n    Escribir "Hola, " + nombre\nFinAlgoritmo\n',
+    );
     await tester.pump();
     await tester.tap(find.text('Pruebas'));
     await tester.pumpAndSettle();
@@ -298,10 +433,8 @@ void main() {
   });
 
   scene('ajustes', (tester) async {
-    await _app(tester, values: {'jaguar.view.mode': 'basic'}, source: _saludo);
-    await tester.tap(find.byIcon(Icons.menu));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Ajustes'));
+    await _app(tester, values: {'jaguar.view.mode': 'basic'});
+    await tester.tap(find.byTooltip('Ajustes'));
     await tester.pumpAndSettle();
     await _shot(tester, 'ajustes');
   });

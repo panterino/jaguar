@@ -1,0 +1,11 @@
+{
+  // La app web (Flutter). Se sirve como archivos estáticos: no hay código del
+  // lado del servidor. El build sale de apps/jaguar/build/web.
+  "$schema": "https://workers.cloudflare.com/schemas/wrangler.json",
+  "name": "jaguar-app",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "../../apps/jaguar/build/web"
+  },
+  "routes": [{ "pattern": "app.jaguarcode.org", "custom_domain": true }]
+}
