@@ -1,0 +1,9 @@
+{
+  // www.jaguarcode.org redirige a jaguarcode.org (301): una sola dirección
+  // para cada página, sin contenido duplicado para los buscadores.
+  "$schema": "https://workers.cloudflare.com/schemas/wrangler.json",
+  "name": "jaguar-www",
+  "main": "src/index.js",
+  "compatibility_date": "2026-10-01",
+  "routes": [{ "pattern": "www.jaguarcode.org", "custom_domain": true }]
+}

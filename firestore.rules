@@ -166,5 +166,19 @@ service cloud.firestore {
         && (!('contacto' in request.resource.data) || shortText('contacto', 200))
         && request.resource.data.creado == request.time;
     }
+
+    // Early access list from the landing page: a person leaves an email to be
+    // told when Jaguar opens. The id is a fingerprint of the email, so the
+    // same address twice keeps one entry (the second create is refused, as an
+    // update is). Only Panterino reads them, in the console.
+    match /accesoAnticipado/{id} {
+      allow create: if onlyFields(['correo', 'origen', 'creado'])
+        && request.resource.data.correo is string
+        && request.resource.data.correo.size() >= 6
+        && request.resource.data.correo.size() <= 200
+        && request.resource.data.correo.matches('^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$')
+        && request.resource.data.origen in ['inicio', 'acceso', 'guia']
+        && request.resource.data.creado == request.time;
+    }
   }
 }

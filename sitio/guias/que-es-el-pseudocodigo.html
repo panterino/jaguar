@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Qué es el pseudocódigo: reglas, palabras clave y ejemplos</title>
+<meta name="description" content="El pseudocódigo describe un algoritmo con palabras parecidas a un lenguaje de programación, sin sintaxis estricta. Reglas, palabras clave y ejemplos que puedes copiar y ejecutar.">
+<link rel="canonical" href="https://jaguarcode.org/guias/que-es-el-pseudocodigo">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="apple-touch-icon" href="/icono.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Jaguar">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://jaguarcode.org/guias/que-es-el-pseudocodigo">
+<meta property="og:title" content="Qué es el pseudocódigo: reglas, palabras clave y ejemplos">
+<meta property="og:description" content="El pseudocódigo describe un algoritmo con palabras parecidas a un lenguaje de programación, sin sintaxis estricta. Reglas, palabras clave y ejemplos que puedes copiar y ejecutar.">
+<meta property="og:image" content="https://jaguarcode.org/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Qué es el pseudocódigo: reglas, palabras clave y ejemplos">
+<meta name="twitter:description" content="El pseudocódigo describe un algoritmo con palabras parecidas a un lenguaje de programación, sin sintaxis estricta. Reglas, palabras clave y ejemplos que puedes copiar y ejecutar.">
+<meta name="twitter:image" content="https://jaguarcode.org/compartir.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://jaguarcode.org/guias/que-es-el-pseudocodigo#articulo",
+      "headline": "Qué es el pseudocódigo: reglas, palabras clave y ejemplos",
+      "description": "El pseudocódigo describe un algoritmo con palabras parecidas a un lenguaje de programación, sin sintaxis estricta. Reglas, palabras clave y ejemplos que puedes copiar y ejecutar.",
+      "inLanguage": "es-MX",
+      "datePublished": "2026-10-26",
+      "dateModified": "2026-10-26",
+      "mainEntityOfPage": "https://jaguarcode.org/guias/que-es-el-pseudocodigo",
+      "image": "https://jaguarcode.org/compartir.png",
+      "author": { "@type": "Organization", "name": "Panterino", "url": "https://jaguarcode.org/" },
+      "publisher": { "@type": "Organization", "name": "Panterino", "logo": { "@type": "ImageObject", "url": "https://jaguarcode.org/icono.png" } }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Jaguar", "item": "https://jaguarcode.org/" },
+        { "@type": "ListItem", "position": 2, "name": "Guías", "item": "https://jaguarcode.org/guias" },
+        { "@type": "ListItem", "position": 3, "name": "Qué es el pseudocódigo", "item": "https://jaguarcode.org/guias/que-es-el-pseudocodigo" }
+      ]
+    },
+    { "@type": "FAQPage", "mainEntity": [{"@type":"Question","name":"¿Existe un pseudocódigo oficial?","acceptedAnswer":{"@type":"Answer","text":"No. No hay un estándar: cada libro y cada escuela usa su estilo. Si lo escribes con claridad y con pasos precisos, cualquiera lo puede seguir."}},{"@type":"Question","name":"¿El pseudocódigo se puede ejecutar?","acceptedAnswer":{"@type":"Answer","text":"Escrito en papel, no. Pero con un programa que lo entienda, como Jaguar, lo ejecutas y ves el resultado, y también puedes ver su diagrama de flujo."}},{"@type":"Question","name":"¿Es mejor empezar por pseudocódigo o por Python?","acceptedAnswer":{"@type":"Answer","text":"Depende de quién lo enseñe, pero empezar por pseudocódigo permite concentrarte en la lógica sin pelear con la sintaxis. Después el paso a Python, C o Java es más corto."}}] }
+  ]
+}
+</script>
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/estilos.css">
+</head>
+<body>
+<header class="sitio-barra">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="/logo.svg" alt="" width="46" height="40">
+      <a class="nombre" href="/">Jaguar</a>
+      <a href="/guias">Guías</a>
+      <a href="/profes">Para profes</a>
+      <a href="https://github.com/panterino/jaguar">GitHub</a>
+    </div>
+  </div>
+</header>
+<main class="guia">
+  <div class="ancho angosto">
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › <a href="/guias">Guías</a> › Qué es el pseudocódigo</nav>
+    <h1>Qué es el pseudocódigo</h1>
+    <p class="resumen">El pseudocódigo es una forma de escribir un algoritmo con palabras parecidas a las de un lenguaje de programación, pero sin reglas estrictas de sintaxis. Sirve para pensar la solución antes de programar.</p>
+    <nav class="contenido" aria-label="Contenido de la guía"><b>En esta guía</b>
+      <ol>
+        <li><a href="#para-que">Para qué sirve</a></li>
+        <li><a href="#estructura">La estructura de un programa</a></li>
+        <li><a href="#palabras">Las palabras que más se usan</a></li>
+        <li><a href="#decisiones">Ejemplo: tomar una decisión</a></li>
+        <li><a href="#ciclos">Ejemplo: repetir pasos</a></li>
+        <li><a href="#tipos">Variables y tipos de datos</a></li>
+        <li><a href="#a-codigo">Del pseudocódigo a otros lenguajes</a></li>
+        <li><a href="#errores">Errores comunes</a></li>
+        <li><a href="#preguntas">Preguntas frecuentes</a></li>
+      </ol>
+    </nav>
+    <article>
+      <section id="para-que">
+        <h2>Para qué sirve</h2>
+<p>Programar directamente obliga a pensar en la solución y en las reglas del lenguaje al mismo tiempo. El pseudocódigo separa las dos cosas: primero decides <i>qué</i> hacer y después lo traduces a Python, C, Java o el lenguaje que uses.</p>
+<p>No hay un pseudocódigo oficial; cada escuela usa pequeñas variaciones. Lo importante es que se lea con claridad y que cada paso sea preciso. En esta guía se usa el estilo que se enseña en las materias de lógica de programación, con palabras en español.</p>
+      </section>
+      <section id="estructura">
+        <h2>La estructura de un programa</h2>
+<p>Un programa empieza con <code>Algoritmo</code> y un nombre, y termina con <code>FinAlgoritmo</code>. Entre los dos van las instrucciones, una por línea y de arriba hacia abajo. Las que están dentro de un <code>Si</code> o de un ciclo se escriben con sangría (unos espacios a la izquierda) para ver dónde empiezan y terminan.</p>
+<pre class="codigo" data-entradas="Ana" data-salida="¿Cómo te llamas?&#10;Hola, Ana" tabindex="0"><code>Algoritmo saludo
+    Escribir "¿Cómo te llamas?"
+    Leer nombre
+    Escribir "Hola, ", nombre
+FinAlgoritmo</code></pre>
+<p><code>Escribir</code> muestra algo en pantalla. <code>Leer</code> pide un dato y lo guarda en una <b>variable</b>: una caja con nombre donde se guarda un valor.</p>
+      </section>
+      <section id="palabras">
+        <h2>Las palabras que más se usan</h2>
+<div class="tabla"><table><caption>Instrucciones básicas</caption><thead><tr><th scope="col">Palabra</th><th scope="col">Para qué sirve</th><th scope="col">Ejemplo</th></tr></thead><tbody><tr><td><code>Leer</code></td><td>Pedir un dato y guardarlo</td><td><code>Leer edad</code></td></tr><tr><td><code>Escribir</code></td><td>Mostrar un texto o un valor</td><td><code>Escribir "Hola"</code></td></tr><tr><td><code>&lt;-</code></td><td>Guardar un valor en una variable</td><td><code>total &lt;- precio * 2</code></td></tr><tr><td><code>Si … Entonces … SiNo … FinSi</code></td><td>Tomar una decisión</td><td><code>Si edad &gt;= 18 Entonces</code></td></tr><tr><td><code>Mientras … FinMientras</code></td><td>Repetir mientras algo sea cierto</td><td><code>Mientras n &gt; 0 Hacer</code></td></tr><tr><td><code>Para … FinPara</code></td><td>Repetir un número conocido de veces</td><td><code>Para i &lt;- 1 Hasta 10</code></td></tr><tr><td><code>Repetir … Hasta Que</code></td><td>Repetir al menos una vez</td><td><code>Hasta Que clave = "jaguar"</code></td></tr><tr><td><code>Segun … FinSegun</code></td><td>Elegir entre varias opciones</td><td><code>Segun dia Hacer</code></td></tr></tbody></table></div>
+      </section>
+      <section id="decisiones">
+        <h2>Ejemplo: tomar una decisión</h2>
+<p>Este programa lee una calificación y dice si se aprobó. La flecha <code>&lt;-</code> guarda un valor; el <code>Si</code> compara.</p>
+<pre class="codigo" data-entradas="8" data-salida="Aprobado" tabindex="0"><code>Algoritmo aprobado
+    Leer calificacion
+    Si calificacion &gt;= 6 Entonces
+        Escribir "Aprobado"
+    SiNo
+        Escribir "Reprobado"
+    FinSi
+FinAlgoritmo</code></pre>
+      </section>
+      <section id="ciclos">
+        <h2>Ejemplo: repetir pasos</h2>
+<p>Cuando sabes cuántas veces repetir algo se usa <code>Para</code>. Este programa muestra la tabla del 5:</p>
+<pre class="codigo" data-salida="5 x 1 = 5&#10;5 x 2 = 10&#10;5 x 3 = 15&#10;5 x 4 = 20&#10;5 x 5 = 25" tabindex="0"><code>Algoritmo tabla_del_5
+    Para i &lt;- 1 Hasta 5 Hacer
+        Escribir "5 x ", i, " = ", 5 * i
+    FinPara
+FinAlgoritmo</code></pre>
+<p>Y cuando no sabes cuántas veces, se usa <code>Mientras</code>: este suma números hasta que escribas 0.</p>
+<pre class="codigo" data-entradas="3|4|0" data-salida="Total: 7" tabindex="0"><code>Algoritmo suma_hasta_cero
+    suma &lt;- 0
+    Leer n
+    Mientras n &lt;&gt; 0 Hacer
+        suma &lt;- suma + n
+        Leer n
+    FinMientras
+    Escribir "Total: ", suma
+FinAlgoritmo</code></pre>
+      </section>
+      <section id="tipos">
+        <h2>Variables y tipos de datos</h2>
+<p>Una variable guarda un dato, y cada dato tiene un tipo: un <b>entero</b> (7), un <b>real</b> (3.5), un <b>texto</b> ("hola") o un <b>lógico</b> (verdadero o falso). Para unir un texto con un valor se usa <code>+</code> o una coma dentro de <code>Escribir</code>.</p>
+<pre class="codigo" data-entradas="100" data-salida="Total con IVA: 116" tabindex="0"><code>Algoritmo precio
+    Leer precio
+    total &lt;- precio * 1.16
+    Escribir "Total con IVA: " + total
+FinAlgoritmo</code></pre>
+      </section>
+      <section id="a-codigo">
+        <h2>Del pseudocódigo a otros lenguajes</h2>
+<p>Una vez que el algoritmo funciona, traducirlo es casi mecánico. Por ejemplo, la decisión de las calificaciones en Python:</p>
+<pre class="codigo" tabindex="0"><code>calificacion = float(input())
+if calificacion &gt;= 6:
+    print("Aprobado")
+else:
+    print("Reprobado")</code></pre>
+<p>Cambian las palabras (<code>Si</code> por <code>if</code>, <code>Escribir</code> por <code>print</code>), pero la idea es la misma. Por eso conviene dominar primero la lógica.</p>
+      </section>
+      <section id="errores">
+        <h2>Errores comunes</h2>
+<ul>
+  <li><b>Olvidar el cierre:</b> cada <code>Si</code> necesita su <code>FinSi</code>, y cada <code>Mientras</code> su <code>FinMientras</code>.</li>
+  <li><b>Usar una variable sin darle valor:</b> hay que leerla o asignarla antes.</li>
+  <li><b>Confundir <code>=</code> con <code>&lt;-</code>:</b> la flecha guarda un valor; el igual compara.</li>
+  <li><b>Un ciclo que no termina:</b> si dentro del <code>Mientras</code> nada cambia la condición, se repite para siempre.</li>
+</ul>
+      </section>
+      <section id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+        <details><summary>¿Existe un pseudocódigo oficial?</summary><p>No. No hay un estándar: cada libro y cada escuela usa su estilo. Si lo escribes con claridad y con pasos precisos, cualquiera lo puede seguir.</p></details>
+        <details><summary>¿El pseudocódigo se puede ejecutar?</summary><p>Escrito en papel, no. Pero con un programa que lo entienda, como Jaguar, lo ejecutas y ves el resultado, y también puedes ver su diagrama de flujo.</p></details>
+        <details><summary>¿Es mejor empezar por pseudocódigo o por Python?</summary><p>Depende de quién lo enseñe, pero empezar por pseudocódigo permite concentrarte en la lógica sin pelear con la sintaxis. Después el paso a Python, C o Java es más corto.</p></details>
+      </section>
+    </article>
+<aside class="cta-guia" aria-labelledby="cta-t">
+  <h2 id="cta-t">Practica esto en Jaguar</h2>
+  <p>Escribe pseudocódigo, mira su diagrama y haz la prueba de escritorio desde el celular. Gratis y sin anuncios. Deja tu correo y te damos entrada a la app.</p>
+  <div class="acceso" data-origen="guia">
+    <form novalidate>
+      <div class="fila">
+        <label class="campo-correo"><span class="oculto">Tu correo</span>
+          <input type="email" name="correo" placeholder="Tu correo" autocomplete="email" inputmode="email" maxlength="200" required></label>
+        <button class="boton principal" type="submit">Quiero entrar primero</button>
+      </div>
+      <label class="oculto" aria-hidden="true">No llenar <input name="sitio" tabindex="-1" autocomplete="off"></label>
+      <p class="estado" role="status" aria-live="polite"></p>
+      <p class="letra-chica">Solo lo usamos para darte entrada a la app y avisarte de novedades. Sin spam. <a href="https://app.jaguarcode.org/privacidad">Aviso de privacidad</a>.</p>
+    </form>
+    <div class="dentro" hidden>
+      <h3>¡Listo, ya estás dentro!</h3>
+      <p>Ya puedes abrir la app. Te escribiremos cuando haya novedades.</p>
+      <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Entrar a la app</a></div>
+    </div>
+  </div>
+</aside>
+    <h2 style="margin-top:44px">Sigue aprendiendo</h2>
+    <div class="relacionadas">
+      <a href="/guias/que-es-un-algoritmo">Qué es un algoritmo<small>Un algoritmo es una lista ordenada y finita de pasos que resuelve un problema o hace una tarea.</small></a>
+      <a href="/guias/prueba-de-escritorio">La prueba de escritorio<small>La prueba de escritorio es seguir un algoritmo a mano, línea por línea, anotando en una tabla cuánto vale cada variable en cada paso.</small></a>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="ancho">
+    <span class="quien"><img src="/logo.svg" alt="" width="30" height="26">Un proyecto de Panterino · hecho en México</span>
+    <a href="/guias">Guías</a>
+    <a href="/manual">Manual</a>
+    <a href="https://www.facebook.com/jaguareducation">Facebook</a>
+    <a href="https://github.com/panterino/jaguar">Código en GitHub</a>
+  </div>
+</footer>
+<script src="/acceso.js" defer></script>
+</body>
+</html>
