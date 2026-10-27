@@ -40,6 +40,10 @@ void main() {
             expect(q.lines.length, greaterThanOrEqualTo(3));
           case FigureQuestion():
             break;
+          case FindErrorQuestion():
+            expect(q.lines.length, greaterThanOrEqualTo(3));
+            expect(q.errorLine, inInclusiveRange(0, q.lines.length - 1));
+            expect(q.fixed, isNot(q.lines[q.errorLine]));
         }
       }
     }
@@ -55,6 +59,28 @@ void main() {
             // La opción correcta es lo que sale: en una línea, o "Nada".
             final esperada = salida.isEmpty ? 'Nada' : salida.split('\n').join(', ');
             expect(q.options[q.answer], esperada);
+          });
+        }
+        if (q is ChoiceQuestion && q.fillOutput != null) {
+          test('${lesson.id}, pregunta ${i + 1}: solo una opción completa bien el código', () async {
+            for (final (k, option) in q.options.indexed) {
+              final source = q.code!.replaceFirst(RegExp(r'_{3,}'), option);
+              final program = 'Algoritmo prueba\n$source\nFinAlgoritmo\n';
+              final result = await runProgram(program, inputs: q.inputs, options: RunOptions(maxSteps: 100000));
+              final worked = result.error == null && result.output.trimRight() == q.fillOutput;
+              expect(worked, k == q.answer, reason: 'opción "$option"');
+            }
+          });
+        }
+        if (q is FindErrorQuestion) {
+          test('${lesson.id}, pregunta ${i + 1}: con la línea mala falla y con la corrección corre', () async {
+            final broken = 'Algoritmo prueba\n${q.lines.skip(1).take(q.lines.length - 2).join('\n')}\nFinAlgoritmo\n';
+            final fixedLines = [...q.lines]..[q.errorLine] = q.fixed;
+            final fixed = fixedLines.join('\n');
+            final bad = await runProgram(q.lines.join('\n'), inputs: q.inputs, options: RunOptions(maxSteps: 100000));
+            expect(bad.error, isNotNull, reason: 'el programa con el error debe fallar');
+            await _run(fixed, q.inputs);
+            expect(broken, isNotEmpty);
           });
         }
         if (q is OrderQuestion) {
@@ -74,9 +100,17 @@ void main() {
       expect(ids.where((id) => id.startsWith('leccion-')).length, allLessons.length);
     });
 
-    test('los retos van en su orden', () {
+    test('los retos de la ruta son todos los retos, una sola vez', () {
       final retos = routeSteps.whereType<ChallengeStep>().map((s) => s.id).toList();
-      expect(retos, challenges.map((c) => c.id).toList());
+      expect(retos.toSet(), challenges.map((c) => c.id).toSet());
+      expect(retos, hasLength(challenges.length));
+    });
+
+    test('el siguiente reto sigue el orden de la ruta, no el de la lista', () {
+      // Los textos van después de Operaciones, antes de las decisiones.
+      expect(nextChallenge('reto-1-04')!.id, 'reto-1-11');
+      expect(nextChallenge('reto-1-12')!.id, 'reto-1-05');
+      expect(nextChallenge('reto-1-10'), isNull);
     });
 
     test('el siguiente paso es el primero sin hacer, y es nulo al terminar', () {

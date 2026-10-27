@@ -260,6 +260,48 @@ const challenges = <Challenge>[
       'intentos <- 0\nRepetir\n    Leer clave\n    intentos <- intentos + 1\nHasta Que clave = "jaguar"',
     ],
   ),
+  Challenge(
+    subject: 'Textos',
+    topic: 'Mayúsculas y unir textos',
+    exercise: Exercise(
+      id: 'reto-1-11',
+      title: 'Reto 11 · Grito',
+      statement:
+          'Pide una palabra o una frase y muéstrala en mayúsculas, con un signo de admiración al final.\n\n'
+          'Si escriben hola, el programa muestra:\nHOLA!',
+      cases: [
+        TestCase(inputs: ['hola'], expected: 'HOLA!'),
+        TestCase(inputs: ['jaguar'], expected: 'JAGUAR!'),
+        TestCase(inputs: ['buenos días'], expected: 'BUENOS DÍAS!', hidden: true),
+      ],
+    ),
+    hints: [
+      'Hay una función que vuelve mayúsculas todas las letras de un texto: Mayusculas.',
+      'Guarda lo que escriben con Leer y muestra Mayusculas(texto) junto con "!". Define el texto Como Texto.',
+      'Leer texto\nEscribir Mayusculas(texto) + "!"',
+    ],
+  ),
+  Challenge(
+    subject: 'Textos',
+    topic: 'Longitud de un texto',
+    exercise: Exercise(
+      id: 'reto-1-12',
+      title: 'Reto 12 · Contar letras',
+      statement:
+          'Pide una palabra y di cuántas letras tiene.\n\n'
+          'Si escriben jaguar, el programa muestra:\nLetras: 6',
+      cases: [
+        TestCase(inputs: ['jaguar'], expected: 'Letras: 6'),
+        TestCase(inputs: ['sol'], expected: 'Letras: 3'),
+        TestCase(inputs: ['a'], expected: 'Letras: 1', hidden: true),
+      ],
+    ),
+    hints: [
+      'La función Longitud cuenta las letras de un texto.',
+      'Guarda la palabra con Leer y muestra "Letras: " junto con Longitud(palabra).',
+      'Leer palabra\nEscribir "Letras: ", Longitud(palabra)',
+    ],
+  ),
 ];
 
 Challenge? challengeById(String id) {
@@ -267,11 +309,4 @@ Challenge? challengeById(String id) {
     if (challenge.id == id) return challenge;
   }
   return null;
-}
-
-/// The reto after [id] in level 1, or null if [id] is the last one (or not a
-/// reto).
-Challenge? nextChallenge(String id) {
-  final i = challenges.indexWhere((c) => c.id == id);
-  return i < 0 || i + 1 >= challenges.length ? null : challenges[i + 1];
 }

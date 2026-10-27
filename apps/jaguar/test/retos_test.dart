@@ -23,6 +23,9 @@ const solutions = {
       'Algoritmo s\n Leer n\n Para i <- 1 Hasta 10 Hacer\n  Escribir n, " x ", i, " = ", n * i\n FinPara\nFinAlgoritmo',
   'reto-1-10':
       'Algoritmo s\n Definir clave Como Texto\n intentos <- 0\n Repetir\n  Leer clave\n  intentos <- intentos + 1\n Hasta Que clave = "jaguar"\n Escribir "Entraste en ", intentos, " intentos"\nFinAlgoritmo',
+  'reto-1-11': 'Algoritmo s\n Definir texto Como Texto\n Leer texto\n Escribir Mayusculas(texto) + "!"\nFinAlgoritmo',
+  'reto-1-12':
+      'Algoritmo s\n Definir palabra Como Texto\n Leer palabra\n Escribir "Letras: ", Longitud(palabra)\nFinAlgoritmo',
 };
 
 /// Soluciones casi correctas que las pruebas deben rechazar (los bordes).
@@ -31,6 +34,9 @@ const wrong = {
       'Algoritmo s\n Leer c\n Si c > 6 Entonces\n  Escribir "Aprobado"\n SiNo\n  Escribir "Reprobado"\n FinSi\nFinAlgoritmo',
   'reto-1-06':
       'Algoritmo s\n Leer n\n Si n > 1 Y n <= 10 Entonces\n  Escribir "Dentro"\n SiNo\n  Escribir "Fuera"\n FinSi\nFinAlgoritmo',
+  // Cuenta una letra de más (la longitud más uno).
+  'reto-1-12':
+      'Algoritmo s\n Definir palabra Como Texto\n Leer palabra\n Escribir "Letras: ", Longitud(palabra) + 1\nFinAlgoritmo',
 };
 
 void main() {

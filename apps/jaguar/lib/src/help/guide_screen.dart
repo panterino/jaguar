@@ -200,8 +200,8 @@ class GuideScreen extends StatelessWidget {
       title: 'Lecciones cortas',
       summary: 'Preguntas rápidas con explicación, antes de cada reto',
       intro:
-          'La Ruta tiene seis lecciones de cinco preguntas cada una: qué es un programa, operaciones, diagramas de '
-          'flujo, decisiones, prueba de escritorio y ciclos. Duran un par de minutos y funcionan sin internet.',
+          'La Ruta tiene siete lecciones de unas cinco preguntas cada una: qué es un programa, operaciones, textos, '
+          'diagramas de flujo, decisiones, prueba de escritorio y ciclos. Duran un par de minutos y funcionan sin internet.',
       steps: [
         desktop
             ? 'Haz clic en Ruta en la barra de la izquierda y elige una lección.'
@@ -227,7 +227,7 @@ class GuideScreen extends StatelessWidget {
       title: 'Retos',
       summary: 'Diez ejercicios para practicar por tu cuenta',
       intro:
-          'Hay 10 retos, uno por tema y en orden: variables, operadores, Si, Según, Mientras, Para y Repetir. '
+          'Hay 12 retos, uno por tema y en orden: variables, operadores, textos, Si, Según, Mientras, Para y Repetir. '
           'Cada uno va después de la lección que lo prepara. Funcionan sin internet.',
       steps: [
         desktop

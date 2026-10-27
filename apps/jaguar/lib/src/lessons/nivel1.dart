@@ -17,6 +17,11 @@ final nivel1 = RouteLevel(
       ChallengeStep(reto(3)),
       ChallengeStep(reto(4)),
     ]),
+    RouteGroup('Textos', 'Junta, mide y cambia las palabras.', [
+      const LessonStep(lessonText),
+      ChallengeStep(reto(11)),
+      ChallengeStep(reto(12)),
+    ]),
     RouteGroup('Diagramas y decisiones', 'Dibuja el flujo y haz que el programa elija.', [
       const LessonStep(lessonFlowcharts),
       const LessonStep(lessonDecisions),

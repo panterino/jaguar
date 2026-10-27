@@ -92,6 +92,7 @@ class _LessonScreenState extends State<LessonScreen> {
       ChoiceQuestion() => _choice == q.answer,
       FigureQuestion() => _choice == q.answer.index,
       OrderQuestion() => _isSorted(_order),
+      FindErrorQuestion() => _choice == q.errorLine,
     };
   }
 
@@ -294,6 +295,7 @@ class _Playing extends StatelessWidget {
                       if (q is ChoiceQuestion) _Options(screen: screen, question: q),
                       if (q is FigureQuestion) _Figures(screen: screen, question: q),
                       if (q is OrderQuestion) _Ordering(screen: screen, question: q),
+                      if (q is FindErrorQuestion) _FindError(screen: screen, question: q),
                     ],
                   ),
                 ),
@@ -431,6 +433,61 @@ class _Options extends StatelessWidget {
                       ),
                       if (correct == true) Icon(Icons.check_circle, color: c.text, semanticLabel: 'Correcta'),
                       if (correct == false) Icon(Icons.cancel, color: c.text, semanticLabel: 'Incorrecta'),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// The lines of a program, to tap the one that is wrong.
+class _FindError extends StatelessWidget {
+  const _FindError({required this.screen, required this.question});
+
+  final _LessonScreenState screen;
+  final FindErrorQuestion question;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (final (i, line) in question.lines.indexed)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Builder(
+              builder: (context) {
+                final checked = screen._checked;
+                final selected = screen._choice == i;
+                final correct = checked ? (i == question.errorLine ? true : (selected ? false : null)) : null;
+                final c = _tileColors(context, selected: selected, correct: correct);
+                return Chunky(
+                  onTap: checked ? null : () => screen._choose(i),
+                  fill: c.fill,
+                  edge: c.edge,
+                  outline: c.outline,
+                  selected: selected,
+                  minHeight: 48,
+                  semanticsLabel: 'Línea ${i + 1}: $line',
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: 24,
+                        child: Text('${i + 1}', style: monoStyle.copyWith(color: c.text.withValues(alpha: 0.6))),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          line,
+                          style: monoStyle.copyWith(color: c.text, fontWeight: FontWeight.w700, fontSize: 15),
+                        ),
+                      ),
+                      if (correct == true) Icon(Icons.check_circle, color: c.text),
+                      if (correct == false) Icon(Icons.cancel, color: c.text),
                     ],
                   ),
                 );
@@ -662,7 +719,13 @@ class _Footer extends StatelessWidget {
                   color: c.text,
                   message: ok ? '¡Correcto!' : 'Casi',
                   detail: ok ? q.right : q.wrong,
-                  solution: !ok && q is OrderQuestion ? q.lines.join('\n') : null,
+                  solution: !ok
+                      ? switch (q) {
+                          OrderQuestion() => q.lines.join('\n'),
+                          FindErrorQuestion() => q.fixed,
+                          _ => null,
+                        }
+                      : null,
                 ),
               Chunky(
                 onTap: checked ? screen._next : (screen._hasAnswer ? screen._check : null),

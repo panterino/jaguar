@@ -36,6 +36,9 @@ Future<void> _responde(WidgetTester tester, Question q, {required bool bien}) as
         await tester.tap(find.text(line.trim()).last);
         await tester.pump();
       }
+    case FindErrorQuestion():
+      final i = bien ? q.errorLine : (q.errorLine + 1) % q.lines.length;
+      await tester.tap(find.text(q.lines[i]).last);
   }
   await tester.pump();
   await tester.tap(find.text('Comprobar'));

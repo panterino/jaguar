@@ -7,11 +7,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: Wrap(
-            children: [
-              for (final pose in MascotPose.values) Mascota(pose: pose, size: 120),
-            ],
-          ),
+          body: Wrap(children: [for (final pose in MascotPose.values) Mascota(pose: pose, size: 120)]),
         ),
       ),
     );

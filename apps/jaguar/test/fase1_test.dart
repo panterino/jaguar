@@ -28,7 +28,7 @@ void main() {
 
     test('las áreas son las del temario y todas tienen retos', () {
       final subjects = {for (final c in challenges) c.subject};
-      expect(subjects, {'Variables', 'Operadores', 'Condicionales', 'Ciclos'});
+      expect(subjects, {'Variables', 'Operadores', 'Condicionales', 'Ciclos', 'Textos'});
     });
   });
 

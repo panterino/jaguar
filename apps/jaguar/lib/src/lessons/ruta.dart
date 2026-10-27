@@ -86,3 +86,15 @@ RouteStep? nextStep({required Set<String> lessons, required Set<String> challeng
 /// The challenge number [n] (from 1) of the first ten, which the first level
 /// uses.
 Challenge reto(int n) => challenges[n - 1];
+
+/// The challenge that follows [id] on the path (the next challenge step,
+/// skipping lessons); null if [id] is the last one or not a challenge.
+Challenge? nextChallenge(String id) {
+  final steps = routeSteps;
+  final i = steps.indexWhere((s) => s.id == id);
+  if (i < 0) return null;
+  for (final step in steps.skip(i + 1)) {
+    if (step is ChallengeStep) return step.challenge;
+  }
+  return null;
+}
