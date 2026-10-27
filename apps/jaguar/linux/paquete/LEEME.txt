@@ -1,0 +1,16 @@
+Jaguar Code para Linux (64 bits)
+
+Para abrirlo:
+  ./jaguar
+
+Para agregarlo al menú de aplicaciones:
+  ./instalar.sh
+
+Necesita GTK 3, que ya trae casi cualquier escritorio (GNOME, KDE, Xfce...).
+Para abrir archivos con el selector de archivos conviene tener zenity o
+kdialog instalado.
+
+En Linux no están las clases ni la comunidad (necesitan Firebase, que no
+tiene versión para Linux); todo lo demás funciona sin internet.
+
+https://jaguarcode.org
