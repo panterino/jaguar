@@ -96,9 +96,8 @@ void main() {
     await tester.pumpWidget(JaguarApp(store: ProgramStore(prefs), exercises: exercises, settings: ViewSettings(prefs)));
     await tester.pumpAndSettle();
 
-    // Inicio puts the teacher's exercise first.
-    expect(find.text('DEL PROFE'), findsOneWidget);
-    expect(find.text('Par o impar'), findsOneWidget);
+    // Inicio says in Clases that a task is waiting.
+    expect(find.text('Tarea nueva: Par o impar'), findsOneWidget);
 
     await irASala(tester, 'Clases');
     expect(find.text('Par o impar'), findsOneWidget);

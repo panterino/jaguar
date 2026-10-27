@@ -8,6 +8,7 @@ import '../cloud/cloud.dart';
 import '../exercises/exercise_store.dart';
 import '../lessons/lessons.dart';
 import '../widgets/appear.dart';
+import '../widgets/chunky.dart';
 import '../programs/examples.dart';
 import '../programs/program_store.dart';
 import '../settings.dart';
@@ -103,6 +104,7 @@ class RoomsScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         // On a phone every place opens from the portal and goes back to it.
@@ -113,8 +115,28 @@ class RoomsScaffold extends StatelessWidget {
                 onPressed: () => onRoom(Room.home),
               )
             : null,
-        title: Text(room == Room.home ? (_isWide(context) ? 'Inicio' : 'Jaguar Code') : _titles[room]!),
+        title: room == Room.home && !_isWide(context)
+            ? Text.rich(
+                TextSpan(
+                  text: 'Jaguar',
+                  children: [
+                    TextSpan(
+                      text: ' Code',
+                      style: TextStyle(
+                        color: theme.brightness == Brightness.dark ? jaguarYellow : const Color(0xFF8A5A00),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            : Text(room == Room.home ? 'Inicio' : _titles[room]!),
         actions: [
+          if (room == Room.home)
+            IconButton(
+              tooltip: 'Cómo funciona Jaguar Code',
+              icon: const Icon(Icons.help_outline_rounded),
+              onPressed: actions.onOpenGuide,
+            ),
           if (room == Room.home)
             IconButton(
               tooltip: 'Ajustes',
@@ -307,223 +329,523 @@ class _HomeRoom extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
     final steps = routeSteps;
-    final solved = steps
-        .where((s) => isStepDone(s, lessons: settings.doneLessons, challenges: settings.doneChallenges))
-        .length;
+    final flags = [
+      for (final step in steps) isStepDone(step, lessons: settings.doneLessons, challenges: settings.doneChallenges),
+    ];
+    final solved = flags.where((d) => d).length;
     final next = nextStep(lessons: settings.doneLessons, challenges: settings.doneChallenges);
-    final fresh = solved == 0 && next != null;
-    final name = exercises.studentName;
     final task = exercises.received.lastOrNull;
     final programs = store.programs.length;
+    final teacher = settings.teacher;
+    final nextIndex = next == null ? -1 : steps.indexWhere((s) => s.id == next.id);
 
-    final taskCard = task == null
-        ? null
-        : _RoomCard(
-            color: scheme.secondaryContainer,
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    final route = _Place(
+      room: Room.route,
+      kicker: 'APRENDER',
+      title: 'Ruta',
+      phrase: next == null ? 'Repasa lo que quieras.' : 'Lecciones cortas y retos con pruebas.',
+      state: next == null
+          ? 'Terminaste los ${steps.length} pasos'
+          : (solved == 0 ? 'Empieza aquí: ${next.title}' : 'Paso ${nextIndex + 1} de ${steps.length}: ${next.title}'),
+      icon: Icons.flag_rounded,
+    );
+    final workshop = _Place(
+      room: Room.workshop,
+      kicker: 'PRACTICAR',
+      title: 'Taller',
+      phrase: programs == 0 ? 'Crea el primero, sin lecciones.' : 'Escribe y guarda tus propios programas.',
+      state: programs == 1 ? '1 programa' : '$programs programas',
+      icon: Icons.handyman_rounded,
+    );
+    final classes = _Place(
+      room: Room.classes,
+      kicker: teacher ? 'CON TU GRUPO' : 'CON TU PROFE',
+      title: 'Clases',
+      phrase: teacher ? 'Tus grupos y sus entregas.' : 'Los ejercicios de tu profe.',
+      state: task != null ? 'Tarea nueva: ${task.title}' : (teacher ? 'Tus clases' : 'Sin clase'),
+      icon: Icons.school_rounded,
+      badge: task != null,
+    );
+    final primaryRoom = teacher ? Room.classes : (next != null ? Room.route : Room.workshop);
+    final places = {Room.route: route, Room.workshop: workshop, Room.classes: classes};
+    final primary = places[primaryRoom]!;
+    final others = [
+      for (final room in [Room.route, Room.workshop, Room.classes])
+        if (room != primaryRoom) places[room]!,
+    ];
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final h = constraints.maxHeight;
+        final scale = MediaQuery.textScalerOf(context).scale(1);
+        final tier = h < 560 ? 0 : (h <= 740 ? 1 : 2);
+        final gap = const [10.0, 12.0, 16.0][tier];
+        final top = 4.0;
+        final bottom = const [12.0, 16.0, 16.0][tier];
+        final showTask = task != null && h >= 560;
+        final taskHeight = showTask ? 56.0 + gap : 0.0;
+        final hero = (0.17 * h).clamp(72.0, 132.0);
+        final room = h - top - bottom - hero - 2 * gap - taskHeight;
+        final primaryHeight = (0.55 * room).clamp(168.0, 320.0);
+        final rowHeight = (room - primaryHeight).clamp(150.0, 260.0);
+        final leftover = math.max(0.0, room - primaryHeight - rowHeight);
+        final compact = scale > 1.15 || room < 360;
+        final needsScroll = scale > 1.6 || h < 440;
+
+        Widget place(_Place p, double height, {required bool wide, required int index}) => Appear(
+          index: index,
+          child: _PortalTile(
+            place: p,
+            wide: wide,
+            height: height,
+            tier: tier,
+            compact: compact,
+            strip: p.room == Room.route && next != null && scale < 1.5
+                ? _RouteDots(done: flags, next: nextIndex, tier: tier)
+                : null,
+            onTap: () => onRoom(p.room),
+          ),
+        );
+
+        final column = Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(height: top),
+            Appear(
+              child: SizedBox(
+                height: hero,
+                child: _Hero(name: exercises.studentName, next: next, started: solved > 0, mascotHeight: hero * 0.9),
+              ),
+            ),
+            SizedBox(height: gap),
+            if (showTask) ...[
+              Appear(
+                index: 1,
+                child: _TaskStrip(title: task.title, onTap: () => actions.onOpenExercise(task)),
+              ),
+              SizedBox(height: gap),
+            ],
+            place(primary, primaryHeight, wide: true, index: 1),
+            SizedBox(height: gap),
+            SizedBox(
+              height: rowHeight,
+              child: Row(
                 children: [
-                  Text(
-                    'DEL PROFE',
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      color: scheme.onSecondaryContainer,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.8,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(task.title, style: theme.textTheme.titleLarge?.copyWith(color: scheme.onSecondaryContainer)),
-                  const SizedBox(height: 10),
-                  FilledButton(onPressed: () => actions.onOpenExercise(task), child: const Text('Abrir ejercicio')),
+                  Expanded(child: place(others[0], rowHeight, wide: false, index: 2)),
+                  SizedBox(width: gap),
+                  Expanded(child: place(others[1], rowHeight, wide: false, index: 3)),
                 ],
               ),
             ),
-          );
+            SizedBox(height: bottom),
+          ],
+        );
 
-    final routeCard = _SectionCard(
-      icon: Icons.flag,
-      kind: 'APRENDER',
-      title: 'Ruta',
-      color: scheme.primaryContainer,
-      onColor: scheme.onPrimaryContainer,
-      description: '${steps.length} pasos: lecciones cortas y retos con pruebas, en orden.',
-      status: next == null
-          ? 'Terminaste la Ruta. Puedes repasar lo que quieras.'
-          : fresh
-          ? 'Empieza por: ${next.title}'
-          : 'Sigues en: ${next.title} · llevas $solved de ${steps.length}',
-      progress: fresh ? null : solved / steps.length,
-      primaryLabel: next == null ? 'Repasar la Ruta' : (fresh ? 'Empezar' : 'Continuar'),
-      onPrimary: next == null ? () => onRoom(Room.route) : () => actions.onOpenStep(next),
-      secondaryLabel: next == null ? null : 'Ver la ruta',
-      onSecondary: () => onRoom(Room.route),
-      onOpen: () => onRoom(Room.route),
-    );
-    final workshopCard = _SectionCard(
-      icon: Icons.folder_open,
-      kind: 'PRACTICAR',
-      title: 'Taller',
-      description: 'Escribe tus propios programas, sin lecciones. Aquí quedan guardados.',
-      status: programs == 0
-          ? 'Aún no tienes programas.'
-          : 'Tienes $programs ${programs == 1 ? 'programa' : 'programas'}.',
-      primaryLabel: 'Nuevo programa',
-      onPrimary: actions.onNew,
-      secondaryLabel: programs == 0 ? null : 'Abrir el Taller',
-      onSecondary: () => onRoom(Room.workshop),
-      onOpen: () => onRoom(Room.workshop),
-    );
-    final classesCard = _SectionCard(
-      icon: Icons.groups,
-      kind: 'CON TU PROFE',
-      title: 'Clases',
-      description: 'Entra con el código de tu clase y recibe sus ejercicios. Si no tienes profe, no la necesitas.',
-      primaryLabel: 'Abrir Clases',
-      primaryTonal: true,
-      onPrimary: () => onRoom(Room.classes),
-      onOpen: () => onRoom(Room.classes),
-    );
-
-    return _Page(
-      children: [
-        Appear(
-          child: _Hero(name: name, next: next, started: solved > 0),
-        ),
-        const SizedBox(height: 8),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(4, 8, 4, 12),
-          child: Text('Elige qué quieres hacer', style: theme.textTheme.titleMedium),
-        ),
-        if (taskCard != null) ...[Appear(index: 1, child: taskCard), const SizedBox(height: 12)],
-        Appear(index: 2, child: routeCard),
-        const SizedBox(height: 12),
-        Appear(index: 3, child: workshopCard),
-        const SizedBox(height: 12),
-        Appear(index: 4, child: classesCard),
-        const SizedBox(height: 8),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: TextButton.icon(
-            onPressed: actions.onOpenGuide,
-            icon: const Icon(Icons.menu_book_outlined),
-            label: const Text('Cómo funciona Jaguar Code'),
+        final padded = Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 640),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: tier == 2 ? 20 : 16),
+              child: needsScroll
+                  ? SingleChildScrollView(child: column)
+                  : Column(children: [if (leftover > 0) Spacer(), column, if (leftover > 0) Spacer()]),
+            ),
           ),
-        ),
-      ],
+        );
+        return padded;
+      },
     );
   }
 }
 
-/// One of the places of the app, as a card at the portal: what it is, where
-/// the person stands in it and the one thing to do first.
-class _SectionCard extends StatelessWidget {
-  const _SectionCard({
-    required this.icon,
-    required this.kind,
+/// What the portal says about one place.
+class _Place {
+  const _Place({
+    required this.room,
+    required this.kicker,
     required this.title,
-    required this.description,
-    required this.primaryLabel,
-    required this.onPrimary,
-    required this.onOpen,
-    this.color,
-    this.onColor,
-    this.status,
-    this.progress,
-    this.primaryTonal = false,
-    this.secondaryLabel,
-    this.onSecondary,
+    required this.phrase,
+    required this.state,
+    required this.icon,
+    this.badge = false,
   });
 
-  final IconData icon;
-  final String kind;
+  final Room room;
+  final String kicker;
   final String title;
-  final String description;
-  final String? status;
-  final double? progress;
-  final Color? color;
-  final Color? onColor;
-  final String primaryLabel;
-  final bool primaryTonal;
-  final VoidCallback onPrimary;
-  final String? secondaryLabel;
-  final VoidCallback? onSecondary;
-  final VoidCallback onOpen;
+  final String phrase;
+  final String state;
+  final IconData icon;
+
+  /// Something is waiting there (a task from the teacher).
+  final bool badge;
+}
+
+PlaceColors _colorsOf(BuildContext context, Room room) => switch (room) {
+  Room.route => PlaceColors.route(context),
+  Room.workshop => PlaceColors.workshop(context),
+  _ => PlaceColors.classes(context),
+};
+
+/// A place of the app as one big button with weight: it has its own color,
+/// shape and icon, and the whole card is what you touch.
+class _PortalTile extends StatelessWidget {
+  const _PortalTile({
+    required this.place,
+    required this.wide,
+    required this.height,
+    required this.tier,
+    required this.compact,
+    required this.onTap,
+    this.strip,
+  });
+
+  final _Place place;
+
+  /// The main one: the full width and a strip of progress.
+  final bool wide;
+  final double height;
+  final int tier;
+  final bool compact;
+  final Widget? strip;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
-    final muted = (onColor ?? scheme.onSurfaceVariant);
-    return _RoomCard(
-      color: color,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: onOpen,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
+    final colors = _colorsOf(context, place.room);
+    final pad = wide ? const [14.0, 16.0, 18.0][tier] : const [12.0, 14.0, 16.0][tier];
+    final titleSize = wide ? const [28.0, 32.0, 36.0][tier] : const [20.0, 22.0, 24.0][tier];
+    final stateSize = wide ? const [15.0, 16.0, 18.0][tier] : const [11.0, 12.0, 13.0][tier];
+    final arrow = wide ? const [36.0, 40.0, 44.0][tier] : const [30.0, 32.0, 36.0][tier];
+    final textStyle = TextStyle(color: colors.ink, height: 1.15);
+    final arrowDot = Container(
+      width: arrow,
+      height: arrow,
+      decoration: BoxDecoration(color: wide ? const Color(0xFF2A1B0F) : colors.ink, shape: BoxShape.circle),
+      child: Icon(Icons.arrow_forward_rounded, size: arrow * 0.6, color: wide ? const Color(0xFFFFE08A) : colors.face),
+    );
+
+    final content = wide
+        ? Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (!compact)
+                Text(
+                  place.kicker,
+                  style: textStyle.copyWith(
+                    color: colors.soft,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.8,
+                  ),
+                ),
+              Text(
+                place.title,
+                style: textStyle.copyWith(fontSize: titleSize, fontWeight: FontWeight.w900),
+              ),
+              if (!compact)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Text(
+                    place.phrase,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: textStyle.copyWith(color: colors.soft, fontSize: 14, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              const Spacer(),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Expanded(
+                    child: Text(
+                      place.state,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: textStyle.copyWith(fontSize: stateSize, fontWeight: FontWeight.w800),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  arrowDot,
+                ],
+              ),
+              if (strip != null) ...[const SizedBox(height: 10), strip!],
+            ],
+          )
+        : Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: scheme.surface.withValues(alpha: 0.7),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Icon(icon, color: onColor ?? scheme.primary),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          kind,
-                          style: theme.textTheme.labelMedium?.copyWith(
-                            color: muted,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.8,
-                          ),
-                        ),
-                        Text(title, style: theme.textTheme.titleLarge?.copyWith(color: onColor)),
-                      ],
-                    ),
-                  ),
+                  if (place.badge)
+                    Container(
+                      width: 20,
+                      height: 20,
+                      alignment: Alignment.center,
+                      decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                      child: const Text(
+                        '1',
+                        style: TextStyle(color: Color(0xFF2A1B0F), fontSize: 12, fontWeight: FontWeight.w900),
+                      ),
+                    )
+                  else
+                    const SizedBox.shrink(),
+                  Icon(place.icon, size: const [40.0, 48.0, 56.0][tier], color: colors.ink),
                 ],
               ),
-              const SizedBox(height: 8),
-              Text(description, style: theme.textTheme.bodyMedium?.copyWith(color: muted)),
-              if (status != null) ...[
-                const SizedBox(height: 6),
-                Text(
-                  status!,
-                  style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700, color: onColor),
+              const Spacer(),
+              Text(
+                place.title,
+                style: textStyle.copyWith(fontSize: titleSize, fontWeight: FontWeight.w900),
+              ),
+              if (!compact)
+                Flexible(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Text(
+                      place.phrase,
+                      maxLines: tier == 2 ? 3 : 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: textStyle.copyWith(
+                        color: colors.soft,
+                        fontSize: const [12.0, 13.0, 14.0][tier],
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
                 ),
-              ],
-              if (progress != null) ...[const SizedBox(height: 10), _Bar(value: progress!)],
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 8,
-                runSpacing: 4,
+              const SizedBox(height: 8),
+              Row(
                 children: [
-                  if (primaryTonal)
-                    FilledButton.tonal(onPressed: onPrimary, child: Text(primaryLabel))
-                  else
-                    FilledButton(onPressed: onPrimary, child: Text(primaryLabel)),
-                  if (secondaryLabel != null) TextButton(onPressed: onSecondary, child: Text(secondaryLabel!)),
+                  Expanded(
+                    child: Container(
+                      constraints: const BoxConstraints(minHeight: 26),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: colors.ink.withValues(alpha: 0.18),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Text(
+                        place.state,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: textStyle.copyWith(fontSize: stateSize, fontWeight: FontWeight.w800),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  arrowDot,
                 ],
               ),
             ],
+          );
+
+    return SizedBox(
+      height: height,
+      child: Chunky(
+        onTap: onTap,
+        fill: colors.face,
+        edge: colors.edge,
+        radius: 24,
+        padding: EdgeInsets.zero,
+        minHeight: height - 4,
+        clip: Clip.antiAlias,
+        semanticsLabel: '${place.title}. ${place.state}. Toca para abrir',
+        child: SizedBox.expand(
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: _Ornament(room: place.room, ink: colors.ink, big: wide),
+              ),
+              Padding(padding: EdgeInsets.all(pad), child: content),
+            ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The shapes at the back of a tile: each place has its own, so they tell
+/// apart without the color.
+class _Ornament extends StatelessWidget {
+  const _Ornament({required this.room, required this.ink, required this.big});
+
+  final Room room;
+  final Color ink;
+  final bool big;
+
+  @override
+  Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    Widget shape(double size, double alpha, {bool ring = false, bool square = false, double turns = 0}) {
+      final color = (room == Room.route ? (dark ? ink : Colors.white) : ink).withValues(alpha: alpha);
+      return Transform.rotate(
+        angle: turns,
+        child: Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            shape: square ? BoxShape.rectangle : BoxShape.circle,
+            borderRadius: square ? BorderRadius.circular(size / 4) : null,
+            color: ring ? null : color,
+            border: ring ? Border.all(color: color, width: size / 8) : null,
+          ),
+        ),
+      );
+    }
+
+    return ExcludeSemantics(
+      child: switch (room) {
+        Room.route => Stack(
+          children: [
+            Positioned(right: -30, top: -40, child: shape(big ? 170 : 120, 0.22)),
+            Positioned(right: 4, top: -8, child: shape(big ? 110 : 80, 0.30)),
+            Positioned(
+              right: 30,
+              top: big ? 22 : 16,
+              child: Icon(Icons.flag_rounded, size: big ? 56 : 40, color: ink),
+            ),
+          ],
+        ),
+        Room.workshop => Stack(
+          children: [
+            Positioned(right: -14, top: -14, child: shape(big ? 130 : 96, 0.16, square: true, turns: 0.21)),
+            Positioned(right: 40, top: 60, child: shape(big ? 80 : 56, 0.12, square: true, turns: -0.14)),
+          ],
+        ),
+        _ => Stack(
+          children: [
+            Positioned(right: -26, top: -26, child: shape(big ? 150 : 112, 0.18, ring: true)),
+            Positioned(right: 56, top: 70, child: shape(28, 0.22)),
+          ],
+        ),
+      },
+    );
+  }
+}
+
+/// One dot per step of the path: done, the one that follows (it pulses) and
+/// those left. Sixteen dots anticipate the road without showing it.
+class _RouteDots extends StatefulWidget {
+  const _RouteDots({required this.done, required this.next, required this.tier});
+
+  final List<bool> done;
+  final int next;
+  final int tier;
+
+  @override
+  State<_RouteDots> createState() => _RouteDotsState();
+}
+
+class _RouteDotsState extends State<_RouteDots> with SingleTickerProviderStateMixin {
+  late final AnimationController _pulse = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1600),
+  );
+  bool _pulsed = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _pulse.stop();
+    } else if (!_pulsed) {
+      _pulsed = true;
+      // A few beats to say where to touch, not a loop that never rests.
+      _pulse.repeat(reverse: true, count: 6);
+    }
+  }
+
+  @override
+  void dispose() {
+    _pulse.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const ink = Color(0xFF2A1B0F);
+    final dot = const [8.0, 9.0, 11.0][widget.tier];
+    final nextDot = const [13.0, 14.0, 17.0][widget.tier];
+    return ExcludeSemantics(
+      child: SizedBox(
+        height: nextDot * 1.4,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            for (final (i, done) in widget.done.indexed)
+              if (i == widget.next)
+                AnimatedBuilder(
+                  animation: _pulse,
+                  builder: (context, _) => Transform.scale(
+                    scale: MediaQuery.disableAnimationsOf(context)
+                        ? 1.15
+                        : 1 + 0.3 * Curves.easeInOut.transform(_pulse.value),
+                    child: Container(
+                      width: nextDot,
+                      height: nextDot,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: ink, width: 3),
+                      ),
+                    ),
+                  ),
+                )
+              else
+                Container(
+                  width: dot,
+                  height: dot,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: done ? ink : null,
+                    border: done ? null : Border.all(color: const Color(0xFF6B4A00), width: 2),
+                  ),
+                ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// A task from the teacher, waiting: one touch opens it.
+class _TaskStrip extends StatelessWidget {
+  const _TaskStrip({required this.title, required this.onTap});
+
+  final String title;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = PlaceColors.classes(context);
+    return SizedBox(
+      height: 56,
+      child: Chunky(
+        onTap: onTap,
+        fill: colors.face,
+        edge: colors.edge,
+        radius: 18,
+        minHeight: 52,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                'Tarea de tu profe: $title',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: colors.ink, fontWeight: FontWeight.w800, fontSize: 15),
+              ),
+            ),
+            Icon(Icons.arrow_forward_rounded, color: colors.ink),
+          ],
         ),
       ),
     );
@@ -533,8 +855,9 @@ class _SectionCard extends StatelessWidget {
 /// The top of Inicio: the mascot says something. Touch it and it jumps and
 /// says another thing.
 class _Hero extends StatefulWidget {
-  const _Hero({required this.name, required this.next, required this.started});
+  const _Hero({required this.name, required this.next, required this.started, this.mascotHeight = 97});
 
+  final double mascotHeight;
   final String? name;
   final RouteStep? next;
   final bool started;
@@ -602,7 +925,11 @@ class _HeroState extends State<_Hero> with SingleTickerProviderStateMixin {
                     child: Transform.scale(scaleY: squash, alignment: Alignment.bottomCenter, child: child),
                   );
                 },
-                child: Image.asset('assets/images/mascota.png', width: 84, height: 97),
+                child: Image.asset(
+                  'assets/images/mascota.png',
+                  width: widget.mascotHeight * 0.866,
+                  height: widget.mascotHeight,
+                ),
               ),
             ),
           ),
@@ -630,7 +957,15 @@ class _HeroState extends State<_Hero> with SingleTickerProviderStateMixin {
                       borderRadius: BorderRadius.circular(18).copyWith(bottomLeft: const Radius.circular(4)),
                       border: Border.all(color: scheme.outlineVariant, width: 2),
                     ),
-                    child: Text(_greeting, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+                    child: MediaQuery.withClampedTextScaling(
+                      maxScaleFactor: 1.15,
+                      child: Text(
+                        _greeting,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -640,22 +975,6 @@ class _HeroState extends State<_Hero> with SingleTickerProviderStateMixin {
       ),
     );
   }
-}
-
-/// A progress bar that fills when it appears and when the value grows.
-class _Bar extends StatelessWidget {
-  const _Bar({required this.value});
-
-  final double value;
-
-  @override
-  Widget build(BuildContext context) => TweenAnimationBuilder<double>(
-    tween: Tween(end: value),
-    duration: motion(context, const Duration(milliseconds: 700)),
-    curve: Curves.easeOutCubic,
-    builder: (context, v, _) =>
-        LinearProgressIndicator(value: v, minHeight: 10, borderRadius: BorderRadius.circular(5)),
-  );
 }
 
 TextStyle? monoLabel(ThemeData theme) => theme.textTheme.bodyMedium?.copyWith(fontFamily: 'JetBrainsMono');
@@ -1198,25 +1517,14 @@ class _Kind extends StatelessWidget {
 
 /// A flat card with a light outline, as the rooms draw all their groups.
 class _RoomCard extends StatelessWidget {
-  const _RoomCard({this.color, this.margin = EdgeInsets.zero, required this.child});
+  const _RoomCard({this.margin = EdgeInsets.zero, required this.child});
 
-  final Color? color;
   final EdgeInsetsGeometry margin;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Card(
-      elevation: 0,
-      color: color ?? scheme.surfaceContainerLow,
-      margin: margin,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: color == null ? scheme.outlineVariant : Colors.transparent),
-      ),
-      child: child,
-    );
+    return Card(margin: margin, child: child);
   }
 }
 

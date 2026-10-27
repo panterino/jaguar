@@ -131,21 +131,22 @@ void main() {
       expect(find.byType(CodeEditor), findsNothing);
     });
 
-    testWidgets('el inicio de un primer uso es un portal con las tres secciones', (tester) async {
+    testWidgets('el inicio de un primer uso es un portal con las tres secciones, sin scroll', (tester) async {
       await _pumpPhone(tester, values: {'jaguar.view.mode': 'basic', 'jaguar.programs': '[]'}, openEditor: false);
       expect(find.textContaining('Soy Jaguar'), findsOneWidget);
-      expect(find.text('Elige qué quieres hacer'), findsOneWidget);
-      // Ruta, Taller and Clases, each saying what it is.
-      expect(find.text('APRENDER'), findsOneWidget);
-      expect(find.text('Empieza por: Tu primer programa'), findsOneWidget);
-      expect(find.text('Empezar'), findsOneWidget);
-      expect(find.text('PRACTICAR'), findsOneWidget);
-      expect(find.text('Aún no tienes programas.'), findsOneWidget);
+      // Ruta, Taller and Clases, each saying where you stand.
+      expect(find.text('Ruta'), findsOneWidget);
+      expect(find.text('Empieza aquí: Tu primer programa'), findsOneWidget);
+      expect(find.text('Taller'), findsOneWidget);
+      expect(find.text('0 programas'), findsOneWidget);
+      expect(find.text('Clases'), findsOneWidget);
       expect(find.byType(CodeEditor), findsNothing);
-      // No bottom bar: the portal is the way in.
+      // No bottom bar and no buttons inside the cards: the card is the way in.
       expect(find.byType(NavigationBar), findsNothing);
-      await tester.scrollUntilVisible(find.text('CON TU PROFE'), 200);
-      expect(find.text('CON TU PROFE'), findsOneWidget);
+      expect(find.byType(FilledButton), findsNothing);
+      // Everything fits: nothing to scroll.
+      expect(find.byType(Scrollable), findsNothing);
+      expect(tester.takeException(), isNull);
     });
 
     testWidgets('las cuatro salas caben con letra grande', (tester) async {
@@ -401,6 +402,7 @@ void main() {
       await tester.tap(find.text('Pruebas'));
       await tester.pumpAndSettle();
       expect(find.text('Desactualizado: cambiaste el código desde la última prueba.'), findsOneWidget);
+      await tester.scrollUntilVisible(find.byIcon(Icons.cancel_outlined), 100);
       expect(find.byIcon(Icons.cancel, skipOffstage: false), findsNothing);
       expect(find.byIcon(Icons.cancel_outlined, skipOffstage: false), findsWidgets);
     });

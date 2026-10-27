@@ -1830,6 +1830,8 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
         key: wide ? _scaffoldKey : null,
         appBar: AppBar(
           titleSpacing: 0,
+          // The bar has the page's color: a thin line parts it from the code.
+          bottom: const PreferredSize(preferredSize: Size.fromHeight(1), child: Divider(height: 1, thickness: 1)),
           // Phones open the editor from a room: the arrow goes back to it.
           leading: wide
               ? null
