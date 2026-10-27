@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../settings.dart';
 import 'challenges.dart';
+import '../widgets/mascota.dart';
 
 /// The level 1 challenges, in order, with the ones already solved marked.
 class ChallengesScreen extends StatelessWidget {
@@ -89,7 +90,14 @@ class _HintsDialogState extends State<_HintsDialog> {
     final theme = Theme.of(context);
     return AlertDialog(
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      title: const Text('Pistas'),
+      title: Row(
+        children: [
+          // Thinking at first; once there is more than one hint, she has the idea.
+          Mascota(pose: _shown > 1 ? MascotPose.idea : MascotPose.pensando, size: 56),
+          const SizedBox(width: 10),
+          const Text('Pistas'),
+        ],
+      ),
       content: SizedBox(
         width: 440,
         child: SingleChildScrollView(

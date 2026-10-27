@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jaguar/main.dart';
+import 'package:jaguar/src/console/desk_check_screen.dart';
 import 'package:jaguar/src/editor/code_editor.dart';
+import 'package:jaguar/src/exercises/exercise_banner.dart';
 import 'package:jaguar/src/exercises/exercise_store.dart';
 import 'package:jaguar/src/lessons/lesson_screen.dart';
 import 'package:jaguar/src/programs/program_store.dart';
 import 'package:jaguar/src/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'ayudas.dart';
 
 late SharedPreferences _prefs;
 
@@ -106,8 +109,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(store.programs, hasLength(1));
 
-      await tester.tap(find.text('Taller'));
-      await tester.pumpAndSettle();
+      await irASala(tester, 'Taller');
       await tester.tap(find.byTooltip('Eliminar "mio"'));
       await tester.pumpAndSettle();
       expect(
@@ -131,26 +133,22 @@ void main() {
       expect(find.byType(CodeEditor), findsNothing);
     });
 
-    testWidgets('el inicio de un primer uso: saludo, siguiente paso y taller vacío', (tester) async {
+    testWidgets('el inicio de un primer uso es un portal con las tres secciones, sin scroll', (tester) async {
       await _pumpPhone(tester, values: {'jaguar.view.mode': 'basic', 'jaguar.programs': '[]'}, openEditor: false);
       expect(find.textContaining('Soy Jaguar'), findsOneWidget);
-      // The first step of the path is a lesson.
-      expect(find.text('Tu primer programa'), findsOneWidget);
-      expect(find.text('EMPIEZA AQUÍ'), findsOneWidget);
-      expect(
-        find.text('Una lección corta: 5 preguntas, unos 2 minutos. Luego escribes tu primer programa.'),
-        findsOneWidget,
-      );
-      expect(find.text('Empezar'), findsOneWidget);
-      // Nothing else competes with the first step.
-      expect(find.text('Cómo funciona Jaguar Code'), findsOneWidget);
-      expect(find.text('Ya programo: abrir un programa en blanco'), findsOneWidget);
-      expect(find.text('Aún no tienes programas.'), findsNothing);
+      // Ruta, Taller and Clases, each saying where you stand.
+      expect(find.text('Ruta'), findsOneWidget);
+      expect(find.text('Empieza aquí: Tu primer programa'), findsOneWidget);
+      expect(find.text('Taller'), findsOneWidget);
+      expect(find.text('0 programas'), findsOneWidget);
+      expect(find.text('Clases'), findsOneWidget);
       expect(find.byType(CodeEditor), findsNothing);
-      // Four rooms, always in sight.
-      for (final room in ['Inicio', 'Ruta', 'Clases', 'Taller']) {
-        expect(find.descendant(of: find.byType(NavigationBar), matching: find.text(room)), findsOneWidget);
-      }
+      // No bottom bar and no buttons inside the cards: the card is the way in.
+      expect(find.byType(NavigationBar), findsNothing);
+      expect(find.byType(FilledButton), findsNothing);
+      // Everything fits: nothing to scroll.
+      expect(find.byType(Scrollable), findsNothing);
+      expect(tester.takeException(), isNull);
     });
 
     testWidgets('las cuatro salas caben con letra grande', (tester) async {
@@ -160,23 +158,20 @@ void main() {
         textScale: 1.3,
         openEditor: false,
       );
-      for (final room in ['Ruta', 'Clases', 'Taller', 'Inicio']) {
-        await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text(room)));
-        await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull, reason: 'Inicio');
+      for (final room in ['Ruta', 'Clases', 'Taller']) {
+        await irASala(tester, room);
         expect(tester.takeException(), isNull, reason: room);
       }
     });
 
     testWidgets('la Ruta agrupa lecciones y retos, y abre el reto que se toca', (tester) async {
       await _pumpPhone(tester, values: {'jaguar.view.mode': 'basic', 'jaguar.view.tourStep': 3}, openEditor: false);
-      await tester.tap(find.text('Ruta'));
-      await tester.pumpAndSettle();
+      await irASala(tester, 'Ruta');
       expect(find.text('Primeros pasos'), findsOneWidget);
       expect(find.text('0 de 2'), findsOneWidget);
       expect(find.text('Tu primer programa'), findsOneWidget);
-      expect(find.text('Lección · Muestra un saludo y pide tu nombre'), findsOneWidget);
       expect(find.text('Saludo'), findsOneWidget);
-      expect(find.text('Reto 1 · Variables'), findsOneWidget);
       await tester.tap(find.text('Saludo'));
       await tester.pumpAndSettle();
       expect(find.text('Ruta · Nivel 1 · Reto 1'), findsOneWidget);
@@ -190,8 +185,7 @@ void main() {
 
     testWidgets('la Ruta avisa que nada está bloqueado', (tester) async {
       await _pumpPhone(tester, values: {'jaguar.view.mode': 'basic', 'jaguar.view.tourStep': 3}, openEditor: false);
-      await tester.tap(find.text('Ruta'));
-      await tester.pumpAndSettle();
+      await irASala(tester, 'Ruta');
       await tester.scrollUntilVisible(find.textContaining('Nada está bloqueado'), 200);
       expect(find.textContaining('Nada está bloqueado'), findsOneWidget);
     });
@@ -204,8 +198,7 @@ void main() {
       );
       store.create('Algoritmo suma\n    Escribir 2\nFinAlgoritmo\n');
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Taller'));
-      await tester.pumpAndSettle();
+      await irASala(tester, 'Taller');
       expect(find.text('promedio'), findsOneWidget);
       expect(find.text('suma'), findsOneWidget);
       expect(find.text('Mío'), findsWidgets);
@@ -236,7 +229,7 @@ void main() {
       expect(find.byIcon(Icons.arrow_back), findsOneWidget);
       expect(find.byIcon(Icons.menu), findsNothing);
       expect(find.byIcon(Icons.qr_code_2), findsNothing);
-      expect(find.byIcon(Icons.account_tree_outlined), findsWidgets); // inside the selector only
+      expect(find.text('Bloques'), findsOneWidget); // inside the selector only
 
       expect(find.text('Código'), findsOneWidget);
       expect(find.text('Diagrama'), findsOneWidget);
@@ -265,10 +258,36 @@ void main() {
       expect(ProgramStore(_prefs).programs.where(ProgramStore.isBlank), isEmpty);
     });
 
+    testWidgets('el enunciado de un reto en el celular ocupa poco y se despliega al tocarlo', (tester) async {
+      await _pumpPhone(tester, values: {'jaguar.view.mode': 'basic', 'jaguar.view.tourStep': 3}, openEditor: false);
+      await irASala(tester, 'Ruta');
+      await tester.tap(find.text('Saludo'));
+      await tester.pumpAndSettle();
+      final banner = find.byType(ExerciseBanner);
+      expect(banner, findsOneWidget);
+      // Two lines of statement and one row of tools: far less than a third of the screen.
+      expect(tester.getSize(banner).height, lessThan(150));
+      expect(find.text('Probar'), findsOneWidget);
+      final folded = tester.getSize(banner).height;
+      await tester.tap(find.byIcon(Icons.expand_more));
+      await tester.pumpAndSettle();
+      expect(tester.getSize(banner).height, greaterThan(folded));
+    });
+
+    testWidgets('la prueba de escritorio se ofrece en la consola, a la vista', (tester) async {
+      await _pumpPhone(tester, source: 'Algoritmo hola\n    Escribir "hola"\nFinAlgoritmo\n');
+      await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Consola')));
+      await tester.pumpAndSettle();
+      final button = find.text('Prueba de escritorio: mira cambiar las variables');
+      expect(button, findsOneWidget);
+      await tester.tap(button);
+      await tester.pumpAndSettle();
+      expect(find.byType(DeskCheckScreen), findsOneWidget);
+    });
+
     testWidgets('el tour avanza al escribir, al ejecutar y al abrir Pruebas', (tester) async {
       await _pumpPhone(tester, values: {'jaguar.view.mode': 'basic', 'jaguar.view.tourStep': 0}, openEditor: false);
-      await tester.tap(find.text('Ruta'));
-      await tester.pumpAndSettle();
+      await irASala(tester, 'Ruta');
       await tester.tap(find.text('Saludo'));
       await tester.pumpAndSettle();
       expect(find.text('Escribe aquí tu programa. Cada instrucción va en su línea.'), findsOneWidget);
@@ -291,8 +310,7 @@ void main() {
 
     testWidgets('Saltar guía termina el tour', (tester) async {
       await _pumpPhone(tester, values: {'jaguar.view.mode': 'basic', 'jaguar.view.tourStep': 0}, openEditor: false);
-      await tester.tap(find.text('Ruta'));
-      await tester.pumpAndSettle();
+      await irASala(tester, 'Ruta');
       await tester.tap(find.text('Saludo'));
       await tester.pumpAndSettle();
       await tester.tap(find.byTooltip('Saltar guía'));
@@ -327,8 +345,7 @@ void main() {
       await tester.tap(find.text('Activar modo profesor'));
       await tester.pumpAndSettle();
       expect(ViewSettings(_prefs).teacher, isTrue);
-      await tester.tap(find.text('Clases'));
-      await tester.pumpAndSettle();
+      await irASala(tester, 'Clases');
       expect(find.text('Mis ejercicios'), findsOneWidget);
     });
 
@@ -388,8 +405,7 @@ void main() {
   group('pruebas', () {
     Future<void> openChallenge(WidgetTester tester) async {
       await _pumpPhone(tester, values: {'jaguar.view.mode': 'basic', 'jaguar.view.tourStep': 3}, openEditor: false);
-      await tester.tap(find.text('Ruta'));
-      await tester.pumpAndSettle();
+      await irASala(tester, 'Ruta');
       await tester.tap(find.text('Saludo'));
       await tester.pumpAndSettle();
     }

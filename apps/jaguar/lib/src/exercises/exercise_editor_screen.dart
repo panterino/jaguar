@@ -225,6 +225,7 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
         title: Text(widget.exercise == null ? 'Nuevo ejercicio' : 'Editar ejercicio'),
         actions: [
           TextButton.icon(
+            style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8)),
             onPressed: () {
               if (_save()) Navigator.pop(context);
             },
@@ -234,6 +235,7 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
           Padding(
             padding: const EdgeInsets.only(right: 12, left: 4),
             child: FilledButton.icon(
+              style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 12)),
               onPressed: _project,
               icon: const Icon(Icons.qr_code_2),
               label: const Text('Proyectar'),

@@ -24,12 +24,14 @@ const _solutions = {
   'reto-1-10':
       'Algoritmo a\n intentos <- 0\n Repetir\n  Leer clave\n  intentos <- intentos + 1\n Hasta Que clave = "jaguar"\n'
       ' Escribir "Entraste en ", intentos, " intentos"\nFinAlgoritmo',
+  'reto-1-11': 'Algoritmo a\n Leer texto\n Escribir Mayusculas(texto) + "!"\nFinAlgoritmo',
+  'reto-1-12': 'Algoritmo a\n Leer palabra\n Escribir "Letras: ", Longitud(palabra)\nFinAlgoritmo',
 };
 
 void main() {
-  test('hay diez retos, cada uno con pistas y pruebas ocultas', () {
-    expect(challenges, hasLength(10));
-    expect({for (final c in challenges) c.id}, hasLength(10));
+  test('hay doce retos, cada uno con pistas y pruebas ocultas', () {
+    expect(challenges, hasLength(12));
+    expect({for (final c in challenges) c.id}, hasLength(12));
     for (final c in challenges) {
       expect(c.hints, isNotEmpty, reason: c.id);
       expect(c.exercise.cases.any((t) => t.hidden), isTrue, reason: c.id);

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../challenges/challenges.dart';
+export 'ruta.dart';
 
 /// The flowchart shapes a figure question asks about.
 enum Figure {
@@ -40,6 +40,7 @@ class ChoiceQuestion extends Question {
     this.mono = false,
     this.output,
     this.inputs = const [],
+    this.fillOutput,
   });
 
   final List<String> options;
@@ -54,6 +55,35 @@ class ChoiceQuestion extends Question {
   /// What [code] shows when it runs (checked by a test against the
   /// interpreter, so a lesson can never teach a wrong result).
   final String? output;
+  final List<String> inputs;
+
+  /// For a "complete the code" question: what the whole program shows once
+  /// the right option replaces the blank (`___`). A test runs it with every
+  /// option, so a blank can never have two right answers.
+  final String? fillOutput;
+}
+
+/// Find the line of a program that is wrong: tap it. The program is checked
+/// by a test: with that line it fails, and with [fixed] in its place it runs.
+class FindErrorQuestion extends Question {
+  const FindErrorQuestion({
+    required super.prompt,
+    required super.right,
+    required super.wrong,
+    required this.lines,
+    required this.errorLine,
+    required this.fixed,
+    this.inputs = const [],
+  });
+
+  /// The program, one line per item, with exactly one wrong line.
+  final List<String> lines;
+
+  /// Index in [lines] of the wrong one.
+  final int errorLine;
+
+  /// What that line should say.
+  final String fixed;
   final List<String> inputs;
 }
 
@@ -95,48 +125,6 @@ class Lesson {
   final String summary;
   final IconData icon;
   final List<Question> questions;
-}
-
-/// A step of the path: a lesson to play or a challenge to solve.
-sealed class RouteStep {
-  const RouteStep();
-
-  String get id;
-  String get title;
-}
-
-class LessonStep extends RouteStep {
-  const LessonStep(this.lesson);
-
-  final Lesson lesson;
-
-  @override
-  String get id => lesson.id;
-  @override
-  String get title => lesson.title;
-}
-
-class ChallengeStep extends RouteStep {
-  const ChallengeStep(this.challenge);
-
-  final Challenge challenge;
-
-  @override
-  String get id => challenge.id;
-  @override
-  String get title => challenge.exercise.title.replaceFirst(RegExp(r'^Reto \d+ · '), '');
-}
-
-/// A group of the path, like a unit: a few lessons and the challenges they
-/// prepare.
-class RouteGroup {
-  const RouteGroup(this.title, this.description, this.steps);
-
-  final String title;
-
-  /// One line saying what the group is for.
-  final String description;
-  final List<RouteStep> steps;
 }
 
 const lessonFirstProgram = Lesson(
@@ -242,6 +230,121 @@ const lessonOperations = Lesson(
       output: 'Total: 5',
       right: 'Con + se une un texto con un número.',
       wrong: 'El + junta el texto con el valor y muestra Total: 5.',
+    ),
+  ],
+);
+
+const lessonText = Lesson(
+  id: 'leccion-textos',
+  title: 'Textos',
+  summary: 'Junta, mide y cambia textos',
+  icon: Icons.text_fields_rounded,
+  questions: [
+    ChoiceQuestion(
+      prompt: '¿Qué muestra este programa?',
+      code: 'nombre <- "Ana"\nEscribir "Hola, " + nombre',
+      options: ['Hola, Ana', 'Hola, nombre', 'Hola, + Ana', 'Un error'],
+      answer: 0,
+      output: 'Hola, Ana',
+      right: 'La variable se cambia por lo que guarda y el + junta los dos textos.',
+      wrong: 'nombre es una variable: se cambia por Ana. El + junta, así que sale Hola, Ana.',
+    ),
+    ChoiceQuestion(
+      prompt: '¿Qué muestra este programa? (Longitud cuenta las letras)',
+      code: 'Escribir Longitud("jaguar")',
+      options: ['5', '6', '7', 'jaguar'],
+      answer: 1,
+      output: '6',
+      right: 'jaguar tiene seis letras: j, a, g, u, a, r.',
+      wrong: 'Longitud cuenta cuántas letras tiene el texto: jaguar tiene 6.',
+    ),
+    ChoiceQuestion(
+      prompt: '¿Qué muestra este programa?',
+      code: 'Escribir Mayusculas("hola")',
+      options: ['hola', 'Hola', 'HOLA', 'Un error'],
+      answer: 2,
+      output: 'HOLA',
+      right: 'Mayusculas vuelve todas las letras mayúsculas.',
+      wrong: 'Mayusculas cambia todas las letras a mayúsculas: sale HOLA.',
+    ),
+    ChoiceQuestion(
+      prompt: 'Completa para que muestre Hola, Ana.',
+      code: 'nombre <- "Ana"\nEscribir "Hola, " ___ nombre',
+      options: ['+', '-', '*', '/'],
+      answer: 0,
+      mono: true,
+      fillOutput: 'Hola, Ana',
+      right: 'El + junta textos. Los otros son para hacer cuentas con números.',
+      wrong: 'Para juntar textos se usa +. Los demás símbolos son para cuentas con números.',
+    ),
+    FindErrorQuestion(
+      prompt: '¿Qué línea tiene el error?',
+      lines: ['Algoritmo saludo', 'nombre <- "Ana', 'Escribir "Hola, " + nombre', 'FinAlgoritmo'],
+      errorLine: 1,
+      fixed: 'nombre <- "Ana"',
+      right: 'Un texto abre y cierra con comillas: a esa línea le falta la comilla del final.',
+      wrong: 'La línea 2: el texto "Ana empieza con comillas pero no las cierra. Debe ser "Ana".',
+    ),
+    ChoiceQuestion(
+      prompt: '¿Qué muestra este programa? (Subcadena toma de una posición a otra)',
+      code: 'Escribir Subcadena("jaguar", 1, 3)',
+      options: ['jag', 'ja', 'jagu', 'aguar'],
+      answer: 0,
+      output: 'jag',
+      right: 'Las posiciones se cuentan desde 1: la 1, la 2 y la 3 son j, a y g.',
+      wrong: 'Subcadena incluye los dos extremos y cuenta desde 1: las posiciones 1, 2 y 3 dan jag.',
+    ),
+  ],
+);
+
+const lessonBlocks = Lesson(
+  id: 'leccion-bloques',
+  title: 'Primeros bloques',
+  summary: 'Arma un programa pieza por pieza',
+  icon: Icons.view_agenda_outlined,
+  questions: [
+    ChoiceQuestion(
+      prompt: '¿Qué bloque usas para mostrar un mensaje?',
+      options: ['Salida (Escribir)', 'Lectura (Leer)', 'Decisión (Si)', 'Ciclo (Mientras)'],
+      answer: 0,
+      right: 'La Salida muestra textos y valores: es el bloque amarillo.',
+      wrong:
+          'Para mostrar algo se usa la Salida, que escribe en la consola. Leer pide datos; Si y Mientras deciden y repiten.',
+    ),
+    ChoiceQuestion(
+      prompt: '¿Qué hace el bloque Lectura?',
+      options: [
+        'Pide un dato y lo guarda en una variable',
+        'Muestra un dato en la pantalla',
+        'Repite otros bloques',
+        'Termina el programa',
+      ],
+      answer: 0,
+      right: 'Leer espera a que la persona escriba y guarda lo que escribió.',
+      wrong: 'Lectura pide un dato y lo guarda en una variable: es la entrada del programa.',
+    ),
+    ChoiceQuestion(
+      prompt: '¿Qué muestra este programa?',
+      code: 'Escribir "Hola"\nEscribir "Adiós"',
+      options: ['Hola, Adiós', 'Adiós, Hola', 'Solo Hola', 'Un error'],
+      answer: 0,
+      output: 'Hola\nAdiós',
+      right: 'Los bloques se ejecutan de arriba hacia abajo, uno tras otro.',
+      wrong: 'Los bloques van de arriba hacia abajo: primero sale Hola y después Adiós.',
+    ),
+    ChoiceQuestion(
+      prompt: 'Un bloque Si tiene otros bloques adentro. ¿Cuándo se hacen?',
+      options: ['Solo cuando se cumple su condición', 'Siempre', 'Nunca', 'Solo la primera vez'],
+      answer: 0,
+      right: 'Lo que está dentro del Si solo ocurre si la condición es verdadera.',
+      wrong: 'Los bloques de adentro del Si solo se hacen cuando la condición se cumple.',
+    ),
+    OrderQuestion(
+      prompt: 'Pon los bloques en orden para avisar si alguien es mayor de edad.',
+      lines: ['Leer edad', 'Si edad >= 18 Entonces', '    Escribir "Mayor"', 'FinSi'],
+      inputs: ['20'],
+      right: 'Primero se lee la edad, luego se decide y lo que se muestra queda dentro del Si.',
+      wrong: 'Primero Leer, luego el Si, y dentro del Si el mensaje; FinSi cierra el bloque.',
     ),
   ],
 );
@@ -459,7 +562,9 @@ const lessonLoops = Lesson(
 
 const allLessons = [
   lessonFirstProgram,
+  lessonBlocks,
   lessonOperations,
+  lessonText,
   lessonFlowcharts,
   lessonDecisions,
   lessonDeskCheck,
@@ -469,52 +574,6 @@ const allLessons = [
 Lesson? lessonById(String id) {
   for (final lesson in allLessons) {
     if (lesson.id == id) return lesson;
-  }
-  return null;
-}
-
-Challenge _reto(int n) => challenges[n - 1];
-
-/// The path of level 1: lessons that prepare each challenge, in order.
-final routeGroups = <RouteGroup>[
-  RouteGroup('Primeros pasos', 'Escribe y ejecuta tu primer programa.', [
-    const LessonStep(lessonFirstProgram),
-    ChallengeStep(_reto(1)),
-  ]),
-  RouteGroup('Operaciones', 'Haz cuentas con lo que escribe la persona.', [
-    const LessonStep(lessonOperations),
-    ChallengeStep(_reto(2)),
-    ChallengeStep(_reto(3)),
-    ChallengeStep(_reto(4)),
-  ]),
-  RouteGroup('Diagramas y decisiones', 'Dibuja el flujo y haz que el programa elija.', [
-    const LessonStep(lessonFlowcharts),
-    const LessonStep(lessonDecisions),
-    ChallengeStep(_reto(5)),
-    ChallengeStep(_reto(6)),
-    ChallengeStep(_reto(7)),
-  ]),
-  RouteGroup('Repetir y comprobar', 'Repite pasos y revisa tu programa a mano.', [
-    const LessonStep(lessonDeskCheck),
-    const LessonStep(lessonLoops),
-    ChallengeStep(_reto(8)),
-    ChallengeStep(_reto(9)),
-    ChallengeStep(_reto(10)),
-  ]),
-];
-
-/// Every step of the path, in order.
-List<RouteStep> get routeSteps => [for (final group in routeGroups) ...group.steps];
-
-bool isStepDone(RouteStep step, {required Set<String> lessons, required Set<String> challenges}) =>
-    step is LessonStep ? lessons.contains(step.id) : challenges.contains(step.id);
-
-/// The first step not done yet; null when the whole path is done.
-RouteStep? nextStep({required Set<String> lessons, required Set<String> challenges}) {
-  for (final step in routeSteps) {
-    if (!isStepDone(step, lessons: lessons, challenges: challenges)) {
-      return step;
-    }
   }
   return null;
 }
