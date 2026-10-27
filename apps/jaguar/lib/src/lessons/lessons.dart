@@ -130,16 +130,19 @@ class ChallengeStep extends RouteStep {
 /// A group of the path, like a unit: a few lessons and the challenges they
 /// prepare.
 class RouteGroup {
-  const RouteGroup(this.title, this.steps);
+  const RouteGroup(this.title, this.description, this.steps);
 
   final String title;
+
+  /// One line saying what the group is for.
+  final String description;
   final List<RouteStep> steps;
 }
 
 const lessonFirstProgram = Lesson(
   id: 'leccion-primer-programa',
   title: 'Tu primer programa',
-  summary: 'Algoritmo, Escribir, Leer y variables',
+  summary: 'Muestra un saludo y pide tu nombre',
   icon: Icons.play_circle_outline,
   questions: [
     ChoiceQuestion(
@@ -193,7 +196,7 @@ const lessonFirstProgram = Lesson(
 const lessonOperations = Lesson(
   id: 'leccion-operaciones',
   title: 'Operaciones',
-  summary: 'Asignar, calcular y unir textos',
+  summary: 'Suma, multiplica y junta textos',
   icon: Icons.calculate_outlined,
   questions: [
     ChoiceQuestion(
@@ -246,7 +249,7 @@ const lessonOperations = Lesson(
 const lessonFlowcharts = Lesson(
   id: 'leccion-diagramas',
   title: 'Diagramas de flujo',
-  summary: 'Las figuras y qué significa cada una',
+  summary: 'Qué significa cada figura del diagrama',
   icon: Icons.account_tree_outlined,
   questions: [
     FigureQuestion(
@@ -286,7 +289,7 @@ const lessonFlowcharts = Lesson(
 const lessonDecisions = Lesson(
   id: 'leccion-decisiones',
   title: 'Decisiones con Si',
-  summary: 'Condiciones, Si y SiNo',
+  summary: 'Haz que el programa elija un camino',
   icon: Icons.call_split,
   questions: [
     ChoiceQuestion(
@@ -346,7 +349,7 @@ const lessonDecisions = Lesson(
 const lessonDeskCheck = Lesson(
   id: 'leccion-prueba-escritorio',
   title: 'Prueba de escritorio',
-  summary: 'Seguir un programa paso a paso',
+  summary: 'Sigue un programa y anota cada valor',
   icon: Icons.table_chart_outlined,
   questions: [
     ChoiceQuestion(
@@ -401,7 +404,7 @@ const lessonDeskCheck = Lesson(
 const lessonLoops = Lesson(
   id: 'leccion-ciclos',
   title: 'Repetir pasos',
-  summary: 'Para y Mientras',
+  summary: 'Repite pasos con Para y Mientras',
   icon: Icons.repeat,
   questions: [
     ChoiceQuestion(
@@ -474,21 +477,24 @@ Challenge _reto(int n) => challenges[n - 1];
 
 /// The path of level 1: lessons that prepare each challenge, in order.
 final routeGroups = <RouteGroup>[
-  RouteGroup('Primeros pasos', [const LessonStep(lessonFirstProgram), ChallengeStep(_reto(1))]),
-  RouteGroup('Operaciones', [
+  RouteGroup('Primeros pasos', 'Escribe y ejecuta tu primer programa.', [
+    const LessonStep(lessonFirstProgram),
+    ChallengeStep(_reto(1)),
+  ]),
+  RouteGroup('Operaciones', 'Haz cuentas con lo que escribe la persona.', [
     const LessonStep(lessonOperations),
     ChallengeStep(_reto(2)),
     ChallengeStep(_reto(3)),
     ChallengeStep(_reto(4)),
   ]),
-  RouteGroup('Diagramas y decisiones', [
+  RouteGroup('Diagramas y decisiones', 'Dibuja el flujo y haz que el programa elija.', [
     const LessonStep(lessonFlowcharts),
     const LessonStep(lessonDecisions),
     ChallengeStep(_reto(5)),
     ChallengeStep(_reto(6)),
     ChallengeStep(_reto(7)),
   ]),
-  RouteGroup('Repetir y comprobar', [
+  RouteGroup('Repetir y comprobar', 'Repite pasos y revisa tu programa a mano.', [
     const LessonStep(lessonDeskCheck),
     const LessonStep(lessonLoops),
     ChallengeStep(_reto(8)),

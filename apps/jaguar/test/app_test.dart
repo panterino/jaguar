@@ -323,10 +323,11 @@ void main() {
     testWidgets('la primera vez pregunta cómo empezar', (tester) async {
       await pumpDesktop(tester, 'Algoritmo hola\nFinAlgoritmo\n', mode: null);
       await tester.pumpAndSettle();
-      expect(find.text('¡Hola! ¿Cómo quieres empezar?'), findsOneWidget);
+      expect(find.text('¡Hola! Esto es Jaguar Code'), findsOneWidget);
       await tester.tap(find.text('Empezar desde cero'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Saltar'));
+      // The first lesson opens; going back leaves the workspace.
+      await tester.binding.handlePopRoute();
       await tester.pumpAndSettle();
       expect(ViewSettings(_prefs).mode, AppMode.basic);
       expect(find.text('Básico'), findsOneWidget);

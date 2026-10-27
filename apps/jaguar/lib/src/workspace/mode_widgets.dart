@@ -45,24 +45,32 @@ class _WelcomeDialog extends StatelessWidget {
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 440),
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Image.asset('assets/images/mascota.png', height: 80),
-              const SizedBox(height: 12),
+              Image.asset('assets/images/mascota.png', height: 64),
+              const SizedBox(height: 8),
               Text(
-                again ? '¿Cómo usas Jaguar?' : '¡Hola! ¿Cómo quieres empezar?',
+                again ? '¿Cómo usas Jaguar Code?' : '¡Hola! Esto es Jaguar Code',
                 style: theme.textTheme.titleLarge,
                 textAlign: TextAlign.center,
               ),
+              if (!again) ...[
+                const SizedBox(height: 8),
+                Text(
+                  'Aprende a programar paso a paso, en español y sin internet. ¿Cómo quieres empezar?',
+                  style: theme.textTheme.bodyMedium,
+                  textAlign: TextAlign.center,
+                ),
+              ],
               const SizedBox(height: 20),
               const _WelcomeOption(
                 choice: WelcomeChoice.learning,
                 icon: Icons.emoji_objects_outlined,
                 title: 'Empezar desde cero',
-                subtitle: 'Te llevo paso a paso con tu primer reto.',
+                subtitle: 'Una lección corta y luego tu primer programa.',
                 highlighted: true,
               ),
               const _WelcomeOption(

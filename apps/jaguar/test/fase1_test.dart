@@ -103,7 +103,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Par o impar'), findsOneWidget);
     expect(find.text('Reto 1 · Saludo'), findsNothing);
-    expect(find.text('Clases en línea'), findsOneWidget);
+    expect(find.textContaining('Las clases en línea necesitan internet'), findsOneWidget);
 
     await tester.tap(find.text('Par o impar'));
     await tester.pumpAndSettle();

@@ -140,7 +140,7 @@ class _AccountDialogState extends State<_AccountDialog> {
     final teacher = _role == CloudRole.profesor;
     return AlertDialog(
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      title: const Text('Entrar a Jaguar en línea'),
+      title: const Text('Entrar a Jaguar Code en línea'),
       content: SizedBox(
         width: 420,
         child: SingleChildScrollView(

@@ -61,7 +61,7 @@ class JaguarApp extends StatelessWidget {
     return ListenableBuilder(
       listenable: settings,
       builder: (context, _) => MaterialApp(
-        title: 'Jaguar',
+        title: 'Jaguar Code',
         debugShowCheckedModeBanner: false,
         locale: const Locale('es', 'MX'),
         supportedLocales: const [Locale('es', 'MX'), Locale('es')],
