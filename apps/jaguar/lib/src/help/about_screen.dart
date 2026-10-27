@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../theme.dart';
 import 'privacy.dart';
+import '../widgets/mascota.dart';
 
-const jaguarVersion = '0.5.0';
+const jaguarVersion = '0.6.0';
 
 /// Acerca de: what Jaguar is, where it comes from and what it stands for.
 class AboutScreen extends StatelessWidget {
@@ -23,7 +24,7 @@ class AboutScreen extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Image.asset('assets/images/mascota.png', width: 96, height: 96),
+                  const Mascota(pose: MascotPose.hola, size: 100),
                   const SizedBox(width: 20),
                   Expanded(
                     child: Column(

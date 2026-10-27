@@ -100,6 +100,16 @@ class SettingsScreen extends StatelessWidget {
                 onChanged: (value) => settings.fontSize = value,
               ),
             ),
+            const _Heading('Vistas del programa'),
+            SwitchListTile(
+              secondary: const Icon(Icons.terminal_rounded),
+              title: const Text('Mostrar la vista Python'),
+              subtitle: const Text(
+                'Tu programa traducido a Python, solo para leer. Se prende sola cuando llegas a esa parte de la Ruta.',
+              ),
+              value: settings.pythonEnabled,
+              onChanged: (value) => settings.pythonEnabled = value,
+            ),
             const _Heading('Tú'),
             ListTile(
               leading: const Icon(Icons.badge_outlined),

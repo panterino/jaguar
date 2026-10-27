@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../settings.dart';
+import '../widgets/mascota.dart';
 
 /// What the person answered the first time Jaguar opened.
 enum WelcomeChoice { learning, programmer, teacher }
@@ -50,7 +51,7 @@ class _WelcomeDialog extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Image.asset('assets/images/mascota.png', height: 64),
+              const Mascota(pose: MascotPose.hola, size: 72),
               const SizedBox(height: 8),
               Text(
                 again ? '¿Cómo usas Jaguar Code?' : '¡Hola! Esto es Jaguar Code',

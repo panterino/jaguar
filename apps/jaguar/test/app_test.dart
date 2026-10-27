@@ -220,7 +220,7 @@ void main() {
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
     expect(find.byType(CodeEditor), findsNothing);
-    expect(find.byType(NavigationBar), findsOneWidget);
+    expect(find.text('Elige qué quieres hacer'), findsNothing);
 
     // The Taller is where it was opened from; from another room, Atrás goes to Inicio.
     await tester.binding.handlePopRoute();
@@ -465,7 +465,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Retos'));
       await tester.pumpAndSettle();
-      expect(find.text('Llevas 0 de 10.', findRichText: true), findsNothing);
+      expect(find.text('Llevas 0 de 12.', findRichText: true), findsNothing);
       await tester.tap(find.text('Saludo'));
       await tester.pumpAndSettle();
       expect(find.text('Reto 1 · Saludo'), findsOneWidget);
@@ -485,7 +485,7 @@ void main() {
       expect(find.text('Reto 2 · Área del rectángulo'), findsOneWidget);
       await tester.tap(find.text('Retos'));
       await tester.pumpAndSettle();
-      expect(find.textContaining('Llevas 1 de 10'), findsOneWidget);
+      expect(find.textContaining('Llevas 1 de 12'), findsOneWidget);
       debugDefaultTargetPlatformOverride = null;
     });
 

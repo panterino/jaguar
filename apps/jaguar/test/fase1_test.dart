@@ -12,6 +12,7 @@ import 'package:jaguar/src/share/share_codec.dart';
 import 'package:jaguar/src/settings.dart';
 import 'package:jaguar_core/jaguar_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'ayudas.dart';
 
 void main() {
   group('los retos están etiquetados', () {
@@ -27,7 +28,7 @@ void main() {
 
     test('las áreas son las del temario y todas tienen retos', () {
       final subjects = {for (final c in challenges) c.subject};
-      expect(subjects, {'Variables', 'Operadores', 'Condicionales', 'Ciclos'});
+      expect(subjects, {'Variables', 'Operadores', 'Condicionales', 'Ciclos', 'Textos'});
     });
   });
 
@@ -95,12 +96,10 @@ void main() {
     await tester.pumpWidget(JaguarApp(store: ProgramStore(prefs), exercises: exercises, settings: ViewSettings(prefs)));
     await tester.pumpAndSettle();
 
-    // Inicio puts the teacher's exercise first.
-    expect(find.text('DEL PROFE'), findsOneWidget);
-    expect(find.text('Par o impar'), findsOneWidget);
+    // Inicio says in Clases that a task is waiting.
+    expect(find.text('Tarea nueva: Par o impar'), findsOneWidget);
 
-    await tester.tap(find.text('Clases'));
-    await tester.pumpAndSettle();
+    await irASala(tester, 'Clases');
     expect(find.text('Par o impar'), findsOneWidget);
     expect(find.text('Reto 1 · Saludo'), findsNothing);
     expect(find.textContaining('Las clases en línea necesitan internet'), findsOneWidget);
@@ -153,8 +152,9 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Clases'));
-      await tester.pumpAndSettle();
+      // The portal already says there is a task waiting in the class.
+      expect(find.text('1 tarea por hacer'), findsOneWidget);
+      await irASala(tester, 'Clases');
 
       expect(find.text('Programación 3A'), findsOneWidget);
       expect(find.text('Prof. Martínez'), findsOneWidget);
@@ -186,8 +186,8 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Clases'));
-      await tester.pumpAndSettle();
+      expect(find.text('1 clase'), findsOneWidget);
+      await irASala(tester, 'Clases');
       expect(find.textContaining('Tu clase · código JAG-'), findsOneWidget);
       expect(find.text('Ver entregas'), findsOneWidget);
       expect(find.text('Crear clase'), findsOneWidget);
@@ -210,8 +210,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Clases'));
-      await tester.pumpAndSettle();
+      await irASala(tester, 'Clases');
       expect(find.text('Tus clases en línea'), findsOneWidget);
       expect(find.text('Entrar'), findsOneWidget);
     });

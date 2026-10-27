@@ -20,6 +20,7 @@ import 'package:jaguar/src/programs/program_store.dart';
 import 'package:jaguar/src/settings.dart';
 import 'package:jaguar/src/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../ayudas.dart';
 
 final _run = Platform.environment['JAGUAR_CAPTURAS'] != null;
 final _out = Platform.environment['JAGUAR_CAPTURAS'] ?? '';
@@ -155,8 +156,7 @@ void main() {
 
   scene('reto-inicio', (tester) async {
     await _app(tester, values: {'jaguar.view.mode': 'basic', 'jaguar.view.tourStep': 0});
-    await tester.tap(find.text('Ruta'));
-    await tester.pumpAndSettle();
+    await irASala(tester, 'Ruta');
     await tester.tap(find.text('Saludo'));
     await tester.pumpAndSettle();
     await _shot(tester, 'reto-inicio');
@@ -168,12 +168,13 @@ void main() {
   });
 
   Future<void> abreLeccion(WidgetTester tester, Lesson leccion, {Map<String, Object> values = const {}}) async {
-    final fila = find.text('Lección · ${leccion.summary}');
+    final fila = find.byKey(ValueKey('paso-${leccion.id}'));
     await _app(tester, values: {'jaguar.view.mode': 'basic', ...values});
-    await tester.tap(find.text('Ruta'));
-    await tester.pumpAndSettle();
+    await irASala(tester, 'Ruta');
     await tester.scrollUntilVisible(fila, 200);
     await tester.ensureVisible(fila);
+    await tester.pumpAndSettle();
+    await tester.drag(find.byType(Scrollable).first, const Offset(0, 250));
     await tester.pumpAndSettle();
     await tester.tap(fila);
     await tester.pumpAndSettle();
@@ -264,8 +265,7 @@ void main() {
       size: const Size(1280, 800),
       openEditor: false,
     );
-    await tester.tap(find.text('Ruta'));
-    await tester.pumpAndSettle();
+    await irASala(tester, 'Ruta');
     await _shot(tester, 'ancha-ruta', pixelRatio: 1);
   });
 
@@ -278,30 +278,26 @@ void main() {
         'jaguar.retos.hechos': ['reto-1-01', 'reto-1-02'],
       },
     );
-    await tester.tap(find.text('Ruta'));
-    await tester.pumpAndSettle();
+    await irASala(tester, 'Ruta');
     await _shot(tester, 'ruta-celular');
   });
 
   scene('sala-clases', (tester) async {
     await _app(tester, values: {'jaguar.view.mode': 'basic'});
-    await tester.tap(find.text('Clases'));
-    await tester.pumpAndSettle();
+    await irASala(tester, 'Clases');
     await _shot(tester, 'sala-clases');
   });
 
   scene('sala-clases-profe', (tester) async {
     await _app(tester, values: {'jaguar.view.mode': 'full', 'jaguar.view.teacher': true});
-    await tester.tap(find.text('Clases'));
-    await tester.pumpAndSettle();
+    await irASala(tester, 'Clases');
     await _shot(tester, 'sala-clases-profe');
   });
 
   scene('sala-taller', (tester) async {
     final store = await _app(tester, values: {'jaguar.view.mode': 'basic'}, source: _saludo, openEditor: false);
     store.create('Algoritmo promedio\n    Escribir 1\nFinAlgoritmo\n');
-    await tester.tap(find.text('Taller'));
-    await tester.pumpAndSettle();
+    await irASala(tester, 'Taller');
     await _shot(tester, 'sala-taller');
   });
 
@@ -337,6 +333,26 @@ void main() {
     await tester.pumpAndSettle(const Duration(seconds: 11));
   });
 
+  scene('bloques', (tester) async {
+    await _app(
+      tester,
+      values: {'jaguar.view.mode': 'basic', 'jaguar.view.editor': 'blocks'},
+      source:
+          'Algoritmo mayor_de_edad\n    Definir edad Como Entero\n    Escribir "¿Cuántos años tienes?"\n    Leer edad\n    Si edad >= 18 Entonces\n        Escribir "Eres mayor de edad"\n    SiNo\n        Escribir "Aún eres menor"\n    FinSi\nFinAlgoritmo\n',
+    );
+    await _shot(tester, 'bloques');
+  });
+
+  scene('python', (tester) async {
+    await _app(
+      tester,
+      values: {'jaguar.view.mode': 'basic', 'jaguar.view.editor': 'python', 'jaguar.view.python': true},
+      source:
+          'Algoritmo mayor_de_edad\n    Definir edad Como Entero\n    Escribir "¿Cuántos años tienes?"\n    Leer edad\n    Si edad >= 18 Entonces\n        Escribir "Eres mayor de edad"\n    SiNo\n        Escribir "Aún eres menor"\n    FinSi\nFinAlgoritmo\n',
+    );
+    await _shot(tester, 'python');
+  });
+
   scene('error', (tester) async {
     await _app(
       tester,
@@ -367,15 +383,13 @@ void main() {
         'jaguar.retos.hechos': ['reto-1-01', 'reto-1-02', 'reto-1-03', 'reto-1-04'],
       },
     );
-    await tester.tap(find.text('Ruta'));
-    await tester.pumpAndSettle();
+    await irASala(tester, 'Ruta');
     await _shot(tester, 'retos');
   });
 
   Future<void> openReto(WidgetTester tester) async {
     await _app(tester, values: {'jaguar.view.mode': 'basic'}, source: _saludo, openEditor: false);
-    await tester.tap(find.text('Ruta'));
-    await tester.pumpAndSettle();
+    await irASala(tester, 'Ruta');
     await tester.tap(find.text('Saludo'));
     await tester.pumpAndSettle();
   }

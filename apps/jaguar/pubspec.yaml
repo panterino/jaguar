@@ -1,7 +1,7 @@
 name: jaguar
 description: "Jaguar: tu pseudocódigo en cualquier lugar. Compatible con PSeInt."
 publish_to: 'none'
-version: 0.5.0+15
+version: 0.6.0+16
 
 environment:
   sdk: ^3.9.2
@@ -35,6 +35,7 @@ flutter:
   assets:
     - assets/images/
     - assets/manual/
+    - assets/mascota/
   fonts:
     - family: JetBrainsMono
       fonts:

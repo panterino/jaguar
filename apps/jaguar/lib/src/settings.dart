@@ -8,7 +8,7 @@ enum AppMode { basic, full }
 
 /// What the code area shows: the code, its flowchart, or both side by
 /// side (desktop).
-enum EditorView { code, diagram, both }
+enum EditorView { code, diagram, blocks, python, both }
 
 /// How the workspace looks, remembered on the device.
 class ViewSettings extends ChangeNotifier {
@@ -74,6 +74,15 @@ class ViewSettings extends ChangeNotifier {
 
   EditorView get editorView => EditorView.values.asNameMap()[_prefs.getString('jaguar.view.editor')] ?? EditorView.code;
   set editorView(EditorView view) => _set(() => _prefs.setString('jaguar.view.editor', view.name));
+
+  /// The Python view is off until the person turns it on (or reaches the part
+  /// of the path that teaches it): it is not the first thing a beginner needs.
+  bool get pythonEnabled => _prefs.getBool('jaguar.view.python') ?? false;
+  set pythonEnabled(bool value) => _set(() {
+    _prefs.setBool('jaguar.view.python', value);
+    // Turning it off while looking at it goes back to the code.
+    if (!value && editorView == EditorView.python) _prefs.setString('jaguar.view.editor', EditorView.code.name);
+  });
 
   ThemeMode get themeMode => ThemeMode.values.byName(_prefs.getString('jaguar.view.theme') ?? ThemeMode.system.name);
   set themeMode(ThemeMode mode) => _set(() => _prefs.setString('jaguar.view.theme', mode.name));

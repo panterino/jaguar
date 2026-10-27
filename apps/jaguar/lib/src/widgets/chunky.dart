@@ -19,6 +19,7 @@ class Chunky extends StatefulWidget {
     this.padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
     this.semanticsLabel,
     this.selected = false,
+    this.clip = Clip.none,
   });
 
   /// Null disables it.
@@ -36,6 +37,9 @@ class Chunky extends StatefulWidget {
   final EdgeInsetsGeometry padding;
   final String? semanticsLabel;
   final bool selected;
+
+  /// Clip what is inside to the rounded face (ornaments that bleed out).
+  final Clip clip;
 
   @override
   State<Chunky> createState() => _ChunkyState();
@@ -86,6 +90,7 @@ class _ChunkyState extends State<Chunky> {
           child: AnimatedContainer(
             duration: motion(context, const Duration(milliseconds: 90)),
             margin: EdgeInsets.only(top: sink, bottom: _depth - sink),
+            clipBehavior: widget.clip,
             constraints: BoxConstraints(minHeight: widget.minHeight),
             padding: widget.padding,
             alignment: Alignment.center,

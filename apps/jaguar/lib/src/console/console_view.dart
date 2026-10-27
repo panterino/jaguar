@@ -7,6 +7,7 @@ import 'package:jaguar_core/jaguar_core.dart';
 import '../settings.dart';
 import '../theme.dart';
 import 'console_session.dart';
+import '../widgets/mascota.dart';
 
 class ConsoleView extends StatefulWidget {
   const ConsoleView({super.key, required this.session, required this.onGoToLine, this.fontSize = 14, this.settings});
@@ -87,7 +88,12 @@ class _ConsoleViewState extends State<ConsoleView> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          if (session.state == RunState.finished) _FinishedNotice(key: ValueKey(session.runCount), session: session, settings: widget.settings),
+                          if (session.state == RunState.finished)
+                            _FinishedNotice(
+                              key: ValueKey(session.runCount),
+                              session: session,
+                              settings: widget.settings,
+                            ),
                           SelectableText.rich(
                             TextSpan(
                               style: mono,
@@ -240,7 +246,7 @@ class _ErrorCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(Icons.error_outline, color: scheme.onErrorContainer),
+                const Mascota(pose: MascotPose.uy, size: 44),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -293,7 +299,7 @@ class _EmptyConsole extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image.asset('assets/images/mascota.png', width: 96, height: 96),
+            const Mascota(pose: MascotPose.programando, size: 110),
             const SizedBox(height: 12),
             Text('Aquí verás lo que hace tu programa', style: theme.textTheme.titleMedium, textAlign: TextAlign.center),
             const SizedBox(height: 4),
