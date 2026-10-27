@@ -8,5 +8,8 @@ cd "$(dirname "$0")/../apps/jaguar"
 flutter clean
 flutter build web --release --pwa-strategy=none --no-web-resources-cdn
 grep -q gstatic build/web/main.dart.js || { echo "El build no trae Firebase; no se publica."; exit 1; }
+# Sin caché fijo: el navegador revisa cada archivo (con su ETag) y nunca mezcla un
+# main.dart.js nuevo con la fuente de iconos de la versión anterior.
+cp ../../cloudflare/app/_headers build/web/_headers
 cd ../../cloudflare/app
 npx --yes wrangler@4 deploy
