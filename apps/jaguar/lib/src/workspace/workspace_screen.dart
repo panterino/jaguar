@@ -22,6 +22,7 @@ import '../editor/keyword_bar.dart';
 import '../diagram/diagram_editing.dart';
 import '../blocks/blocks_view.dart';
 import '../python/python_view.dart';
+import '../widgets/mascota.dart';
 import '../diagram/diagram_view.dart';
 import '../editor/syntax_controller.dart';
 import '../exercises/plan_dialog.dart';
@@ -147,6 +148,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
     _code.addListener(_onTyped);
     _session.addListener(_onSessionChanged);
     if (_settings.chosenMode == null) WidgetsBinding.instance.addPostFrameCallback((_) => _welcome());
+    WidgetsBinding.instance.addPostFrameCallback((_) => precacheMascota(context));
     WidgetsBinding.instance.addPostFrameCallback((_) => _syncTeacher());
     WidgetsBinding.instance.addPostFrameCallback((_) => _restoreTests(_store.current));
   }
