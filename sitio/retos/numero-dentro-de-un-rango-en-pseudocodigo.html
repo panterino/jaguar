@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Número dentro de un rango en pseudocódigo: Si con Y</title>
+<meta name="description" content="Algoritmo que dice si un número está entre 1 y 10 usando el operador lógico Y: planteamiento, diagrama, pseudocódigo y los casos de borde.">
+<link rel="canonical" href="https://jaguarcode.org/retos/numero-dentro-de-un-rango-en-pseudocodigo">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="apple-touch-icon" href="/icono.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Jaguar Code">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://jaguarcode.org/retos/numero-dentro-de-un-rango-en-pseudocodigo">
+<meta property="og:title" content="Número dentro de un rango en pseudocódigo: Si con Y">
+<meta property="og:description" content="Algoritmo que dice si un número está entre 1 y 10 usando el operador lógico Y: planteamiento, diagrama, pseudocódigo y los casos de borde.">
+<meta property="og:image" content="https://jaguarcode.org/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Número dentro de un rango en pseudocódigo: Si con Y">
+<meta name="twitter:description" content="Algoritmo que dice si un número está entre 1 y 10 usando el operador lógico Y: planteamiento, diagrama, pseudocódigo y los casos de borde.">
+<meta name="twitter:image" content="https://jaguarcode.org/compartir.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": ["Article", "LearningResource"],
+      "@id": "https://jaguarcode.org/retos/numero-dentro-de-un-rango-en-pseudocodigo#articulo",
+      "headline": "Número dentro de un rango en pseudocódigo: Si con Y",
+      "description": "Algoritmo que dice si un número está entre 1 y 10 usando el operador lógico Y: planteamiento, diagrama, pseudocódigo y los casos de borde.",
+      "inLanguage": "es-MX",
+      "datePublished": "2026-10-27",
+      "dateModified": "2026-10-27",
+      "mainEntityOfPage": "https://jaguarcode.org/retos/numero-dentro-de-un-rango-en-pseudocodigo",
+      "image": "https://jaguarcode.org/compartir.png",
+      "learningResourceType": "ejercicio",
+      "educationalLevel": "Bachillerato",
+      "teaches": "Operadores lógicos",
+      "author": { "@type": "Organization", "name": "Panterino", "url": "https://jaguarcode.org/" },
+      "publisher": { "@type": "Organization", "name": "Panterino", "logo": { "@type": "ImageObject", "url": "https://jaguarcode.org/icono.png" } }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "https://jaguarcode.org/" },
+        { "@type": "ListItem", "position": 2, "name": "Retos", "item": "https://jaguarcode.org/retos" },
+        { "@type": "ListItem", "position": 3, "name": "Algoritmo que revisa si un número está en un rango", "item": "https://jaguarcode.org/retos/numero-dentro-de-un-rango-en-pseudocodigo" }
+      ]
+    },
+    { "@type": "FAQPage", "mainEntity": [{"@type":"Question","name":"¿Qué hace el operador Y en una condición?","acceptedAnswer":{"@type":"Answer","text":"Une dos condiciones y da verdadero solo cuando las dos se cumplen. El operador O, en cambio, da verdadero si se cumple al menos una."}},{"@type":"Question","name":"¿Por qué importan tanto los valores de borde?","acceptedAnswer":{"@type":"Answer","text":"Porque es donde se equivocan los signos > y >=. Un buen programa se prueba con los valores justo en el límite y uno antes y uno después."}}] }
+  ]
+}
+</script>
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/estilos.css">
+</head>
+<body>
+<header class="sitio-barra">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="/logo.svg" alt="" width="46" height="40">
+      <a class="nombre" href="/">Jaguar Code</a>
+      <a href="/guias">Guías</a>
+      <a href="/retos">Retos</a>
+      <a href="/profes">Para profes</a>
+      <a href="https://github.com/panterino/jaguar">GitHub</a>
+    </div>
+  </div>
+</header>
+<main class="guia">
+  <div class="ancho angosto">
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › <a href="/retos">Retos</a> › Dentro del rango</nav>
+    <h1>Algoritmo que revisa si un número está en un rango</h1>
+    <p class="resumen">Dos condiciones que se cumplen a la vez: el operador Y y los valores de borde, donde más se equivoca la gente.</p>
+    <nav class="contenido" aria-label="Contenido de la página"><b>En esta página</b>
+      <ol>
+        <li><a href="#planteamiento">El problema y su planteamiento</a></li>
+        <li><a href="#diagrama">Diagrama de flujo</a></li>
+        <li><a href="#pseudocodigo">Pseudocódigo</a></li>
+        <li><a href="#como-pensarlo">Cómo pensarlo</a></li>
+        <li><a href="#errores">Errores comunes</a></li>
+        <li><a href="#python">El mismo programa en Python</a></li>
+        <li><a href="#preguntas">Preguntas frecuentes</a></li>
+      </ol>
+    </nav>
+    <article>
+      <section id="planteamiento">
+        <h2>El problema y su planteamiento</h2>
+        <p>Lee un número. Si está entre 1 y 10 (incluidos), muestra Dentro; si no, Fuera.</p>
+        <div class="tabla"><table><caption>Planteamiento: entrada, proceso y salida</caption><thead><tr><th scope="col">Entrada</th><th scope="col">Proceso</th><th scope="col">Salida</th></tr></thead><tbody><tr><td>Un número.</td><td>Comprobar que sea mayor o igual a 1 y menor o igual a 10.</td><td>Dentro si está en el rango (incluidos 1 y 10); Fuera si no.</td></tr></tbody></table></div>
+      </section>
+      <section id="diagrama">
+        <h2>Diagrama de flujo</h2>
+        <p>Así se dibuja el algoritmo: el óvalo marca el inicio y el fin, el paralelogramo es una entrada o una salida, el rectángulo es un proceso y el rombo es una decisión.</p>
+        <figure class="diagrama" style="margin:0">
+          <svg viewBox="0 0 440.1 365.6" width="440.1" role="img" aria-labelledby="diag-tit"><title id="diag-tit">Diagrama de flujo del algoritmo dentro del rango</title><g class="linea" stroke-width="1.5" fill="none" stroke-linejoin="round"><path d="M216.9 56L216.9 84"/><path d="M216.9 124L216.9 152"/><path d="M106.8 180L106.8 180L106.8 224.8"/><path d="M327 180L329.5 180L329.5 224.8"/><path d="M106.8 264.8L106.8 281.6L216.9 281.6"/><path d="M329.5 264.8L329.5 281.6L216.9 281.6"/><path d="M216.9 281.6L216.9 309.6"/></g><path d="M216.9 84L212.9 76L220.9 76z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M216.9 152L212.9 144L220.9 144z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M106.8 224.8L102.8 216.8L110.8 216.8z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M329.5 224.8L325.5 216.8L333.5 216.8z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M216.9 309.6L212.9 301.6L220.9 301.6z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><rect class="ini fig" x="171.9" y="16" width="90" height="40" rx="20"/><text x="216.9" y="40.5" text-anchor="middle">Inicio</text><path class="io fig" d="M178.1 84 H269.7 L255.7 124 H164.1 z"/><text x="216.9" y="108.5" text-anchor="middle">Leer n</text><path class="dec fig" d="M216.9 152 L327 180 L216.9 208 L106.8 180 z"/><text x="216.9" y="184.5" text-anchor="middle">n &gt;= 1 Y n &lt;= 10</text><path class="sal fig" d="M30 224.8 H197.6 L183.6 264.8 H16 z"/><text x="106.8" y="249.3" text-anchor="middle">Escribir "Fuera"</text><path class="sal fig" d="M248.9 224.8 H424.1 L410.1 264.8 H234.9 z"/><text x="329.5" y="249.3" text-anchor="middle">Escribir "Dentro"</text><rect class="ini fig" x="171.9" y="309.6" width="90" height="40" rx="20"/><text x="216.9" y="334.1" text-anchor="middle">Fin</text><text x="84.8" y="164" font-size="11">No</text><text x="333" y="164" font-size="11">Sí</text></svg>
+        </figure>
+      </section>
+      <section id="pseudocodigo">
+        <h2>Pseudocódigo</h2>
+        <p>Esta es una solución. Léela línea por línea con el diagrama al lado y compara con lo que tú escribirías.</p>
+        <pre class="codigo" data-entradas="5" data-salida="Dentro" tabindex="0"><code>Algoritmo dentro_del_rango
+    Leer n
+    Si n &gt;= 1 Y n &lt;= 10 Entonces
+        Escribir "Dentro"
+    SiNo
+        Escribir "Fuera"
+    FinSi
+FinAlgoritmo</code></pre>
+        <div class="tabla"><table><caption>Pruebas del reto</caption><thead><tr><th scope="col">Entrada</th><th scope="col">Salida esperada</th></tr></thead><tbody><tr><td>5</td><td>Dentro</td></tr><tr><td>0</td><td>Fuera</td></tr></tbody></table></div><p class="nota-tabla">Con estas entradas, el programa debe mostrar exactamente esa salida.</p>
+      </section>
+      <section id="como-pensarlo">
+        <h2>Cómo pensarlo</h2>
+        <p>Estar entre 1 y 10 son dos condiciones juntas: que sea mayor o igual a 1 y que sea menor o igual a 10. Se unen con el operador lógico Y, que solo da verdadero si ambas lo son.</p>
+        <p>La condición queda: n &gt;= 1 Y n &lt;= 10. No se puede escribir como 1 &lt;= n &lt;= 10: en pseudocódigo cada comparación va por separado.</p>
+        <p>Los bordes son el 1 y el 10: ambos cuentan como dentro, por eso se usan &gt;= y &lt;=. Por eso este reto se prueba con 0, 1, 10 y 11, que son los valores donde un error de signo se nota.</p>
+      </section>
+      <section id="errores">
+        <h2>Errores comunes</h2>
+        <ul>
+          <li>Escribir n &gt; 1 Y n &lt;= 10: el 1 saldría como Fuera.</li>
+          <li>Usar O en lugar de Y: con O, casi cualquier número cumpliría alguna de las dos condiciones.</li>
+          <li>Encadenar comparaciones como en matemáticas (1 &lt;= n &lt;= 10): no funciona, hay que separarlas con Y.</li>
+        </ul>
+      </section>
+      <section id="python">
+        <h2>El mismo programa en Python</h2>
+        <p>Si más adelante pasas a Python, así se ve la misma lógica. Cambian las palabras (<code>print</code>, <code>input</code>, <code>if</code>) y los bloques se marcan con sangría en lugar de <code>FinSi</code> o <code>FinPara</code>.</p>
+        <pre class="codigo" tabindex="0"><code># Algoritmo dentro_del_rango
+n = float(input())
+if n &gt;= 1 and n &lt;= 10:
+    print("Dentro")
+else:
+    print("Fuera")</code></pre>
+      </section>
+      <section id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+        <details><summary>¿Qué hace el operador Y en una condición?</summary><p>Une dos condiciones y da verdadero solo cuando las dos se cumplen. El operador O, en cambio, da verdadero si se cumple al menos una.</p></details>
+        <details><summary>¿Por qué importan tanto los valores de borde?</summary><p>Porque es donde se equivocan los signos &gt; y &gt;=. Un buen programa se prueba con los valores justo en el límite y uno antes y uno después.</p></details>
+      </section>
+    </article>
+    <aside class="cta-guia" aria-labelledby="cta-t">
+      <h2 id="cta-t">Pruébalo paso a paso en tu celular</h2>
+      <p>En Jaguar Code escribes este algoritmo, lo ejecutas, ves su diagrama y haces la prueba de escritorio. El reto trae pistas y pruebas que te dicen si está bien. Gratis, sin anuncios y sin cuenta.</p>
+      <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir Jaguar Code</a></div>
+    </aside>
+    <h2 style="margin-top:44px">Sigue con otro reto</h2>
+    <div class="relacionadas">
+      <a href="/retos/algoritmo-aprobado-o-reprobado">Algoritmo que dice si una calificación aprueba<small>Tu primera decisión: el programa elige entre dos caminos según una condición.</small></a>
+      <a href="/retos/dia-de-la-semana-con-segun-en-pseudocodigo">Algoritmo que convierte un número en un día de la semana<small>La estructura Según elige entre muchas opciones sin escribir un Si detrás de otro.</small></a>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="ancho">
+    <span class="quien"><img src="/logo.svg" alt="" width="30" height="26">Un proyecto de Panterino · hecho en México</span>
+    <a href="/guias">Guías</a>
+    <a href="/retos">Retos</a>
+    <a href="/manual">Manual</a>
+    <a href="https://www.facebook.com/jaguareducation">Facebook</a>
+    <a href="https://github.com/panterino/jaguar">Código en GitHub</a>
+  </div>
+</footer>
+<script src="/acceso.js" defer></script>
+</body>
+</html>

@@ -406,6 +406,12 @@ class _HomeRoomState extends State<_HomeRoom> {
     final teacher = settings.teacher;
     final status = _status;
     final nextIndex = next == null ? -1 : steps.indexWhere((s) => s.id == next.id);
+    // The dots show the level the person is in: one per step of the whole path would not fit.
+    final dotSteps = (next == null ? null : levelOf(next)?.steps) ?? steps;
+    final dotFlags = [
+      for (final step in dotSteps) isStepDone(step, lessons: settings.doneLessons, challenges: settings.doneChallenges),
+    ];
+    final dotNext = next == null ? -1 : dotSteps.indexWhere((s) => s.id == next.id);
 
     final route = _Place(
       room: Room.route,
@@ -478,7 +484,7 @@ class _HomeRoomState extends State<_HomeRoom> {
             tier: tier,
             compact: compact,
             strip: p.room == Room.route && next != null && scale < 1.5
-                ? _RouteDots(done: flags, next: nextIndex, tier: tier)
+                ? _RouteDots(done: dotFlags, next: dotNext, tier: tier)
                 : null,
             onTap: () => onRoom(p.room),
           ),
@@ -808,8 +814,8 @@ class _Ornament extends StatelessWidget {
   }
 }
 
-/// One dot per step of the path: done, the one that follows (it pulses) and
-/// those left. Sixteen dots anticipate the road without showing it.
+/// One dot per step of the level: done, the one that follows (it pulses) and
+/// those left. They anticipate the road without showing it.
 class _RouteDots extends StatefulWidget {
   const _RouteDots({required this.done, required this.next, required this.tier});
 

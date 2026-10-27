@@ -1556,9 +1556,10 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
     if (exercise == null) return 'Taller';
     final blockIndex = blockChallenges.indexWhere((c) => c.id == exercise.id);
     if (blockIndex >= 0) return 'Ruta · Nivel 0 · Bloques ${blockIndex + 1}';
-    final index = challenges.indexWhere((c) => c.id == exercise.id);
+    final index = [...challenges, ...challengesNivel2].indexWhere((c) => c.id == exercise.id);
     if (index < 0) return 'Ejercicio del profe';
-    return 'Ruta · Nivel ${challenges[index].level} · Reto ${index + 1}';
+    final challenge = [...challenges, ...challengesNivel2][index];
+    return 'Ruta · Nivel ${challenge.level} · Reto ${index + 1}';
   }
 
   /// What the content area shows with no program open.

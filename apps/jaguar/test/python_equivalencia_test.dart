@@ -37,7 +37,7 @@ void main() {
   }
 
   group('las soluciones de los retos hacen lo mismo en Python', () {
-    for (final c in [...challenges, ...blockChallenges]) {
+    for (final c in everyChallenge) {
       test(c.id, () async {
         final code = toPython(parse(retos.solutions[c.id]!));
         for (final testCase in c.exercise.cases) {

@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Área de un rectángulo en pseudocódigo (con diagrama)</title>
+<meta name="description" content="Algoritmo para calcular el área de un rectángulo: lee la base y la altura, multiplica y muestra el resultado. Planteamiento, diagrama de flujo y pseudocódigo.">
+<link rel="canonical" href="https://jaguarcode.org/retos/area-de-un-rectangulo-en-pseudocodigo">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="apple-touch-icon" href="/icono.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Jaguar Code">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://jaguarcode.org/retos/area-de-un-rectangulo-en-pseudocodigo">
+<meta property="og:title" content="Área de un rectángulo en pseudocódigo (con diagrama)">
+<meta property="og:description" content="Algoritmo para calcular el área de un rectángulo: lee la base y la altura, multiplica y muestra el resultado. Planteamiento, diagrama de flujo y pseudocódigo.">
+<meta property="og:image" content="https://jaguarcode.org/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Área de un rectángulo en pseudocódigo (con diagrama)">
+<meta name="twitter:description" content="Algoritmo para calcular el área de un rectángulo: lee la base y la altura, multiplica y muestra el resultado. Planteamiento, diagrama de flujo y pseudocódigo.">
+<meta name="twitter:image" content="https://jaguarcode.org/compartir.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": ["Article", "LearningResource"],
+      "@id": "https://jaguarcode.org/retos/area-de-un-rectangulo-en-pseudocodigo#articulo",
+      "headline": "Área de un rectángulo en pseudocódigo (con diagrama)",
+      "description": "Algoritmo para calcular el área de un rectángulo: lee la base y la altura, multiplica y muestra el resultado. Planteamiento, diagrama de flujo y pseudocódigo.",
+      "inLanguage": "es-MX",
+      "datePublished": "2026-10-27",
+      "dateModified": "2026-10-27",
+      "mainEntityOfPage": "https://jaguarcode.org/retos/area-de-un-rectangulo-en-pseudocodigo",
+      "image": "https://jaguarcode.org/compartir.png",
+      "learningResourceType": "ejercicio",
+      "educationalLevel": "Bachillerato",
+      "teaches": "Operadores aritméticos",
+      "author": { "@type": "Organization", "name": "Panterino", "url": "https://jaguarcode.org/" },
+      "publisher": { "@type": "Organization", "name": "Panterino", "logo": { "@type": "ImageObject", "url": "https://jaguarcode.org/icono.png" } }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "https://jaguarcode.org/" },
+        { "@type": "ListItem", "position": 2, "name": "Retos", "item": "https://jaguarcode.org/retos" },
+        { "@type": "ListItem", "position": 3, "name": "Algoritmo para calcular el área de un rectángulo", "item": "https://jaguarcode.org/retos/area-de-un-rectangulo-en-pseudocodigo" }
+      ]
+    },
+    { "@type": "FAQPage", "mainEntity": [{"@type":"Question","name":"¿Cómo se multiplica en pseudocódigo?","acceptedAnswer":{"@type":"Answer","text":"Con el asterisco *. La potencia se escribe con ^ y el residuo de una división con MOD."}},{"@type":"Question","name":"¿Puedo usar decimales en la base y la altura?","acceptedAnswer":{"@type":"Answer","text":"Sí. Con base 10 y altura 2.5 el programa muestra Área: 25, porque Jaguar trabaja con números reales sin que declares el tipo."}}] }
+  ]
+}
+</script>
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/estilos.css">
+</head>
+<body>
+<header class="sitio-barra">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="/logo.svg" alt="" width="46" height="40">
+      <a class="nombre" href="/">Jaguar Code</a>
+      <a href="/guias">Guías</a>
+      <a href="/retos">Retos</a>
+      <a href="/profes">Para profes</a>
+      <a href="https://github.com/panterino/jaguar">GitHub</a>
+    </div>
+  </div>
+</header>
+<main class="guia">
+  <div class="ancho angosto">
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › <a href="/retos">Retos</a> › Área del rectángulo</nav>
+    <h1>Algoritmo para calcular el área de un rectángulo</h1>
+    <p class="resumen">Leer dos datos, hacer una operación y mostrar el resultado: la estructura de casi todos los primeros algoritmos.</p>
+    <nav class="contenido" aria-label="Contenido de la página"><b>En esta página</b>
+      <ol>
+        <li><a href="#planteamiento">El problema y su planteamiento</a></li>
+        <li><a href="#diagrama">Diagrama de flujo</a></li>
+        <li><a href="#pseudocodigo">Pseudocódigo</a></li>
+        <li><a href="#como-pensarlo">Cómo pensarlo</a></li>
+        <li><a href="#errores">Errores comunes</a></li>
+        <li><a href="#python">El mismo programa en Python</a></li>
+        <li><a href="#preguntas">Preguntas frecuentes</a></li>
+      </ol>
+    </nav>
+    <article>
+      <section id="planteamiento">
+        <h2>El problema y su planteamiento</h2>
+        <p>Lee la base y la altura de un rectángulo y muestra su área.</p>
+        <p>Con base 4 y altura 3, muestra:<br>Área: 12</p>
+        <div class="tabla"><table><caption>Planteamiento: entrada, proceso y salida</caption><thead><tr><th scope="col">Entrada</th><th scope="col">Proceso</th><th scope="col">Salida</th></tr></thead><tbody><tr><td>La base y la altura del rectángulo (dos números).</td><td>Multiplicar la base por la altura.</td><td>El texto Área: seguido del resultado.</td></tr></tbody></table></div>
+      </section>
+      <section id="diagrama">
+        <h2>Diagrama de flujo</h2>
+        <p>Así se dibuja el algoritmo: el óvalo marca el inicio y el fin, el paralelogramo es una entrada o una salida, el rectángulo es un proceso y el rombo es una decisión.</p>
+        <figure class="diagrama" style="margin:0">
+          <svg viewBox="0 0 266.8 344" width="266.8" role="img" aria-labelledby="diag-tit"><title id="diag-tit">Diagrama de flujo del algoritmo área del rectángulo</title><g class="linea" stroke-width="1.5" fill="none" stroke-linejoin="round"><path d="M133.4 56L133.4 84"/><path d="M133.4 124L133.4 152"/><path d="M133.4 192L133.4 220"/><path d="M133.4 260L133.4 288"/></g><path d="M133.4 84L129.4 76L137.4 76z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M133.4 152L129.4 144L137.4 144z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M133.4 220L129.4 212L137.4 212z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M133.4 288L129.4 280L137.4 280z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><rect class="ini fig" x="88.4" y="16" width="90" height="40" rx="20"/><text x="133.4" y="40.5" text-anchor="middle">Inicio</text><path class="io fig" d="M52.8 84 H228 L214 124 H38.8 z"/><text x="133.4" y="108.5" text-anchor="middle">Leer base, altura</text><rect class="proc fig" x="37.6" y="152" width="191.6" height="40" rx="3"/><text x="133.4" y="176.5" text-anchor="middle">area &lt;- base * altura</text><path class="sal fig" d="M30 220 H250.8 L236.8 260 H16 z"/><text x="133.4" y="244.5" text-anchor="middle">Escribir "Área: ", area</text><rect class="ini fig" x="88.4" y="288" width="90" height="40" rx="20"/><text x="133.4" y="312.5" text-anchor="middle">Fin</text></svg>
+        </figure>
+      </section>
+      <section id="pseudocodigo">
+        <h2>Pseudocódigo</h2>
+        <p>Esta es una solución. Léela línea por línea con el diagrama al lado y compara con lo que tú escribirías.</p>
+        <pre class="codigo" data-entradas="4|3" data-salida="Área: 12" tabindex="0"><code>Algoritmo area_rectangulo
+    Leer base, altura
+    area &lt;- base * altura
+    Escribir "Área: ", area
+FinAlgoritmo</code></pre>
+        <div class="tabla"><table><caption>Pruebas del reto</caption><thead><tr><th scope="col">Entrada</th><th scope="col">Salida esperada</th></tr></thead><tbody><tr><td>4, 3</td><td>Área: 12</td></tr><tr><td>10, 2.5</td><td>Área: 25</td></tr></tbody></table></div><p class="nota-tabla">Con estas entradas, el programa debe mostrar exactamente esa salida.</p>
+      </section>
+      <section id="como-pensarlo">
+        <h2>Cómo pensarlo</h2>
+        <p>El área de un rectángulo es base por altura. En pseudocódigo el asterisco * multiplica, y la flecha &lt;- guarda el resultado en una variable: area &lt;- base * altura.</p>
+        <p>Leer puede pedir varios datos en una sola instrucción: Leer base, altura. La persona los escribe uno por uno y cada valor se guarda en su variable, en el mismo orden.</p>
+        <p>Los números pueden traer decimales, como 2.5. No hace falta nada especial: el pseudocódigo trabaja con números enteros y reales sin que tengas que distinguirlos.</p>
+      </section>
+      <section id="errores">
+        <h2>Errores comunes</h2>
+        <ul>
+          <li>Usar la letra x para multiplicar: en pseudocódigo se usa *.</li>
+          <li>Mostrar la fórmula en lugar del resultado: Escribir "base * altura" muestra esas palabras, no la cuenta.</li>
+          <li>Escribir los datos en el orden contrario al de Leer: la primera cifra es la base, la segunda la altura.</li>
+        </ul>
+      </section>
+      <section id="python">
+        <h2>El mismo programa en Python</h2>
+        <p>Si más adelante pasas a Python, así se ve la misma lógica. Cambian las palabras (<code>print</code>, <code>input</code>, <code>if</code>) y los bloques se marcan con sangría en lugar de <code>FinSi</code> o <code>FinPara</code>.</p>
+        <pre class="codigo" tabindex="0"><code># Algoritmo area_rectangulo
+base = float(input())
+altura = float(input())
+area = base * altura
+print("Área: ", area, sep="")</code></pre>
+      </section>
+      <section id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+        <details><summary>¿Cómo se multiplica en pseudocódigo?</summary><p>Con el asterisco *. La potencia se escribe con ^ y el residuo de una división con MOD.</p></details>
+        <details><summary>¿Puedo usar decimales en la base y la altura?</summary><p>Sí. Con base 10 y altura 2.5 el programa muestra Área: 25, porque Jaguar trabaja con números reales sin que declares el tipo.</p></details>
+      </section>
+    </article>
+    <aside class="cta-guia" aria-labelledby="cta-t">
+      <h2 id="cta-t">Pruébalo paso a paso en tu celular</h2>
+      <p>En Jaguar Code escribes este algoritmo, lo ejecutas, ves su diagrama y haces la prueba de escritorio. El reto trae pistas y pruebas que te dicen si está bien. Gratis, sin anuncios y sin cuenta.</p>
+      <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir Jaguar Code</a></div>
+    </aside>
+    <h2 style="margin-top:44px">Sigue con otro reto</h2>
+    <div class="relacionadas">
+      <a href="/retos/algoritmo-para-calcular-el-iva">Algoritmo para calcular el precio con IVA<small>Una constante, una expresión con dos operaciones y un resultado: cómo se pasa una fórmula del mundo real a pseudocódigo.</small></a>
+      <a href="/retos/convertir-minutos-a-horas-en-pseudocodigo">Algoritmo para convertir minutos a horas y minutos<small>La división entera y el residuo, dos operaciones que aparecen una y otra vez: horas completas y lo que sobra.</small></a>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="ancho">
+    <span class="quien"><img src="/logo.svg" alt="" width="30" height="26">Un proyecto de Panterino · hecho en México</span>
+    <a href="/guias">Guías</a>
+    <a href="/retos">Retos</a>
+    <a href="/manual">Manual</a>
+    <a href="https://www.facebook.com/jaguareducation">Facebook</a>
+    <a href="https://github.com/panterino/jaguar">Código en GitHub</a>
+  </div>
+</footer>
+<script src="/acceso.js" defer></script>
+</body>
+</html>

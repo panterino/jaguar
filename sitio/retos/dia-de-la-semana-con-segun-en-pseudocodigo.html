@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Día de la semana con Según en pseudocódigo</title>
+<meta name="description" content="Algoritmo que muestra el día de la semana a partir de un número del 1 al 7 con la estructura Según: pseudocódigo, diagrama y el caso De Otro Modo.">
+<link rel="canonical" href="https://jaguarcode.org/retos/dia-de-la-semana-con-segun-en-pseudocodigo">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="apple-touch-icon" href="/icono.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Jaguar Code">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://jaguarcode.org/retos/dia-de-la-semana-con-segun-en-pseudocodigo">
+<meta property="og:title" content="Día de la semana con Según en pseudocódigo">
+<meta property="og:description" content="Algoritmo que muestra el día de la semana a partir de un número del 1 al 7 con la estructura Según: pseudocódigo, diagrama y el caso De Otro Modo.">
+<meta property="og:image" content="https://jaguarcode.org/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Día de la semana con Según en pseudocódigo">
+<meta name="twitter:description" content="Algoritmo que muestra el día de la semana a partir de un número del 1 al 7 con la estructura Según: pseudocódigo, diagrama y el caso De Otro Modo.">
+<meta name="twitter:image" content="https://jaguarcode.org/compartir.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": ["Article", "LearningResource"],
+      "@id": "https://jaguarcode.org/retos/dia-de-la-semana-con-segun-en-pseudocodigo#articulo",
+      "headline": "Día de la semana con Según en pseudocódigo",
+      "description": "Algoritmo que muestra el día de la semana a partir de un número del 1 al 7 con la estructura Según: pseudocódigo, diagrama y el caso De Otro Modo.",
+      "inLanguage": "es-MX",
+      "datePublished": "2026-10-27",
+      "dateModified": "2026-10-27",
+      "mainEntityOfPage": "https://jaguarcode.org/retos/dia-de-la-semana-con-segun-en-pseudocodigo",
+      "image": "https://jaguarcode.org/compartir.png",
+      "learningResourceType": "ejercicio",
+      "educationalLevel": "Bachillerato",
+      "teaches": "Estructura selectiva",
+      "author": { "@type": "Organization", "name": "Panterino", "url": "https://jaguarcode.org/" },
+      "publisher": { "@type": "Organization", "name": "Panterino", "logo": { "@type": "ImageObject", "url": "https://jaguarcode.org/icono.png" } }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "https://jaguarcode.org/" },
+        { "@type": "ListItem", "position": 2, "name": "Retos", "item": "https://jaguarcode.org/retos" },
+        { "@type": "ListItem", "position": 3, "name": "Algoritmo que convierte un número en un día de la semana", "item": "https://jaguarcode.org/retos/dia-de-la-semana-con-segun-en-pseudocodigo" }
+      ]
+    },
+    { "@type": "FAQPage", "mainEntity": [{"@type":"Question","name":"¿Cuándo conviene usar Según en lugar de Si?","acceptedAnswer":{"@type":"Answer","text":"Cuando comparas la misma variable con varios valores concretos, como los días de la semana. Es más corto y más fácil de leer que varios Si anidados."}},{"@type":"Question","name":"¿Para qué sirve De Otro Modo?","acceptedAnswer":{"@type":"Answer","text":"Es el caso por omisión: se ejecuta cuando el valor no coincide con ninguno de los anteriores."}}] }
+  ]
+}
+</script>
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/estilos.css">
+</head>
+<body>
+<header class="sitio-barra">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="/logo.svg" alt="" width="46" height="40">
+      <a class="nombre" href="/">Jaguar Code</a>
+      <a href="/guias">Guías</a>
+      <a href="/retos">Retos</a>
+      <a href="/profes">Para profes</a>
+      <a href="https://github.com/panterino/jaguar">GitHub</a>
+    </div>
+  </div>
+</header>
+<main class="guia">
+  <div class="ancho angosto">
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › <a href="/retos">Retos</a> › Día de la semana</nav>
+    <h1>Algoritmo que convierte un número en un día de la semana</h1>
+    <p class="resumen">La estructura Según elige entre muchas opciones sin escribir un Si detrás de otro.</p>
+    <nav class="contenido" aria-label="Contenido de la página"><b>En esta página</b>
+      <ol>
+        <li><a href="#planteamiento">El problema y su planteamiento</a></li>
+        <li><a href="#diagrama">Diagrama de flujo</a></li>
+        <li><a href="#pseudocodigo">Pseudocódigo</a></li>
+        <li><a href="#como-pensarlo">Cómo pensarlo</a></li>
+        <li><a href="#errores">Errores comunes</a></li>
+        <li><a href="#python">El mismo programa en Python</a></li>
+        <li><a href="#preguntas">Preguntas frecuentes</a></li>
+      </ol>
+    </nav>
+    <article>
+      <section id="planteamiento">
+        <h2>El problema y su planteamiento</h2>
+        <p>Lee un número del 1 al 7 y muestra el día: 1 es Lunes, 2 Martes… 7 Domingo. Con cualquier otro número muestra No existe.</p>
+        <div class="tabla"><table><caption>Planteamiento: entrada, proceso y salida</caption><thead><tr><th scope="col">Entrada</th><th scope="col">Proceso</th><th scope="col">Salida</th></tr></thead><tbody><tr><td>Un número.</td><td>Buscar a qué día corresponde: 1 es Lunes, 2 Martes… 7 Domingo.</td><td>El nombre del día, o No existe si el número no está entre 1 y 7.</td></tr></tbody></table></div>
+      </section>
+      <section id="diagrama">
+        <h2>Diagrama de flujo</h2>
+        <p>Así se dibuja el algoritmo: el óvalo marca el inicio y el fin, el paralelogramo es una entrada o una salida, el rectángulo es un proceso y el rombo es una decisión.</p>
+        <figure class="diagrama" style="margin:0">
+          <svg viewBox="0 0 1850.8 382.4" width="520" role="img" aria-labelledby="diag-tit"><title id="diag-tit">Diagrama de flujo del algoritmo día de la semana</title><g class="linea" stroke-width="1.5" fill="none" stroke-linejoin="round"><path d="M925.4 56L925.4 84"/><path d="M925.4 124L925.4 152"/><path d="M925.4 208L925.4 222L106.8 222L106.8 241.6"/><path d="M925.4 208L925.4 222L328.2 222L328.2 241.6"/><path d="M925.4 208L925.4 222L564.8 222L564.8 241.6"/><path d="M925.4 208L925.4 222L801.4 222L801.4 241.6"/><path d="M925.4 208L925.4 222L1030.4 222L1030.4 241.6"/><path d="M925.4 208L925.4 222L1259.4 222L1259.4 241.6"/><path d="M925.4 208L925.4 222L1488.4 222L1488.4 241.6"/><path d="M925.4 208L925.4 222L1728.8 222L1728.8 241.6"/><path d="M106.8 281.6L106.8 298.4L925.4 298.4"/><path d="M328.2 281.6L328.2 298.4L925.4 298.4"/><path d="M564.8 281.6L564.8 298.4L925.4 298.4"/><path d="M801.4 281.6L801.4 298.4L925.4 298.4"/><path d="M1030.4 281.6L1030.4 298.4L925.4 298.4"/><path d="M1259.4 281.6L1259.4 298.4L925.4 298.4"/><path d="M1488.4 281.6L1488.4 298.4L925.4 298.4"/><path d="M1728.8 281.6L1728.8 298.4L925.4 298.4"/><path d="M925.4 298.4L925.4 326.4"/></g><path d="M925.4 84L921.4 76L929.4 76z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M925.4 152L921.4 144L929.4 144z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M106.8 241.6L102.8 233.6L110.8 233.6z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M328.2 241.6L324.2 233.6L332.2 233.6z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M564.8 241.6L560.8 233.6L568.8 233.6z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M801.4 241.6L797.4 233.6L805.4 233.6z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M1030.4 241.6L1026.4 233.6L1034.4 233.6z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M1259.4 241.6L1255.4 233.6L1263.4 233.6z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M1488.4 241.6L1484.4 233.6L1492.4 233.6z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M1728.8 241.6L1724.8 233.6L1732.8 233.6z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M925.4 326.4L921.4 318.4L929.4 318.4z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><rect class="ini fig" x="880.4" y="16" width="90" height="40" rx="20"/><text x="925.4" y="40.5" text-anchor="middle">Inicio</text><path class="io fig" d="M879 84 H985.8 L971.8 124 H865 z"/><text x="925.4" y="108.5" text-anchor="middle">Leer dia</text><path class="dec fig" d="M925.4 152 L983.9 180 L925.4 208 L866.9 180 z"/><text x="925.4" y="184.5" text-anchor="middle">dia</text><path class="sal fig" d="M30 241.6 H197.6 L183.6 281.6 H16 z"/><text x="106.8" y="266.1" text-anchor="middle">Escribir "Lunes"</text><path class="sal fig" d="M247.6 241.6 H422.8 L408.8 281.6 H233.6 z"/><text x="328.2" y="266.1" text-anchor="middle">Escribir "Martes"</text><path class="sal fig" d="M472.8 241.6 H670.8 L656.8 281.6 H458.8 z"/><text x="564.8" y="266.1" text-anchor="middle">Escribir "Miércoles"</text><path class="sal fig" d="M720.8 241.6 H896 L882 281.6 H706.8 z"/><text x="801.4" y="266.1" text-anchor="middle">Escribir "Jueves"</text><path class="sal fig" d="M946 241.6 H1128.8 L1114.8 281.6 H932 z"/><text x="1030.4" y="266.1" text-anchor="middle">Escribir "Viernes"</text><path class="sal fig" d="M1178.8 241.6 H1354 L1340 281.6 H1164.8 z"/><text x="1259.4" y="266.1" text-anchor="middle">Escribir "Sábado"</text><path class="sal fig" d="M1404 241.6 H1586.8 L1572.8 281.6 H1390 z"/><text x="1488.4" y="266.1" text-anchor="middle">Escribir "Domingo"</text><path class="sal fig" d="M1636.8 241.6 H1834.8 L1820.8 281.6 H1622.8 z"/><text x="1728.8" y="266.1" text-anchor="middle">Escribir "No existe"</text><rect class="ini fig" x="880.4" y="326.4" width="90" height="40" rx="20"/><text x="925.4" y="350.9" text-anchor="middle">Fin</text><text x="110.8" y="224" font-size="11">1</text><text x="332.2" y="224" font-size="11">2</text><text x="568.8" y="224" font-size="11">3</text><text x="805.4" y="224" font-size="11">4</text><text x="1034.4" y="224" font-size="11">5</text><text x="1263.4" y="224" font-size="11">6</text><text x="1492.4" y="224" font-size="11">7</text><text x="1732.8" y="224" font-size="11">De Otro Modo</text></svg>
+        </figure>
+      </section>
+      <section id="pseudocodigo">
+        <h2>Pseudocódigo</h2>
+        <p>Esta es una solución. Léela línea por línea con el diagrama al lado y compara con lo que tú escribirías.</p>
+        <pre class="codigo" data-entradas="1" data-salida="Lunes" tabindex="0"><code>Algoritmo dia_de_la_semana
+    Leer dia
+    Segun dia Hacer
+        1: Escribir "Lunes"
+        2: Escribir "Martes"
+        3: Escribir "Miércoles"
+        4: Escribir "Jueves"
+        5: Escribir "Viernes"
+        6: Escribir "Sábado"
+        7: Escribir "Domingo"
+        De Otro Modo: Escribir "No existe"
+    FinSegun
+FinAlgoritmo</code></pre>
+        <div class="tabla"><table><caption>Pruebas del reto</caption><thead><tr><th scope="col">Entrada</th><th scope="col">Salida esperada</th></tr></thead><tbody><tr><td>1</td><td>Lunes</td></tr><tr><td>5</td><td>Viernes</td></tr></tbody></table></div><p class="nota-tabla">Con estas entradas, el programa debe mostrar exactamente esa salida.</p>
+      </section>
+      <section id="como-pensarlo">
+        <h2>Cómo pensarlo</h2>
+        <p>Cuando hay muchas opciones para un mismo valor, Según es más claro que una cadena de Si. Escribes Segun dia Hacer y, debajo, un renglón por cada valor: 1: Escribir "Lunes".</p>
+        <p>La opción De Otro Modo recoge todo lo que no coincide con ninguno de los casos. Aquí sirve para el 0, el 9 o cualquier número fuera de 1 a 7: muestra No existe.</p>
+        <p>La estructura se cierra con FinSegun. En el diagrama de flujo, Según se dibuja como una decisión con varias salidas, una por caso.</p>
+      </section>
+      <section id="errores">
+        <h2>Errores comunes</h2>
+        <ul>
+          <li>Olvidar De Otro Modo: con un 9 el programa no mostraría nada.</li>
+          <li>Escribir los casos con comillas ("1"): son números, no texto.</li>
+          <li>Olvidar FinSegun al final.</li>
+        </ul>
+      </section>
+      <section id="python">
+        <h2>El mismo programa en Python</h2>
+        <p>Si más adelante pasas a Python, así se ve la misma lógica. Cambian las palabras (<code>print</code>, <code>input</code>, <code>if</code>) y los bloques se marcan con sangría en lugar de <code>FinSi</code> o <code>FinPara</code>.</p>
+        <pre class="codigo" tabindex="0"><code># Algoritmo dia_de_la_semana
+dia = float(input())
+if dia == 1:
+    print("Lunes")
+elif dia == 2:
+    print("Martes")
+elif dia == 3:
+    print("Miércoles")
+elif dia == 4:
+    print("Jueves")
+elif dia == 5:
+    print("Viernes")
+elif dia == 6:
+    print("Sábado")
+elif dia == 7:
+    print("Domingo")
+else:
+    print("No existe")</code></pre>
+      </section>
+      <section id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+        <details><summary>¿Cuándo conviene usar Según en lugar de Si?</summary><p>Cuando comparas la misma variable con varios valores concretos, como los días de la semana. Es más corto y más fácil de leer que varios Si anidados.</p></details>
+        <details><summary>¿Para qué sirve De Otro Modo?</summary><p>Es el caso por omisión: se ejecuta cuando el valor no coincide con ninguno de los anteriores.</p></details>
+      </section>
+    </article>
+    <aside class="cta-guia" aria-labelledby="cta-t">
+      <h2 id="cta-t">Pruébalo paso a paso en tu celular</h2>
+      <p>En Jaguar Code escribes este algoritmo, lo ejecutas, ves su diagrama y haces la prueba de escritorio. El reto trae pistas y pruebas que te dicen si está bien. Gratis, sin anuncios y sin cuenta.</p>
+      <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir Jaguar Code</a></div>
+    </aside>
+    <h2 style="margin-top:44px">Sigue con otro reto</h2>
+    <div class="relacionadas">
+      <a href="/retos/algoritmo-aprobado-o-reprobado">Algoritmo que dice si una calificación aprueba<small>Tu primera decisión: el programa elige entre dos caminos según una condición.</small></a>
+      <a href="/retos/numero-dentro-de-un-rango-en-pseudocodigo">Algoritmo que revisa si un número está en un rango<small>Dos condiciones que se cumplen a la vez: el operador Y y los valores de borde, donde más se equivoca la gente.</small></a>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="ancho">
+    <span class="quien"><img src="/logo.svg" alt="" width="30" height="26">Un proyecto de Panterino · hecho en México</span>
+    <a href="/guias">Guías</a>
+    <a href="/retos">Retos</a>
+    <a href="/manual">Manual</a>
+    <a href="https://www.facebook.com/jaguareducation">Facebook</a>
+    <a href="https://github.com/panterino/jaguar">Código en GitHub</a>
+  </div>
+</footer>
+<script src="/acceso.js" defer></script>
+</body>
+</html>

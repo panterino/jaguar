@@ -38,6 +38,13 @@ class _Translator {
   final _numeric = <String>{};
   final _text = <String>{};
 
+  /// Variables compared with <, >, <= or >= against something that is not
+  /// text: with nothing else said, a value read to find the greater is a number.
+  final _ordered = <String>{};
+
+  /// `x <- y` between two variables: they hold the same kind of value.
+  final _copies = <(String, String)>[];
+
   /// Numbers that must be whole: positions, remainders, loop bounds.
   final _whole = <String>{};
 
@@ -45,6 +52,21 @@ class _Translator {
     _inferTypes(program.main.body);
     for (final sub in program.functions.values) {
       _inferTypes(sub.body);
+    }
+    // A value copied from or to a number that is compared is a number too.
+    for (var changed = true; changed;) {
+      changed = false;
+      for (final (to, from) in _copies) {
+        final numberTo = _numeric.contains(to) || _ordered.contains(to);
+        final numberFrom = _numeric.contains(from) || _ordered.contains(from);
+        if (numberTo && !numberFrom && !_text.contains(from)) {
+          _ordered.add(from);
+          changed = true;
+        } else if (numberFrom && !numberTo && !_text.contains(to)) {
+          _ordered.add(to);
+          changed = true;
+        }
+      }
     }
     final body = StringBuffer();
     for (final sub in program.functions.values) {
@@ -94,6 +116,11 @@ class _Translator {
             if (right is NumberLit) number(left);
             if (left is StringLit) text(right);
             if (right is StringLit) text(left);
+            if (const {'<', '>', '<=', '>='}.contains(op) && left is! StringLit && right is! StringLit) {
+              for (final side in [left, right]) {
+                if (side is VarRef) _ordered.add(side.name.toLowerCase());
+              }
+            }
             // Two values added with nothing that says text: they are numbers.
             if (op == '+' && left is! StringLit && right is! StringLit) {
               bool textual(Expr x) =>
@@ -144,6 +171,7 @@ class _Translator {
           expr(value);
           if (value is StringLit && target is VarRef) _text.add(target.name.toLowerCase());
           if (value is NumberLit && target is VarRef) _numeric.add(target.name.toLowerCase());
+          if (value is VarRef && target is VarRef) _copies.add((target.name.toLowerCase(), value.name.toLowerCase()));
         case WriteStmt(:final values):
           values.forEach(expr);
         case IfStmt(:final condition, :final thenBody, :final elseBody):
@@ -343,6 +371,7 @@ class _Translator {
     };
     if (_text.contains(name) && !_numeric.contains(name)) return 'input()';
     if (_numeric.contains(name)) return _whole.contains(name) ? 'int(input())' : 'float(input())';
+    if (_ordered.contains(name) && !_text.contains(name)) return 'float(input())';
     return 'input()';
   }
 
