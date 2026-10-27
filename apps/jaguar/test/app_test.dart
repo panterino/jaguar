@@ -239,7 +239,8 @@ void main() {
     expect(find.text('Código'), findsOneWidget);
     expect(find.text('<-'), findsOneWidget); // keyword bar
 
-    await tester.tap(find.byTooltip('Ejecutar'));
+    // Ejecutar has its word on a phone, as in the design.
+    await tester.tap(find.text('Ejecutar'));
     await tester.pumpAndSettle();
     expect(_inConsole('hola desde el cel'), findsOneWidget);
   });

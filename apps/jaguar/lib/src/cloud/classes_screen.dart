@@ -9,6 +9,14 @@ import '../theme.dart';
 import 'account_dialog.dart';
 import 'cloud.dart';
 
+/// Asks for the class code and the student's name; null if cancelled.
+Future<(String, String)?> askJoinCode(BuildContext context) =>
+    showDialog<(String, String)>(context: context, builder: (_) => const _JoinDialog());
+
+/// Asks for the name of a new class; null if cancelled.
+Future<String?> askNewClassName(BuildContext context) =>
+    _askText(context, title: 'Nueva clase', label: 'Nombre de la clase', hint: '1° A · Lógica');
+
 /// My classes: the teacher creates them; students join with a code.
 class ClassesScreen extends StatefulWidget {
   const ClassesScreen({

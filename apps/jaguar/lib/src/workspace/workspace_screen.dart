@@ -485,6 +485,34 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
     );
   }
 
+  /// A student opens a task from their class: the results of Probar go to the
+  /// teacher.
+  void _openAssignment(Assignment assignment) {
+    widget.cloud?.linkAssignment(assignment.exercise, assignment);
+    widget.exercises.saveReceived(assignment.exercise);
+    _openExercise(assignment.exercise);
+  }
+
+  void _openClass(ClassRoom room) {
+    final cloud = widget.cloud;
+    if (cloud == null) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (_) => ClassScreen(
+          cloud: cloud,
+          room: room,
+          exercises: widget.exercises,
+          onOpenAssignment: (assignment) {
+            widget.exercises.saveReceived(assignment.exercise);
+            _openExercise(assignment.exercise);
+          },
+          onOpenSource: _openSource,
+        ),
+      ),
+    );
+  }
+
   void _openClasses() {
     final cloud = widget.cloud;
     if (cloud == null) {
@@ -1462,8 +1490,17 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
   /// is in its statement.
   String _barTitle() {
     final exercise = _exercise;
-    if (exercise != null && challengeById(exercise.id) != null) return exercise.title.split(' · ').first;
+    if (exercise != null && challengeById(exercise.id) != null) return exercise.title.split(' · ').last;
     return programName(_code.text);
+  }
+
+  /// Where the program in the editor comes from, under its name.
+  String _barSubtitle() {
+    final exercise = _exercise;
+    if (exercise == null) return 'Taller';
+    final index = challenges.indexWhere((c) => c.id == exercise.id);
+    if (index < 0) return 'Ejercicio del profe';
+    return 'Ruta · Nivel ${challenges[index].level} · Reto ${index + 1}';
   }
 
   void _openHome() {
@@ -1575,7 +1612,8 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
     onOpenGuide: _showGuide,
     onOpenSettings: _openSettings,
     onScan: canScanQr ? _scanQr : null,
-    onOpenClasses: widget.cloud == null ? null : _openClasses,
+    onOpenAssignment: widget.cloud == null ? null : _openAssignment,
+    onOpenClass: widget.cloud == null ? null : _openClass,
     onOpenTeacher: _settings.teacher ? _openTeacher : null,
   );
 
@@ -1591,6 +1629,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
       settings: _settings,
       store: _store,
       exercises: widget.exercises,
+      cloud: widget.cloud,
       actions: _roomActions(),
     ),
   );
@@ -1600,7 +1639,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
     final width = MediaQuery.sizeOf(context).width;
     final wide = width >= _wideLayoutWidth;
     // On phones the program name needs the room: Ejecutar becomes an icon.
-    final compact = width < 480;
+    final compact = width < 340 || MediaQuery.textScalerOf(context).scale(1) > 1.2;
     final scheme = Theme.of(context).colorScheme;
     final empty = _store.isEmpty;
     // Two points smaller on phones, so most lines fit without scrolling.
@@ -1694,7 +1733,20 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
               ? const Text('Jaguar')
               : ListenableBuilder(
                   listenable: _code,
-                  builder: (context, _) => Text(_barTitle(), overflow: TextOverflow.ellipsis),
+                  builder: (context, _) => Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(_barTitle(), overflow: TextOverflow.ellipsis),
+                      Text(
+                        _barSubtitle(),
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
           // Three controls: the menu, play and the rest. What is used less
           // lives under the three dots.
