@@ -602,6 +602,123 @@ Future<String> _diagramaWeb() async {
   return b.toString();
 }
 
+// Descargas ------------------------------------------------------------------
+
+const _rutaDescargas = '/descargas';
+const _bajar = 'https://github.com/panterino/jaguar/releases/latest/download';
+
+String _descargas() {
+  const titulo = 'Descargar Jaguar Code: Android, Mac y Linux';
+  const desc =
+      'Descarga Jaguar Code gratis para Android (APK), Mac (DMG) y Linux. También funciona sin instalar en el navegador. Sin anuncios y sin cuenta.';
+  const preguntas = <(String, String)>[
+    (
+      '¿Es seguro instalar el APK fuera de Google Play?',
+      'El APK está firmado por Panterino y su código es abierto en GitHub. Android pide permiso para instalar apps de fuera de la tienda; se da solo para el navegador o el administrador de archivos con el que lo abres. Cada descarga trae una suma de verificación SHA-256 en la página de la versión.',
+    ),
+    (
+      '¿Por qué el Mac dice que no puede verificar la app?',
+      'La app aún no está notarizada por Apple, un trámite de paga. La primera vez, haz clic derecho sobre Jaguar Code, elige Abrir y confirma. Después abre como cualquier otra.',
+    ),
+    (
+      '¿Hay versión para Windows o iPhone?',
+      'Todavía no. Mientras tanto, la versión web funciona en cualquier navegador, incluidos Windows, iPhone y iPad, y se puede agregar a la pantalla de inicio.',
+    ),
+    (
+      '¿Qué cambia entre la descarga y la versión web?',
+      'Es la misma app. En Linux faltan las clases y la comunidad, que dependen de un servicio sin versión para ese sistema; todo lo demás funciona sin internet.',
+    ),
+  ];
+  final faq = preguntas
+      .map((p) => '{"@type":"Question","name":"${g.json(p.$1)}","acceptedAnswer":{"@type":"Answer","text":"${g.json(p.$2)}"}}')
+      .join(',');
+  final datos =
+      """
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "name": "Jaguar Code",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Android, macOS, Linux, Web",
+      "inLanguage": "es-MX",
+      "isAccessibleForFree": true,
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "MXN" },
+      "downloadUrl": "${g.sitio}$_rutaDescargas",
+      "publisher": { "@type": "Organization", "name": "Panterino", "url": "${g.sitio}/" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "${g.sitio}/" },
+        { "@type": "ListItem", "position": 2, "name": "Descargas", "item": "${g.sitio}$_rutaDescargas" }
+      ]
+    },
+    { "@type": "FAQPage", "mainEntity": [$faq] }
+  ]
+}
+</script>""";
+  final b = StringBuffer(g.cabeza(titulo: titulo, descripcion: desc, ruta: _rutaDescargas, tipo: 'website', extra: datos));
+  b.write("""
+<main class="guia">
+  <div class="ancho angosto">
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › Descargas</nav>
+    <h1>Descargar Jaguar Code</h1>
+    <p class="resumen">Instálalo en tu celular o tu computadora, o ábrelo sin instalar nada en el navegador. Es gratis, sin anuncios y sin cuenta, y el código es abierto.</p>
+
+    <div class="relacionadas descargas">
+      <a href="https://app.jaguarcode.org/">Navegador<small>Sin instalar. Funciona en Windows, Mac, Linux, Android, iPhone y iPad.</small></a>
+      <a href="$_bajar/JaguarCode-android.apk">Android (APK)<small>Para celulares y tabletas con Android.</small></a>
+      <a href="$_bajar/JaguarCode-macos.dmg">Mac (DMG)<small>Para Mac con chip de Apple o Intel.</small></a>
+      <a href="$_bajar/JaguarCode-linux-x64.tar.gz">Linux (tar.gz)<small>Para Linux de 64 bits con escritorio GTK.</small></a>
+    </div>
+    <p class="nota-tabla">Todas las versiones y sus sumas de verificación están en <a href="https://github.com/panterino/jaguar/releases">la página de versiones</a>.</p>
+
+    <article>
+      <section id="android">
+        <h2>Cómo instalarlo en Android</h2>
+        <ol>
+          <li>Descarga el archivo APK desde tu celular.</li>
+          <li>Ábrelo. Si Android lo pide, permite instalar apps desde esa fuente (solo para el navegador o el administrador de archivos que usaste).</li>
+          <li>Toca Instalar y abre Jaguar Code.</li>
+        </ol>
+      </section>
+      <section id="mac">
+        <h2>Cómo instalarlo en Mac</h2>
+        <ol>
+          <li>Abre el archivo DMG y arrastra Jaguar Code a la carpeta Aplicaciones.</li>
+          <li>La primera vez, haz clic derecho sobre la app, elige Abrir y confirma. Es necesario porque la app aún no está notarizada por Apple.</li>
+        </ol>
+      </section>
+      <section id="linux">
+        <h2>Cómo usarlo en Linux</h2>
+        <ol>
+          <li>Descomprime el archivo: <code>tar -xzf JaguarCode-linux-x64.tar.gz</code>.</li>
+          <li>Entra a la carpeta y ejecuta <code>./jaguar</code>.</li>
+          <li>Para tenerlo en el menú de aplicaciones, ejecuta <code>./instalar.sh</code> y no muevas la carpeta de lugar.</li>
+        </ol>
+        <p>En Linux no están las clases ni la comunidad; el resto funciona sin conexión.</p>
+      </section>
+      <section id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+        ${preguntas.map((p) => '<details><summary>${g.esc(p.$1)}</summary><p>${g.esc(p.$2)}</p></details>').join('\n        ')}
+      </section>
+    </article>
+    <h2 style="margin-top:44px">Antes de instalar</h2>
+    <div class="relacionadas">
+      <a href="/herramientas/prueba-de-escritorio">Prueba de escritorio online<small>La tabla de variables de tu algoritmo, en el navegador.</small></a>
+      <a href="/herramientas/diagrama-de-flujo-online">Diagrama de flujo online<small>Pega tu pseudocódigo y descarga el diagrama.</small></a>
+      <a href="/retos">Retos resueltos paso a paso<small>Con su diagrama y su pseudocódigo.</small></a>
+    </div>
+  </div>
+</main>
+""");
+  b.write(g.pie);
+  return b.toString();
+}
+
 // Mapa del sitio ---------------------------------------------------------
 
 String _mapa() {
@@ -611,6 +728,7 @@ String _mapa() {
     url('/', 'weekly', '1.0'),
     url('/guias', 'monthly', '0.8'),
     for (final guia in g.guias) url('/guias/${guia.slug}', 'monthly', '0.8'),
+    url('/descargas', 'monthly', '0.8'),
     url('/herramientas/prueba-de-escritorio', 'monthly', '0.9'),
     url('/herramientas/diagrama-de-flujo-online', 'monthly', '0.9'),
     url('/retos', 'monthly', '0.8'),
@@ -633,6 +751,7 @@ Future<void> main() async {
   Directory('../../sitio/herramientas').createSync(recursive: true);
   File('../../sitio/herramientas/prueba-de-escritorio.html').writeAsStringSync(await _herramienta());
   File('../../sitio/herramientas/diagrama-de-flujo-online.html').writeAsStringSync(await _diagramaWeb());
+  File('../../sitio/descargas.html').writeAsStringSync(_descargas());
   File('../../sitio/sitemap.xml').writeAsStringSync(_mapa());
   stdout.writeln('Listo: ${_orden.length + 1} páginas en sitio/retos y el mapa del sitio');
 }

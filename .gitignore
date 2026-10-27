@@ -36,3 +36,4 @@ apps/jaguar/tool/capturas/salida/
 
 # Cloudflare: estado local de wrangler dev
 .wrangler/
+dist/
