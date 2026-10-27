@@ -7,7 +7,6 @@
 // (packages/jaguar_core/test/guias_test.dart) los ejecuta con el intérprete.
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math' as math;
 
 import 'package:jaguar/src/challenges/challenges.dart';
 import 'package:jaguar/src/challenges/soluciones.dart';
@@ -39,67 +38,10 @@ String _nombre(Challenge c) => c.exercise.title.replaceFirst(RegExp(r'^Reto \d+ 
 
 // Diagrama ---------------------------------------------------------------
 
-String _f(num n) => n.toStringAsFixed(1).replaceAll(RegExp(r'\.0$'), '');
-
 /// El diagrama de flujo del programa, como SVG que usa los colores de la
 /// página (las clases de .diagrama en estilos.css).
-String _diagrama(Program programa, String titulo) {
-  final chart = flowchartsFor(programa, metrics: const FlowMetrics(charWidth: 7.6, margin: 16)).first;
-  final w = chart.width;
-  final h = chart.height;
-  final b = StringBuffer(
-    '<svg viewBox="0 0 ${_f(w)} ${_f(h)}" width="${_f(math.min(w, 520))}" role="img" aria-labelledby="diag-tit">'
-    '<title id="diag-tit">${g.esc(titulo)}</title>',
-  );
-  b.write('<g class="linea" stroke-width="1.5" fill="none" stroke-linejoin="round">');
-  final cabezas = StringBuffer();
-  for (final line in chart.lines) {
-    final p = line.points;
-    b.write('<path d="M${_f(p.first.$1)} ${_f(p.first.$2)}${[for (final q in p.skip(1)) 'L${_f(q.$1)} ${_f(q.$2)}'].join()}"/>');
-    if (line.arrow && p.length >= 2) {
-      final (x, y) = p.last;
-      final (px, py) = p[p.length - 2];
-      final dx = x - px;
-      final dy = y - py;
-      final largo = math.sqrt(dx * dx + dy * dy);
-      if (largo > 0) {
-        final ux = dx / largo;
-        final uy = dy / largo;
-        // Una punta de flecha de 8 de largo y 4 de cada lado.
-        final bx = x - ux * 8;
-        final by = y - uy * 8;
-        cabezas.write(
-          '<path d="M${_f(x)} ${_f(y)}L${_f(bx - uy * 4)} ${_f(by + ux * 4)}L${_f(bx + uy * 4)} ${_f(by - ux * 4)}z" style="fill:var(--fig-linea);stroke:none"/>',
-        );
-      }
-    }
-  }
-  b.write('</g>$cabezas');
-  for (final block in chart.blocks) {
-    final r = block.rect;
-    final l = _f(r.left);
-    final t = _f(r.top);
-    final shape = switch (block.shape) {
-      BlockShape.terminal =>
-        '<rect class="ini fig" x="$l" y="$t" width="${_f(r.width)}" height="${_f(r.height)}" rx="${_f(r.height / 2)}"/>',
-      BlockShape.process ||
-      BlockShape.call => '<rect class="proc fig" x="$l" y="$t" width="${_f(r.width)}" height="${_f(r.height)}" rx="3"/>',
-      BlockShape.input || BlockShape.output =>
-        '<path class="${block.shape == BlockShape.input ? 'io' : 'sal'} fig" d="M${_f(r.left + r.height * 0.35)} $t H${_f(r.right)} L${_f(r.right - r.height * 0.35)} ${_f(r.bottom)} H${_f(r.left)} z"/>',
-      BlockShape.decision =>
-        '<path class="dec fig" d="M${_f(r.centerX)} $t L${_f(r.right)} ${_f(r.centerY)} L${_f(r.centerX)} ${_f(r.bottom)} L$l ${_f(r.centerY)} z"/>',
-      BlockShape.loop =>
-        '<path class="dec fig" d="M${_f(r.left + r.height * 0.4)} $t H${_f(r.right - r.height * 0.4)} L${_f(r.right)} ${_f(r.centerY)} L${_f(r.right - r.height * 0.4)} ${_f(r.bottom)} H${_f(r.left + r.height * 0.4)} L$l ${_f(r.centerY)} z"/>',
-    };
-    b.write(shape);
-    b.write('<text x="${_f(r.centerX)}" y="${_f(r.centerY + 4.5)}" text-anchor="middle">${g.esc(block.text)}</text>');
-  }
-  for (final label in chart.labels) {
-    b.write('<text x="${_f(label.x)}" y="${_f(label.y)}" font-size="11">${g.esc(label.text)}</text>');
-  }
-  b.write('</svg>');
-  return b.toString();
-}
+String _diagrama(Program programa, String titulo) =>
+    flowchartSvg(flowchartsFor(programa, metrics: const FlowMetrics(charWidth: 7.6, margin: 16)).first, title: titulo);
 
 // Páginas ----------------------------------------------------------------
 
@@ -458,12 +400,203 @@ Future<String> _herramienta() async {
     <h2 style="margin-top:44px">Sigue aprendiendo</h2>
     <div class="relacionadas">
       <a href="/guias/prueba-de-escritorio">La prueba de escritorio<small>Cómo seguir un programa a mano con una tabla, con un ejemplo completo.</small></a>
+      <a href="/herramientas/diagrama-de-flujo-online">Diagrama de flujo online<small>Pega tu pseudocódigo y descarga el diagrama.</small></a>
       <a href="/retos">Retos resueltos paso a paso<small>Doce problemas con planteamiento, diagrama y pseudocódigo.</small></a>
       <a href="/guias/pseint-en-el-celular">Pseudocódigo en el celular<small>Qué buscar en una app para Android.</small></a>
     </div>
   </div>
 </main>
 <script src="/herramientas/herramienta.js" defer></script>
+""");
+  b.write(g.pie);
+  return b.toString();
+}
+
+// Herramienta de diagramas de flujo -----------------------------------------
+
+const _ejemplosDiagrama = <(String, String)>[
+  (
+    'Promedio y decisión',
+    'Algoritmo promedio\n    Leer a, b\n    p <- (a + b) / 2\n    Si p >= 6 Entonces\n        Escribir "Pasaste"\n    SiNo\n        Escribir "Casi"\n    FinSi\nFinAlgoritmo\n',
+  ),
+  (
+    'Tabla de multiplicar (Para)',
+    'Algoritmo tabla\n    Leer n\n    Para i <- 1 Hasta 10 Hacer\n        Escribir n, " x ", i, " = ", n * i\n    FinPara\nFinAlgoritmo\n',
+  ),
+  (
+    'Suma hasta el cero (Mientras)',
+    'Algoritmo suma_hasta_cero\n    suma <- 0\n    Leer n\n    Mientras n <> 0 Hacer\n        suma <- suma + n\n        Leer n\n    FinMientras\n    Escribir "Suma: ", suma\nFinAlgoritmo\n',
+  ),
+  (
+    'Contraseña (Repetir)',
+    'Algoritmo contrasena\n    Definir clave Como Texto\n    intentos <- 0\n    Repetir\n        Leer clave\n        intentos <- intentos + 1\n    Hasta Que clave = "jaguar"\n    Escribir "Entraste en ", intentos, " intentos"\nFinAlgoritmo\n',
+  ),
+  (
+    'Día de la semana (Según)',
+    'Algoritmo dia\n    Leer d\n    Segun d Hacer\n        1: Escribir "Lunes"\n        2: Escribir "Martes"\n        3: Escribir "Miércoles"\n        De Otro Modo: Escribir "Otro día"\n    FinSegun\nFinAlgoritmo\n',
+  ),
+];
+
+const _rutaDiagrama = '/herramientas/diagrama-de-flujo-online';
+
+Future<String> _diagramaWeb() async {
+  const titulo = 'Diagrama de flujo online desde pseudocódigo (gratis)';
+  const desc =
+      'Escribe pseudocódigo y mira al instante su diagrama de flujo. Descárgalo como imagen o SVG. Gratis, sin registro, y con la tabla para pasar del diagrama al código.';
+  for (final (nombre, fuente) in _ejemplosDiagrama) {
+    final programa = parse(fuente); // un ejemplo con error detendría la generación
+    assert(flowchartsFor(programa).isNotEmpty, nombre);
+  }
+  final primero = _ejemplosDiagrama.first;
+  final estatico = flowchartSvg(
+    flowchartsFor(parse(primero.$2), metrics: const FlowMetrics(charWidth: 7.6, margin: 16)).first,
+    title: 'Diagrama de flujo del algoritmo promedio',
+  );
+  final preguntas = <(String, String)>[
+    (
+      '¿Cómo paso un diagrama de flujo a pseudocódigo?',
+      'Recorre el diagrama de arriba abajo y escribe una instrucción por símbolo: el óvalo de inicio es Algoritmo, el paralelogramo de entrada es Leer, el de salida es Escribir, el rectángulo es una asignación y el rombo es un Si o un Mientras. La tabla de esta página trae todas las equivalencias.',
+    ),
+    (
+      '¿Esta herramienta convierte diagramas dibujados a pseudocódigo?',
+      'Esta herramienta va del pseudocódigo al diagrama. Para el camino contrario, la app Jaguar Code te deja armar el diagrama con las figuras y el pseudocódigo se escribe solo.',
+    ),
+    (
+      '¿Puedo descargar el diagrama?',
+      'Sí, como imagen PNG o como archivo SVG, que se puede abrir en cualquier editor y escalar sin perder calidad.',
+    ),
+    ('¿Se guarda o se envía mi código?', 'No. El diagrama se dibuja en tu navegador y tu código no se envía a ningún servidor.'),
+    (
+      '¿Qué instrucciones entiende?',
+      'Algoritmo, Definir, Leer, Escribir, Si, Segun, Mientras, Repetir, Para, arreglos y funciones. Si el código tiene un error, te dice la línea y conserva el último diagrama.',
+    ),
+  ];
+  final faq = preguntas
+      .map((p) => '{"@type":"Question","name":"${g.json(p.$1)}","acceptedAnswer":{"@type":"Answer","text":"${g.json(p.$2)}"}}')
+      .join(',');
+  final datos =
+      """
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "${g.sitio}$_rutaDiagrama#herramienta",
+      "name": "Diagrama de flujo online desde pseudocódigo",
+      "description": "${g.json(desc)}",
+      "url": "${g.sitio}$_rutaDiagrama",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Cualquiera con navegador",
+      "browserRequirements": "Requiere JavaScript",
+      "inLanguage": "es-MX",
+      "isAccessibleForFree": true,
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "MXN" },
+      "publisher": { "@type": "Organization", "name": "Panterino", "url": "${g.sitio}/" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "${g.sitio}/" },
+        { "@type": "ListItem", "position": 2, "name": "Diagrama de flujo online", "item": "${g.sitio}$_rutaDiagrama" }
+      ]
+    },
+    { "@type": "FAQPage", "mainEntity": [$faq] }
+  ]
+}
+</script>""";
+  final ejemplosJson = jsonEncode([
+    for (final e in _ejemplosDiagrama) {'nombre': e.$1, 'fuente': e.$2},
+  ]).replaceAll('<', r'<');
+  final tabla = g.tabla(
+    'De cada símbolo del diagrama a su instrucción',
+    ['Símbolo', 'Qué significa', 'Se escribe así'],
+    [
+      ['Óvalo (Inicio y Fin)', 'Donde empieza y termina', '<code>Algoritmo nombre</code> y <code>FinAlgoritmo</code>'],
+      ['Paralelogramo de entrada', 'Pide un dato', '<code>Leer a, b</code>'],
+      ['Paralelogramo de salida', 'Muestra algo', '<code>Escribir "Promedio: ", p</code>'],
+      ['Rectángulo', 'Una operación o asignación', '<code>p &lt;- (a + b) / 2</code>'],
+      ['Rombo con dos salidas (Sí y No)', 'Una decisión', '<code>Si p &gt;= 6 Entonces … SiNo … FinSi</code>'],
+      [
+        'Rombo que regresa hacia arriba',
+        'Un ciclo que se repite mientras se cumple algo',
+        '<code>Mientras n &lt;&gt; 0 Hacer … FinMientras</code>',
+      ],
+      ['Hexágono', 'Un ciclo con contador', '<code>Para i &lt;- 1 Hasta 10 Hacer … FinPara</code>'],
+    ],
+  );
+  final b = StringBuffer(g.cabeza(titulo: titulo, descripcion: desc, ruta: _rutaDiagrama, tipo: 'website', extra: datos));
+  b.write("""
+<main class="guia">
+  <div class="ancho">
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › Diagrama de flujo online</nav>
+    <h1>Diagrama de flujo online a partir de tu pseudocódigo</h1>
+    <p class="resumen">Escribe tu algoritmo a la izquierda y mira su diagrama de flujo al instante. Descárgalo como imagen o SVG para tu tarea. Gratis, sin registro y sin salir de tu navegador.</p>
+
+    <div class="herramienta dos-columnas" role="region" aria-labelledby="herr-t">
+      <h2 id="herr-t" style="margin-top:0">Genera tu diagrama</h2>
+      <div class="acciones" style="margin:0 0 6px">
+        <label for="ejemplo">Ejemplos:
+          <select id="ejemplo">
+            <option value="" selected disabled>Elige uno</option>
+            ${[for (final (i, e) in _ejemplosDiagrama.indexed) '<option value="$i">${g.esc(e.$1)}</option>'].join('\n            ')}
+          </select>
+        </label>
+      </div>
+      <div class="cols">
+        <div>
+          <label for="fuente">Pseudocódigo</label>
+          <textarea id="fuente" rows="16" spellcheck="false" autocapitalize="off" autocomplete="off">${g.esc(primero.$2)}</textarea>
+        </div>
+        <div>
+          <p style="font-weight:700;margin:14px 0 6px">Diagrama de flujo</p>
+          <div id="diagrama-salida" class="resultado" style="margin-top:0" aria-live="polite">
+            <figure class="diagrama" style="margin:0">$estatico</figure>
+          </div>
+        </div>
+      </div>
+      <div class="acciones">
+        <button class="boton linea" type="button" id="bajar-png">Descargar imagen (PNG)</button>
+        <button class="boton linea" type="button" id="bajar-svg">Descargar SVG</button>
+      </div>
+      <p class="estado" id="estado-herramienta" role="status" aria-live="polite"></p>
+      <noscript><p class="nota-tabla">Para dibujar tu propio diagrama hace falta JavaScript. Mientras, arriba ves el diagrama del ejemplo.</p></noscript>
+    </div>
+    <script type="application/json" id="ejemplos-datos">$ejemplosJson</script>
+
+    <article>
+      <section id="de-diagrama-a-pseudocodigo">
+        <h2>Cómo pasar un diagrama de flujo a pseudocódigo</h2>
+        <p>Si ya tienes un diagrama dibujado y necesitas el código, recórrelo de arriba abajo, siguiendo las flechas, y escribe una instrucción por cada símbolo. Esta es la equivalencia de cada figura:</p>
+        $tabla
+        <ol>
+          <li>Empieza por el óvalo de inicio: escribe <code>Algoritmo</code> con el nombre del programa.</li>
+          <li>Sigue las flechas. Cada paralelogramo y cada rectángulo es una línea de código, en el mismo orden.</li>
+          <li>En cada rombo, escribe el <code>Si</code> con su condición. Lo que está en la salida <i>Sí</i> va dentro del <code>Si</code> y lo de la salida <i>No</i> dentro del <code>SiNo</code>.</li>
+          <li>Si una flecha regresa a un rombo anterior, es un ciclo: lo que está en el camino de regreso va dentro del <code>Mientras</code>.</li>
+          <li>Cierra con el óvalo de fin: <code>FinAlgoritmo</code>.</li>
+        </ol>
+        <p>Pega el resultado arriba para comprobar que el diagrama que dibuja es el tuyo. Si quieres practicar el camino completo, la guía de <a href="/guias/como-hacer-un-diagrama-de-flujo">cómo hacer un diagrama de flujo</a> lo explica con un ejemplo.</p>
+      </section>
+      <section id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+        ${preguntas.map((p) => '<details><summary>${g.esc(p.$1)}</summary><p>${g.esc(p.$2)}</p></details>').join('\n        ')}
+      </section>
+    </article>
+    <aside class="cta-guia" aria-labelledby="cta-t">
+      <h2 id="cta-t">Arma el diagrama con figuras en tu celular</h2>
+      <p>En Jaguar Code dibujas el diagrama tocando figuras y el pseudocódigo se escribe solo, y al revés. Trae también bloques, la prueba de escritorio y doce retos con pistas. Gratis, sin anuncios y sin cuenta.</p>
+      <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir Jaguar Code</a></div>
+    </aside>
+    <h2 style="margin-top:44px">Sigue aprendiendo</h2>
+    <div class="relacionadas">
+      <a href="/herramientas/prueba-de-escritorio">Prueba de escritorio online<small>La tabla de variables de tu algoritmo, paso a paso.</small></a>
+      <a href="/guias/como-hacer-un-diagrama-de-flujo">Cómo hacer un diagrama de flujo<small>Los símbolos y un ejemplo paso a paso.</small></a>
+      <a href="/retos">Retos resueltos paso a paso<small>Con su diagrama y su pseudocódigo.</small></a>
+    </div>
+  </div>
+</main>
+<script src="/herramientas/diagrama.js" defer></script>
 """);
   b.write(g.pie);
   return b.toString();
@@ -479,6 +612,7 @@ String _mapa() {
     url('/guias', 'monthly', '0.8'),
     for (final guia in g.guias) url('/guias/${guia.slug}', 'monthly', '0.8'),
     url('/herramientas/prueba-de-escritorio', 'monthly', '0.9'),
+    url('/herramientas/diagrama-de-flujo-online', 'monthly', '0.9'),
     url('/retos', 'monthly', '0.8'),
     for (final id in _orden) url(_ruta(id), 'monthly', '0.8'),
     url('/profes', 'monthly', '0.7'),
@@ -498,6 +632,7 @@ Future<void> main() async {
   }
   Directory('../../sitio/herramientas').createSync(recursive: true);
   File('../../sitio/herramientas/prueba-de-escritorio.html').writeAsStringSync(await _herramienta());
+  File('../../sitio/herramientas/diagrama-de-flujo-online.html').writeAsStringSync(await _diagramaWeb());
   File('../../sitio/sitemap.xml').writeAsStringSync(_mapa());
   stdout.writeln('Listo: ${_orden.length + 1} páginas en sitio/retos y el mapa del sitio');
 }

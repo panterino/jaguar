@@ -8,6 +8,7 @@ export 'src/editing.dart';
 export 'src/errors.dart';
 export 'src/exercise.dart';
 export 'src/flowchart.dart';
+export 'src/flowchart_svg.dart' show flowchartSvg;
 export 'src/format.dart' show Notation, assignArrow, formatExpr, formatSimpleStmt;
 export 'src/interpreter.dart' show BufferedIO, Interpreter, JaguarIO, RunOptions, StepHook;
 export 'src/parser.dart' show parse;

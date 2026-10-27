@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diagrama de flujo online desde pseudocódigo (gratis)</title>
+<meta name="description" content="Escribe pseudocódigo y mira al instante su diagrama de flujo. Descárgalo como imagen o SVG. Gratis, sin registro, y con la tabla para pasar del diagrama al código.">
+<link rel="canonical" href="https://jaguarcode.org/herramientas/diagrama-de-flujo-online">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="apple-touch-icon" href="/icono.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Jaguar Code">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://jaguarcode.org/herramientas/diagrama-de-flujo-online">
+<meta property="og:title" content="Diagrama de flujo online desde pseudocódigo (gratis)">
+<meta property="og:description" content="Escribe pseudocódigo y mira al instante su diagrama de flujo. Descárgalo como imagen o SVG. Gratis, sin registro, y con la tabla para pasar del diagrama al código.">
+<meta property="og:image" content="https://jaguarcode.org/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Diagrama de flujo online desde pseudocódigo (gratis)">
+<meta name="twitter:description" content="Escribe pseudocódigo y mira al instante su diagrama de flujo. Descárgalo como imagen o SVG. Gratis, sin registro, y con la tabla para pasar del diagrama al código.">
+<meta name="twitter:image" content="https://jaguarcode.org/compartir.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://jaguarcode.org/herramientas/diagrama-de-flujo-online#herramienta",
+      "name": "Diagrama de flujo online desde pseudocódigo",
+      "description": "Escribe pseudocódigo y mira al instante su diagrama de flujo. Descárgalo como imagen o SVG. Gratis, sin registro, y con la tabla para pasar del diagrama al código.",
+      "url": "https://jaguarcode.org/herramientas/diagrama-de-flujo-online",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Cualquiera con navegador",
+      "browserRequirements": "Requiere JavaScript",
+      "inLanguage": "es-MX",
+      "isAccessibleForFree": true,
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "MXN" },
+      "publisher": { "@type": "Organization", "name": "Panterino", "url": "https://jaguarcode.org/" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "https://jaguarcode.org/" },
+        { "@type": "ListItem", "position": 2, "name": "Diagrama de flujo online", "item": "https://jaguarcode.org/herramientas/diagrama-de-flujo-online" }
+      ]
+    },
+    { "@type": "FAQPage", "mainEntity": [{"@type":"Question","name":"¿Cómo paso un diagrama de flujo a pseudocódigo?","acceptedAnswer":{"@type":"Answer","text":"Recorre el diagrama de arriba abajo y escribe una instrucción por símbolo: el óvalo de inicio es Algoritmo, el paralelogramo de entrada es Leer, el de salida es Escribir, el rectángulo es una asignación y el rombo es un Si o un Mientras. La tabla de esta página trae todas las equivalencias."}},{"@type":"Question","name":"¿Esta herramienta convierte diagramas dibujados a pseudocódigo?","acceptedAnswer":{"@type":"Answer","text":"Esta herramienta va del pseudocódigo al diagrama. Para el camino contrario, la app Jaguar Code te deja armar el diagrama con las figuras y el pseudocódigo se escribe solo."}},{"@type":"Question","name":"¿Puedo descargar el diagrama?","acceptedAnswer":{"@type":"Answer","text":"Sí, como imagen PNG o como archivo SVG, que se puede abrir en cualquier editor y escalar sin perder calidad."}},{"@type":"Question","name":"¿Se guarda o se envía mi código?","acceptedAnswer":{"@type":"Answer","text":"No. El diagrama se dibuja en tu navegador y tu código no se envía a ningún servidor."}},{"@type":"Question","name":"¿Qué instrucciones entiende?","acceptedAnswer":{"@type":"Answer","text":"Algoritmo, Definir, Leer, Escribir, Si, Segun, Mientras, Repetir, Para, arreglos y funciones. Si el código tiene un error, te dice la línea y conserva el último diagrama."}}] }
+  ]
+}
+</script>
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/estilos.css">
+</head>
+<body>
+<header class="sitio-barra">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="/logo.svg" alt="" width="46" height="40">
+      <a class="nombre" href="/">Jaguar Code</a>
+      <a href="/guias">Guías</a>
+      <a href="/retos">Retos</a>
+      <a href="/profes">Para profes</a>
+      <a href="https://github.com/panterino/jaguar">GitHub</a>
+    </div>
+  </div>
+</header>
+<main class="guia">
+  <div class="ancho">
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › Diagrama de flujo online</nav>
+    <h1>Diagrama de flujo online a partir de tu pseudocódigo</h1>
+    <p class="resumen">Escribe tu algoritmo a la izquierda y mira su diagrama de flujo al instante. Descárgalo como imagen o SVG para tu tarea. Gratis, sin registro y sin salir de tu navegador.</p>
+
+    <div class="herramienta dos-columnas" role="region" aria-labelledby="herr-t">
+      <h2 id="herr-t" style="margin-top:0">Genera tu diagrama</h2>
+      <div class="acciones" style="margin:0 0 6px">
+        <label for="ejemplo">Ejemplos:
+          <select id="ejemplo">
+            <option value="" selected disabled>Elige uno</option>
+            <option value="0">Promedio y decisión</option>
+            <option value="1">Tabla de multiplicar (Para)</option>
+            <option value="2">Suma hasta el cero (Mientras)</option>
+            <option value="3">Contraseña (Repetir)</option>
+            <option value="4">Día de la semana (Según)</option>
+          </select>
+        </label>
+      </div>
+      <div class="cols">
+        <div>
+          <label for="fuente">Pseudocódigo</label>
+          <textarea id="fuente" rows="16" spellcheck="false" autocapitalize="off" autocomplete="off">Algoritmo promedio
+    Leer a, b
+    p &lt;- (a + b) / 2
+    Si p &gt;= 6 Entonces
+        Escribir "Pasaste"
+    SiNo
+        Escribir "Casi"
+    FinSi
+FinAlgoritmo
+</textarea>
+        </div>
+        <div>
+          <p style="font-weight:700;margin:14px 0 6px">Diagrama de flujo</p>
+          <div id="diagrama-salida" class="resultado" style="margin-top:0" aria-live="polite">
+            <figure class="diagrama" style="margin:0"><svg viewBox="0 0 438.8 433.6" width="438.8" role="img" aria-labelledby="diag-tit"><title id="diag-tit">Diagrama de flujo del algoritmo promedio</title><g class="linea" stroke-width="1.5" fill="none" stroke-linejoin="round"><path d="M208 56L208 84"/><path d="M208 124L208 152"/><path d="M208 192L208 220"/><path d="M149.2 248L103 248L103 292.8"/><path d="M266.8 248L324.4 248L324.4 292.8"/><path d="M103 332.8L103 349.6L208 349.6"/><path d="M324.4 332.8L324.4 349.6L208 349.6"/><path d="M208 349.6L208 377.6"/></g><path d="M208 84L204 76L212 76z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M208 152L204 144L212 144z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M208 220L204 212L212 212z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M103 292.8L99 284.8L107 284.8z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M324.4 292.8L320.4 284.8L328.4 284.8z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M208 377.6L204 369.6L212 369.6z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><rect class="ini fig" x="163" y="16" width="90" height="40" rx="20"/><text x="208" y="40.5" text-anchor="middle">Inicio</text><path class="io fig" d="M157.8 84 H272.2 L258.2 124 H143.8 z"/><text x="208" y="108.5" text-anchor="middle">Leer a, b</text><rect class="proc fig" x="131.2" y="152" width="153.6" height="40" rx="3"/><text x="208" y="176.5" text-anchor="middle">p &lt;- (a + b) / 2</text><path class="dec fig" d="M208 220 L266.8 248 L208 276 L149.2 248 z"/><text x="208" y="252.5" text-anchor="middle">p &gt;= 6</text><path class="sal fig" d="M30 292.8 H190 L176 332.8 H16 z"/><text x="103" y="317.3" text-anchor="middle">Escribir "Casi"</text><path class="sal fig" d="M240 292.8 H422.8 L408.8 332.8 H226 z"/><text x="324.4" y="317.3" text-anchor="middle">Escribir "Pasaste"</text><rect class="ini fig" x="163" y="377.6" width="90" height="40" rx="20"/><text x="208" y="402.1" text-anchor="middle">Fin</text><text x="127.2" y="232" font-size="11">No</text><text x="272.8" y="232" font-size="11">Sí</text></svg></figure>
+          </div>
+        </div>
+      </div>
+      <div class="acciones">
+        <button class="boton linea" type="button" id="bajar-png">Descargar imagen (PNG)</button>
+        <button class="boton linea" type="button" id="bajar-svg">Descargar SVG</button>
+      </div>
+      <p class="estado" id="estado-herramienta" role="status" aria-live="polite"></p>
+      <noscript><p class="nota-tabla">Para dibujar tu propio diagrama hace falta JavaScript. Mientras, arriba ves el diagrama del ejemplo.</p></noscript>
+    </div>
+    <script type="application/json" id="ejemplos-datos">[{"nombre":"Promedio y decisión","fuente":"Algoritmo promedio\n    Leer a, b\n    p <- (a + b) / 2\n    Si p >= 6 Entonces\n        Escribir \"Pasaste\"\n    SiNo\n        Escribir \"Casi\"\n    FinSi\nFinAlgoritmo\n"},{"nombre":"Tabla de multiplicar (Para)","fuente":"Algoritmo tabla\n    Leer n\n    Para i <- 1 Hasta 10 Hacer\n        Escribir n, \" x \", i, \" = \", n * i\n    FinPara\nFinAlgoritmo\n"},{"nombre":"Suma hasta el cero (Mientras)","fuente":"Algoritmo suma_hasta_cero\n    suma <- 0\n    Leer n\n    Mientras n <> 0 Hacer\n        suma <- suma + n\n        Leer n\n    FinMientras\n    Escribir \"Suma: \", suma\nFinAlgoritmo\n"},{"nombre":"Contraseña (Repetir)","fuente":"Algoritmo contrasena\n    Definir clave Como Texto\n    intentos <- 0\n    Repetir\n        Leer clave\n        intentos <- intentos + 1\n    Hasta Que clave = \"jaguar\"\n    Escribir \"Entraste en \", intentos, \" intentos\"\nFinAlgoritmo\n"},{"nombre":"Día de la semana (Según)","fuente":"Algoritmo dia\n    Leer d\n    Segun d Hacer\n        1: Escribir \"Lunes\"\n        2: Escribir \"Martes\"\n        3: Escribir \"Miércoles\"\n        De Otro Modo: Escribir \"Otro día\"\n    FinSegun\nFinAlgoritmo\n"}]</script>
+
+    <article>
+      <section id="de-diagrama-a-pseudocodigo">
+        <h2>Cómo pasar un diagrama de flujo a pseudocódigo</h2>
+        <p>Si ya tienes un diagrama dibujado y necesitas el código, recórrelo de arriba abajo, siguiendo las flechas, y escribe una instrucción por cada símbolo. Esta es la equivalencia de cada figura:</p>
+        <div class="tabla"><table><caption>De cada símbolo del diagrama a su instrucción</caption><thead><tr><th scope="col">Símbolo</th><th scope="col">Qué significa</th><th scope="col">Se escribe así</th></tr></thead><tbody><tr><td>Óvalo (Inicio y Fin)</td><td>Donde empieza y termina</td><td><code>Algoritmo nombre</code> y <code>FinAlgoritmo</code></td></tr><tr><td>Paralelogramo de entrada</td><td>Pide un dato</td><td><code>Leer a, b</code></td></tr><tr><td>Paralelogramo de salida</td><td>Muestra algo</td><td><code>Escribir "Promedio: ", p</code></td></tr><tr><td>Rectángulo</td><td>Una operación o asignación</td><td><code>p &lt;- (a + b) / 2</code></td></tr><tr><td>Rombo con dos salidas (Sí y No)</td><td>Una decisión</td><td><code>Si p &gt;= 6 Entonces … SiNo … FinSi</code></td></tr><tr><td>Rombo que regresa hacia arriba</td><td>Un ciclo que se repite mientras se cumple algo</td><td><code>Mientras n &lt;&gt; 0 Hacer … FinMientras</code></td></tr><tr><td>Hexágono</td><td>Un ciclo con contador</td><td><code>Para i &lt;- 1 Hasta 10 Hacer … FinPara</code></td></tr></tbody></table></div>
+        <ol>
+          <li>Empieza por el óvalo de inicio: escribe <code>Algoritmo</code> con el nombre del programa.</li>
+          <li>Sigue las flechas. Cada paralelogramo y cada rectángulo es una línea de código, en el mismo orden.</li>
+          <li>En cada rombo, escribe el <code>Si</code> con su condición. Lo que está en la salida <i>Sí</i> va dentro del <code>Si</code> y lo de la salida <i>No</i> dentro del <code>SiNo</code>.</li>
+          <li>Si una flecha regresa a un rombo anterior, es un ciclo: lo que está en el camino de regreso va dentro del <code>Mientras</code>.</li>
+          <li>Cierra con el óvalo de fin: <code>FinAlgoritmo</code>.</li>
+        </ol>
+        <p>Pega el resultado arriba para comprobar que el diagrama que dibuja es el tuyo. Si quieres practicar el camino completo, la guía de <a href="/guias/como-hacer-un-diagrama-de-flujo">cómo hacer un diagrama de flujo</a> lo explica con un ejemplo.</p>
+      </section>
+      <section id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+        <details><summary>¿Cómo paso un diagrama de flujo a pseudocódigo?</summary><p>Recorre el diagrama de arriba abajo y escribe una instrucción por símbolo: el óvalo de inicio es Algoritmo, el paralelogramo de entrada es Leer, el de salida es Escribir, el rectángulo es una asignación y el rombo es un Si o un Mientras. La tabla de esta página trae todas las equivalencias.</p></details>
+        <details><summary>¿Esta herramienta convierte diagramas dibujados a pseudocódigo?</summary><p>Esta herramienta va del pseudocódigo al diagrama. Para el camino contrario, la app Jaguar Code te deja armar el diagrama con las figuras y el pseudocódigo se escribe solo.</p></details>
+        <details><summary>¿Puedo descargar el diagrama?</summary><p>Sí, como imagen PNG o como archivo SVG, que se puede abrir en cualquier editor y escalar sin perder calidad.</p></details>
+        <details><summary>¿Se guarda o se envía mi código?</summary><p>No. El diagrama se dibuja en tu navegador y tu código no se envía a ningún servidor.</p></details>
+        <details><summary>¿Qué instrucciones entiende?</summary><p>Algoritmo, Definir, Leer, Escribir, Si, Segun, Mientras, Repetir, Para, arreglos y funciones. Si el código tiene un error, te dice la línea y conserva el último diagrama.</p></details>
+      </section>
+    </article>
+    <aside class="cta-guia" aria-labelledby="cta-t">
+      <h2 id="cta-t">Arma el diagrama con figuras en tu celular</h2>
+      <p>En Jaguar Code dibujas el diagrama tocando figuras y el pseudocódigo se escribe solo, y al revés. Trae también bloques, la prueba de escritorio y doce retos con pistas. Gratis, sin anuncios y sin cuenta.</p>
+      <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir Jaguar Code</a></div>
+    </aside>
+    <h2 style="margin-top:44px">Sigue aprendiendo</h2>
+    <div class="relacionadas">
+      <a href="/herramientas/prueba-de-escritorio">Prueba de escritorio online<small>La tabla de variables de tu algoritmo, paso a paso.</small></a>
+      <a href="/guias/como-hacer-un-diagrama-de-flujo">Cómo hacer un diagrama de flujo<small>Los símbolos y un ejemplo paso a paso.</small></a>
+      <a href="/retos">Retos resueltos paso a paso<small>Con su diagrama y su pseudocódigo.</small></a>
+    </div>
+  </div>
+</main>
+<script src="/herramientas/diagrama.js" defer></script>
+<footer>
+  <div class="ancho">
+    <span class="quien"><img src="/logo.svg" alt="" width="30" height="26">Un proyecto de Panterino · hecho en México</span>
+    <a href="/guias">Guías</a>
+    <a href="/retos">Retos</a>
+    <a href="/manual">Manual</a>
+    <a href="https://www.facebook.com/jaguareducation">Facebook</a>
+    <a href="https://github.com/panterino/jaguar">Código en GitHub</a>
+  </div>
+</footer>
+<script src="/acceso.js" defer></script>
+</body>
+</html>

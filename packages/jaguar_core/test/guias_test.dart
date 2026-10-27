@@ -29,6 +29,13 @@ void main() {
     expect(carpetas.last.listSync().whereType<File>().length, greaterThanOrEqualTo(13));
   });
 
+  test('el generador de diagramas tiene su página y su núcleo compilado', () {
+    final html = File('../../sitio/herramientas/diagrama-de-flujo-online.html').readAsStringSync();
+    expect(html, contains('id="bajar-svg"'));
+    expect(html, contains('<svg'));
+    expect(File('../../sitio/herramientas/diagrama-nucleo.js').readAsStringSync(), contains('jaguarDiagrama'));
+  });
+
   test('la herramienta de prueba de escritorio tiene su página y su núcleo compilado', () {
     final pagina = File('../../sitio/herramientas/prueba-de-escritorio.html');
     expect(pagina.existsSync(), isTrue);
