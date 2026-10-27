@@ -96,7 +96,6 @@ class _LessonScreenState extends State<LessonScreen> {
     setState(() {
       _checked = true;
       _ok = ok;
-      if (ok) _burst++;
     });
     final q = _current;
     SemanticsService.announce(ok ? '¡Correcto! ${q.right}' : 'Casi. ${q.wrong}', TextDirection.ltr);
@@ -128,9 +127,36 @@ class _LessonScreenState extends State<LessonScreen> {
     return i < 0 || i + 1 >= steps.length ? null : steps[i + 1];
   }
 
+  /// Leaving halfway loses the answers so far: ask first.
+  Future<void> _confirmExit() async {
+    final leave = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('¿Salir de la lección?'),
+        content: const Text('Perderás tus respuestas de esta vez. La lección no se marca como hecha.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Seguir aquí')),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Salir')),
+        ],
+      ),
+    );
+    if (leave == true && mounted) Navigator.pop(context);
+  }
+
+  @override
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    return PopScope(
+      canPop: _finished || (_index == 0 && !_checked),
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _confirmExit();
+      },
+      child: _scaffold(context, scheme),
+    );
+  }
+
+  Widget _scaffold(BuildContext context, ColorScheme scheme) {
     return Scaffold(
       backgroundColor: scheme.surface,
       body: SafeArea(
@@ -151,10 +177,7 @@ class _LessonScreenState extends State<LessonScreen> {
                   : _Playing(key: const ValueKey('juego'), screen: this),
             ),
             Positioned.fill(
-              child: Confetti(
-                trigger: _burst,
-                origin: _finished ? const Alignment(0, -0.35) : const Alignment(0, 0.55),
-              ),
+              child: Confetti(trigger: _burst, origin: const Alignment(0, -0.35)),
             ),
           ],
         ),
@@ -207,12 +230,9 @@ class _Playing extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              Hero(
-                tag: 'leccion-${screen.widget.lesson.id}',
-                child: Material(
-                  color: Colors.transparent,
-                  child: Icon(screen.widget.lesson.icon, color: scheme.primary),
-                ),
+              Text(
+                'Pregunta ${math.min(screen._index + 1, screen._queue.length)} de ${screen._queue.length}',
+                style: theme.textTheme.labelLarge?.copyWith(color: scheme.onSurfaceVariant),
               ),
             ],
           ),
@@ -265,8 +285,25 @@ class _Playing extends StatelessWidget {
   }
 }
 
+/// The faces of the buttons keep 4.5:1 against their text: white on the
+/// darker greens and reds of the light theme, dark text on the lighter ones
+/// of the dark theme.
 Color _green(BuildContext context) =>
-    Theme.of(context).brightness == Brightness.dark ? const Color(0xFF7BC043) : const Color(0xFF58A700);
+    Theme.of(context).brightness == Brightness.dark ? const Color(0xFF7BC043) : const Color(0xFF3F8200);
+
+Color _greenEdge(BuildContext context) =>
+    Theme.of(context).brightness == Brightness.dark ? const Color(0xFF4F8A24) : const Color(0xFF2D6100);
+
+Color _red(BuildContext context) =>
+    Theme.of(context).brightness == Brightness.dark ? const Color(0xFFFF8A80) : const Color(0xFFC73A30);
+
+Color _redEdge(BuildContext context) =>
+    Theme.of(context).brightness == Brightness.dark ? const Color(0xFFC9483E) : const Color(0xFF96271F);
+
+/// The text on a green or red face.
+Color _onFace(BuildContext context, {required bool green}) => Theme.of(context).brightness == Brightness.dark
+    ? (green ? const Color(0xFF17300A) : const Color(0xFF3A0B07))
+    : Colors.white;
 
 class _CodeCard extends StatelessWidget {
   const _CodeCard(this.code);
@@ -577,7 +614,6 @@ class _Footer extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final q = screen._current;
-    final dark = theme.brightness == Brightness.dark;
     final checked = screen._checked;
     final ok = screen._ok;
     final c = _tileColors(context, selected: false, correct: checked ? ok : null);
@@ -610,19 +646,19 @@ class _Footer extends StatelessWidget {
                 onTap: checked ? screen._next : (screen._hasAnswer ? screen._check : null),
                 fill: !checked
                     ? (screen._hasAnswer ? _green(context) : theme.colorScheme.surfaceContainerHighest)
-                    : (ok ? _green(context) : (dark ? const Color(0xFFE5574C) : const Color(0xFFE5574C))),
+                    : (ok ? _green(context) : _red(context)),
                 edge: !checked
-                    ? (screen._hasAnswer
-                          ? (dark ? const Color(0xFF4A8A1F) : const Color(0xFF3F8200))
-                          : theme.colorScheme.outlineVariant)
-                    : (ok ? (dark ? const Color(0xFF4A8A1F) : const Color(0xFF3F8200)) : const Color(0xFFB03A31)),
+                    ? (screen._hasAnswer ? _greenEdge(context) : theme.colorScheme.outlineVariant)
+                    : (ok ? _greenEdge(context) : _redEdge(context)),
                 minHeight: 54,
                 child: Text(
                   checked ? (last ? 'Terminar' : 'Continuar') : 'Comprobar',
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w800,
                     letterSpacing: 0.4,
-                    color: !checked && !screen._hasAnswer ? theme.colorScheme.onSurfaceVariant : Colors.white,
+                    color: !checked && !screen._hasAnswer
+                        ? theme.colorScheme.onSurfaceVariant
+                        : _onFace(context, green: !checked || ok),
                   ),
                 ),
               ),
@@ -784,11 +820,14 @@ class _Result extends StatelessWidget {
                   if (next != null) screen.widget.onOpenNext?.call(next);
                 },
                 fill: _green(context),
-                edge: theme.brightness == Brightness.dark ? const Color(0xFF4A8A1F) : const Color(0xFF3F8200),
+                edge: _greenEdge(context),
                 minHeight: 54,
                 child: Text(
                   next == null ? 'Terminar' : 'Seguir: ${next.title}',
-                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800, color: Colors.white),
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: _onFace(context, green: true),
+                  ),
                 ),
               ),
               const SizedBox(height: 6),

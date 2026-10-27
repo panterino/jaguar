@@ -43,6 +43,8 @@ class Chunky extends StatefulWidget {
 
 class _ChunkyState extends State<Chunky> {
   bool _down = false;
+  bool _hover = false;
+  bool _focus = false;
 
   static const _depth = 4.0;
 
@@ -57,30 +59,46 @@ class _ChunkyState extends State<Chunky> {
       selected: widget.selected,
       label: widget.semanticsLabel,
       excludeSemantics: widget.semanticsLabel != null,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTapDown: enabled ? (_) => setState(() => _down = true) : null,
-        onTapCancel: () => setState(() => _down = false),
-        onTapUp: (_) => setState(() => _down = false),
-        onTap: enabled
-            ? () {
-                HapticFeedback.selectionClick();
-                widget.onTap!();
-              }
-            : null,
-        child: AnimatedContainer(
-          duration: motion(context, const Duration(milliseconds: 90)),
-          margin: EdgeInsets.only(top: sink, bottom: _depth - sink),
-          constraints: BoxConstraints(minHeight: widget.minHeight),
-          padding: widget.padding,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: widget.fill,
-            borderRadius: radius,
-            border: widget.outline == null ? null : Border.all(color: widget.outline!, width: 2),
-            boxShadow: sink > 0 ? null : [BoxShadow(color: widget.edge, offset: const Offset(0, _depth))],
+      child: FocusableActionDetector(
+        enabled: enabled,
+        mouseCursor: enabled ? SystemMouseCursors.click : MouseCursor.defer,
+        onShowHoverHighlight: (value) => setState(() => _hover = value),
+        onShowFocusHighlight: (value) => setState(() => _focus = value),
+        actions: {
+          ActivateIntent: CallbackAction<ActivateIntent>(
+            onInvoke: (_) {
+              widget.onTap?.call();
+              return null;
+            },
           ),
-          child: widget.child,
+        },
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTapDown: enabled ? (_) => setState(() => _down = true) : null,
+          onTapCancel: () => setState(() => _down = false),
+          onTapUp: (_) => setState(() => _down = false),
+          onTap: enabled
+              ? () {
+                  HapticFeedback.selectionClick();
+                  widget.onTap!();
+                }
+              : null,
+          child: AnimatedContainer(
+            duration: motion(context, const Duration(milliseconds: 90)),
+            margin: EdgeInsets.only(top: sink, bottom: _depth - sink),
+            constraints: BoxConstraints(minHeight: widget.minHeight),
+            padding: widget.padding,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: _hover && enabled ? Color.lerp(widget.fill, Colors.white, 0.08) : widget.fill,
+              borderRadius: radius,
+              border: _focus
+                  ? Border.all(color: Theme.of(context).colorScheme.secondary, width: 3)
+                  : (widget.outline == null ? null : Border.all(color: widget.outline!, width: 2)),
+              boxShadow: sink > 0 ? null : [BoxShadow(color: widget.edge, offset: const Offset(0, _depth))],
+            ),
+            child: widget.child,
+          ),
         ),
       ),
     );
