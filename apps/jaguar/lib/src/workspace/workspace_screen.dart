@@ -45,6 +45,7 @@ import 'intro_sheet.dart';
 import 'mode_widgets.dart';
 import 'desktop_chrome.dart';
 import 'programs_drawer.dart';
+import 'rooms.dart';
 import 'programs_sidebar.dart';
 import 'settings_screen.dart';
 import 'start_panel.dart';
@@ -59,7 +60,14 @@ const _wideLayoutWidth = 900.0;
 enum _Panel { console, tests }
 
 class WorkspaceScreen extends StatefulWidget {
-  const WorkspaceScreen({super.key, required this.store, required this.exercises, required this.settings, this.cloud});
+  const WorkspaceScreen({
+    super.key,
+    required this.store,
+    required this.exercises,
+    required this.settings,
+    this.cloud,
+    this.startInEditor = false,
+  });
 
   final ProgramStore store;
   final ExerciseStore exercises;
@@ -67,6 +75,10 @@ class WorkspaceScreen extends StatefulWidget {
 
   /// Classes and community; null when Jaguar runs offline.
   final Cloud? cloud;
+
+  /// On a phone, open the editor instead of the rooms: the app was launched
+  /// with a program or an exercise from a link.
+  final bool startInEditor;
 
   @override
   State<WorkspaceScreen> createState() => _WorkspaceScreenState();
@@ -98,6 +110,10 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
   DateTime? _lastBack;
   Timer? _saveTimer;
   int _tab = 0; // narrow layout: 0 code, 1 console, 2 tests
+
+  /// Phones: the room on screen, and whether the editor covers the rooms.
+  Room _room = Room.home;
+  late bool _inEditor = widget.startInEditor;
   _Panel _panel = _Panel.console; // wide layouts
   double _diagramSplit = 0.5; // code | diagram, in "Ambos"
   bool _checking = false;
@@ -237,7 +253,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
         await _intro(beginner: false);
       case WelcomeChoice.teacher:
         _settings.tourStep = 3;
-        if (_store.isEmpty) _show(_store.current);
+        if (_store.isEmpty && wide) _show(_store.current);
     }
   }
 
@@ -276,7 +292,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
     _tab = panel == _Panel.console ? 1 : 2;
   });
 
-  void _show(SavedProgram program) {
+  void _show(SavedProgram program, {bool openEditor = true}) {
     _session.stop();
     final known = _results[program.id];
     _testResult = known?.$1;
@@ -288,7 +304,20 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
     _code.value = TextEditingValue(text: program.source);
     _loading = false;
     _undo.value = UndoHistoryValue.empty;
-    setState(() => _tab = 0);
+    setState(() {
+      _tab = 0;
+      if (openEditor) _inEditor = true;
+    });
+  }
+
+  /// Phones: from the editor back to the room it was opened from.
+  void _leaveEditor() {
+    _saveNow();
+    _session.stop();
+    setState(() {
+      _inEditor = false;
+      _tab = 0;
+    });
   }
 
   /// After a restart only the counts were saved: running the tests again on
@@ -1401,8 +1430,19 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
       scaffold.closeDrawer();
       return;
     }
+    final phone = MediaQuery.sizeOf(context).width < _wideLayoutWidth;
     if (_tab != 0) {
       setState(() => _tab = 0);
+      return;
+    }
+    // Phones: the editor opens from a room; Atrás goes back to it, and from
+    // another room to Inicio, before it asks to leave.
+    if (phone && _inEditor) {
+      _leaveEditor();
+      return;
+    }
+    if (phone && _room != Room.home) {
+      setState(() => _room = Room.home);
       return;
     }
     final now = DateTime.now();
@@ -1476,6 +1516,9 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
             _settings.tourStep = 0;
             _openChallenge(challenges.first);
           },
+          onCommunity: widget.cloud == null ? null : _openCommunity,
+          onAccount: widget.cloud == null ? null : _account,
+          onAbout: _showAbout,
         ),
       ),
     );
@@ -1500,7 +1543,60 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
     onOpenTeacher: _settings.teacher ? _openTeacher : null,
   );
 
+  Future<void> _exportAll() async {
+    _saveNow();
+    final sources = [for (final program in _store.programs) program.source];
+    if (sources.isEmpty) return;
+    try {
+      if (await exportAllPrograms(sources, nameOf: programName)) _toast('Listo: ${sources.length} programas en un archivo');
+    } on Object catch (e) {
+      _toast('No se pudo guardar el archivo: $e');
+    }
+  }
+
+  /// Phones: deleting from the Taller keeps the rooms on screen; the editor
+  /// only follows the program that stays selected.
+  void _deleteFromWorkshop(SavedProgram program) {
+    confirmDeleteProgram(context, _store, program, (selected) {
+      if (_editingId != selected.id) _show(selected, openEditor: false);
+    });
+  }
+
+  RoomActions _roomActions() => RoomActions(
+    onOpenChallenge: _openChallenge,
+    onOpenProgram: _load,
+    onOpenSource: _openSource,
+    onOpenExercise: _openExercise,
+    onDeleteProgram: _deleteFromWorkshop,
+    onNew: _newProgram,
+    onOpenFile: _openFile,
+    onExportAll: _exportAll,
+    onOpenLink: _openLink,
+    onOpenGuide: _showGuide,
+    onOpenSettings: _openSettings,
+    onScan: canScanQr ? _scanQr : null,
+    onOpenClasses: widget.cloud == null ? null : _openClasses,
+    onOpenTeacher: _settings.teacher ? _openTeacher : null,
+  );
+
+  Widget _buildRooms() => PopScope(
+    // The browser keeps its own Atrás.
+    canPop: kIsWeb,
+    onPopInvokedWithResult: (didPop, _) {
+      if (!didPop) _onBack();
+    },
+    child: RoomsScaffold(
+      room: _room,
+      onRoom: (room) => setState(() => _room = room),
+      settings: _settings,
+      store: _store,
+      exercises: widget.exercises,
+      actions: _roomActions(),
+    ),
+  );
+
   Widget _buildTouch() {
+    if (MediaQuery.sizeOf(context).width < _wideLayoutWidth && !_inEditor) return _buildRooms();
     final width = MediaQuery.sizeOf(context).width;
     final wide = width >= _wideLayoutWidth;
     // On phones the program name needs the room: Ejecutar becomes an icon.
@@ -1590,6 +1686,10 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
         key: _scaffoldKey,
         appBar: AppBar(
           titleSpacing: 0,
+          // Phones open the editor from a room: the arrow goes back to it.
+          leading: wide
+              ? null
+              : IconButton(tooltip: 'Volver', icon: const Icon(Icons.arrow_back), onPressed: _leaveEditor),
           title: empty
               ? const Text('Jaguar')
               : ListenableBuilder(
@@ -1648,7 +1748,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
                   ),
                 ],
         ),
-        drawer: _drawer(),
+        drawer: wide ? _drawer() : null,
         body: empty
             ? _startPanel()
             : wide

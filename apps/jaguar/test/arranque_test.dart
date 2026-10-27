@@ -6,7 +6,6 @@ import 'package:jaguar/src/editor/code_editor.dart';
 import 'package:jaguar/src/exercises/exercise_store.dart';
 import 'package:jaguar/src/programs/program_store.dart';
 import 'package:jaguar/src/settings.dart';
-import 'package:jaguar/src/workspace/start_panel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 late SharedPreferences _prefs;
@@ -21,6 +20,7 @@ Future<ProgramStore> _pumpPhone(
   Map<String, Object> values = const {'jaguar.view.mode': 'basic'},
   String? source,
   double textScale = 1,
+  bool openEditor = true,
 }) async {
   tester.view.physicalSize = const Size(360, 800);
   tester.view.devicePixelRatio = 1;
@@ -30,7 +30,7 @@ Future<ProgramStore> _pumpPhone(
   await _prefsWith(values);
   final store = ProgramStore(_prefs);
   if (source != null) store.openSource(source);
-  await tester.pumpWidget(JaguarApp(store: store, exercises: ExerciseStore(_prefs), settings: ViewSettings(_prefs)));
+  await tester.pumpWidget(JaguarApp(store: store, exercises: ExerciseStore(_prefs), settings: ViewSettings(_prefs), openEditor: openEditor));
   await tester.pumpAndSettle();
   return store;
 }
@@ -91,8 +91,12 @@ void main() {
   });
 
   group('celular', () {
-    testWidgets('borrar el único programa lleva al inicio y se puede deshacer', (tester) async {
-      final store = await _pumpPhone(tester, source: 'Algoritmo mio\n    Escribir 1\nFinAlgoritmo\n');
+    testWidgets('borrar el único programa deja el taller vacío y se puede deshacer', (tester) async {
+      final store = await _pumpPhone(
+        tester,
+        source: 'Algoritmo mio\n    Escribir 1\nFinAlgoritmo\n',
+        openEditor: false,
+      );
       // The blank program of a first launch stays in the list next to it.
       for (final program in store.programs.where(ProgramStore.isBlank).toList()) {
         store.delete(program);
@@ -100,9 +104,9 @@ void main() {
       await tester.pumpAndSettle();
       expect(store.programs, hasLength(1));
 
-      await tester.tap(find.byIcon(Icons.menu));
+      await tester.tap(find.text('Taller'));
       await tester.pumpAndSettle();
-      await tester.tap(find.byTooltip('Eliminar'));
+      await tester.tap(find.byTooltip('Eliminar "mio"'));
       await tester.pumpAndSettle();
       expect(
         find.text('Es tu único programa. Después verás el inicio para empezar otro. Las copias guardadas no cambian.'),
@@ -112,48 +116,108 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(store.isEmpty, isTrue);
-      expect(find.byType(StartPanel), findsOneWidget);
+      expect(find.text('Tu taller está vacío'), findsOneWidget);
       expect(find.text('Programa eliminado'), findsOneWidget);
+      expect(find.byType(CodeEditor), findsNothing);
 
       await tester.tap(find.text('Deshacer'));
       await tester.pumpAndSettle();
       expect(store.programs, hasLength(1));
-      expect(find.byType(StartPanel), findsNothing);
-      expect(find.byType(CodeEditor), findsOneWidget);
+      expect(find.text('Tu taller está vacío'), findsNothing);
+      expect(find.text('mio'), findsOneWidget);
+      // Still in the rooms: nothing opened by itself.
+      expect(find.byType(CodeEditor), findsNothing);
     });
 
-    testWidgets('con la lista vacía se ve el panel de inicio con retos y recientes', (tester) async {
-      await _pumpPhone(tester, values: {'jaguar.view.mode': 'basic', 'jaguar.programs': '[]'});
-      expect(find.byType(StartPanel), findsOneWidget);
-      expect(find.text('¿Qué quieres hacer?'), findsOneWidget);
-      expect(find.text('Llevas 0 de ${challenges.length}'), findsOneWidget);
+    testWidgets('el inicio de un primer uso: saludo, siguiente paso y taller vacío', (tester) async {
+      await _pumpPhone(tester, values: {'jaguar.view.mode': 'basic', 'jaguar.programs': '[]'}, openEditor: false);
+      expect(find.text('Hola'), findsOneWidget);
+      expect(find.text('Nivel 1 · llevas 0 de ${challenges.length}'), findsOneWidget);
       expect(find.text('Empezar'), findsOneWidget);
-      expect(find.text('Aún no tienes programas. Empieza con un reto o uno nuevo.'), findsOneWidget);
-      expect(find.byType(NavigationBar), findsNothing);
+      expect(find.text('Aún no tienes programas.'), findsOneWidget);
+      expect(find.byType(CodeEditor), findsNothing);
+      // Four rooms, always in sight.
+      for (final room in ['Inicio', 'Ruta', 'Clases', 'Taller']) {
+        expect(find.descendant(of: find.byType(NavigationBar), matching: find.text(room)), findsOneWidget);
+      }
     });
 
-    testWidgets('los botones del inicio miden lo mismo, también con letra grande', (tester) async {
-      await _pumpPhone(tester, values: {'jaguar.view.mode': 'basic', 'jaguar.programs': '[]'}, textScale: 1.3);
-      final tiles = [
-        for (final label in [
-          'Nuevo programa',
-          'Abrir archivo',
-          'Ejemplos',
-          'Guía: cómo funciona todo',
-          'Ajustes',
-          if (find.text('Abrir enlace').evaluate().isNotEmpty) 'Abrir enlace' else 'Escanear QR o abrir enlace',
-        ])
-          tester.getSize(find.ancestor(of: find.text(label), matching: find.byType(InkWell)).first),
-      ];
-      expect(tiles.map((t) => t.height).toSet(), hasLength(1), reason: '$tiles');
-      expect(tiles.map((t) => t.width).toSet(), hasLength(1), reason: '$tiles');
+    testWidgets('las cuatro salas caben con letra grande', (tester) async {
+      await _pumpPhone(
+        tester,
+        values: {'jaguar.view.mode': 'basic', 'jaguar.programs': '[]'},
+        textScale: 1.3,
+        openEditor: false,
+      );
+      for (final room in ['Ruta', 'Clases', 'Taller', 'Inicio']) {
+        await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text(room)));
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull, reason: room);
+      }
+    });
+
+    testWidgets('la Ruta lista los retos con su tema y abre el que se toca', (tester) async {
+      await _pumpPhone(tester, values: {'jaguar.view.mode': 'basic', 'jaguar.view.tourStep': 3}, openEditor: false);
+      await tester.tap(find.text('Ruta'));
+      await tester.pumpAndSettle();
+      expect(find.text('NIVEL 1'), findsOneWidget);
+      expect(find.text('0 de ${challenges.length}'), findsOneWidget);
+      expect(find.text('Saludo'), findsOneWidget);
+      expect(find.text('Variables'), findsOneWidget);
+      await tester.tap(find.text('Saludo'));
+      await tester.pumpAndSettle();
+      expect(find.text('Reto 1'), findsOneWidget);
+      expect(find.byType(CodeEditor), findsOneWidget);
+      // Atrás comes back to the room, not out of the app.
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(find.byType(CodeEditor), findsNothing);
+      expect(find.text('NIVEL 1'), findsOneWidget);
+    });
+
+    testWidgets('la Ruta avisa que nada está bloqueado', (tester) async {
+      await _pumpPhone(tester, values: {'jaguar.view.mode': 'basic', 'jaguar.view.tourStep': 3}, openEditor: false);
+      await tester.tap(find.text('Ruta'));
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(find.textContaining('Nada está bloqueado'), 200);
+      expect(find.textContaining('Nada está bloqueado'), findsOneWidget);
+    });
+
+    testWidgets('el Taller lista y busca, y marca de dónde viene cada programa', (tester) async {
+      final store = await _pumpPhone(tester, source: 'Algoritmo promedio\n    Escribir 1\nFinAlgoritmo\n', openEditor: false);
+      store.create('Algoritmo suma\n    Escribir 2\nFinAlgoritmo\n');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Taller'));
+      await tester.pumpAndSettle();
+      expect(find.text('promedio'), findsOneWidget);
+      expect(find.text('suma'), findsOneWidget);
+      expect(find.text('Propio'), findsWidgets);
+
+      await tester.enterText(find.byType(TextField), 'prom');
+      await tester.pumpAndSettle();
+      expect(find.text('promedio'), findsOneWidget);
+      expect(find.text('suma'), findsNothing);
+
+      await tester.enterText(find.byType(TextField), 'zzz');
+      await tester.pumpAndSettle();
+      expect(find.text('Ningún programa se llama así.'), findsOneWidget);
+    });
+
+    testWidgets('Ajustes está en Inicio y trae Acerca de', (tester) async {
+      await _pumpPhone(tester, values: {'jaguar.view.mode': 'basic', 'jaguar.view.tourStep': 3}, openEditor: false);
+      await tester.tap(find.byTooltip('Ajustes'));
+      await tester.pumpAndSettle();
+      expect(find.text('Cómo usas Jaguar'), findsOneWidget);
+      await tester.scrollUntilVisible(find.text('Acerca de Jaguar'), 200);
+      expect(find.text('Acerca de Jaguar'), findsOneWidget);
     });
 
     testWidgets('la barra tiene tres controles y el cambio de vista tiene texto', (tester) async {
       await _pumpPhone(tester, source: 'Algoritmo hola\n    Escribir "hola"\nFinAlgoritmo\n');
       expect(find.byIcon(Icons.play_arrow), findsOneWidget);
       expect(find.byTooltip('Más opciones'), findsOneWidget);
-      expect(find.byIcon(Icons.menu), findsOneWidget);
+      expect(find.byIcon(Icons.arrow_back), findsOneWidget);
+      expect(find.byIcon(Icons.menu), findsNothing);
       expect(find.byIcon(Icons.qr_code_2), findsNothing);
       expect(find.byIcon(Icons.account_tree_outlined), findsWidgets); // inside the selector only
 
@@ -167,29 +231,8 @@ void main() {
       expect(find.text('Es el mismo programa dibujado. Toca un bloque para ver su línea de código.'), findsOneWidget);
     });
 
-    testWidgets('el menú pone Retos y Programas primero, y lo demás en Más', (tester) async {
-      await _pumpPhone(tester, source: 'Algoritmo hola\n    Escribir "hola"\nFinAlgoritmo\n');
-      await tester.tap(find.byIcon(Icons.menu));
-      await tester.pumpAndSettle();
-      expect(find.text('Inicio'), findsOneWidget);
-      expect(find.text('Retos'), findsOneWidget);
-      expect(find.text('Mis programas'), findsOneWidget);
-      expect(find.text('Ajustes'), findsOneWidget);
-      expect(find.text('Guía'), findsOneWidget); // in sight, not folded away
-      // No mode switch, name or profile rows in the menu any more.
-      expect(find.text('Básico'), findsNothing);
-      expect(find.text('Escribe tu nombre'), findsNothing);
-      expect(find.textContaining('profesor'), findsNothing);
-      // Folded away until opened.
-      expect(find.text('Comunidad'), findsNothing);
-      await tester.tap(find.text('Más'));
-      await tester.pumpAndSettle();
-      expect(find.text('Comunidad'), findsOneWidget);
-      expect(find.text('Acerca de'), findsOneWidget);
-    });
-
     testWidgets('Empezar desde cero abre el Reto 1 con la primera pista', (tester) async {
-      await _pumpPhone(tester, values: {});
+      await _pumpPhone(tester, values: {}, openEditor: false);
       expect(find.text('¡Hola! ¿Cómo quieres empezar?'), findsOneWidget);
       expect(find.text('Empezar desde cero'), findsOneWidget);
       expect(find.text('Ya sé algo de programar'), findsOneWidget);
@@ -207,7 +250,7 @@ void main() {
     });
 
     testWidgets('el tour avanza al escribir, al ejecutar y al abrir Pruebas', (tester) async {
-      await _pumpPhone(tester, values: {});
+      await _pumpPhone(tester, values: {}, openEditor: false);
       await tester.tap(find.text('Empezar desde cero'));
       await tester.pumpAndSettle();
       // Four small ideas first, then the balloons.
@@ -237,7 +280,7 @@ void main() {
     });
 
     testWidgets('Saltar guía termina el tour', (tester) async {
-      await _pumpPhone(tester, values: {});
+      await _pumpPhone(tester, values: {}, openEditor: false);
       await tester.tap(find.text('Empezar desde cero'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Saltar'));
@@ -248,7 +291,7 @@ void main() {
     });
 
     testWidgets('Ya sé algo de programar abre Hola mundo sin globos', (tester) async {
-      await _pumpPhone(tester, values: {});
+      await _pumpPhone(tester, values: {}, openEditor: false);
       await tester.tap(find.text('Ya sé algo de programar'));
       await tester.pumpAndSettle();
       expect(find.text('Así funciona Jaguar'), findsOneWidget);
@@ -260,7 +303,7 @@ void main() {
     });
 
     testWidgets('Soy profesor pide confirmar antes de activarse', (tester) async {
-      await _pumpPhone(tester, values: {});
+      await _pumpPhone(tester, values: {}, openEditor: false);
       await tester.tap(find.text('Soy profesor'));
       await tester.pumpAndSettle();
       expect(find.text('Modo profesor'), findsOneWidget);
@@ -274,6 +317,8 @@ void main() {
       await tester.tap(find.text('Activar modo profesor'));
       await tester.pumpAndSettle();
       expect(ViewSettings(_prefs).teacher, isTrue);
+      await tester.tap(find.text('Clases'));
+      await tester.pumpAndSettle();
       expect(find.text('Mis ejercicios'), findsOneWidget);
     });
 
@@ -324,7 +369,7 @@ void main() {
         textScale: 1.3,
       );
       expect(tester.takeException(), isNull);
-      await tester.tap(find.byIcon(Icons.menu));
+      await tester.tap(find.byIcon(Icons.arrow_back));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
     });
@@ -332,10 +377,8 @@ void main() {
 
   group('pruebas', () {
     Future<void> openChallenge(WidgetTester tester) async {
-      await _pumpPhone(tester, values: {'jaguar.view.mode': 'basic', 'jaguar.view.tourStep': 3});
-      await tester.tap(find.byIcon(Icons.menu));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Retos'));
+      await _pumpPhone(tester, values: {'jaguar.view.mode': 'basic', 'jaguar.view.tourStep': 3}, openEditor: false);
+      await tester.tap(find.text('Ruta'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Saludo'));
       await tester.pumpAndSettle();

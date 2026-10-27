@@ -74,6 +74,7 @@ Future<ProgramStore> _app(
   String? source,
   Size size = const Size(360, 740),
   bool desktop = false,
+  bool? openEditor,
 }) async {
   if (desktop) debugDefaultTargetPlatformOverride = TargetPlatform.linux;
   tester.view.physicalSize = size * 2;
@@ -90,7 +91,13 @@ Future<ProgramStore> _app(
   await tester.pumpWidget(
     RepaintBoundary(
       key: _boundary,
-      child: JaguarApp(store: store, exercises: ExerciseStore(_prefs), settings: ViewSettings(_prefs)),
+      child: JaguarApp(
+        store: store,
+        exercises: ExerciseStore(_prefs),
+        settings: ViewSettings(_prefs),
+        // A program in hand means the editor; without one, the rooms.
+        openEditor: openEditor ?? source != null,
+      ),
     ),
   );
   await tester.pumpAndSettle();
@@ -159,6 +166,28 @@ void main() {
     await _shot(tester, 'inicio');
   });
 
+  scene('sala-clases', (tester) async {
+    await _app(tester, values: {'jaguar.view.mode': 'basic'});
+    await tester.tap(find.text('Clases'));
+    await tester.pumpAndSettle();
+    await _shot(tester, 'sala-clases');
+  });
+
+  scene('sala-clases-profe', (tester) async {
+    await _app(tester, values: {'jaguar.view.mode': 'full', 'jaguar.view.teacher': true});
+    await tester.tap(find.text('Clases'));
+    await tester.pumpAndSettle();
+    await _shot(tester, 'sala-clases-profe');
+  });
+
+  scene('sala-taller', (tester) async {
+    final store = await _app(tester, values: {'jaguar.view.mode': 'basic'}, source: _saludo, openEditor: false);
+    store.create('Algoritmo promedio\n    Escribir 1\nFinAlgoritmo\n');
+    await tester.tap(find.text('Taller'));
+    await tester.pumpAndSettle();
+    await _shot(tester, 'sala-taller');
+  });
+
   scene('codigo', (tester) async {
     await _app(tester, values: {'jaguar.view.mode': 'basic'}, source: _saludo);
     await _shot(tester, 'codigo');
@@ -206,22 +235,6 @@ void main() {
     await _shot(tester, 'error');
   });
 
-  scene('menu', (tester) async {
-    await _app(tester, values: {'jaguar.view.mode': 'basic'}, source: _saludo);
-    await tester.tap(find.byIcon(Icons.menu));
-    await tester.pumpAndSettle();
-    await _shot(tester, 'menu');
-  });
-
-  scene('menu-mas', (tester) async {
-    await _app(tester, values: {'jaguar.view.mode': 'basic'}, source: _saludo);
-    await tester.tap(find.byIcon(Icons.menu));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Más'));
-    await tester.pumpAndSettle();
-    await _shot(tester, 'menu-mas');
-  });
-
   scene('mas-opciones', (tester) async {
     await _app(tester, values: {'jaguar.view.mode': 'basic'}, source: _saludo);
     await tester.tap(find.byTooltip('Más opciones'));
@@ -230,19 +243,15 @@ void main() {
   });
 
   scene('retos', (tester) async {
-    await _app(tester, values: {'jaguar.view.mode': 'basic', 'jaguar.retos.hechos': ['reto-1-01']}, source: _saludo);
-    await tester.tap(find.byIcon(Icons.menu));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Retos'));
+    await _app(tester, values: {'jaguar.view.mode': 'basic', 'jaguar.retos.hechos': ['reto-1-01', 'reto-1-02', 'reto-1-03', 'reto-1-04']});
+    await tester.tap(find.text('Ruta'));
     await tester.pumpAndSettle();
     await _shot(tester, 'retos');
   });
 
   Future<void> openReto(WidgetTester tester) async {
-    await _app(tester, values: {'jaguar.view.mode': 'basic'}, source: _saludo);
-    await tester.tap(find.byIcon(Icons.menu));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Retos'));
+    await _app(tester, values: {'jaguar.view.mode': 'basic'}, source: _saludo, openEditor: false);
+    await tester.tap(find.text('Ruta'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Saludo'));
     await tester.pumpAndSettle();
@@ -298,10 +307,8 @@ void main() {
   });
 
   scene('ajustes', (tester) async {
-    await _app(tester, values: {'jaguar.view.mode': 'basic'}, source: _saludo);
-    await tester.tap(find.byIcon(Icons.menu));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Ajustes'));
+    await _app(tester, values: {'jaguar.view.mode': 'basic'});
+    await tester.tap(find.byTooltip('Ajustes'));
     await tester.pumpAndSettle();
     await _shot(tester, 'ajustes');
   });

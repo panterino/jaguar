@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:archive/archive.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:jaguar_core/jaguar_core.dart';
@@ -53,4 +54,44 @@ Uint8List _pscBytes(String source) {
   } on ArgumentError {
     return utf8.encode(text);
   }
+}
+
+/// Every program as a `.psc` inside one `.zip`, named after its algorithm.
+/// Two programs with the same name get `_2`, `_3`… so none is lost.
+Uint8List programsZipBytes(Iterable<String> sources, {required String Function(String source) nameOf}) {
+  final archive = Archive();
+  final used = <String, int>{};
+  for (final source in sources) {
+    final base = nameOf(source);
+    final count = (used[base] ?? 0) + 1;
+    used[base] = count;
+    archive.addFile(ArchiveFile.bytes(count == 1 ? '$base.psc' : '${base}_$count.psc', _pscBytes(source)));
+  }
+  return ZipEncoder().encodeBytes(archive);
+}
+
+/// Saves or sends all [sources] in one `.zip`: the phone's share sheet on
+/// Android and iOS, a save dialog elsewhere. Returns false if cancelled.
+Future<bool> exportAllPrograms(Iterable<String> sources, {required String Function(String source) nameOf}) async {
+  final bytes = programsZipBytes(sources, nameOf: nameOf);
+  const name = 'mis_programas_jaguar.zip';
+  final phone = !kIsWeb && (defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS);
+  if (phone) {
+    final result = await SharePlus.instance.share(
+      ShareParams(
+        files: [XFile.fromData(bytes, mimeType: 'application/zip', name: name)],
+        fileNameOverrides: [name],
+        subject: name,
+      ),
+    );
+    return result.status != ShareResultStatus.dismissed;
+  }
+  final path = await FilePicker.saveFile(
+    dialogTitle: 'Guardar todos mis programas',
+    fileName: name,
+    type: FileType.custom,
+    allowedExtensions: const ['zip'],
+    bytes: bytes,
+  );
+  return path != null || kIsWeb;
 }
