@@ -431,7 +431,6 @@ void main() {
       await tester.tap(find.text('Pruebas'));
       await tester.pumpAndSettle();
       expect(find.text('Desactualizado: cambiaste el código desde la última prueba.'), findsOneWidget);
-      await tester.scrollUntilVisible(find.byIcon(Icons.cancel_outlined), 100);
       expect(find.byIcon(Icons.cancel, skipOffstage: false), findsNothing);
       expect(find.byIcon(Icons.cancel_outlined, skipOffstage: false), findsWidgets);
     });

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:jaguar_core/jaguar_core.dart';
 
 import '../theme.dart';
+import '../widgets/mascota.dart';
 
 /// The program's tests, next to the console: "if it gets these inputs, it
 /// must show this". Run them all with Probar and see, in words, why one
@@ -134,8 +135,17 @@ class _Summary extends StatelessWidget {
       ),
     };
 
+    // How she looks at the result: puzzled when it fails, "oops" when it does not even run.
+    final pose = stale || result == null
+        ? null
+        : switch (result) {
+            CheckResult(syntaxError: _?) => MascotPose.uy,
+            CheckResult(passed: true) => null,
+            _ => MascotPose.confundido,
+          };
     return Row(
       children: [
+        if (pose != null) ...[Mascota(pose: pose, size: 40), const SizedBox(width: 8)],
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -165,12 +175,14 @@ class _Summary extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-        FilledButton.icon(
-          onPressed: running ? null : onRunTests,
-          icon: running
-              ? const SizedBox.square(dimension: 16, child: CircularProgressIndicator(strokeWidth: 2))
-              : const Icon(Icons.fact_check_outlined, size: 18),
-          label: Text(result == null ? 'Probar' : 'Probar de nuevo'),
+        Flexible(
+          child: FilledButton.icon(
+            onPressed: running ? null : onRunTests,
+            icon: running
+                ? const SizedBox.square(dimension: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                : const Icon(Icons.fact_check_outlined, size: 18),
+            label: Text(result == null ? 'Probar' : 'Probar de nuevo', overflow: TextOverflow.ellipsis),
+          ),
         ),
       ],
     );
@@ -237,7 +249,10 @@ class _AllPassedState extends State<_AllPassed> {
             children: [
               Row(
                 children: [
-                  _Seal(color: green, animate: !still),
+                  if (widget.challenge)
+                    const Mascota(pose: MascotPose.estrella, size: 64)
+                  else
+                    _Seal(color: green, animate: !still),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(

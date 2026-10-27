@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 
 import '../theme.dart';
+import '../widgets/mascota.dart';
 
 /// One of the three balloons of the first challenge: where to write, how to
 /// run and where the tests are. It never blocks a touch (only the balloon
@@ -83,6 +84,11 @@ class _TourBalloonState extends State<TourBalloon> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // She points at what the balloon talks about.
+                    const Padding(
+                      padding: EdgeInsets.only(top: 2, right: 8),
+                      child: Mascota(pose: MascotPose.miraAqui, size: 44),
+                    ),
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.only(top: 6),

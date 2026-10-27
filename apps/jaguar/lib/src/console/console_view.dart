@@ -246,7 +246,7 @@ class _ErrorCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(Icons.error_outline, color: scheme.onErrorContainer),
+                const Mascota(pose: MascotPose.uy, size: 44),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
