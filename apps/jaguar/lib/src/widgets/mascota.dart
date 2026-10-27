@@ -115,3 +115,32 @@ class MascotaCara extends StatelessWidget {
   Widget build(BuildContext context) =>
       Image.asset(face.asset, width: size, height: size * 470 / 600, fit: BoxFit.contain, excludeFromSemantics: true);
 }
+
+/// Loads the poses used most before they are needed, so a pose change never
+/// shows an empty frame first (on the web, where each image is a download).
+Future<void> precacheMascota(BuildContext context) async {
+  const common = [
+    MascotPose.hola,
+    MascotPose.lograste,
+    MascotPose.animo,
+    MascotPose.guino,
+    MascotPose.idea,
+    MascotPose.pensando,
+    MascotPose.programando,
+    MascotPose.dormido,
+    MascotPose.uy,
+    MascotPose.confundido,
+    MascotPose.estrella,
+    MascotPose.orgulloso,
+    MascotPose.estudiando,
+    MascotPose.yHoy,
+  ];
+  for (final pose in common) {
+    if (!context.mounted) return;
+    try {
+      await precacheImage(AssetImage(pose.asset), context);
+    } on Object {
+      // A missing image only means that pose loads when it is shown.
+    }
+  }
+}
