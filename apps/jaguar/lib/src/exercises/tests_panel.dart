@@ -122,7 +122,10 @@ class _Summary extends StatelessWidget {
     final scheme = theme.colorScheme;
     final result = this.result;
     final (text, detail) = switch (result) {
-      null => ('$total ${total == 1 ? 'prueba' : 'pruebas'}', 'Aún no has probado. Toca Probar para ver si tu programa las pasa.'),
+      null => (
+        '$total ${total == 1 ? 'prueba' : 'pruebas'}',
+        'Aún no has probado. Toca Probar para ver si tu programa las pasa.',
+      ),
       CheckResult(syntaxError: _?) => ('Tu programa tiene un error', null),
       CheckResult(passed: true) => ('¡Pasa todas las pruebas!', null),
       _ => (
@@ -237,7 +240,10 @@ class _AllPassedState extends State<_AllPassed> {
                   _Seal(color: green, animate: !still),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: Text(_message, style: TextStyle(color: green, fontWeight: FontWeight.w600)),
+                    child: Text(
+                      _message,
+                      style: TextStyle(color: green, fontWeight: FontWeight.w600),
+                    ),
                   ),
                   if (!widget.challenge) ...[
                     const SizedBox(width: 8),
@@ -301,12 +307,18 @@ class _Seal extends StatelessWidget {
                 child: Opacity(
                   opacity: (0.35 * (1 - ring)).clamp(0.0, 1.0),
                   child: DecoratedBox(
-                    decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: color, width: 2)),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: color, width: 2),
+                    ),
                     child: const SizedBox.square(dimension: 28),
                   ),
                 ),
               ),
-              Transform.scale(scale: 0.4 + 0.6 * t, child: Icon(Icons.verified, color: color, size: 32)),
+              Transform.scale(
+                scale: 0.4 + 0.6 * t,
+                child: Icon(Icons.verified, color: color, size: 32),
+              ),
             ],
           ),
         );

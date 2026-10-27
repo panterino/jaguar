@@ -82,7 +82,7 @@ class _VerifiedScreenState extends State<VerifiedScreen> with SingleTickerProvid
                     child: Stack(
                       alignment: Alignment.bottomRight,
                       children: [
-                        const Mascota(pose: MascotPose.celebra, size: 120),
+                        const Mascota(pose: MascotPose.lograste, size: 130),
                         const CircleAvatar(
                           radius: 22,
                           backgroundColor: onGreen,

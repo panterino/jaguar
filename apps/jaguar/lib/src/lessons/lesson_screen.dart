@@ -791,7 +791,7 @@ class _Feedback extends StatelessWidget {
               final dx = ok ? 0.0 : math.sin(t * math.pi * 6) * 5 * (1 - t);
               return Transform.translate(offset: Offset(dx, dy), child: child);
             },
-            child: Mascota(pose: ok ? MascotPose.feliz : MascotPose.triste, size: 60),
+            child: Mascota(pose: ok ? MascotPose.lograste : MascotPose.animo, size: 64),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -857,7 +857,7 @@ class _Result extends StatelessWidget {
                 duration: motion(context, const Duration(milliseconds: 900)),
                 curve: Curves.elasticOut,
                 builder: (context, t, child) => Transform.scale(scale: 0.5 + 0.5 * t, child: child),
-                child: const Mascota(pose: MascotPose.celebra, size: 150),
+                child: const Mascota(pose: MascotPose.lograste, size: 160),
               ),
               const SizedBox(height: 12),
               Semantics(

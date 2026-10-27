@@ -10,6 +10,13 @@ import 'package:jaguar_core/jaguar_core.dart';
 
 import 'retos_test.dart' as retos;
 
+/// The block that says [text] (its semantics label is the whole line).
+Finder _bloque(String text) => find.byWidgetPredicate((w) => w is Semantics && w.properties.label == text);
+
+/// Blocks whose line starts with [start].
+Finder _bloqueQue(String start) =>
+    find.byWidgetPredicate((w) => w is Semantics && (w.properties.label ?? '').startsWith(start));
+
 const _hola = 'Algoritmo hola\n    Escribir "hola"\nFinAlgoritmo\n';
 
 Future<SyntaxController> _pump(WidgetTester tester, String source, {bool editable = true, int? executing}) async {
@@ -44,7 +51,7 @@ void main() {
     for (final entry in sources.entries) {
       testWidgets(entry.key, (tester) async {
         await _pump(tester, entry.value);
-        expect(find.textContaining('Algoritmo '), findsWidgets);
+        expect(_bloqueQue('Algoritmo '), findsWidgets);
         expect(tester.takeException(), isNull);
       });
     }
@@ -56,13 +63,13 @@ void main() {
       'Algoritmo a\n    Leer n\n    Si n > 1 Entonces\n        Escribir "mayor"\n    SiNo\n        Escribir "menor"\n    FinSi\n'
       '    Para i <- 1 Hasta 3 Hacer\n        Escribir i\n    FinPara\nFinAlgoritmo\n',
     );
-    expect(find.text('Algoritmo a'), findsOneWidget);
-    expect(find.text('Si n > 1 Entonces'), findsOneWidget);
+    expect(_bloque('Algoritmo a'), findsOneWidget);
+    expect(_bloque('Si n > 1 Entonces'), findsOneWidget);
     expect(find.text('SiNo'), findsOneWidget);
     expect(find.text('FinSi'), findsOneWidget);
-    expect(find.textContaining('Para i <- 1 Hasta 3'), findsOneWidget);
+    expect(_bloqueQue('Para i <- 1 Hasta 3'), findsOneWidget);
     expect(find.text('FinPara'), findsOneWidget);
-    expect(find.text('Leer n'), findsOneWidget);
+    expect(_bloque('Leer n'), findsOneWidget);
   });
 
   testWidgets('agregar un bloque con el + escribe la línea en el programa', (tester) async {
@@ -78,12 +85,12 @@ void main() {
     await tester.pumpAndSettle();
     expect(code.text, contains('Escribir "adiós"'));
     // The blocks follow the code.
-    expect(find.textContaining('adiós'), findsWidgets);
+    expect(_bloqueQue('Escribir "adiós"'), findsOneWidget);
   });
 
   testWidgets('tocar un bloque lo cambia y el código lo refleja', (tester) async {
     final code = await _pump(tester, _hola);
-    await tester.tap(find.text('Escribir "hola"'));
+    await tester.tap(_bloque('Escribir "hola"'));
     await tester.pumpAndSettle();
     expect(find.text('Guardar'), findsOneWidget);
     await tester.enterText(find.byType(TextField), '"chao"');
@@ -95,7 +102,7 @@ void main() {
 
   testWidgets('mantener pulsado ofrece eliminar el bloque', (tester) async {
     final code = await _pump(tester, _hola);
-    await tester.longPress(find.text('Escribir "hola"'));
+    await tester.longPress(_bloque('Escribir "hola"'));
     await tester.pumpAndSettle();
     expect(find.text('Cambiar'), findsOneWidget);
     await tester.tap(find.text('Eliminar'));
@@ -132,17 +139,39 @@ void main() {
     code.text = 'Algoritmo hola\n    Escribir "hola\nFinAlgoritmo\n';
     await tester.pump();
     // Half a word is not a mistake yet.
-    expect(find.text('Escribir "hola"'), findsOneWidget);
+    expect(_bloque('Escribir "hola"'), findsOneWidget);
     await tester.pump(const Duration(milliseconds: 800));
     expect(find.textContaining('Hay un error en la línea'), findsOneWidget);
-    expect(find.text('Escribir "hola"'), findsOneWidget);
+    expect(_bloque('Escribir "hola"'), findsOneWidget);
   });
 
   testWidgets('"Así se escribe" muestra el pseudocódigo de los bloques', (tester) async {
     await _pump(tester, _hola);
-    await tester.scrollUntilVisible(find.text('Así se escribe'), 200);
-    await tester.tap(find.text('Así se escribe'));
+    await tester.scrollUntilVisible(
+      find.text('EL MISMO PROGRAMA, ESCRITO'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.text('EL MISMO PROGRAMA, ESCRITO'));
     await tester.pumpAndSettle();
     expect(find.textContaining('Algoritmo hola', findRichText: true), findsWidgets);
+  });
+
+  testWidgets('la bandeja de abajo agrega un bloque al final del programa', (tester) async {
+    final code = await _pump(tester, _hola);
+    // The tray is the last thing on screen: its chip is the last "Escribir".
+    await tester.tap(find.text('Escribir').last);
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), '"fin"');
+    await tester.tap(find.text('Agregar'));
+    await tester.pumpAndSettle();
+    final lines = code.text.trimRight().split('\n');
+    expect(lines.last, 'FinAlgoritmo');
+    expect(lines[lines.length - 2].trim(), 'Escribir "fin"');
+  });
+
+  testWidgets('mientras corre el programa no hay bandeja', (tester) async {
+    await _pump(tester, _hola, editable: false);
+    expect(find.text('Mientras'), findsNothing);
   });
 }

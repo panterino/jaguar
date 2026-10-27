@@ -967,9 +967,9 @@ class _HeroState extends State<_Hero> with SingleTickerProviderStateMixin {
   /// Her mood: proud when the path is done, otherwise a different face each
   /// time she is touched.
   MascotPose get _pose {
-    if (widget.next == null) return MascotPose.celebra;
-    if (_phrase == 0) return MascotPose.normal;
-    const moods = [MascotPose.feliz, MascotPose.pensando, MascotPose.guino, MascotPose.sorpresa];
+    if (widget.next == null) return MascotPose.orgulloso;
+    if (_phrase == 0) return MascotPose.hola;
+    const moods = [MascotPose.guino, MascotPose.idea, MascotPose.estudiando, MascotPose.yHoy, MascotPose.programando];
     return moods[(_phrase - 1) % moods.length];
   }
 

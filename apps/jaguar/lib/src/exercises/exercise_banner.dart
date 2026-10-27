@@ -40,7 +40,7 @@ class ExerciseBanner extends StatefulWidget {
 }
 
 class _ExerciseBannerState extends State<ExerciseBanner> {
-  bool _expanded = true;
+  bool? _expandedChoice;
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +49,11 @@ class _ExerciseBannerState extends State<ExerciseBanner> {
     final exercise = widget.exercise;
     final visibleCases = exercise.cases.where((c) => !c.hidden).length;
     final hiddenCases = exercise.cases.length - visibleCases;
+
+    // On a phone the statement starts folded to two lines: the code gets the room.
+    final compact = !widget.side && MediaQuery.sizeOf(context).width < 480;
+    final expandedNow = _expandedChoice ?? !compact;
+    if (compact) return _compact(context, exercise, visibleCases, hiddenCases, expandedNow);
 
     final title = Text(
       exercise.title,
@@ -94,10 +99,10 @@ class _ExerciseBannerState extends State<ExerciseBanner> {
                   const Spacer(),
                 if (exercise.statement.isNotEmpty)
                   IconButton(
-                    tooltip: _expanded ? 'Ocultar enunciado' : 'Ver enunciado',
-                    icon: Icon(_expanded ? Icons.expand_less : Icons.expand_more),
+                    tooltip: expandedNow ? 'Ocultar enunciado' : 'Ver enunciado',
+                    icon: Icon(expandedNow ? Icons.expand_less : Icons.expand_more),
                     color: scheme.onPrimaryContainer,
-                    onPressed: () => setState(() => _expanded = !_expanded),
+                    onPressed: () => setState(() => _expandedChoice = !expandedNow),
                   ),
                 if (widget.onHints case final onHints?)
                   IconButton(
@@ -124,7 +129,7 @@ class _ExerciseBannerState extends State<ExerciseBanner> {
                   ),
               ],
             ),
-            if (_expanded && !typing && exercise.statement.isNotEmpty)
+            if (expandedNow && !typing && exercise.statement.isNotEmpty)
               if (widget.side)
                 Expanded(child: statement)
               else
@@ -141,6 +146,104 @@ class _ExerciseBannerState extends State<ExerciseBanner> {
                   style: theme.textTheme.bodySmall?.copyWith(color: scheme.onPrimaryContainer.withValues(alpha: 0.75)),
                 ),
               ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// The phone's banner: the statement (two lines, tap for the rest) and one
+  /// row of tools. The title is already in the bar above, so it is not repeated.
+  Widget _compact(BuildContext context, Exercise exercise, int visibleCases, int hiddenCases, bool expanded) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final color = scheme.onPrimaryContainer;
+    // While typing the code needs the room: only the tools.
+    final typing = MediaQuery.viewInsetsOf(context).bottom > 0;
+    final text = exercise.statement.isEmpty ? exercise.title : exercise.statement;
+    // Short: the hidden ones are in the Pruebas tab.
+    final cases =
+        '${exercise.cases.length} ${exercise.cases.length == 1 ? 'prueba' : 'pruebas'}'
+        '${widget.challenge ? '' : ' del profe'}';
+    return Material(
+      color: scheme.primaryContainer,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 6, 8, 6),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (!typing)
+              InkWell(
+                onTap: () => setState(() => _expandedChoice = !expanded),
+                child: Semantics(
+                  button: true,
+                  label: expanded ? 'Ocultar el resto del enunciado' : 'Ver el enunciado completo',
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: expanded
+                              ? ConstrainedBox(
+                                  constraints: const BoxConstraints(maxHeight: 190),
+                                  child: SingleChildScrollView(
+                                    child: Text(text, style: theme.textTheme.bodyMedium?.copyWith(color: color)),
+                                  ),
+                                )
+                              : Text(
+                                  text.replaceAll('\n', ' '),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: theme.textTheme.bodyMedium?.copyWith(color: color),
+                                ),
+                        ),
+                        Icon(expanded ? Icons.expand_less : Icons.expand_more, color: color, size: 22),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    cases,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodySmall?.copyWith(color: color.withValues(alpha: 0.8)),
+                  ),
+                ),
+                if (widget.onHints case final onHints?)
+                  IconButton(
+                    tooltip: 'Pistas',
+                    icon: const Icon(Icons.lightbulb_outline),
+                    visualDensity: VisualDensity.compact,
+                    color: color,
+                    onPressed: onHints,
+                  ),
+                if (widget.onPlan case final onPlan?)
+                  IconButton(
+                    tooltip: 'Planteamiento: entrada, proceso y salida',
+                    icon: const Icon(Icons.edit_note),
+                    visualDensity: VisualDensity.compact,
+                    color: color,
+                    onPressed: onPlan,
+                  ),
+                if (widget.showCheckButton)
+                  FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size(0, 36),
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                    onPressed: widget.checking ? null : widget.onCheck,
+                    icon: widget.checking
+                        ? const SizedBox.square(dimension: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                        : const Icon(Icons.fact_check_outlined, size: 18),
+                    label: const Text('Probar'),
+                  ),
+              ],
+            ),
           ],
         ),
       ),

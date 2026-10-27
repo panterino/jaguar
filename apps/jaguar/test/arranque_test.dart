@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jaguar/main.dart';
 import 'package:jaguar/src/editor/code_editor.dart';
+import 'package:jaguar/src/exercises/exercise_banner.dart';
 import 'package:jaguar/src/exercises/exercise_store.dart';
 import 'package:jaguar/src/lessons/lesson_screen.dart';
 import 'package:jaguar/src/programs/program_store.dart';
@@ -254,6 +255,22 @@ void main() {
       expect(ViewSettings(_prefs).tourStep, 0);
       // The blank program of a first launch did not stay behind.
       expect(ProgramStore(_prefs).programs.where(ProgramStore.isBlank), isEmpty);
+    });
+
+    testWidgets('el enunciado de un reto en el celular ocupa poco y se despliega al tocarlo', (tester) async {
+      await _pumpPhone(tester, values: {'jaguar.view.mode': 'basic', 'jaguar.view.tourStep': 3}, openEditor: false);
+      await irASala(tester, 'Ruta');
+      await tester.tap(find.text('Saludo'));
+      await tester.pumpAndSettle();
+      final banner = find.byType(ExerciseBanner);
+      expect(banner, findsOneWidget);
+      // Two lines of statement and one row of tools: far less than a third of the screen.
+      expect(tester.getSize(banner).height, lessThan(140));
+      expect(find.text('Probar'), findsOneWidget);
+      final folded = tester.getSize(banner).height;
+      await tester.tap(find.byIcon(Icons.expand_more));
+      await tester.pumpAndSettle();
+      expect(tester.getSize(banner).height, greaterThan(folded));
     });
 
     testWidgets('el tour avanza al escribir, al ejecutar y al abrir Pruebas', (tester) async {

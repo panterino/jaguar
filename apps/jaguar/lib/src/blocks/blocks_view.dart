@@ -9,29 +9,30 @@ import '../editor/syntax_controller.dart';
 import '../theme.dart';
 import '../widgets/chunky.dart';
 
-/// The face, the edge under it and the text color of a kind of block. One
-/// color per idea, so a program can be read by its colors.
+/// The face and text color of a kind of block, and the color of the field
+/// pill inside it. One color per idea, so a program can be read by its colors.
 class BlockColors {
-  const BlockColors(this.face, this.edge, this.ink);
+  const BlockColors(this.face, this.edge, this.ink, this.pillInk);
 
   final Color face;
   final Color edge;
   final Color ink;
 
-  static const _show = BlockColors(Color(0xFFF4B723), Color(0xFFA8730A), Color(0xFF2A1B0F));
-  static const _ask = BlockColors(Color(0xFF0B6BAF), Color(0xFF064B7D), Colors.white);
-  static const _data = BlockColors(Color(0xFF17796C), Color(0xFF0E564D), Colors.white);
-  static const _decide = BlockColors(Color(0xFF6B4BB8), Color(0xFF4A3187), Colors.white);
-  static const _repeat = BlockColors(Color(0xFFBF5700), Color(0xFF8A3E00), Colors.white);
-  static const _call = BlockColors(Color(0xFFC2185B), Color(0xFF8A0F41), Colors.white);
-  static const _neutral = BlockColors(Color(0xFF65503D), Color(0xFF3E2F20), Colors.white);
+  /// The text of the white pill that holds what the block says.
+  final Color pillInk;
+
+  static const _show = BlockColors(Color(0xFF2E7D32), Color(0xFF1B5E20), Colors.white, Color(0xFF2E7D32));
+  static const _ask = BlockColors(Color(0xFF0077B6), Color(0xFF005A8C), Colors.white, Color(0xFF0060A0));
+  static const _data = BlockColors(Color(0xFF5C4300), Color(0xFF3E2D00), Colors.white, Color(0xFF3E2D00));
+  static const _control = BlockColors(Color(0xFF8A4B00), Color(0xFF633500), Colors.white, Color(0xFF1F1B13));
+  static const _call = BlockColors(Color(0xFF6B4BB8), Color(0xFF4A3187), Colors.white, Color(0xFF4A3187));
+  static const _neutral = BlockColors(Color(0xFF4E4639), Color(0xFF332D24), Colors.white, Color(0xFF1F1B13));
 
   static BlockColors of(BlockKind? kind) => switch (kind) {
     BlockKind.salida => _show,
     BlockKind.lectura => _ask,
     BlockKind.asignacion => _data,
-    BlockKind.decision || BlockKind.segun => _decide,
-    BlockKind.mientras || BlockKind.para || BlockKind.repetir => _repeat,
+    BlockKind.decision || BlockKind.segun || BlockKind.mientras || BlockKind.para || BlockKind.repetir => _control,
     BlockKind.llamada => _call,
     null => _neutral,
   };
@@ -251,6 +252,15 @@ class _BlocksViewState extends State<BlocksView> {
 
   // Drawing -----------------------------------------------------------------
 
+  /// A new block at the end of the program, from the tray at the bottom.
+  Future<void> _addAtEnd(BlockKind kind) async {
+    final editing = widget.editing;
+    final program = _editableProgram();
+    if (editing == null || program == null) return;
+    final main = program.main;
+    await editing.insert(context, program, InsertPoint(main.body, main.body.length, headerLine: main.line), kind);
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -273,49 +283,69 @@ class _BlocksViewState extends State<BlocksView> {
     }
     final main = program.main;
     final stale = _error != null && _showError;
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),
+    return Column(
       children: [
-        if (stale)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Text(
-              'Hay un error en la línea ${_error!.line}: ves los bloques del último programa que funcionaba.',
-              style: theme.textTheme.bodyMedium?.copyWith(color: scheme.error),
-            ),
-          )
-        else if (_editable)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Text(
-              'Toca un + para agregar un bloque, toca un bloque para cambiarlo y mantenlo pulsado para más opciones.',
-              style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
-            ),
-          ),
-        _Block(
-          colors: BlockColors.of(null),
-          text: 'Algoritmo ${main.name}',
-          onTap: _editable ? _rename : () => widget.onTapLine(main.line),
-        ),
-        _body(program, main.body, headerLine: main.line),
-        _Block(colors: BlockColors.of(null), text: 'FinAlgoritmo', onTap: null),
-        if (program.functions.isNotEmpty) ...[
-          const SizedBox(height: 16),
-          Text('Funciones y SubProcesos', style: theme.textTheme.labelLarge?.copyWith(color: scheme.onSurfaceVariant)),
-          const SizedBox(height: 6),
-          for (final sub in program.functions.values)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 6),
-              child: _Block(
-                colors: BlockColors.of(BlockKind.llamada),
-                text: '${sub.returnVar == null ? 'SubProceso' : 'Funcion'} ${sub.name}',
-                caption: 'Se cambia en la vista Código',
-                onTap: () => widget.onTapLine(sub.line),
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(14, 10, 14, 16),
+            children: [
+              if (stale)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Text(
+                    'Hay un error en la línea ${_error!.line}: ves los bloques del último programa que funcionaba.',
+                    style: theme.textTheme.bodyMedium?.copyWith(color: scheme.error),
+                  ),
+                )
+              else if (_editable && main.body.length < 3)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Text(
+                    'Toca un + o un bloque de abajo para agregar. Toca un bloque para cambiarlo; mantenlo pulsado para más.',
+                    style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                  ),
+                ),
+              _Block(
+                colors: BlockColors.of(null),
+                keyword: 'Algoritmo',
+                chip: main.name,
+                onTap: _editable ? _rename : () => widget.onTapLine(main.line),
               ),
-            ),
-        ],
-        const SizedBox(height: 16),
-        _AsWritten(code: widget.code),
+              _body(program, main.body, headerLine: main.line),
+              const _Block(
+                colors: BlockColors(Color(0xFF4E4639), Color(0xFF332D24), Colors.white, Color(0xFF1F1B13)),
+                keyword: 'FinAlgoritmo',
+                onTap: null,
+              ),
+              if (program.functions.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Text(
+                  'FUNCIONES Y SUBPROCESOS',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                    letterSpacing: 0.8,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                for (final sub in program.functions.values)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: _Block(
+                      colors: BlockColors.of(BlockKind.llamada),
+                      keyword: sub.returnVar == null ? 'SubProceso' : 'Funcion',
+                      chip: sub.name,
+                      caption: 'Se cambia en la vista Código',
+                      onTap: () => widget.onTapLine(sub.line),
+                    ),
+                  ),
+              ],
+              const SizedBox(height: 16),
+              _AsWritten(code: widget.code),
+            ],
+          ),
+        ),
+        if (_editable) _Tray(onPick: _addAtEnd),
       ],
     );
   }
@@ -349,133 +379,218 @@ class _BlocksViewState extends State<BlocksView> {
     void tap() => _edit(stmt);
     void hold() => _menu(stmt);
 
-    Widget header(String text, {String? footer, VoidCallback? onFooterTap, required Widget inside}) => _Compound(
+    _Block head(String keyword, {String? chip, String? suffix}) => _Block(
       colors: colors,
-      header: _Block(colors: colors, text: text, executing: executing, onTap: tap, onLongPress: hold),
-      footer: footer,
-      onFooterTap: onFooterTap,
-      child: inside,
+      keyword: keyword,
+      chip: chip,
+      suffix: suffix,
+      executing: executing,
+      onTap: tap,
+      onLongPress: hold,
+      joined: true,
     );
+
+    Widget compound({
+      required _Block header,
+      required List<_Part> parts,
+      required String last,
+      String? lastChip,
+      VoidCallback? onLastTap,
+    }) => _Compound(colors: colors, header: header, parts: parts, last: last, lastChip: lastChip, onLastTap: onLastTap);
 
     switch (stmt) {
       case IfStmt():
         final elseLine = spans?.elseLine(stmt);
-        return header(
-          'Si ${e(stmt.condition)} Entonces',
-          footer: 'FinSi',
-          inside: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _body(program, stmt.thenBody, headerLine: stmt.line),
-              if (elseLine != null) ...[
-                _Divider(colors: colors, text: 'SiNo'),
-                _body(program, stmt.elseBody ?? const [], headerLine: elseLine),
-              ] else if (_editable)
-                _body(program, <Stmt>[], headerLine: stmt.line, addElseTo: stmt),
-            ],
-          ),
+        return compound(
+          header: head('Si', chip: e(stmt.condition), suffix: 'Entonces'),
+          parts: [
+            _Part(body: _body(program, stmt.thenBody, headerLine: stmt.line)),
+            if (elseLine != null)
+              _Part(
+                label: 'SiNo',
+                body: _body(program, stmt.elseBody ?? const [], headerLine: elseLine),
+              )
+            else if (_editable)
+              _Part(
+                body: _body(program, <Stmt>[], headerLine: stmt.line, addElseTo: stmt),
+              ),
+          ],
+          last: 'FinSi',
         );
       case WhileStmt():
-        return header(
-          'Mientras ${e(stmt.condition)} Hacer',
-          footer: 'FinMientras',
-          inside: _body(program, stmt.body, headerLine: stmt.line),
+        return compound(
+          header: head('Mientras', chip: e(stmt.condition), suffix: 'Hacer'),
+          parts: [_Part(body: _body(program, stmt.body, headerLine: stmt.line))],
+          last: 'FinMientras',
         );
       case ForStmt():
         final step = stmt.step == null ? '' : ' Con Paso ${e(stmt.step!)}';
-        return header(
-          'Para ${stmt.variable} <- ${e(stmt.from)} Hasta ${e(stmt.to)}$step Hacer',
-          footer: 'FinPara',
-          inside: _body(program, stmt.body, headerLine: stmt.line),
+        return compound(
+          header: head('Para', chip: '${stmt.variable} <- ${e(stmt.from)} Hasta ${e(stmt.to)}$step', suffix: 'Hacer'),
+          parts: [_Part(body: _body(program, stmt.body, headerLine: stmt.line))],
+          last: 'FinPara',
         );
       case ForEachStmt():
-        return header(
-          'Para Cada ${stmt.variable} de ${stmt.arrayName} Hacer',
-          footer: 'FinPara',
-          inside: _body(program, stmt.body, headerLine: stmt.line),
+        return compound(
+          header: head('Para Cada', chip: '${stmt.variable} de ${stmt.arrayName}', suffix: 'Hacer'),
+          parts: [_Part(body: _body(program, stmt.body, headerLine: stmt.line))],
+          last: 'FinPara',
         );
       case RepeatStmt():
-        return header(
-          'Repetir',
-          footer: '${stmt.untilTrue ? 'Hasta Que' : 'Mientras Que'} ${e(stmt.condition)}',
-          onFooterTap: tap,
-          inside: _body(program, stmt.body, headerLine: stmt.line),
+        return compound(
+          header: head('Repetir'),
+          parts: [_Part(body: _body(program, stmt.body, headerLine: stmt.line))],
+          last: stmt.untilTrue ? 'Hasta Que' : 'Mientras Que',
+          lastChip: e(stmt.condition),
+          onLastTap: tap,
         );
       case SwitchStmt():
-        return header(
-          'Segun ${e(stmt.subject)} Hacer',
-          footer: 'FinSegun',
-          inside: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              for (final c in stmt.cases) ...[
-                _Divider(colors: colors, text: '${c.values.map(e).join(', ')}:'),
-                _body(program, c.body, headerLine: spans?.caseLine(c) ?? stmt.line),
-              ],
-              if (stmt.otherwise != null) ...[
-                _Divider(colors: colors, text: 'De Otro Modo:'),
-                _body(program, stmt.otherwise!, headerLine: spans?.otherwiseLine(stmt) ?? stmt.line),
-              ],
-            ],
-          ),
+        return compound(
+          header: head('Segun', chip: e(stmt.subject), suffix: 'Hacer'),
+          parts: [
+            for (final c in stmt.cases)
+              _Part(
+                label: '${c.values.map(e).join(', ')}:',
+                body: _body(program, c.body, headerLine: spans?.caseLine(c) ?? stmt.line),
+              ),
+            if (stmt.otherwise != null)
+              _Part(
+                label: 'De Otro Modo:',
+                body: _body(program, stmt.otherwise!, headerLine: spans?.otherwiseLine(stmt) ?? stmt.line),
+              ),
+          ],
+          last: 'FinSegun',
         );
       default:
+        final (keyword, chip) = _simpleParts(stmt);
         return _Block(
           colors: colors,
-          text: formatSimpleStmt(stmt),
+          keyword: keyword,
+          chip: chip,
           executing: executing,
           onTap: tap,
           onLongPress: hold,
         );
     }
   }
+
+  /// The word and the field of a block without anything inside.
+  (String, String?) _simpleParts(Stmt stmt) {
+    String e(Expr expr) => formatExpr(expr);
+    switch (stmt) {
+      case WriteStmt():
+        return ('Escribir', stmt.values.map(e).join(', '));
+      case ReadStmt():
+        return ('Leer', stmt.targets.map(e).join(', '));
+      case AssignStmt():
+        return ('Asignar', '${e(stmt.target)} <- ${e(stmt.value)}');
+      default:
+        final text = formatSimpleStmt(stmt);
+        final space = text.indexOf(' ');
+        return space < 0 ? (text, null) : (text.substring(0, space), text.substring(space + 1));
+    }
+  }
 }
 
-/// One block: a rounded piece with weight and the line it stands for.
+/// One block: a rounded piece with the word of the instruction and, in a
+/// white pill, what it says.
 class _Block extends StatelessWidget {
   const _Block({
     required this.colors,
-    required this.text,
+    required this.keyword,
     required this.onTap,
+    this.chip,
+    this.suffix,
     this.onLongPress,
     this.executing = false,
     this.caption,
+    this.joined = false,
   });
 
   final BlockColors colors;
-  final String text;
+  final String keyword;
+
+  /// What the block says (a condition, the values to show...), in a pill.
+  final String? chip;
+
+  /// A word after the pill: Entonces, Hacer.
+  final String? suffix;
   final String? caption;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final bool executing;
 
+  /// The header of a compound block: no rounded bottom, it sits on its body.
+  final bool joined;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return GestureDetector(
-      onLongPress: onLongPress,
-      child: Chunky(
-        onTap: onTap,
-        fill: colors.face,
-        edge: colors.edge,
-        outline: executing ? theme.colorScheme.onSurface : null,
-        radius: 14,
-        minHeight: 46,
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        semanticsLabel: text,
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
+    final label = [keyword, if (chip != null) chip!, if (suffix != null) suffix!].join(' ');
+    final content = Row(
+      children: [
+        Flexible(
+          child: Wrap(
+            spacing: 8,
+            runSpacing: 4,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Text(
-                text,
-                style: monoStyle.copyWith(color: colors.ink, fontSize: 15, fontWeight: FontWeight.w700, height: 1.25),
+                keyword,
+                style: TextStyle(color: colors.ink, fontSize: 15, fontWeight: FontWeight.w700),
               ),
-              if (caption != null)
-                Text(caption!, style: TextStyle(color: colors.ink.withValues(alpha: 0.8), fontSize: 12)),
+              if (chip != null)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(7)),
+                  child: Text(
+                    chip!,
+                    style: monoStyle.copyWith(color: colors.pillInk, fontSize: 14, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              if (suffix != null)
+                Text(
+                  suffix!,
+                  style: TextStyle(color: colors.ink, fontSize: 15, fontWeight: FontWeight.w700),
+                ),
             ],
+          ),
+        ),
+      ],
+    );
+    return Semantics(
+      button: onTap != null,
+      label: label,
+      excludeSemantics: true,
+      child: GestureDetector(
+        onLongPress: onLongPress,
+        child: Material(
+          color: colors.face,
+          borderRadius: joined ? const BorderRadius.vertical(top: Radius.circular(12)) : BorderRadius.circular(12),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: onTap,
+            child: Container(
+              constraints: const BoxConstraints(minHeight: 44),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: executing
+                  ? BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: theme.colorScheme.onSurface, width: 3),
+                    )
+                  : null,
+              alignment: Alignment.centerLeft,
+              child: caption == null
+                  ? content
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        content,
+                        Text(caption!, style: TextStyle(color: colors.ink.withValues(alpha: 0.85), fontSize: 12)),
+                      ],
+                    ),
+            ),
           ),
         ),
       ),
@@ -483,79 +598,94 @@ class _Block extends StatelessWidget {
   }
 }
 
-/// A block that holds others: its header, a rail down the left side with the
-/// blocks inside, and a closing bar.
-class _Compound extends StatelessWidget {
-  const _Compound({required this.colors, required this.header, required this.child, this.footer, this.onFooterTap});
+/// A body of a compound block, with the word that opens it (SiNo, a case).
+class _Part {
+  const _Part({required this.body, this.label});
 
-  final BlockColors colors;
-  final Widget header;
-  final Widget child;
-  final String? footer;
-  final VoidCallback? onFooterTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        header,
-        IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(width: 18, margin: const EdgeInsets.only(bottom: 0), color: colors.face),
-              Expanded(
-                child: Padding(padding: const EdgeInsets.only(left: 6), child: child),
-              ),
-            ],
-          ),
-        ),
-        if (footer != null)
-          GestureDetector(
-            onTap: onFooterTap,
-            child: Container(
-              height: 34,
-              margin: const EdgeInsets.only(bottom: 4),
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              alignment: Alignment.centerLeft,
-              decoration: BoxDecoration(
-                color: colors.face,
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(14)),
-                boxShadow: [BoxShadow(color: colors.edge, offset: const Offset(0, 4))],
-              ),
-              child: Text(
-                footer!,
-                style: monoStyle.copyWith(color: colors.ink, fontSize: 14, fontWeight: FontWeight.w700),
-              ),
-            ),
-          ),
-      ],
-    );
-  }
+  final Widget body;
+  final String? label;
 }
 
-/// A label between two bodies of one block: SiNo, a case of Según.
-class _Divider extends StatelessWidget {
-  const _Divider({required this.colors, required this.text});
+/// A block that holds others: its header, then the blocks inside on a light
+/// ground with a rail of the block's color down the left, then the closing
+/// word.
+class _Compound extends StatelessWidget {
+  const _Compound({
+    required this.colors,
+    required this.header,
+    required this.parts,
+    required this.last,
+    this.lastChip,
+    this.onLastTap,
+  });
 
   final BlockColors colors;
-  final String text;
+  final _Block header;
+  final List<_Part> parts;
+  final String last;
+  final String? lastChip;
+  final VoidCallback? onLastTap;
 
-  @override
-  Widget build(BuildContext context) => Container(
-    margin: const EdgeInsets.only(top: 2, bottom: 2),
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-    decoration: BoxDecoration(color: colors.face.withValues(alpha: 0.25), borderRadius: BorderRadius.circular(10)),
-    child: Text(
-      text,
-      style: monoStyle.copyWith(
-        fontSize: 14,
-        fontWeight: FontWeight.w700,
-        color: Theme.of(context).colorScheme.onSurface,
+  Widget _word(String text, {String? chip, VoidCallback? onTap}) => InkWell(
+    onTap: onTap,
+    child: Container(
+      constraints: const BoxConstraints(minHeight: 38),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      alignment: Alignment.centerLeft,
+      child: Wrap(
+        spacing: 8,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          Text(
+            text,
+            style: TextStyle(color: colors.ink, fontSize: 15, fontWeight: FontWeight.w700),
+          ),
+          if (chip != null)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(7)),
+              child: Text(
+                chip,
+                style: monoStyle.copyWith(color: colors.pillInk, fontSize: 14, fontWeight: FontWeight.w600),
+              ),
+            ),
+        ],
       ),
     ),
   );
+
+  @override
+  Widget build(BuildContext context) {
+    final ground = Theme.of(context).colorScheme.surface;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 2),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: ColoredBox(
+          color: colors.face,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              header,
+              for (final part in parts) ...[
+                if (part.label != null) _word(part.label!),
+                Container(
+                  margin: const EdgeInsets.only(left: 18),
+                  padding: const EdgeInsets.fromLTRB(10, 2, 10, 2),
+                  decoration: BoxDecoration(
+                    color: ground,
+                    borderRadius: const BorderRadius.horizontal(left: Radius.circular(8)),
+                  ),
+                  child: part.body,
+                ),
+              ],
+              _word(last, chip: lastChip, onTap: onLastTap),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 /// A place where a block can go: a small round button, or a wide dashed one
@@ -580,23 +710,23 @@ class _Slot extends StatelessWidget {
           button: true,
           label: label == null ? 'Agregar un bloque aquí' : 'Agregar un bloque en $label',
           child: InkWell(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(10),
             onTap: onTap,
             child: Container(
-              height: 44,
+              height: 40,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: scheme.outline, width: 1.5),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.add, size: 20, color: scheme.onSurfaceVariant),
+                  Icon(Icons.add, size: 18, color: scheme.onSurfaceVariant),
                   const SizedBox(width: 6),
                   Text(
                     label == null ? 'Agregar un bloque' : 'Agregar $label',
-                    style: TextStyle(color: scheme.onSurfaceVariant, fontWeight: FontWeight.w700),
+                    style: TextStyle(color: scheme.onSurfaceVariant, fontWeight: FontWeight.w700, fontSize: 14),
                   ),
                 ],
               ),
@@ -606,24 +736,88 @@ class _Slot extends StatelessWidget {
       );
     }
     return SizedBox(
-      height: 32,
+      height: 26,
       child: Center(
         child: Semantics(
           button: true,
           label: 'Agregar un bloque aquí',
           child: InkResponse(
             onTap: onTap,
-            radius: 24,
+            radius: 20,
             child: Container(
-              width: 26,
-              height: 26,
+              width: 20,
+              height: 20,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: scheme.surfaceContainerHighest,
-                border: Border.all(color: scheme.outline, width: 1.5),
+                border: Border.all(color: scheme.outline.withValues(alpha: 0.7), width: 1.5),
               ),
-              child: Icon(Icons.add, size: 18, color: scheme.onSurfaceVariant),
+              child: Icon(Icons.add, size: 14, color: scheme.onSurfaceVariant),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The blocks at hand, at the bottom: one touch adds one at the end of the
+/// program. For another place, the ＋ between blocks.
+class _Tray extends StatelessWidget {
+  const _Tray({required this.onPick});
+
+  final ValueChanged<BlockKind> onPick;
+
+  static const _names = {
+    BlockKind.lectura: 'Leer',
+    BlockKind.salida: 'Escribir',
+    BlockKind.decision: 'Si',
+    BlockKind.mientras: 'Mientras',
+    BlockKind.para: 'Para',
+    BlockKind.asignacion: 'Asignar',
+    BlockKind.segun: 'Segun',
+    BlockKind.repetir: 'Repetir',
+    BlockKind.llamada: 'Llamar',
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Material(
+      color: scheme.surfaceContainer,
+      child: SizedBox(
+        height: 64,
+        child: Semantics(
+          label: 'Bloques disponibles: toca uno para agregarlo al final',
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            children: [
+              for (final entry in _names.entries)
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: Material(
+                    color: BlockColors.of(entry.key).face,
+                    borderRadius: BorderRadius.circular(10),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(10),
+                      onTap: () => onPick(entry.key),
+                      child: Container(
+                        constraints: const BoxConstraints(minWidth: 56),
+                        padding: const EdgeInsets.symmetric(horizontal: 14),
+                        alignment: Alignment.center,
+                        child: Text(
+                          entry.value,
+                          style: TextStyle(
+                            color: BlockColors.of(entry.key).ink,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
         ),
       ),
@@ -715,18 +909,29 @@ class _AsWritten extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    return Card(
+    return Container(
+      decoration: BoxDecoration(color: scheme.surfaceContainer, borderRadius: BorderRadius.circular(12)),
       child: Theme(
         data: theme.copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
-          title: const Text('Así se escribe'),
-          subtitle: const Text('Los mismos bloques, en pseudocódigo'),
-          childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          title: Text(
+            'EL MISMO PROGRAMA, ESCRITO',
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: scheme.onSurfaceVariant,
+              letterSpacing: 0.8,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          tilePadding: const EdgeInsets.symmetric(horizontal: 12),
+          childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
           expandedAlignment: Alignment.centerLeft,
           children: [
-            SelectableText(
-              code.text.trimRight(),
-              style: monoStyle.copyWith(fontSize: 13, color: scheme.onSurface, height: 1.4),
+            Text.rich(
+              code.buildTextSpan(
+                context: context,
+                style: monoStyle.copyWith(fontSize: 13, color: scheme.onSurface, height: 1.5),
+                withComposing: false,
+              ),
             ),
           ],
         ),

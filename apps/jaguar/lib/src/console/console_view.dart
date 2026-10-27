@@ -299,7 +299,7 @@ class _EmptyConsole extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Mascota(pose: MascotPose.guino, size: 96),
+            const Mascota(pose: MascotPose.programando, size: 110),
             const SizedBox(height: 12),
             Text('Aquí verás lo que hace tu programa', style: theme.textTheme.titleMedium, textAlign: TextAlign.center),
             const SizedBox(height: 4),

@@ -51,7 +51,7 @@ class _WelcomeDialog extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Mascota(pose: MascotPose.guino, size: 64),
+              const Mascota(pose: MascotPose.hola, size: 72),
               const SizedBox(height: 8),
               Text(
                 again ? '¿Cómo usas Jaguar Code?' : '¡Hola! Esto es Jaguar Code',

@@ -2160,9 +2160,52 @@ class _EditorViewSwitch extends StatelessWidget {
     EditorView.both: Icons.vertical_split_outlined,
   };
 
+  /// On a phone: three tabs across the width, the chosen one underlined.
+  Widget _tabs(BuildContext context, EditorView view) {
+    final scheme = Theme.of(context).colorScheme;
+    return Semantics(
+      label: 'Vista del programa',
+      child: Row(
+        children: [
+          for (final option in [EditorView.code, EditorView.diagram, EditorView.blocks, if (allowBoth) EditorView.both])
+            Expanded(
+              child: Tooltip(
+                message: _tips[option]!,
+                child: InkWell(
+                  onTap: () => settings.editorView = option,
+                  child: Container(
+                    height: 44,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(color: view == option ? scheme.primary : Colors.transparent, width: 3),
+                      ),
+                    ),
+                    child: Semantics(
+                      selected: view == option,
+                      button: true,
+                      child: Text(
+                        _labels[option]!,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: view == option ? scheme.primary : scheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final view = !allowBoth && settings.editorView == EditorView.both ? EditorView.code : settings.editorView;
+    if (expanded) return _tabs(context, view);
     return Semantics(
       label: 'Vista del programa',
       child: SegmentedButton<EditorView>(
@@ -2267,18 +2310,13 @@ class _ViewStrip extends StatelessWidget {
           ? const SizedBox(width: double.infinity)
           : DecoratedBox(
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceContainerLow,
+                color: Theme.of(context).colorScheme.surface,
                 border: Border(bottom: BorderSide(color: Theme.of(context).colorScheme.outlineVariant)),
               ),
               child: SizedBox(
-                height: 48,
+                height: 44,
                 width: double.infinity,
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: _EditorViewSwitch(settings: settings, allowBoth: allowBoth, expanded: true),
-                  ),
-                ),
+                child: _EditorViewSwitch(settings: settings, allowBoth: allowBoth, expanded: true),
               ),
             ),
     );
