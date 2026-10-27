@@ -100,6 +100,24 @@ void main() {
     expect(find.text('4 de 5'), findsOneWidget);
   });
 
+  testWidgets('dos aciertos seguidos celebran una racha y un error la corta', (tester) async {
+    await _abre(tester);
+    await irASala(tester, 'Ruta');
+    await tester.tap(find.text('Tu primer programa'));
+    await tester.pumpAndSettle();
+    final preguntas = lessonFirstProgram.questions;
+    await _responde(tester, preguntas[0], bien: true);
+    expect(find.textContaining('Racha de'), findsNothing, reason: 'una sola no es racha');
+    await tester.tap(find.text('Continuar'));
+    await tester.pumpAndSettle();
+    await _responde(tester, preguntas[1], bien: true);
+    expect(find.text('Racha de 2'), findsOneWidget);
+    await tester.tap(find.text('Continuar'));
+    await tester.pumpAndSettle();
+    await _responde(tester, preguntas[2], bien: false);
+    expect(find.textContaining('Racha de'), findsNothing);
+  });
+
   testWidgets('las preguntas de figuras y de ordenar se pueden responder', (tester) async {
     await _abre(tester);
     await irASala(tester, 'Ruta');

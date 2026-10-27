@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
+import 'package:flutter/services.dart';
 
 import '../settings.dart';
 import '../theme.dart';
@@ -34,6 +35,9 @@ class _LessonScreenState extends State<LessonScreen> {
   final _retried = <Question>{};
   int _index = 0;
   int _firstTry = 0;
+
+  /// Right answers in a row, to cheer a streak.
+  int _streak = 0;
 
   // The answer being built.
   int? _choice;
@@ -101,7 +105,9 @@ class _LessonScreenState extends State<LessonScreen> {
     setState(() {
       _checked = true;
       _ok = ok;
+      _streak = ok ? _streak + 1 : 0;
     });
+    if (ok) HapticFeedback.lightImpact();
     final q = _current;
     SemanticsService.announce(ok ? '¡Correcto! ${q.right}' : 'Casi. ${q.wrong}', TextDirection.ltr);
     if (!ok && _retried.add(q)) _queue.add(q);
@@ -410,30 +416,33 @@ class _Options extends StatelessWidget {
                 final selected = screen._choice == i;
                 final correct = checked ? (i == question.answer ? true : (selected ? false : null)) : null;
                 final c = _tileColors(context, selected: selected, correct: correct);
-                return Chunky(
-                  onTap: checked ? null : () => screen._choose(i),
-                  fill: c.fill,
-                  edge: c.edge,
-                  outline: c.outline,
-                  selected: selected,
-                  minHeight: 58,
-                  child: Row(
-                    children: [
-                      _Key(index: i, color: c.text),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          option,
-                          style: (question.mono ? monoStyle : theme.textTheme.titleMedium)?.copyWith(
-                            color: c.text,
-                            fontWeight: FontWeight.w700,
-                            fontSize: question.mono ? 16 : null,
+                return _Reaction(
+                  correct: selected ? correct : null,
+                  child: Chunky(
+                    onTap: checked ? null : () => screen._choose(i),
+                    fill: c.fill,
+                    edge: c.edge,
+                    outline: c.outline,
+                    selected: selected,
+                    minHeight: 58,
+                    child: Row(
+                      children: [
+                        _Key(index: i, color: c.text),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            option,
+                            style: (question.mono ? monoStyle : theme.textTheme.titleMedium)?.copyWith(
+                              color: c.text,
+                              fontWeight: FontWeight.w700,
+                              fontSize: question.mono ? 16 : null,
+                            ),
                           ),
                         ),
-                      ),
-                      if (correct == true) Icon(Icons.check_circle, color: c.text, semanticLabel: 'Correcta'),
-                      if (correct == false) Icon(Icons.cancel, color: c.text, semanticLabel: 'Incorrecta'),
-                    ],
+                        if (correct == true) Icon(Icons.check_circle, color: c.text, semanticLabel: 'Correcta'),
+                        if (correct == false) Icon(Icons.cancel, color: c.text, semanticLabel: 'Incorrecta'),
+                      ],
+                    ),
                   ),
                 );
               },
@@ -465,30 +474,33 @@ class _FindError extends StatelessWidget {
                 final selected = screen._choice == i;
                 final correct = checked ? (i == question.errorLine ? true : (selected ? false : null)) : null;
                 final c = _tileColors(context, selected: selected, correct: correct);
-                return Chunky(
-                  onTap: checked ? null : () => screen._choose(i),
-                  fill: c.fill,
-                  edge: c.edge,
-                  outline: c.outline,
-                  selected: selected,
-                  minHeight: 48,
-                  semanticsLabel: 'Línea ${i + 1}: $line',
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: 24,
-                        child: Text('${i + 1}', style: monoStyle.copyWith(color: c.text.withValues(alpha: 0.6))),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          line,
-                          style: monoStyle.copyWith(color: c.text, fontWeight: FontWeight.w700, fontSize: 15),
+                return _Reaction(
+                  correct: selected ? correct : null,
+                  child: Chunky(
+                    onTap: checked ? null : () => screen._choose(i),
+                    fill: c.fill,
+                    edge: c.edge,
+                    outline: c.outline,
+                    selected: selected,
+                    minHeight: 48,
+                    semanticsLabel: 'Línea ${i + 1}: $line',
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: 24,
+                          child: Text('${i + 1}', style: monoStyle.copyWith(color: c.text.withValues(alpha: 0.6))),
                         ),
-                      ),
-                      if (correct == true) Icon(Icons.check_circle, color: c.text),
-                      if (correct == false) Icon(Icons.cancel, color: c.text),
-                    ],
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            line,
+                            style: monoStyle.copyWith(color: c.text, fontWeight: FontWeight.w700, fontSize: 15),
+                          ),
+                        ),
+                        if (correct == true) Icon(Icons.check_circle, color: c.text),
+                        if (correct == false) Icon(Icons.cancel, color: c.text),
+                      ],
+                    ),
                   ),
                 );
               },
@@ -544,17 +556,20 @@ class _Figures extends StatelessWidget {
             final selected = screen._choice == figure.index;
             final correct = checked ? (figure == question.answer ? true : (selected ? false : null)) : null;
             final c = _tileColors(context, selected: selected, correct: correct);
-            return Chunky(
-              key: ValueKey(figure),
-              onTap: checked ? null : () => screen._choose(figure.index),
-              fill: c.fill,
-              edge: c.edge,
-              outline: c.outline,
-              selected: selected,
-              semanticsLabel: figure.label,
-              child: CustomPaint(
-                size: const Size(96, 56),
-                painter: FigurePainter(figure, line: c.text, fill: c.text.withValues(alpha: 0.12)),
+            return _Reaction(
+              correct: selected ? correct : null,
+              child: Chunky(
+                key: ValueKey(figure),
+                onTap: checked ? null : () => screen._choose(figure.index),
+                fill: c.fill,
+                edge: c.edge,
+                outline: c.outline,
+                selected: selected,
+                semanticsLabel: figure.label,
+                child: CustomPaint(
+                  size: const Size(96, 56),
+                  painter: FigurePainter(figure, line: c.text, fill: c.text.withValues(alpha: 0.12)),
+                ),
               ),
             );
           },
@@ -716,6 +731,7 @@ class _Footer extends StatelessWidget {
                 _Feedback(
                   key: ValueKey('${screen._index}-$ok'),
                   ok: ok,
+                  streak: screen._streak,
                   color: c.text,
                   message: ok ? '¡Correcto!' : 'Casi',
                   detail: ok ? q.right : q.wrong,
@@ -755,6 +771,133 @@ class _Footer extends StatelessWidget {
   }
 }
 
+/// An answer that reacts: the right one pops, the wrong one shakes.
+class _Reaction extends StatelessWidget {
+  const _Reaction({required this.correct, required this.child});
+
+  /// Null when the tile was not the one chosen (or nothing is checked yet).
+  final bool? correct;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (correct == null || MediaQuery.disableAnimationsOf(context)) return child;
+    final right = correct!;
+    return TweenAnimationBuilder<double>(
+      key: ValueKey(right),
+      tween: Tween(begin: 0, end: 1),
+      duration: Duration(milliseconds: right ? 420 : 380),
+      builder: (context, t, child) {
+        if (right) {
+          // A little swell and back.
+          final scale = 1 + 0.06 * math.sin(t * math.pi);
+          return Transform.scale(scale: scale, child: child);
+        }
+        final dx = math.sin(t * math.pi * 5) * 6 * (1 - t);
+        return Transform.translate(offset: Offset(dx, 0), child: child);
+      },
+      child: child,
+    );
+  }
+}
+
+/// Little stars that fly out of the mascot when an answer is right. Drawn
+/// around her, away from the text.
+class _Sparkles extends StatelessWidget {
+  const _Sparkles({required this.color});
+
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned.fill(
+      child: IgnorePointer(
+        child: TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0, end: 1),
+          duration: const Duration(milliseconds: 800),
+          curve: Curves.easeOutCubic,
+          builder: (context, t, _) => CustomPaint(painter: _SparklePainter(t, color)),
+        ),
+      ),
+    );
+  }
+}
+
+class _SparklePainter extends CustomPainter {
+  _SparklePainter(this.t, this.color);
+
+  final double t;
+  final Color color;
+
+  static const _gold = Color(0xFFF4B723);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = size.center(Offset.zero);
+    const count = 10;
+    for (var i = 0; i < count; i++) {
+      final angle = i / count * math.pi * 2 + 0.3;
+      final distance = size.width * (0.55 + 0.45 * t) + (i.isEven ? 6 : 0);
+      final at = center + Offset(math.cos(angle), math.sin(angle)) * distance;
+      final radius = (i.isEven ? 4.5 : 3.0) * (1 - t * 0.7);
+      final paint = Paint()..color = (i % 3 == 0 ? color : _gold).withValues(alpha: (1 - t).clamp(0, 1));
+      if (i.isEven) {
+        // A four-point star.
+        final path = Path();
+        for (var k = 0; k < 8; k++) {
+          final r = k.isEven ? radius * 1.8 : radius * 0.6;
+          final a = k * math.pi / 4;
+          final point = at + Offset(math.cos(a), math.sin(a)) * r;
+          k == 0 ? path.moveTo(point.dx, point.dy) : path.lineTo(point.dx, point.dy);
+        }
+        canvas.drawPath(path..close(), paint);
+      } else {
+        canvas.drawCircle(at, radius, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_SparklePainter old) => old.t != t || old.color != color;
+}
+
+/// "Racha de 3": right answers in a row, with a flame.
+class _StreakChip extends StatelessWidget {
+  const _StreakChip({required this.count, required this.color});
+
+  final int count;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.6, end: 1),
+      duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : const Duration(milliseconds: 380),
+      curve: Curves.elasticOut,
+      builder: (context, scale, child) => Transform.scale(scale: scale, child: child),
+      child: Semantics(
+        label: 'Racha de $count respuestas correctas',
+        excludeSemantics: true,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          decoration: BoxDecoration(color: color.withValues(alpha: 0.14), borderRadius: BorderRadius.circular(12)),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.local_fire_department_rounded, size: 18, color: color),
+              const SizedBox(width: 2),
+              Text(
+                'Racha de $count',
+                style: TextStyle(color: color, fontWeight: FontWeight.w800, fontSize: 13),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// The panel that says if it was right and why, with the mascot reacting.
 class _Feedback extends StatelessWidget {
   const _Feedback({
@@ -764,9 +907,13 @@ class _Feedback extends StatelessWidget {
     required this.message,
     required this.detail,
     this.solution,
+    this.streak = 0,
   });
 
   final bool ok;
+
+  /// Right answers in a row, counting this one.
+  final int streak;
   final Color color;
   final String message;
   final String detail;
@@ -791,16 +938,30 @@ class _Feedback extends StatelessWidget {
               final dx = ok ? 0.0 : math.sin(t * math.pi * 6) * 5 * (1 - t);
               return Transform.translate(offset: Offset(dx, dy), child: child);
             },
-            child: Mascota(pose: ok ? MascotPose.lograste : MascotPose.animo, size: 64),
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.center,
+              children: [
+                if (ok && !still) _Sparkles(color: color),
+                Mascota(pose: ok ? MascotPose.lograste : MascotPose.animo, size: 64),
+              ],
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  message,
-                  style: theme.textTheme.titleLarge?.copyWith(color: color, fontWeight: FontWeight.w900),
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        message,
+                        style: theme.textTheme.titleLarge?.copyWith(color: color, fontWeight: FontWeight.w900),
+                      ),
+                    ),
+                    if (ok && streak >= 2) ...[const SizedBox(width: 10), _StreakChip(count: streak, color: color)],
+                  ],
                 ),
                 const SizedBox(height: 2),
                 Text(detail, style: theme.textTheme.bodyMedium?.copyWith(color: color)),
