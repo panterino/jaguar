@@ -87,7 +87,9 @@ void main() {
         id: 'tarea-1',
         title: 'Par o impar',
         statement: 'Di si un número es par.',
-        cases: [TestCase(inputs: ['2'], expected: 'par')],
+        cases: [
+          TestCase(inputs: ['2'], expected: 'par'),
+        ],
       ),
     );
     await tester.pumpWidget(JaguarApp(store: ProgramStore(prefs), exercises: exercises, settings: ViewSettings(prefs)));
@@ -123,7 +125,9 @@ void main() {
           id: 'par',
           title: 'Par o impar',
           statement: 'Di si es par.',
-          cases: [TestCase(inputs: ['2'], expected: 'par')],
+          cases: [
+            TestCase(inputs: ['2'], expected: 'par'),
+          ],
         ),
       );
       if (asTeacher) return (cloud, backend);
@@ -141,7 +145,12 @@ void main() {
       final (cloud, _) = await classWith(tester, asTeacher: false);
       final prefs = await SharedPreferences.getInstance();
       await tester.pumpWidget(
-        JaguarApp(store: ProgramStore(prefs), exercises: ExerciseStore(prefs), settings: ViewSettings(prefs), cloud: cloud),
+        JaguarApp(
+          store: ProgramStore(prefs),
+          exercises: ExerciseStore(prefs),
+          settings: ViewSettings(prefs),
+          cloud: cloud,
+        ),
       );
       await tester.pumpAndSettle();
       await tester.tap(find.text('Clases'));
@@ -169,7 +178,12 @@ void main() {
       final (cloud, _) = await classWith(tester, asTeacher: true);
       final prefs = await SharedPreferences.getInstance();
       await tester.pumpWidget(
-        JaguarApp(store: ProgramStore(prefs), exercises: ExerciseStore(prefs), settings: ViewSettings(prefs), cloud: cloud),
+        JaguarApp(
+          store: ProgramStore(prefs),
+          exercises: ExerciseStore(prefs),
+          settings: ViewSettings(prefs),
+          cloud: cloud,
+        ),
       );
       await tester.pumpAndSettle();
       await tester.tap(find.text('Clases'));
@@ -188,7 +202,12 @@ void main() {
       final prefs = await SharedPreferences.getInstance();
       final cloud = Cloud(MemoryBackend(), prefs);
       await tester.pumpWidget(
-        JaguarApp(store: ProgramStore(prefs), exercises: ExerciseStore(prefs), settings: ViewSettings(prefs), cloud: cloud),
+        JaguarApp(
+          store: ProgramStore(prefs),
+          exercises: ExerciseStore(prefs),
+          settings: ViewSettings(prefs),
+          cloud: cloud,
+        ),
       );
       await tester.pumpAndSettle();
       await tester.tap(find.text('Clases'));
