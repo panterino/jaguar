@@ -196,15 +196,42 @@ class GuideScreen extends StatelessWidget {
       shots: const [_Shot('error', 'El error con su sugerencia, debajo del código.')],
     ),
     _Topic(
+      icon: Icons.bolt_outlined,
+      title: 'Lecciones cortas',
+      summary: 'Preguntas rápidas con explicación, antes de cada reto',
+      intro:
+          'La Ruta tiene seis lecciones de cinco preguntas cada una: qué es un programa, operaciones, diagramas de '
+          'flujo, decisiones, prueba de escritorio y ciclos. Duran un par de minutos y funcionan sin internet.',
+      steps: [
+        desktop
+            ? 'Haz clic en Ruta en la barra de la izquierda y elige una lección.'
+            : 'Abre la sala Ruta (abajo) y toca una lección. La siguiente también aparece en Inicio.',
+        'Cada pregunta tiene una respuesta: elige una opción, ordena líneas de un programa o escoge una figura '
+            'del diagrama de flujo. Toca Comprobar.',
+        'Verde dice por qué estaba bien. Si fallas, la explicación te dice la respuesta y la pregunta vuelve al '
+            'final para que la repitas una vez.',
+        'Al terminar ves cuántas acertaste a la primera. La lección queda marcada y Seguir te lleva al paso '
+            'siguiente de la ruta.',
+        'No hay vidas ni castigos: puedes repetir una lección cuando quieras.',
+      ],
+      shots: const [
+        _Shot('leccion-pregunta', 'Una pregunta con un programa y cuatro opciones.'),
+        _Shot('leccion-acierto', 'Al acertar: la explicación y a seguir.'),
+        _Shot('leccion-figuras', 'Preguntas de figuras del diagrama de flujo.'),
+        _Shot('leccion-ordenar', 'Ordenar las líneas de un programa.'),
+        _Shot('leccion-final', 'Al terminar: cuántas acertaste a la primera.'),
+      ],
+    ),
+    _Topic(
       icon: Icons.flag_outlined,
       title: 'Retos',
       summary: 'Diez ejercicios para practicar por tu cuenta',
       intro:
           'Hay 10 retos, uno por tema y en orden: variables, operadores, Si, Según, Mientras, Para y Repetir. '
-          'Funcionan sin internet.',
+          'Cada uno va después de la lección que lo prepara. Funcionan sin internet.',
       steps: [
         desktop
-            ? 'Haz clic en Retos en el panel de la izquierda o en Ayuda → Retos para practicar.'
+            ? 'Haz clic en Ruta en la barra de la izquierda y elige un reto, o en Ayuda → Retos para practicar.'
             : 'Abre la sala Ruta (abajo) y toca un reto. El siguiente también aparece en Inicio.',
         'Lee el enunciado. Lo ocultas o lo muestras con la flecha.',
         'Si te atoras, toca el foco para ver una pista. Con Otra pista ves la siguiente: van de una idea a un '
@@ -214,7 +241,7 @@ class GuideScreen extends StatelessWidget {
         'Si pasa todo, sale ¡Reto superado! y el botón Siguiente reto.',
       ],
       shots: const [
-        _Shot('retos', 'La lista de retos y tu avance.'),
+        _Shot('retos', 'La Ruta: lecciones y retos por grupos, con tu avance.'),
         _Shot('reto', 'El reto con su enunciado.'),
       ],
       action: ('Ver los retos', go(onOpenChallenges)),
@@ -333,9 +360,8 @@ class GuideScreen extends StatelessWidget {
       title: 'Inicio y ajustes',
       summary: 'Dónde empezar y cómo usas Jaguar',
       intro: desktop
-          ? 'El inicio aparece cuando no tienes ningún programa abierto, y desde el panel de la izquierda cuando '
-                'quieras. Ahí están los retos, un programa nuevo, los ejemplos, abrir un archivo, esta guía y tus '
-                'programas recientes.'
+          ? 'En la computadora las cuatro salas están siempre en la barra de la izquierda: Inicio (lo que sigue), Ruta '
+                '(lecciones y retos), Clases (lo de tu profe) y Taller (tu editor y tus programas).'
           : 'En el celular Jaguar tiene cuatro salas, siempre abajo: Inicio (lo que sigue), Ruta (los retos), '
                 'Clases (lo de tu profe) y Taller (tus programas). Un programa, un reto o una tarea se abre en el '
                 'editor; Atrás regresa a la sala.',
@@ -353,9 +379,12 @@ class GuideScreen extends StatelessWidget {
             ? 'Lo que usas menos (Comunidad, Mis clases, tu cuenta, Acerca de) está en Más, dentro del menú.'
             : 'Lo que usas menos (programas de la comunidad, tu cuenta, Acerca de) está al final de Ajustes.',
       ],
-      shots: const [
-        _Shot('inicio', 'Inicio: lo que sigue para ti.'),
-        _Shot('ajustes', 'Ajustes.'),
+      shots: [
+        if (desktop)
+          const _Shot('ancha-inicio', 'Inicio, con las salas en la barra de la izquierda.')
+        else
+          const _Shot('inicio', 'Inicio: lo que sigue para ti.'),
+        const _Shot('ajustes', 'Ajustes.'),
       ],
     ),
     _Topic(
@@ -365,7 +394,7 @@ class GuideScreen extends StatelessWidget {
       intro: 'Las clases en línea necesitan internet. Tu profe te da un código como JAG-4K7Q.',
       steps: [
         desktop
-            ? 'Abre Mis clases (en Más del menú, o en el panel de la izquierda).'
+            ? 'Haz clic en Clases en la barra de la izquierda.'
             : 'Abre la sala Clases y toca Mis clases en línea.',
         'Toca Entrar, elige Alumno y escribe un alias. No uses tu nombre completo ni datos personales. No '
             'necesitas correo.',

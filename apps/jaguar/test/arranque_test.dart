@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jaguar/main.dart';
-import 'package:jaguar/src/challenges/challenges.dart';
 import 'package:jaguar/src/editor/code_editor.dart';
 import 'package:jaguar/src/exercises/exercise_store.dart';
+import 'package:jaguar/src/lessons/lessons.dart';
 import 'package:jaguar/src/programs/program_store.dart';
 import 'package:jaguar/src/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -30,7 +30,9 @@ Future<ProgramStore> _pumpPhone(
   await _prefsWith(values);
   final store = ProgramStore(_prefs);
   if (source != null) store.openSource(source);
-  await tester.pumpWidget(JaguarApp(store: store, exercises: ExerciseStore(_prefs), settings: ViewSettings(_prefs), openEditor: openEditor));
+  await tester.pumpWidget(
+    JaguarApp(store: store, exercises: ExerciseStore(_prefs), settings: ViewSettings(_prefs), openEditor: openEditor),
+  );
   await tester.pumpAndSettle();
   return store;
 }
@@ -131,8 +133,10 @@ void main() {
 
     testWidgets('el inicio de un primer uso: saludo, siguiente paso y taller vacío', (tester) async {
       await _pumpPhone(tester, values: {'jaguar.view.mode': 'basic', 'jaguar.programs': '[]'}, openEditor: false);
-      expect(find.text('Hola'), findsOneWidget);
-      expect(find.text('Nivel 1 · llevas 0 de ${challenges.length}'), findsOneWidget);
+      expect(find.textContaining('Soy Jaguar'), findsOneWidget);
+      // The first step of the path is a lesson.
+      expect(find.text('Tu primer programa'), findsOneWidget);
+      expect(find.text('Lección · llevas 0 de ${routeSteps.length} pasos'), findsOneWidget);
       expect(find.text('Empezar'), findsOneWidget);
       expect(find.text('Aún no tienes programas.'), findsOneWidget);
       expect(find.byType(CodeEditor), findsNothing);
@@ -156,14 +160,16 @@ void main() {
       }
     });
 
-    testWidgets('la Ruta lista los retos con su tema y abre el que se toca', (tester) async {
+    testWidgets('la Ruta agrupa lecciones y retos, y abre el reto que se toca', (tester) async {
       await _pumpPhone(tester, values: {'jaguar.view.mode': 'basic', 'jaguar.view.tourStep': 3}, openEditor: false);
       await tester.tap(find.text('Ruta'));
       await tester.pumpAndSettle();
-      expect(find.text('NIVEL 1'), findsOneWidget);
-      expect(find.text('0 de ${challenges.length}'), findsOneWidget);
+      expect(find.text('Primeros pasos'), findsOneWidget);
+      expect(find.text('0 de 2'), findsOneWidget);
+      expect(find.text('Tu primer programa'), findsOneWidget);
+      expect(find.text('Lección · Algoritmo, Escribir, Leer y variables'), findsOneWidget);
       expect(find.text('Saludo'), findsOneWidget);
-      expect(find.text('Variables'), findsOneWidget);
+      expect(find.text('Reto 1 · Variables'), findsOneWidget);
       await tester.tap(find.text('Saludo'));
       await tester.pumpAndSettle();
       expect(find.text('Ruta · Nivel 1 · Reto 1'), findsOneWidget);
@@ -172,7 +178,7 @@ void main() {
       await tester.binding.handlePopRoute();
       await tester.pumpAndSettle();
       expect(find.byType(CodeEditor), findsNothing);
-      expect(find.text('NIVEL 1'), findsOneWidget);
+      expect(find.text('Primeros pasos'), findsOneWidget);
     });
 
     testWidgets('la Ruta avisa que nada está bloqueado', (tester) async {
@@ -184,7 +190,11 @@ void main() {
     });
 
     testWidgets('el Taller lista y busca, y marca de dónde viene cada programa', (tester) async {
-      final store = await _pumpPhone(tester, source: 'Algoritmo promedio\n    Escribir 1\nFinAlgoritmo\n', openEditor: false);
+      final store = await _pumpPhone(
+        tester,
+        source: 'Algoritmo promedio\n    Escribir 1\nFinAlgoritmo\n',
+        openEditor: false,
+      );
       store.create('Algoritmo suma\n    Escribir 2\nFinAlgoritmo\n');
       await tester.pumpAndSettle();
       await tester.tap(find.text('Taller'));
