@@ -587,3 +587,18 @@ footer .quien { margin-right: auto; display: flex; align-items: center; gap: 10p
 .pagina-404 p { color: var(--suave); max-width: 30em; margin: 0 auto 22px; }
 .pagina-404 .botones { justify-content: center; }
 .guia section { padding: 0; }
+
+/* Herramienta de prueba de escritorio */
+.herramienta { background: var(--superficie); border: 1px solid var(--borde); border-radius: 22px; padding: 22px; margin: 22px 0; }
+.herramienta label { display: block; font-weight: 700; margin: 14px 0 6px; }
+.herramienta textarea { width: 100%; box-sizing: border-box; border: 1.5px solid var(--borde); border-radius: 12px; padding: 12px 14px; background: var(--codigo); color: var(--texto); font: 15px/1.6 ui-monospace, "SF Mono", Menlo, Consolas, "Roboto Mono", monospace; resize: vertical; tab-size: 4; }
+.herramienta textarea:focus-visible { outline: 3px solid var(--azul); outline-offset: 2px; }
+.herramienta .acciones { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin-top: 16px; }
+.herramienta .acciones label { margin: 0; font-weight: 600; display: inline-flex; gap: 8px; align-items: center; }
+.herramienta select { border: 1.5px solid var(--borde); border-radius: 10px; padding: 9px 10px; background: var(--superficie); color: var(--texto); font: inherit; }
+.herramienta .estado { margin: 10px 0 0; min-height: 1.4em; color: var(--suave); }
+.resultado { margin-top: 12px; }
+.resultado .tabla table td.instr { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 14px; }
+.resultado .tabla table td.cambio { background: var(--marca); font-weight: 700; }
+.aviso-error { background: #FBE3E0; color: #7A1D14; border-radius: 12px; padding: 12px 14px; margin: 0 0 12px; }
+@media (prefers-color-scheme: dark) { .aviso-error { background: #44201D; color: #FFB4AC; } }

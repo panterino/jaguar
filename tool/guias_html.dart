@@ -435,7 +435,8 @@ FinAlgoritmo
         'Para qué sirve',
         '''
 <p>Cuando un programa no da el resultado esperado, a veces no se ve por qué. La prueba de escritorio te obliga a hacer lo que hace la computadora: una instrucción a la vez, sin saltarte nada. Así descubres dónde un valor deja de ser el que pensabas.</p>
-<p>También es una forma de comprobar tu algoritmo <i>antes</i> de escribirlo en un lenguaje, y es un ejercicio frecuente en las materias de lógica de programación.</p>''',
+<p>También es una forma de comprobar tu algoritmo <i>antes</i> de escribirlo en un lenguaje, y es un ejercicio frecuente en las materias de lógica de programación.</p>
+<p>Si quieres ver una tabla ya hecha para tu propio algoritmo, pruébala en la <a href="/herramientas/prueba-de-escritorio">herramienta de prueba de escritorio online</a>: escribes el pseudocódigo, pones los datos y la tabla sale sola.</p>''',
       ),
       (
         'como',

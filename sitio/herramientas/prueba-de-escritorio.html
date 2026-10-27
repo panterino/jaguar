@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prueba de escritorio online: tabla de variables gratis</title>
+<meta name="description" content="Escribe un algoritmo en pseudocódigo, pon los datos de entrada y obtén al momento su prueba de escritorio: una fila por instrucción y una columna por variable.">
+<link rel="canonical" href="https://jaguarcode.org/herramientas/prueba-de-escritorio">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="apple-touch-icon" href="/icono.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Jaguar Code">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://jaguarcode.org/herramientas/prueba-de-escritorio">
+<meta property="og:title" content="Prueba de escritorio online: tabla de variables gratis">
+<meta property="og:description" content="Escribe un algoritmo en pseudocódigo, pon los datos de entrada y obtén al momento su prueba de escritorio: una fila por instrucción y una columna por variable.">
+<meta property="og:image" content="https://jaguarcode.org/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Prueba de escritorio online: tabla de variables gratis">
+<meta name="twitter:description" content="Escribe un algoritmo en pseudocódigo, pon los datos de entrada y obtén al momento su prueba de escritorio: una fila por instrucción y una columna por variable.">
+<meta name="twitter:image" content="https://jaguarcode.org/compartir.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://jaguarcode.org/herramientas/prueba-de-escritorio#herramienta",
+      "name": "Prueba de escritorio online",
+      "description": "Escribe un algoritmo en pseudocódigo, pon los datos de entrada y obtén al momento su prueba de escritorio: una fila por instrucción y una columna por variable.",
+      "url": "https://jaguarcode.org/herramientas/prueba-de-escritorio",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Cualquiera con navegador",
+      "browserRequirements": "Requiere JavaScript",
+      "inLanguage": "es-MX",
+      "isAccessibleForFree": true,
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "MXN" },
+      "publisher": { "@type": "Organization", "name": "Panterino", "url": "https://jaguarcode.org/" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "https://jaguarcode.org/" },
+        { "@type": "ListItem", "position": 2, "name": "Prueba de escritorio online", "item": "https://jaguarcode.org/herramientas/prueba-de-escritorio" }
+      ]
+    },
+    { "@type": "FAQPage", "mainEntity": [{"@type":"Question","name":"¿Qué es la prueba de escritorio?","acceptedAnswer":{"@type":"Answer","text":"Es seguir un programa paso a paso anotando en una tabla cuánto vale cada variable después de cada instrucción. Sirve para entender qué hace un algoritmo y para encontrar errores."}},{"@type":"Question","name":"¿Esta herramienta necesita internet o guarda mi código?","acceptedAnswer":{"@type":"Answer","text":"Solo necesita internet para cargar la página. El programa se ejecuta en tu navegador y no se envía a ningún servidor: tu código y tus datos no salen de tu equipo."}},{"@type":"Question","name":"¿Qué pseudocódigo entiende?","acceptedAnswer":{"@type":"Answer","text":"Algoritmo, Definir, Leer, Escribir, Si, Segun, Mientras, Repetir, Para, arreglos y funciones, con las palabras en español. Si algo no lo entiende, te dice la línea del error y una sugerencia."}},{"@type":"Question","name":"¿Cómo pongo los datos que pide Leer?","acceptedAnswer":{"@type":"Answer","text":"En el cuadro de datos de entrada, un valor por renglón y en el mismo orden en que el programa los pide."}}] }
+  ]
+}
+</script>
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/estilos.css">
+</head>
+<body>
+<header class="sitio-barra">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="/logo.svg" alt="" width="46" height="40">
+      <a class="nombre" href="/">Jaguar Code</a>
+      <a href="/guias">Guías</a>
+      <a href="/retos">Retos</a>
+      <a href="/profes">Para profes</a>
+      <a href="https://github.com/panterino/jaguar">GitHub</a>
+    </div>
+  </div>
+</header>
+<main class="guia">
+  <div class="ancho angosto">
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › Prueba de escritorio online</nav>
+    <h1>Prueba de escritorio online para tu algoritmo</h1>
+    <p class="resumen">Escribe tu pseudocódigo, pon los datos de entrada y mira cómo cambia cada variable, instrucción por instrucción. Gratis, sin registro y sin salir de tu navegador.</p>
+
+    <div class="herramienta" role="region" aria-labelledby="herr-t">
+      <h2 id="herr-t" style="margin-top:0">Genera tu prueba de escritorio</h2>
+      <label for="fuente">Pseudocódigo</label>
+      <textarea id="fuente" rows="13" spellcheck="false" autocapitalize="off" autocomplete="off">Algoritmo promedio
+    Leer a, b
+    p &lt;- (a + b) / 2
+    Escribir "Promedio: ", p
+FinAlgoritmo
+</textarea>
+      <label for="entradas">Datos de entrada (uno por renglón, en el orden en que los pide Leer)</label>
+      <textarea id="entradas" rows="3" spellcheck="false" autocapitalize="off" autocomplete="off">8
+10</textarea>
+      <div class="acciones">
+        <button class="boton principal" type="button" id="generar">Generar prueba de escritorio</button>
+        <label for="ejemplo">Ejemplos:
+          <select id="ejemplo">
+            <option value="" selected disabled>Elige uno</option>
+            <option value="0">Promedio de dos calificaciones</option>
+            <option value="1">Par o impar</option>
+            <option value="2">Tabla de multiplicar (Para)</option>
+            <option value="3">Suma hasta el cero (Mientras)</option>
+            <option value="4">Contraseña (Repetir)</option>
+          </select>
+        </label>
+      </div>
+      <p class="estado" id="estado-herramienta" role="status" aria-live="polite"></p>
+      <div id="resultado" class="resultado" aria-live="polite">
+        <div class="tabla"><table><caption>Ejemplo: promedio de 8 y 10</caption><thead><tr><th scope="col">Paso</th><th scope="col">Línea</th><th scope="col">Instrucción</th><th scope="col">a</th><th scope="col">b</th><th scope="col">p</th><th scope="col">Pantalla</th></tr></thead><tbody><tr><td>1</td><td>2</td><td class="instr">Leer a, b</td><td class="cambio">8</td><td class="cambio">10</td><td></td><td></td></tr><tr><td>2</td><td>3</td><td class="instr">p &lt;- (a + b) / 2</td><td>8</td><td>10</td><td class="cambio">9</td><td></td></tr><tr><td>3</td><td>4</td><td class="instr">Escribir "Promedio: ", p</td><td>8</td><td>10</td><td>9</td><td>Promedio: 9</td></tr></tbody></table></div>
+      </div>
+      <noscript><p class="nota-tabla">Para generar tu propia tabla hace falta JavaScript. Mientras, arriba ves el resultado del ejemplo.</p></noscript>
+    </div>
+    <script type="application/json" id="ejemplos-datos">[{"nombre":"Promedio de dos calificaciones","fuente":"Algoritmo promedio\n    Leer a, b\n    p <- (a + b) / 2\n    Escribir \"Promedio: \", p\nFinAlgoritmo\n","entradas":"8\n10"},{"nombre":"Par o impar","fuente":"Algoritmo par_o_impar\n    Leer n\n    Si n MOD 2 = 0 Entonces\n        Escribir \"Par\"\n    SiNo\n        Escribir \"Impar\"\n    FinSi\nFinAlgoritmo\n","entradas":"7"},{"nombre":"Tabla de multiplicar (Para)","fuente":"Algoritmo tabla\n    Leer n\n    Para i <- 1 Hasta 4 Hacer\n        Escribir n, \" x \", i, \" = \", n * i\n    FinPara\nFinAlgoritmo\n","entradas":"3"},{"nombre":"Suma hasta el cero (Mientras)","fuente":"Algoritmo suma_hasta_cero\n    suma <- 0\n    Leer n\n    Mientras n <> 0 Hacer\n        suma <- suma + n\n        Leer n\n    FinMientras\n    Escribir \"Suma: \", suma\nFinAlgoritmo\n","entradas":"4\n6\n10\n0"},{"nombre":"Contraseña (Repetir)","fuente":"Algoritmo contrasena\n    Definir clave Como Texto\n    intentos <- 0\n    Repetir\n        Leer clave\n        intentos <- intentos + 1\n    Hasta Que clave = \"jaguar\"\n    Escribir \"Entraste en \", intentos, \" intentos\"\nFinAlgoritmo\n","entradas":"gato\njaguar"}]</script>
+
+    <article>
+      <section id="como-leerla">
+        <h2>Cómo leer la tabla</h2>
+        <ul>
+          <li><b>Cada fila es una instrucción</b> que se ejecutó, en el orden real: si hay un ciclo, la misma línea aparece varias veces.</li>
+          <li><b>Cada columna es una variable.</b> Una celda vacía significa que la variable todavía no tenía valor en ese momento.</li>
+          <li><b>El valor resaltado es el que acaba de cambiar</b> con esa instrucción.</li>
+          <li><b>La última columna es lo que el programa mostró en pantalla</b> con Escribir.</li>
+        </ul>
+      </section>
+      <section id="que-es">
+        <h2>Para qué sirve la prueba de escritorio</h2>
+        <p>En clase te piden la prueba de escritorio para comprobar que un algoritmo hace lo que debe antes de pasarlo a una computadora, o para encontrar en qué paso se equivoca. Hacerla a mano es lento y es fácil equivocarse al copiar valores; aquí la tabla sale sola. Si quieres aprender a hacerla tú, lee la guía de <a href="/guias/prueba-de-escritorio">la prueba de escritorio paso a paso</a>.</p>
+      </section>
+      <section id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+        <details><summary>¿Qué es la prueba de escritorio?</summary><p>Es seguir un programa paso a paso anotando en una tabla cuánto vale cada variable después de cada instrucción. Sirve para entender qué hace un algoritmo y para encontrar errores.</p></details>
+        <details><summary>¿Esta herramienta necesita internet o guarda mi código?</summary><p>Solo necesita internet para cargar la página. El programa se ejecuta en tu navegador y no se envía a ningún servidor: tu código y tus datos no salen de tu equipo.</p></details>
+        <details><summary>¿Qué pseudocódigo entiende?</summary><p>Algoritmo, Definir, Leer, Escribir, Si, Segun, Mientras, Repetir, Para, arreglos y funciones, con las palabras en español. Si algo no lo entiende, te dice la línea del error y una sugerencia.</p></details>
+        <details><summary>¿Cómo pongo los datos que pide Leer?</summary><p>En el cuadro de datos de entrada, un valor por renglón y en el mismo orden en que el programa los pide.</p></details>
+      </section>
+    </article>
+    <aside class="cta-guia" aria-labelledby="cta-t">
+      <h2 id="cta-t">En el celular, con diagrama y retos</h2>
+      <p>Jaguar Code hace esta misma prueba de escritorio en la app, la deja llenar a mano para practicar y la combina con el diagrama de flujo, los bloques y doce retos con pistas. Gratis, sin anuncios y sin cuenta.</p>
+      <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir Jaguar Code</a></div>
+    </aside>
+    <h2 style="margin-top:44px">Sigue aprendiendo</h2>
+    <div class="relacionadas">
+      <a href="/guias/prueba-de-escritorio">La prueba de escritorio<small>Cómo seguir un programa a mano con una tabla, con un ejemplo completo.</small></a>
+      <a href="/retos">Retos resueltos paso a paso<small>Doce problemas con planteamiento, diagrama y pseudocódigo.</small></a>
+      <a href="/guias/pseint-en-el-celular">Pseudocódigo en el celular<small>Qué buscar en una app para Android.</small></a>
+    </div>
+  </div>
+</main>
+<script src="/herramientas/herramienta.js" defer></script>
+<footer>
+  <div class="ancho">
+    <span class="quien"><img src="/logo.svg" alt="" width="30" height="26">Un proyecto de Panterino · hecho en México</span>
+    <a href="/guias">Guías</a>
+    <a href="/retos">Retos</a>
+    <a href="/manual">Manual</a>
+    <a href="https://www.facebook.com/jaguareducation">Facebook</a>
+    <a href="https://github.com/panterino/jaguar">Código en GitHub</a>
+  </div>
+</footer>
+<script src="/acceso.js" defer></script>
+</body>
+</html>
