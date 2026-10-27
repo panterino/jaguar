@@ -8,6 +8,7 @@ import '../theme.dart';
 import '../widgets/chunky.dart';
 import '../widgets/confetti.dart';
 import 'lessons.dart';
+import '../widgets/mascota.dart';
 
 /// Plays a lesson: one question at a time, an answer you check, and a panel
 /// that says why. A wrong question comes back once at the end, so it gets
@@ -727,7 +728,7 @@ class _Feedback extends StatelessWidget {
               final dx = ok ? 0.0 : math.sin(t * math.pi * 6) * 5 * (1 - t);
               return Transform.translate(offset: Offset(dx, dy), child: child);
             },
-            child: Image.asset('assets/images/mascota.png', width: 52, height: 60, excludeFromSemantics: true),
+            child: Mascota(pose: ok ? MascotPose.feliz : MascotPose.triste, size: 60),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -793,7 +794,7 @@ class _Result extends StatelessWidget {
                 duration: motion(context, const Duration(milliseconds: 900)),
                 curve: Curves.elasticOut,
                 builder: (context, t, child) => Transform.scale(scale: 0.5 + 0.5 * t, child: child),
-                child: Image.asset('assets/images/mascota.png', height: 150, excludeFromSemantics: true),
+                child: const Mascota(pose: MascotPose.celebra, size: 150),
               ),
               const SizedBox(height: 12),
               Semantics(

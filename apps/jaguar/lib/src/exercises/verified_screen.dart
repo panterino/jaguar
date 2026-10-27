@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../theme.dart';
+import '../widgets/mascota.dart';
 
 /// What the student shows the teacher walking by: big, readable from a
 /// distance, with a live clock so a screenshot of someone else's screen is
@@ -81,7 +82,7 @@ class _VerifiedScreenState extends State<VerifiedScreen> with SingleTickerProvid
                     child: Stack(
                       alignment: Alignment.bottomRight,
                       children: [
-                        Image.asset('assets/images/mascota.png', width: 120, height: 120),
+                        const Mascota(pose: MascotPose.celebra, size: 120),
                         const CircleAvatar(
                           radius: 22,
                           backgroundColor: onGreen,

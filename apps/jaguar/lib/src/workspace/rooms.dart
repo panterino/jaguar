@@ -9,6 +9,7 @@ import '../exercises/exercise_store.dart';
 import '../lessons/lessons.dart';
 import '../widgets/appear.dart';
 import '../widgets/chunky.dart';
+import '../widgets/mascota.dart';
 import '../programs/examples.dart';
 import '../programs/program_store.dart';
 import '../settings.dart';
@@ -963,6 +964,15 @@ class _HeroState extends State<_Hero> with SingleTickerProviderStateMixin {
     return _more[(_phrase - 1) % _more.length];
   }
 
+  /// Her mood: proud when the path is done, otherwise a different face each
+  /// time she is touched.
+  MascotPose get _pose {
+    if (widget.next == null) return MascotPose.celebra;
+    if (_phrase == 0) return MascotPose.normal;
+    const moods = [MascotPose.feliz, MascotPose.pensando, MascotPose.guino, MascotPose.sorpresa];
+    return moods[(_phrase - 1) % moods.length];
+  }
+
   @override
   void dispose() {
     _jump.dispose();
@@ -1000,11 +1010,7 @@ class _HeroState extends State<_Hero> with SingleTickerProviderStateMixin {
                     child: Transform.scale(scaleY: squash, alignment: Alignment.bottomCenter, child: child),
                   );
                 },
-                child: Image.asset(
-                  'assets/images/mascota.png',
-                  width: widget.mascotHeight * 0.866,
-                  height: widget.mascotHeight,
-                ),
+                child: Mascota(pose: _pose, size: widget.mascotHeight),
               ),
             ),
           ),
@@ -1480,7 +1486,7 @@ class _WorkshopRoomState extends State<_WorkshopRoom> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.folder_open_outlined, size: 48, color: scheme.onSurfaceVariant),
+              const Mascota(pose: MascotPose.dormido, size: 96),
               const SizedBox(height: 12),
               Text('Tu taller está vacío', style: theme.textTheme.titleMedium),
               const SizedBox(height: 4),
