@@ -326,7 +326,8 @@ ${tabla('Figuras del diagrama de flujo', ['Figura', 'Nombre', 'Se usa para'], [
           ['<svg viewBox="0 0 56 30" width="56" height="30" role="img" aria-label="Rombo"><path class="f" d="M28 2l25 13-25 13L3 15z"/></svg>', 'Rombo', 'Decisión: una pregunta con dos salidas, Sí y No'],
           ['<svg viewBox="0 0 56 30" width="56" height="30" role="img" aria-label="Flecha"><path class="l" d="M4 15h42M40 9l8 6-8 6"/></svg>', 'Flecha', 'Indica el orden en que se sigue el diagrama'],
         ])}
-<p>Los libros de cada materia pueden usar variaciones (por ejemplo, otra figura para repetir), pero estas cinco bastan para casi todos los ejercicios de un primer curso.</p>''',
+<p>Los libros de cada materia pueden usar variaciones (por ejemplo, otra figura para repetir), pero estas cinco bastan para casi todos los ejercicios de un primer curso.</p>
+<p>Para ver el diagrama de un algoritmo ya escrito, usa el <a href="/herramientas/diagrama-de-flujo-online">generador de diagramas de flujo online</a>: pegas el pseudocódigo y lo descargas como imagen.</p>''',
       ),
       (
         'pasos',

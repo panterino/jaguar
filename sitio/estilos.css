@@ -602,3 +602,7 @@ footer .quien { margin-right: auto; display: flex; align-items: center; gap: 10p
 .resultado .tabla table td.cambio { background: var(--marca); font-weight: 700; }
 .aviso-error { background: #FBE3E0; color: #7A1D14; border-radius: 12px; padding: 12px 14px; margin: 0 0 12px; }
 @media (prefers-color-scheme: dark) { .aviso-error { background: #44201D; color: #FFB4AC; } }
+.herramienta .cols { display: grid; grid-template-columns: 1fr; gap: 6px 22px; }
+@media (min-width: 900px) { .herramienta.dos-columnas { margin-left: -60px; margin-right: -60px; } .herramienta .cols { grid-template-columns: 1fr 1fr; } }
+.herramienta .diagrama svg { max-width: 100%; height: auto; }
+.herramienta button:disabled { opacity: .55; cursor: not-allowed; }

@@ -2,6 +2,7 @@ import '../challenges/challenges.dart';
 import 'lessons.dart';
 import 'nivel0.dart';
 import 'nivel1.dart';
+import 'nivel2.dart';
 
 /// A step of the path: a lesson to play or a challenge to solve.
 sealed class RouteStep {
@@ -82,7 +83,7 @@ class RouteLevel {
 }
 
 /// The levels of the path, in order.
-final routeLevels = <RouteLevel>[nivel0, nivel1];
+final routeLevels = <RouteLevel>[nivel0, nivel1, nivel2];
 
 /// Every unit of the path, in order.
 List<RouteGroup> get routeGroups => [for (final level in routeLevels) ...level.groups];

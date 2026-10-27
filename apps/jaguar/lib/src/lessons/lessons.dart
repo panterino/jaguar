@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'lessons_nivel2.dart';
+
 export 'ruta.dart';
 
 /// The flowchart shapes a figure question asks about.
@@ -569,6 +571,7 @@ const allLessons = [
   lessonDecisions,
   lessonDeskCheck,
   lessonLoops,
+  ...lessonsNivel2,
 ];
 
 Lesson? lessonById(String id) {

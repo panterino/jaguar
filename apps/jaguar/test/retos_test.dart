@@ -19,6 +19,18 @@ const wrong = {
   // Cuenta una letra de más (la longitud más uno).
   'reto-1-12':
       'Algoritmo s\n Definir palabra Como Texto\n Leer palabra\n Escribir "Letras: ", Longitud(palabra) + 1\nFinAlgoritmo',
+  // Olvida que los años de siglo no son bisiestos (1900).
+  'reto-2-01':
+      'Algoritmo s\n Leer a\n Si a MOD 4 = 0 Entonces\n  Escribir "Bisiesto"\n SiNo\n  Escribir "No bisiesto"\n FinSi\nFinAlgoritmo',
+  // Empieza el mayor en 0: los negativos nunca lo superan.
+  'reto-2-07':
+      'Algoritmo s\n mayor <- 0\n Leer n\n Mientras n <> 0 Hacer\n  Si n > mayor Entonces\n   mayor <- n\n  FinSi\n  Leer n\n FinMientras\n Escribir "Mayor: ", mayor\nFinAlgoritmo',
+  // Un Para de 1 hasta 0 cuenta hacia atrás: el factorial de 0 sale 0.
+  'reto-2-09':
+      'Algoritmo s\n Leer n\n f <- 1\n Para i <- 1 Hasta n Hacer\n  f <- f * i\n FinPara\n Escribir "Factorial: ", f\nFinAlgoritmo',
+  // Divide sin revisar que haya datos.
+  'reto-2-06':
+      'Algoritmo s\n suma <- 0\n cuenta <- 0\n Leer c\n Mientras c <> -1 Hacer\n  suma <- suma + c\n  cuenta <- cuenta + 1\n  Leer c\n FinMientras\n Escribir "Promedio: ", suma / cuenta\nFinAlgoritmo',
 };
 
 void main() {
@@ -28,7 +40,7 @@ void main() {
       expect((await checkSolution(entry.value, c.exercise)).passed, isFalse);
     });
   }
-  for (final c in [...challenges, ...blockChallenges]) {
+  for (final c in everyChallenge) {
     test(c.id, () async {
       final r = await checkSolution(solutions[c.id]!, c.exercise);
       for (final cs in r.cases) {
