@@ -4,11 +4,34 @@ import 'package:jaguar_core/jaguar_core.dart';
 /// like a teacher's exercise; the hints go from an idea to a sketch, never
 /// the full answer.
 class Challenge {
-  const Challenge({required this.topic, required this.exercise, required this.hints});
+  const Challenge({
+    required this.subject,
+    required this.topic,
+    required this.exercise,
+    required this.hints,
+    this.level = 1,
+    this.languages = const ['Pseudocódigo'],
+    this.author = 'Jaguar',
+    this.license = 'CC BY-SA',
+  });
+
+  /// The area it belongs to, to group and filter: Variables, Operadores,
+  /// Condicionales or Ciclos.
+  final String subject;
 
   /// What it practices, as the SEP program names it (Cultura Digital I,
   /// propósito 8).
   final String topic;
+
+  /// Level of the path, 1 to 5.
+  final int level;
+
+  /// The languages it has a version in.
+  final List<String> languages;
+
+  /// Who wrote it and under which license it is shared.
+  final String author;
+  final String license;
   final Exercise exercise;
   final List<String> hints;
 
@@ -18,6 +41,7 @@ class Challenge {
 /// Level 1: one challenge per content of the program, in order.
 const challenges = <Challenge>[
   Challenge(
+    subject: 'Variables',
     topic: 'Dato y variable',
     exercise: Exercise(
       id: 'reto-1-01',
@@ -38,6 +62,7 @@ const challenges = <Challenge>[
     ],
   ),
   Challenge(
+    subject: 'Operadores',
     topic: 'Operadores aritméticos',
     exercise: Exercise(
       id: 'reto-1-02',
@@ -58,6 +83,7 @@ const challenges = <Challenge>[
     ],
   ),
   Challenge(
+    subject: 'Operadores',
     topic: 'Constantes y expresiones',
     exercise: Exercise(
       id: 'reto-1-03',
@@ -78,6 +104,7 @@ const challenges = <Challenge>[
     ],
   ),
   Challenge(
+    subject: 'Operadores',
     topic: 'División entera y residuo',
     exercise: Exercise(
       id: 'reto-1-04',
@@ -98,6 +125,7 @@ const challenges = <Challenge>[
     ],
   ),
   Challenge(
+    subject: 'Condicionales',
     topic: 'Operadores relacionales y estructura condicional',
     exercise: Exercise(
       id: 'reto-1-05',
@@ -116,6 +144,7 @@ const challenges = <Challenge>[
     ],
   ),
   Challenge(
+    subject: 'Condicionales',
     topic: 'Operadores lógicos',
     exercise: Exercise(
       id: 'reto-1-06',
@@ -136,6 +165,7 @@ const challenges = <Challenge>[
     ],
   ),
   Challenge(
+    subject: 'Condicionales',
     topic: 'Estructura selectiva',
     exercise: Exercise(
       id: 'reto-1-07',
@@ -158,6 +188,7 @@ const challenges = <Challenge>[
     ],
   ),
   Challenge(
+    subject: 'Ciclos',
     topic: 'Estructura repetitiva: Mientras',
     exercise: Exercise(
       id: 'reto-1-08',
@@ -178,6 +209,7 @@ const challenges = <Challenge>[
     ],
   ),
   Challenge(
+    subject: 'Ciclos',
     topic: 'Estructura repetitiva: Para',
     exercise: Exercise(
       id: 'reto-1-09',
@@ -208,6 +240,7 @@ const challenges = <Challenge>[
     ],
   ),
   Challenge(
+    subject: 'Ciclos',
     topic: 'Estructura repetitiva: Repetir y contador',
     exercise: Exercise(
       id: 'reto-1-10',

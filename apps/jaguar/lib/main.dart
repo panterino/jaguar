@@ -22,26 +22,39 @@ Future<void> main() async {
   final cloud = await connectCloud(prefs);
 
   // On the web, a shared link carries a program or an exercise in the URL.
+  var fromLink = false;
   switch (contentFromLink(Uri.base.toString())) {
     case SharedProgram(:final source):
       store.openSource(source);
+      fromLink = true;
     case SharedExercise(:final exercise):
       exercises.saveReceived(exercise);
       store.openExercise(exercise);
+      fromLink = true;
     case null:
       break;
   }
 
-  runApp(JaguarApp(store: store, exercises: exercises, settings: settings, cloud: cloud));
+  runApp(JaguarApp(store: store, exercises: exercises, settings: settings, cloud: cloud, openEditor: fromLink));
 }
 
 class JaguarApp extends StatelessWidget {
-  const JaguarApp({super.key, required this.store, required this.exercises, required this.settings, this.cloud});
+  const JaguarApp({
+    super.key,
+    required this.store,
+    required this.exercises,
+    required this.settings,
+    this.cloud,
+    this.openEditor = false,
+  });
 
   final ProgramStore store;
   final ExerciseStore exercises;
   final ViewSettings settings;
   final Cloud? cloud;
+
+  /// Phones: start in the editor, not in the rooms (a link brought a program).
+  final bool openEditor;
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +69,13 @@ class JaguarApp extends StatelessWidget {
         theme: buildTheme(Brightness.light),
         darkTheme: buildTheme(Brightness.dark),
         themeMode: settings.themeMode,
-        home: WorkspaceScreen(store: store, exercises: exercises, settings: settings, cloud: cloud),
+        home: WorkspaceScreen(
+          store: store,
+          exercises: exercises,
+          settings: settings,
+          cloud: cloud,
+          startInEditor: openEditor,
+        ),
       ),
     );
   }

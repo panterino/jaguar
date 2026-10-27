@@ -34,6 +34,13 @@ class ExerciseStore extends ChangeNotifier {
       if (_mine.contains(e.id)) e,
   ];
 
+  /// Exercises that arrived through a link or a class, newest last. The
+  /// challenges are not here: they come with the app.
+  List<Exercise> get received => [
+    for (final e in _exercises.values)
+      if (!_mine.contains(e.id) && !e.id.startsWith('reto-')) e,
+  ];
+
   Exercise? byId(String id) => _exercises[id];
 
   String? solutionFor(String id) => _solutions[id];

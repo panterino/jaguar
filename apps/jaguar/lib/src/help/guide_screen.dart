@@ -205,7 +205,7 @@ class GuideScreen extends StatelessWidget {
       steps: [
         desktop
             ? 'Haz clic en Retos en el panel de la izquierda o en Ayuda → Retos para practicar.'
-            : 'Abre el menú ☰ y toca Retos (también está en el inicio).',
+            : 'Abre la sala Ruta (abajo) y toca un reto. El siguiente también aparece en Inicio.',
         'Lee el enunciado. Lo ocultas o lo muestras con la flecha.',
         'Si te atoras, toca el foco para ver una pista. Con Otra pista ves la siguiente: van de una idea a un '
             'ejemplo, sin darte la respuesta.',
@@ -246,13 +246,13 @@ class GuideScreen extends StatelessWidget {
       summary: 'Escanea el QR de tu profe',
       steps: [
         if (canScanQr) ...[
-          'En el inicio toca Escanear QR o abrir enlace. En modo Completo también está en el menú de tres puntos.',
+          'En la sala Clases toca Escanear QR.',
           'Apunta al QR que proyecta tu profe: el ejercicio se abre solo, listo para resolver.',
         ] else ...[
           'Escanéalo con la cámara de tu celular: abre el ejercicio en el navegador.',
           desktop
               ? 'Si te pasan el enlace, ábrelo en el menú Archivo, en Abrir enlace.'
-              : 'Si te pasan el enlace, ábrelo en el inicio, en Abrir enlace.',
+              : 'Si te pasan el enlace, ábrelo en la sala Clases, en Abrir enlace.',
         ],
         'El ejercicio queda guardado en tus programas y lo resuelves sin conexión.',
       ],
@@ -311,19 +311,19 @@ class GuideScreen extends StatelessWidget {
         desktop
             ? 'Tus programas están en el panel Mis programas, a la izquierda. Guardar (${shortcutLabel('S')}) y '
                   'Abrir (${shortcutLabel('O')}) están en la barra.'
-            : 'Tus programas están en el menú ☰, en Mis programas. Ahí también puedes eliminar uno: te deja '
-                  'Deshacer unos segundos.',
+            : 'Tus programas están en la sala Taller (abajo). Ahí los buscas, los abres y puedes eliminar uno: te '
+                  'deja Deshacer unos segundos. Con el menú ⋮ del Taller guardas todos tus programas en un solo archivo.',
         desktop
             ? 'Compartir (QR o enlace) está en la barra.'
-            : 'En el menú ⋮ de arriba: Guardar como archivo (.psc), Abrir archivo, Enviar archivo (WhatsApp, '
-                  'correo…) y Compartir (QR o enlace).',
+            : 'Dentro de un programa, en el menú ⋮ de arriba: Guardar como archivo (.psc), Abrir archivo, Enviar '
+                  'archivo (WhatsApp, correo…) y Compartir (QR o enlace).',
         'Con Compartir sale un QR. Escanéalo con la cámara de otro celular para abrir ahí el programa, o toca '
             'Copiar enlace y mándalo por WhatsApp.',
         'Ojo: tus programas viven en este dispositivo. Si borras los datos del navegador o desinstalas la app, '
             'se borran. Guarda como archivo lo que no quieras perder.',
       ],
       shots: [
-        const _Shot('menu', 'El menú ☰ con tus programas.'),
+        if (!desktop) const _Shot('sala-taller', 'La sala Taller, con tus programas.'),
         if (!desktop) const _Shot('mas-opciones', 'El menú ⋮ de arriba.'),
         const _Shot('compartir', 'Compartir con QR o enlace.'),
       ],
@@ -332,9 +332,13 @@ class GuideScreen extends StatelessWidget {
       icon: Icons.home_outlined,
       title: 'Inicio y ajustes',
       summary: 'Dónde empezar y cómo usas Jaguar',
-      intro:
-          'El inicio aparece cuando no tienes ningún programa abierto, y desde el menú ☰ cuando quieras. Ahí '
-          'están los retos, un programa nuevo, los ejemplos, abrir un archivo, esta guía y tus programas recientes.',
+      intro: desktop
+          ? 'El inicio aparece cuando no tienes ningún programa abierto, y desde el panel de la izquierda cuando '
+                'quieras. Ahí están los retos, un programa nuevo, los ejemplos, abrir un archivo, esta guía y tus '
+                'programas recientes.'
+          : 'En el celular Jaguar tiene cuatro salas, siempre abajo: Inicio (lo que sigue), Ruta (los retos), '
+                'Clases (lo de tu profe) y Taller (tus programas). Un programa, un reto o una tarea se abre en el '
+                'editor; Atrás regresa a la sala.',
       steps: [
         'Básico muestra solo lo necesario para empezar. Completo agrega todos los menús (como Editar y Ver), '
             'atajos y más opciones. Puedes ir y venir sin perder nada.',
@@ -343,13 +347,14 @@ class GuideScreen extends StatelessWidget {
         desktop
             ? 'Ajustes está abajo del panel de la izquierda: modo, perfil (alumno o profesor), tema, tamaño de '
                   'letra, tu nombre y volver a ver la introducción.'
-            : 'Ajustes está en el menú ☰: modo, perfil (alumno o profesor), tema, tamaño de letra, tu nombre y '
-                  'volver a ver la introducción o la guía del Reto 1.',
-        'Lo que usas menos (Comunidad, Mis clases, tu cuenta, Acerca de) está en Más, dentro del menú.',
+            : 'Ajustes está en Inicio, con el engrane de arriba: modo, perfil (alumno o profesor), tema, tamaño de '
+                  'letra, tu nombre y volver a ver la introducción o la guía del Reto 1.',
+        desktop
+            ? 'Lo que usas menos (Comunidad, Mis clases, tu cuenta, Acerca de) está en Más, dentro del menú.'
+            : 'Lo que usas menos (programas de la comunidad, tu cuenta, Acerca de) está al final de Ajustes.',
       ],
       shots: const [
-        _Shot('inicio', 'El inicio, sin programas abiertos.'),
-        _Shot('menu-mas', 'Lo demás está en Más.'),
+        _Shot('inicio', 'Inicio: lo que sigue para ti.'),
         _Shot('ajustes', 'Ajustes.'),
       ],
     ),
@@ -359,7 +364,9 @@ class GuideScreen extends StatelessWidget {
       summary: 'Únete con el código de tu profe y entrega',
       intro: 'Las clases en línea necesitan internet. Tu profe te da un código como JAG-4K7Q.',
       steps: [
-        'Abre Mis clases (en Más del menú, o en el panel de la izquierda).',
+        desktop
+            ? 'Abre Mis clases (en Más del menú, o en el panel de la izquierda).'
+            : 'Abre la sala Clases y toca Mis clases en línea.',
         'Toca Entrar, elige Alumno y escribe un alias. No uses tu nombre completo ni datos personales. No '
             'necesitas correo.',
         'Toca Unirme con un código. Escribe el código y tu nombre: solo lo ve tu profe, para saber de quién es '
@@ -388,8 +395,8 @@ class GuideScreen extends StatelessWidget {
         title: 'El botón Atrás en Android',
         summary: 'No sales por accidente',
         steps: [
-          'Atrás primero cierra el menú, luego te regresa al programa.',
-          'Si ya estás en el programa, Jaguar dice "Presiona Atrás otra vez para salir". Solo sale si lo '
+          'Atrás te regresa del programa a la sala donde lo abriste; desde otra sala, al Inicio.',
+          'Si ya estás en Inicio, Jaguar dice "Presiona Atrás otra vez para salir". Solo sale si lo '
               'presionas otra vez enseguida.',
           'Tu programa ya está guardado; al volver lo encuentras igual.',
         ],
@@ -420,9 +427,9 @@ class GuideScreen extends StatelessWidget {
         'En la bienvenida toca "Soy profesor" y confirma. Si ya habías elegido otra opción, cámbialo en Ajustes → Perfil.',
         desktop
             ? 'Aparece el menú Profesor (en modo Completo) y Mis ejercicios en el panel de la izquierda.'
-            : 'Mis ejercicios aparece arriba en el inicio y en el menú ☰.',
+            : 'Mis ejercicios aparece arriba en la sala Clases.',
       ],
-      shots: const [_Shot('inicio', 'El inicio de un profesor empieza por Mis ejercicios.')],
+      shots: const [_Shot('sala-clases-profe', 'La sala Clases de un profesor empieza por Mis ejercicios.')],
     ),
     _Topic(
       icon: Icons.assignment_outlined,
@@ -505,7 +512,7 @@ class GuideScreen extends StatelessWidget {
     ),
     (
       'Perdí mi programa',
-      'Búscalo en el menú ☰ (celular) o en Mis programas (computadora). Si acabas de eliminarlo, toca Deshacer '
+      'Búscalo en la sala Taller (celular) o en Mis programas (computadora). Si acabas de eliminarlo, toca Deshacer '
           'en el aviso de abajo. Se guarda en este dispositivo y navegador; por eso conviene guardar como '
           'archivo o compartir con un enlace.',
     ),

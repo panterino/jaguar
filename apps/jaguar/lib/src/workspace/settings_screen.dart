@@ -15,6 +15,9 @@ class SettingsScreen extends StatelessWidget {
     required this.onWelcome,
     required this.onIntro,
     required this.onRepeatTour,
+    this.onCommunity,
+    this.onAccount,
+    required this.onAbout,
   });
 
   final ViewSettings settings;
@@ -29,6 +32,11 @@ class SettingsScreen extends StatelessWidget {
 
   /// Starts over the balloons of the first challenge.
   final VoidCallback onRepeatTour;
+
+  /// Community programs and the online account: null when offline.
+  final VoidCallback? onCommunity;
+  final VoidCallback? onAccount;
+  final VoidCallback onAbout;
 
   @override
   Widget build(BuildContext context) {
@@ -115,6 +123,23 @@ class SettingsScreen extends StatelessWidget {
               leading: const Icon(Icons.tips_and_updates_outlined),
               title: const Text('Repetir la guía del Reto 1'),
               onTap: onRepeatTour,
+            ),
+            if (onCommunity case final community?)
+              ListTile(
+                leading: const Icon(Icons.public),
+                title: const Text('Programas de la comunidad'),
+                onTap: community,
+              ),
+            if (onAccount case final account?)
+              ListTile(
+                leading: const Icon(Icons.account_circle_outlined),
+                title: const Text('Mi cuenta en línea'),
+                onTap: account,
+              ),
+            ListTile(
+              leading: const Icon(Icons.info_outline),
+              title: const Text('Acerca de Jaguar'),
+              onTap: onAbout,
             ),
           ],
         ),
