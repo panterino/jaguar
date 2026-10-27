@@ -78,7 +78,10 @@ class ProgramsDrawer extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Jaguar', style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
+                            Text(
+                              'Jaguar Code',
+                              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+                            ),
                             Text('Tus programas en este dispositivo', style: theme.textTheme.bodySmall),
                           ],
                         ),

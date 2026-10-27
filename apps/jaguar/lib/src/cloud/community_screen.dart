@@ -130,7 +130,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 const _Note(
                   'Sin conexión: la comunidad aparece cuando Jaguar se conecta. Mientras, prueba los ejemplos.',
                 ),
-              Text('Ejemplos de Jaguar', style: theme.textTheme.titleMedium),
+              Text('Ejemplos de Jaguar Code', style: theme.textTheme.titleMedium),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,

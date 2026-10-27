@@ -559,7 +559,7 @@ String cabeza({required String titulo, required String descripcion, required Str
 <link rel="icon" type="image/svg+xml" href="/logo.svg">
 <link rel="apple-touch-icon" href="/icono.png">
 <meta property="og:type" content="$tipo">
-<meta property="og:site_name" content="Jaguar">
+<meta property="og:site_name" content="Jaguar Code">
 <meta property="og:locale" content="es_MX">
 <meta property="og:url" content="$sitio$ruta">
 <meta property="og:title" content="${esc(titulo)}">
@@ -581,7 +581,7 @@ $extra
   <div class="ancho">
     <div class="barra-sup">
       <img src="/logo.svg" alt="" width="46" height="40">
-      <a class="nombre" href="/">Jaguar</a>
+      <a class="nombre" href="/">Jaguar Code</a>
       <a href="/guias">Guías</a>
       <a href="/profes">Para profes</a>
       <a href="https://github.com/panterino/jaguar">GitHub</a>
@@ -607,7 +607,7 @@ const pie = '''
 
 String cta() => '''
 <aside class="cta-guia" aria-labelledby="cta-t">
-  <h2 id="cta-t">Practica esto en Jaguar</h2>
+  <h2 id="cta-t">Practica esto en Jaguar Code</h2>
   <p>Escribe pseudocódigo, mira su diagrama y haz la prueba de escritorio desde el celular. Gratis y sin anuncios. Deja tu correo y te damos entrada a la app.</p>
   <div class="acceso" data-origen="guia">
     <form novalidate>
@@ -656,7 +656,7 @@ String pagina(Guia g) {
     {
       "@type": "BreadcrumbList",
       "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Jaguar", "item": "$sitio/" },
+        { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "$sitio/" },
         { "@type": "ListItem", "position": 2, "name": "Guías", "item": "$sitio/guias" },
         { "@type": "ListItem", "position": 3, "name": "${json(g.h1)}", "item": "$sitio$ruta" }
       ]
@@ -699,7 +699,7 @@ String pagina(Guia g) {
 }
 
 String indice() {
-  const titulo = 'Guías para aprender a programar desde cero | Jaguar';
+  const titulo = 'Guías para aprender a programar desde cero | Jaguar Code';
   const desc =
       'Guías cortas y con ejemplos para aprender lógica de programación: qué es un algoritmo, el pseudocódigo, los diagramas de flujo y la prueba de escritorio.';
   final lista = guias
@@ -713,7 +713,7 @@ String indice() {
     { "@type": "CollectionPage", "name": "${json(titulo)}", "url": "$sitio/guias", "inLanguage": "es-MX" },
     { "@type": "ItemList", "itemListElement": [$lista] },
     { "@type": "BreadcrumbList", "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Jaguar", "item": "$sitio/" },
+      { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "$sitio/" },
       { "@type": "ListItem", "position": 2, "name": "Guías", "item": "$sitio/guias" }
     ] }
   ]

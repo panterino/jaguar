@@ -249,11 +249,10 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
     _settings.editorView = wide ? EditorView.both : EditorView.code;
     switch (choice) {
       case WelcomeChoice.learning:
-        // The first challenge; its balloons start once the introduction closes.
-        _settings.tourStep = 3;
-        _openChallenge(challenges.first);
-        await _intro(beginner: true);
-        if (mounted) _settings.tourStep = 0;
+        // The first lesson; at its end the first challenge opens, and its
+        // balloons start there. The four-page introduction stays in Ajustes.
+        _settings.tourStep = 0;
+        _openStep(routeSteps.first);
       case WelcomeChoice.programmer:
         _settings.tourStep = 3;
         _openSource(examples.first.$2);
@@ -550,7 +549,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
   Future<void> _account() async {
     final cloud = widget.cloud;
     if (cloud == null) {
-      _toast('Sin conexión: Jaguar funciona igual, y tus programas se guardan en este equipo.');
+      _toast('Sin conexión: Jaguar Code funciona igual, y tus programas se guardan en este equipo.');
       return;
     }
     await showAccountDialog(context, cloud);
@@ -1127,7 +1126,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
         ]),
         if (!usePlatformMenus) ...[
           const AppMenuDivider(),
-          AppMenuItem('Acerca de Jaguar', icon: Icons.info_outline, onSelected: _showAbout),
+          AppMenuItem('Acerca de Jaguar Code', icon: Icons.info_outline, onSelected: _showAbout),
         ],
       ]),
     ];
@@ -1157,12 +1156,12 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
         screen = ListenableBuilder(
           listenable: _code,
           builder: (context, child) =>
-              Title(title: '${programName(_code.text)} — Jaguar', color: jaguarYellow, child: child!),
+              Title(title: '${programName(_code.text)} — Jaguar Code', color: jaguarYellow, child: child!),
           child: screen,
         );
         if (desktop && usePlatformMenus) {
           screen = PlatformMenuBar(
-            menus: platformMenus(shownMenus, appName: 'Jaguar', onAbout: _showAbout),
+            menus: platformMenus(shownMenus, appName: 'Jaguar Code', onAbout: _showAbout),
             child: screen,
           );
         }
@@ -1525,7 +1524,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
       context,
       MaterialPageRoute<void>(
         builder: (context) => Scaffold(
-          appBar: AppBar(title: const Text('Jaguar')),
+          appBar: AppBar(title: const Text('Jaguar Code')),
           body: _startPanel(afterAction: () => Navigator.pop(context)),
         ),
       ),
@@ -1774,9 +1773,10 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
                 fontSize: fontSize,
                 inlineErrors: wide,
               ),
-              // Where the first balloon points: under the first lines.
+              // Where the first balloon points: just under the last line, so
+              // the balloon sits on empty space and covers no code.
               Positioned(
-                top: fontSize * 3,
+                top: fontSize * 1.5 * (_code.text.split('\n').length.clamp(1, 14) + 0.5) + 8,
                 left: 16,
                 child: SizedBox(key: _firstLineKey, width: 1, height: 1),
               ),
@@ -1830,7 +1830,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
               ? null
               : IconButton(tooltip: 'Volver', icon: const Icon(Icons.arrow_back), onPressed: _leaveEditor),
           title: empty
-              ? const Text('Jaguar')
+              ? const Text('Jaguar Code')
               : ListenableBuilder(
                   listenable: _code,
                   builder: (context, _) => Column(

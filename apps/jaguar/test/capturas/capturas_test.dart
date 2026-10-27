@@ -154,10 +154,10 @@ void main() {
   });
 
   scene('reto-inicio', (tester) async {
-    await _app(tester, values: {'jaguar.view.firstRunDone': false});
-    await tester.tap(find.text('Empezar desde cero'));
+    await _app(tester, values: {'jaguar.view.mode': 'basic', 'jaguar.view.tourStep': 0});
+    await tester.tap(find.text('Ruta'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Saltar'));
+    await tester.tap(find.text('Saludo'));
     await tester.pumpAndSettle();
     await _shot(tester, 'reto-inicio');
   });

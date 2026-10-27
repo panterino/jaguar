@@ -14,7 +14,7 @@ class AboutScreen extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     return Scaffold(
-      appBar: AppBar(title: const Text('Acerca de Jaguar')),
+      appBar: AppBar(title: const Text('Acerca de Jaguar Code')),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 760),
@@ -29,7 +29,7 @@ class AboutScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Jaguar', style: theme.textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w800)),
+                        Text('Jaguar Code', style: theme.textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w800)),
                         Text('Un proyecto de Panterino · versión $jaguarVersion', style: theme.textTheme.bodyMedium),
                       ],
                     ),
@@ -38,7 +38,7 @@ class AboutScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               Text(
-                'Jaguar es un lugar para aprender lógica de programación: escribes pseudocódigo o dibujas diagramas de flujo, '
+                'Jaguar Code es un lugar para aprender lógica de programación: escribes pseudocódigo o dibujas diagramas de flujo, '
                 'resuelves ejercicios que se revisan solos y compartes con una comunidad. '
                 'Funciona en la computadora del laboratorio, en el navegador y en el celular, sin internet y sin cuenta.',
                 style: theme.textTheme.bodyLarge,
