@@ -1773,9 +1773,10 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
                 fontSize: fontSize,
                 inlineErrors: wide,
               ),
-              // Where the first balloon points: under the first lines.
+              // Where the first balloon points: just under the last line, so
+              // the balloon sits on empty space and covers no code.
               Positioned(
-                top: fontSize * 3,
+                top: fontSize * 1.5 * (_code.text.split('\n').length.clamp(1, 14) + 0.5) + 8,
                 left: 16,
                 child: SizedBox(key: _firstLineKey, width: 1, height: 1),
               ),

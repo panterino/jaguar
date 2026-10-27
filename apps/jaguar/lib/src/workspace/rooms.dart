@@ -650,10 +650,23 @@ class _RouteRoom extends StatelessWidget {
           LayoutBuilder(
             builder: (context, constraints) {
               final half = (constraints.maxWidth - 16) / 2;
-              return Wrap(
-                spacing: 16,
-                runSpacing: 16,
-                children: [for (final card in cards) SizedBox(width: half, child: card)],
+              // Two columns, each stacked on its own: no gaps under short cards.
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (final column in [0, 1]) ...[
+                    if (column == 1) const SizedBox(width: 16),
+                    SizedBox(
+                      width: half,
+                      child: Column(
+                        children: [
+                          for (var i = column; i < cards.length; i += 2)
+                            Padding(padding: const EdgeInsets.only(bottom: 16), child: cards[i]),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
               );
             },
           )
