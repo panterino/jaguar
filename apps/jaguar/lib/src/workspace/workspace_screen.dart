@@ -1972,11 +1972,18 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
                   NavigationBar(
                     selectedIndex: tab,
                     labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-                    onDestinationSelected: (tab) => setState(() {
-                      if (tab == 2) _tourAdvance(2);
-                      _tab = tab;
-                      if (tab > 0) _panel = tab == 1 ? _Panel.console : _Panel.tests;
-                    }),
+                    onDestinationSelected: (tab) {
+                      // The desk check is a screen of its own: it does not change the tab.
+                      if (tab == (exercise != null ? 3 : 2)) {
+                        _deskCheck();
+                        return;
+                      }
+                      setState(() {
+                        if (tab == 2) _tourAdvance(2);
+                        _tab = tab;
+                        if (tab > 0) _panel = tab == 1 ? _Panel.console : _Panel.tests;
+                      });
+                    },
                     destinations: [
                       const NavigationDestination(icon: Icon(Icons.code), label: 'Programa'),
                       NavigationDestination(
@@ -1996,6 +2003,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
                           ),
                           label: 'Pruebas',
                         ),
+                      const NavigationDestination(icon: Icon(Icons.table_chart_outlined), label: 'Escritorio'),
                     ],
                   ),
                 ],

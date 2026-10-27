@@ -188,7 +188,19 @@ class _ExerciseBannerState extends State<ExerciseBanner> {
                               ? ConstrainedBox(
                                   constraints: const BoxConstraints(maxHeight: 190),
                                   child: SingleChildScrollView(
-                                    child: Text(text, style: theme.textTheme.bodyMedium?.copyWith(color: color)),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(text, style: theme.textTheme.bodyMedium?.copyWith(color: color)),
+                                        const SizedBox(height: 6),
+                                        Text(
+                                          cases,
+                                          style: theme.textTheme.bodySmall?.copyWith(
+                                            color: color.withValues(alpha: 0.8),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 )
                               : Text(
@@ -206,29 +218,39 @@ class _ExerciseBannerState extends State<ExerciseBanner> {
               ),
             Row(
               children: [
+                // Words, not bare icons: they are what a student needs when stuck.
                 Expanded(
-                  child: Text(
-                    cases,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodySmall?.copyWith(color: color.withValues(alpha: 0.8)),
+                  child: Wrap(
+                    children: [
+                      if (widget.onHints case final onHints?)
+                        TextButton.icon(
+                          style: TextButton.styleFrom(
+                            foregroundColor: color,
+                            minimumSize: const Size(0, 36),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            visualDensity: VisualDensity.compact,
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                          ),
+                          onPressed: onHints,
+                          icon: const Icon(Icons.lightbulb_outline, size: 20),
+                          label: const Text('Pista'),
+                        ),
+                      if (widget.onPlan case final onPlan?)
+                        TextButton.icon(
+                          style: TextButton.styleFrom(
+                            foregroundColor: color,
+                            minimumSize: const Size(0, 36),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            visualDensity: VisualDensity.compact,
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                          ),
+                          onPressed: onPlan,
+                          icon: const Icon(Icons.edit_note, size: 22),
+                          label: const Text('Planteamiento'),
+                        ),
+                    ],
                   ),
                 ),
-                if (widget.onHints case final onHints?)
-                  IconButton(
-                    tooltip: 'Pistas',
-                    icon: const Icon(Icons.lightbulb_outline),
-                    visualDensity: VisualDensity.compact,
-                    color: color,
-                    onPressed: onHints,
-                  ),
-                if (widget.onPlan case final onPlan?)
-                  IconButton(
-                    tooltip: 'Planteamiento: entrada, proceso y salida',
-                    icon: const Icon(Icons.edit_note),
-                    visualDensity: VisualDensity.compact,
-                    color: color,
-                    onPressed: onPlan,
-                  ),
                 if (widget.showCheckButton)
                   FilledButton.icon(
                     style: FilledButton.styleFrom(

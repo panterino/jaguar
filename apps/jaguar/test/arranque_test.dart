@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jaguar/main.dart';
+import 'package:jaguar/src/console/desk_check_screen.dart';
 import 'package:jaguar/src/editor/code_editor.dart';
 import 'package:jaguar/src/exercises/exercise_banner.dart';
 import 'package:jaguar/src/exercises/exercise_store.dart';
@@ -265,12 +266,21 @@ void main() {
       final banner = find.byType(ExerciseBanner);
       expect(banner, findsOneWidget);
       // Two lines of statement and one row of tools: far less than a third of the screen.
-      expect(tester.getSize(banner).height, lessThan(140));
+      expect(tester.getSize(banner).height, lessThan(150));
       expect(find.text('Probar'), findsOneWidget);
       final folded = tester.getSize(banner).height;
       await tester.tap(find.byIcon(Icons.expand_more));
       await tester.pumpAndSettle();
       expect(tester.getSize(banner).height, greaterThan(folded));
+    });
+
+    testWidgets('la prueba de escritorio tiene su lugar en la barra de abajo', (tester) async {
+      await _pumpPhone(tester, source: 'Algoritmo hola\n    Escribir "hola"\nFinAlgoritmo\n');
+      final tab = find.descendant(of: find.byType(NavigationBar), matching: find.text('Escritorio'));
+      expect(tab, findsOneWidget);
+      await tester.tap(tab);
+      await tester.pumpAndSettle();
+      expect(find.byType(DeskCheckScreen), findsOneWidget);
     });
 
     testWidgets('el tour avanza al escribir, al ejecutar y al abrir Pruebas', (tester) async {
