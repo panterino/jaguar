@@ -166,7 +166,7 @@ void main() {
       expect(find.text('Variables'), findsOneWidget);
       await tester.tap(find.text('Saludo'));
       await tester.pumpAndSettle();
-      expect(find.text('Reto 1'), findsOneWidget);
+      expect(find.text('Ruta · Nivel 1 · Reto 1'), findsOneWidget);
       expect(find.byType(CodeEditor), findsOneWidget);
       // Atrás comes back to the room, not out of the app.
       await tester.binding.handlePopRoute();
@@ -243,7 +243,7 @@ void main() {
       expect(find.text('Un programa es una lista de instrucciones'), findsOneWidget);
       await tester.tap(find.text('Saltar'));
       await tester.pumpAndSettle();
-      expect(find.text('Reto 1'), findsOneWidget);
+      expect(find.text('Ruta · Nivel 1 · Reto 1'), findsOneWidget);
       expect(find.text('Escribe aquí tu programa. Cada instrucción va en su línea.'), findsOneWidget);
       // The blank program of a first launch did not stay behind.
       expect(ProgramStore(_prefs).programs.where(ProgramStore.isBlank), isEmpty);

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jaguar/main.dart';
 import 'package:jaguar/src/challenges/challenges.dart';
+import 'package:jaguar/src/cloud/cloud.dart';
+import 'package:jaguar/src/cloud/memory_backend.dart';
 import 'package:jaguar/src/exercises/exercise_store.dart';
 import 'package:jaguar/src/files/psc_files.dart';
 import 'package:jaguar/src/programs/program_store.dart';
@@ -99,11 +101,100 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Par o impar'), findsOneWidget);
     expect(find.text('Reto 1 · Saludo'), findsNothing);
-    expect(find.text('Mis clases en línea'), findsOneWidget);
+    expect(find.text('Clases en línea'), findsOneWidget);
 
     await tester.tap(find.text('Par o impar'));
     await tester.pumpAndSettle();
     expect(find.byType(Scaffold), findsWidgets);
     expect(ProgramStore(prefs).programs.any((p) => p.exerciseId == 'tarea-1'), isTrue);
+  });
+
+  group('Clases con la nube', () {
+    Future<(Cloud, MemoryBackend)> classWith(WidgetTester tester, {required bool asTeacher}) async {
+      SharedPreferences.setMockInitialValues({'jaguar.view.mode': 'basic', 'jaguar.view.tourStep': 3});
+      final prefs = await SharedPreferences.getInstance();
+      final backend = MemoryBackend();
+      final cloud = Cloud(backend, prefs);
+      final teacher = await backend.registerTeacher(email: 'p@x.mx', password: 'secreto', alias: 'Martínez');
+      final room = await backend.createClass('Programación 3A');
+      await backend.assign(
+        room.id,
+        const Exercise(
+          id: 'par',
+          title: 'Par o impar',
+          statement: 'Di si es par.',
+          cases: [TestCase(inputs: ['2'], expected: 'par')],
+        ),
+      );
+      if (asTeacher) return (cloud, backend);
+      backend.actAs(null);
+      await backend.signInAnonymously(alias: 'Leo', role: CloudRole.alumno);
+      await backend.joinClass(code: room.code, name: 'Leo');
+      expect(teacher.isTeacher, isTrue);
+      return (cloud, backend);
+    }
+
+    testWidgets('el alumno ve su clase, la tarea y cuánto lleva', (tester) async {
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final (cloud, _) = await classWith(tester, asTeacher: false);
+      final prefs = await SharedPreferences.getInstance();
+      await tester.pumpWidget(
+        JaguarApp(store: ProgramStore(prefs), exercises: ExerciseStore(prefs), settings: ViewSettings(prefs), cloud: cloud),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Clases'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Programación 3A'), findsOneWidget);
+      expect(find.text('Prof. Martínez'), findsOneWidget);
+      expect(find.text('Par o impar'), findsOneWidget);
+      expect(find.text('Sin empezar'), findsOneWidget);
+      expect(find.text('Unirme con código'), findsOneWidget);
+
+      // Opening the task goes to the editor, and Atrás returns to the room.
+      await tester.tap(find.text('Par o impar'));
+      await tester.pumpAndSettle();
+      expect(find.text('Probar'), findsOneWidget);
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(find.text('Programación 3A'), findsOneWidget);
+    });
+
+    testWidgets('el profe ve su clase con el código y puede crear otra', (tester) async {
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final (cloud, _) = await classWith(tester, asTeacher: true);
+      final prefs = await SharedPreferences.getInstance();
+      await tester.pumpWidget(
+        JaguarApp(store: ProgramStore(prefs), exercises: ExerciseStore(prefs), settings: ViewSettings(prefs), cloud: cloud),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Clases'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Tu clase · código JAG-'), findsOneWidget);
+      expect(find.text('Ver entregas'), findsOneWidget);
+      expect(find.text('Crear clase'), findsOneWidget);
+      expect(find.text('Unirme con código'), findsNothing);
+    });
+
+    testWidgets('sin sesión invita a entrar', (tester) async {
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      SharedPreferences.setMockInitialValues({'jaguar.view.mode': 'basic', 'jaguar.view.tourStep': 3});
+      final prefs = await SharedPreferences.getInstance();
+      final cloud = Cloud(MemoryBackend(), prefs);
+      await tester.pumpWidget(
+        JaguarApp(store: ProgramStore(prefs), exercises: ExerciseStore(prefs), settings: ViewSettings(prefs), cloud: cloud),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Clases'));
+      await tester.pumpAndSettle();
+      expect(find.text('Tus clases en línea'), findsOneWidget);
+      expect(find.text('Entrar'), findsOneWidget);
+    });
   });
 }

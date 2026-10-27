@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:jaguar_core/jaguar_core.dart';
 
 import '../challenges/challenges.dart';
+import '../cloud/cloud.dart';
 import '../exercises/exercise_store.dart';
 import '../programs/examples.dart';
 import '../programs/program_store.dart';
 import '../settings.dart';
+import 'classes_room.dart';
 import 'programs_drawer.dart' show timeAgo;
 
 /// The four places of the phone app. Each one answers a question: what is
@@ -28,7 +30,8 @@ class RoomActions {
     required this.onOpenGuide,
     required this.onOpenSettings,
     this.onScan,
-    this.onOpenClasses,
+    this.onOpenAssignment,
+    this.onOpenClass,
     this.onOpenTeacher,
   });
 
@@ -47,8 +50,10 @@ class RoomActions {
   /// The camera; null where it does not exist.
   final VoidCallback? onScan;
 
-  /// Online classes; null when Jaguar runs offline.
-  final VoidCallback? onOpenClasses;
+  /// Online classes (null when Jaguar runs offline): a student opens a
+  /// task; the class itself opens its page.
+  final ValueChanged<Assignment>? onOpenAssignment;
+  final ValueChanged<ClassRoom>? onOpenClass;
 
   /// Teachers only.
   final VoidCallback? onOpenTeacher;
@@ -66,8 +71,10 @@ class RoomsScaffold extends StatelessWidget {
     required this.store,
     required this.exercises,
     required this.actions,
+    this.cloud,
   });
 
+  final Cloud? cloud;
   final Room room;
   final ValueChanged<Room> onRoom;
   final ViewSettings settings;
@@ -95,14 +102,15 @@ class RoomsScaffold extends StatelessWidget {
           if (room == Room.home)
             IconButton(tooltip: 'Ajustes', icon: const Icon(Icons.settings_outlined), onPressed: actions.onOpenSettings),
           if (room == Room.workshop) ..._workshopActions(context),
+          if (room == Room.classes && cloud != null) _classesAction(context, cloud!),
         ],
       ),
       body: ListenableBuilder(
-        listenable: Listenable.merge([settings, store, exercises]),
+        listenable: Listenable.merge([settings, store, exercises, ?cloud]),
         builder: (context, _) => switch (room) {
           Room.home => _HomeRoom(settings: settings, store: store, exercises: exercises, actions: actions, onRoom: onRoom),
           Room.route => _RouteRoom(settings: settings, actions: actions),
-          Room.classes => _ClassesRoom(settings: settings, exercises: exercises, actions: actions),
+          Room.classes => _ClassesRoom(cloud: cloud, exercises: exercises, actions: actions),
           Room.workshop => _WorkshopRoom(store: store, actions: actions),
         },
       ),
@@ -118,6 +126,25 @@ class RoomsScaffold extends StatelessWidget {
           NavigationDestination(icon: Icon(Icons.folder_outlined), selectedIcon: Icon(Icons.folder), label: 'Taller'),
         ],
       ),
+    );
+  }
+
+  /// Students join with a code; teachers create the class.
+  Widget _classesAction(BuildContext context, Cloud cloud) {
+    final teacher = cloud.user?.isTeacher ?? false;
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: teacher
+          ? FilledButton.icon(
+              onPressed: () => createClassFlow(context, cloud),
+              icon: const Icon(Icons.add),
+              label: const Text('Crear clase'),
+            )
+          : OutlinedButton.icon(
+              onPressed: () => joinClassFlow(context, cloud, exercises),
+              icon: const Icon(Icons.add),
+              label: const Text('Unirme con código'),
+            ),
     );
   }
 
@@ -520,9 +547,9 @@ class _ChallengeRow extends StatelessWidget {
 }
 
 class _ClassesRoom extends StatelessWidget {
-  const _ClassesRoom({required this.settings, required this.exercises, required this.actions});
+  const _ClassesRoom({required this.cloud, required this.exercises, required this.actions});
 
-  final ViewSettings settings;
+  final Cloud? cloud;
   final ExerciseStore exercises;
   final RoomActions actions;
 
@@ -535,7 +562,6 @@ class _ClassesRoom extends StatelessWidget {
       children: [
         if (actions.onOpenTeacher case final openTeacher?) ...[
           _RoomCard(
-            margin: EdgeInsets.zero,
             child: ListTile(
               minVerticalPadding: 14,
               leading: const Icon(Icons.school_outlined),
@@ -547,22 +573,21 @@ class _ClassesRoom extends StatelessWidget {
           ),
           const SizedBox(height: 12),
         ],
-        _RoomCard(
-          margin: EdgeInsets.zero,
-          child: ListTile(
-            minVerticalPadding: 14,
-            leading: const Icon(Icons.groups_outlined),
-            title: const Text('Mis clases en línea'),
-            subtitle: Text(
-              actions.onOpenClasses == null
-                  ? 'Necesitan conexión a internet.'
-                  : 'Únete con el código de tu profe, o crea una clase.',
+        if (cloud case final cloud?)
+          ClassesList(
+            cloud: cloud,
+            onOpenAssignment: (assignment) => actions.onOpenAssignment?.call(assignment),
+            onOpenClass: (room) => actions.onOpenClass?.call(room),
+          )
+        else
+          _RoomCard(
+            child: ListTile(
+              minVerticalPadding: 14,
+              leading: const Icon(Icons.cloud_off_outlined),
+              title: const Text('Clases en línea'),
+              subtitle: const Text('Necesitan conexión a internet.'),
             ),
-            trailing: const Icon(Icons.chevron_right),
-            enabled: actions.onOpenClasses != null,
-            onTap: actions.onOpenClasses,
           ),
-        ),
         const SizedBox(height: 20),
         const _Label('Ejercicios del profe'),
         if (received.isEmpty)
