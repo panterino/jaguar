@@ -29,6 +29,19 @@ void main() {
     expect(carpetas.last.listSync().whereType<File>().length, greaterThanOrEqualTo(13));
   });
 
+  test('la herramienta de prueba de escritorio tiene su página y su núcleo compilado', () {
+    final pagina = File('../../sitio/herramientas/prueba-de-escritorio.html');
+    expect(pagina.existsSync(), isTrue);
+    final html = pagina.readAsStringSync();
+    expect(html, contains('id="generar"'));
+    expect(html, contains('/herramientas/herramienta.js'));
+    // La tabla de ejemplo ya viene hecha: sirve sin JavaScript.
+    expect(html, contains('<td class="instr">Leer a, b</td>'));
+    final nucleo = File('../../sitio/herramientas/prueba-nucleo.js');
+    expect(nucleo.existsSync(), isTrue);
+    expect(nucleo.readAsStringSync(), contains('jaguarPruebaDeEscritorio'));
+  });
+
   final archivos = [
     for (final c in carpetas)
       if (c.existsSync()) ...c.listSync().whereType<File>().where((f) => f.path.endsWith('.html')),
