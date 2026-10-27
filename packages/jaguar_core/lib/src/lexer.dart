@@ -99,7 +99,7 @@ class Lexer {
     }
     if (_pos >= source.length || source[_pos] == '\n') {
       throw JaguarError.syntax(
-        'El texto que empieza aquí no tiene comillas de cierre.',
+        'Falta la comilla que cierra este texto.',
         line: line,
         column: column,
         hint: 'Cierra el texto con $opening en la misma línea.',

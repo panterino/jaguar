@@ -194,7 +194,7 @@ void main() {
     await tester.tap(find.text('Ejecutar'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Error de sintaxis en la línea 2'), findsOneWidget);
+    expect(find.text('Error de escritura en la línea 2'), findsOneWidget);
     expect(find.text("¿Quisiste decir 'Escribir'?"), findsOneWidget);
 
     await tester.tap(find.text('Ir a la línea 2'));
