@@ -220,7 +220,7 @@ void main() {
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
     expect(find.byType(CodeEditor), findsNothing);
-    expect(find.byType(NavigationBar), findsOneWidget);
+    expect(find.text('Elige qué quieres hacer'), findsNothing);
 
     // The Taller is where it was opened from; from another room, Atrás goes to Inicio.
     await tester.binding.handlePopRoute();

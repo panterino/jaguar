@@ -1643,7 +1643,12 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
         Navigator.push(
           context,
           MaterialPageRoute<void>(
-            builder: (_) => LessonScreen(lesson: lesson, settings: _settings, onOpenNext: _openStep),
+            builder: (_) => LessonScreen(
+              lesson: lesson,
+              settings: _settings,
+              onOpenNext: _openStep,
+              onOpenRoute: () => _goRoom(Room.route),
+            ),
           ),
         );
       case ChallengeStep(:final challenge):

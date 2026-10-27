@@ -103,9 +103,16 @@ class RoomsScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
+        // On a phone every place opens from the portal and goes back to it.
+        leading: bottomNavigation && room != Room.home
+            ? IconButton(
+                tooltip: 'Volver al inicio',
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => onRoom(Room.home),
+              )
+            : null,
         title: Text(room == Room.home ? (_isWide(context) ? 'Inicio' : 'Jaguar Code') : _titles[room]!),
         actions: [
           if (room == Room.home)
@@ -148,28 +155,6 @@ class RoomsScaffold extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: bottomNavigation
-          ? NavigationBar(
-              selectedIndex: room.index,
-              labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-              backgroundColor: theme.colorScheme.surfaceContainer,
-              onDestinationSelected: (index) => onRoom(Room.values[index]),
-              destinations: const [
-                NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Inicio'),
-                NavigationDestination(icon: Icon(Icons.flag_outlined), selectedIcon: Icon(Icons.flag), label: 'Ruta'),
-                NavigationDestination(
-                  icon: Icon(Icons.groups_outlined),
-                  selectedIcon: Icon(Icons.groups),
-                  label: 'Clases',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.folder_outlined),
-                  selectedIcon: Icon(Icons.folder),
-                  label: 'Taller',
-                ),
-              ],
-            )
-          : null,
     );
   }
 
@@ -324,60 +309,15 @@ class _HomeRoom extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final doneLessons = settings.doneLessons;
-    final doneChallenges = settings.doneChallenges;
     final steps = routeSteps;
-    final solved = steps.where((s) => isStepDone(s, lessons: doneLessons, challenges: doneChallenges)).length;
-    final next = nextStep(lessons: doneLessons, challenges: doneChallenges);
+    final solved = steps
+        .where((s) => isStepDone(s, lessons: settings.doneLessons, challenges: settings.doneChallenges))
+        .length;
+    final next = nextStep(lessons: settings.doneLessons, challenges: settings.doneChallenges);
+    final fresh = solved == 0 && next != null;
     final name = exercises.studentName;
     final task = exercises.received.lastOrNull;
-    final recent = store.programs.take(3).toList();
-    final wide = _isWide(context);
-    final fresh = solved == 0 && next != null;
-
-    final nextCard = _RoomCard(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              next == null ? 'RUTA COMPLETA' : (fresh ? 'EMPIEZA AQUÍ' : 'SIGUE DONDE TE QUEDASTE'),
-              style: theme.textTheme.labelMedium?.copyWith(
-                color: scheme.onSurfaceVariant,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.8,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(next == null ? '¡Terminaste el nivel 1!' : next.title, style: theme.textTheme.titleLarge),
-            const SizedBox(height: 2),
-            Text(
-              next == null
-                  ? 'Hiciste todas las lecciones y los retos. Ahora escribe tus propios programas.'
-                  : fresh
-                  ? (next is LessonStep
-                        ? 'Una lección corta: 5 preguntas, unos 2 minutos. Luego escribes tu primer programa.'
-                        : 'Un reto con pruebas que te dicen si va bien.')
-                  : '${next is LessonStep ? 'Lección' : 'Reto'} · llevas $solved de ${steps.length} pasos',
-              style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
-            ),
-            const SizedBox(height: 10),
-            if (!fresh) ...[_Bar(value: solved / steps.length), const SizedBox(height: 12)],
-            if (next != null)
-              FilledButton(
-                onPressed: () => actions.onOpenStep(next),
-                child: Text(solved == 0 ? 'Empezar' : 'Continuar'),
-              )
-            else ...[
-              FilledButton(onPressed: actions.onNew, child: const Text('Abrir un programa nuevo')),
-              const SizedBox(height: 8),
-              OutlinedButton(onPressed: () => onRoom(Room.route), child: const Text('Repasar la Ruta')),
-            ],
-          ],
-        ),
-      ),
-    );
+    final programs = store.programs.length;
 
     final taskCard = task == null
         ? null
@@ -405,81 +345,187 @@ class _HomeRoom extends StatelessWidget {
             ),
           );
 
+    final routeCard = _SectionCard(
+      icon: Icons.flag,
+      kind: 'APRENDER',
+      title: 'Ruta',
+      color: scheme.primaryContainer,
+      onColor: scheme.onPrimaryContainer,
+      description: '${steps.length} pasos: lecciones cortas y retos con pruebas, en orden.',
+      status: next == null
+          ? 'Terminaste la Ruta. Puedes repasar lo que quieras.'
+          : fresh
+          ? 'Empieza por: ${next.title}'
+          : 'Sigues en: ${next.title} · llevas $solved de ${steps.length}',
+      progress: fresh ? null : solved / steps.length,
+      primaryLabel: next == null ? 'Repasar la Ruta' : (fresh ? 'Empezar' : 'Continuar'),
+      onPrimary: next == null ? () => onRoom(Room.route) : () => actions.onOpenStep(next),
+      secondaryLabel: next == null ? null : 'Ver la ruta',
+      onSecondary: () => onRoom(Room.route),
+      onOpen: () => onRoom(Room.route),
+    );
+    final workshopCard = _SectionCard(
+      icon: Icons.folder_open,
+      kind: 'PRACTICAR',
+      title: 'Taller',
+      description: 'Escribe tus propios programas, sin lecciones. Aquí quedan guardados.',
+      status: programs == 0
+          ? 'Aún no tienes programas.'
+          : 'Tienes $programs ${programs == 1 ? 'programa' : 'programas'}.',
+      primaryLabel: 'Nuevo programa',
+      onPrimary: actions.onNew,
+      secondaryLabel: programs == 0 ? null : 'Abrir el Taller',
+      onSecondary: () => onRoom(Room.workshop),
+      onOpen: () => onRoom(Room.workshop),
+    );
+    final classesCard = _SectionCard(
+      icon: Icons.groups,
+      kind: 'CON TU PROFE',
+      title: 'Clases',
+      description: 'Entra con el código de tu clase y recibe sus ejercicios. Si no tienes profe, no la necesitas.',
+      primaryLabel: 'Abrir Clases',
+      primaryTonal: true,
+      onPrimary: () => onRoom(Room.classes),
+      onOpen: () => onRoom(Room.classes),
+    );
+
     return _Page(
       children: [
         Appear(
           child: _Hero(name: name, next: next, started: solved > 0),
         ),
-        const SizedBox(height: 16),
-        if (wide && taskCard != null)
-          Appear(
-            index: 1,
-            child: IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(child: nextCard),
-                  const SizedBox(width: 16),
-                  Expanded(child: taskCard),
-                ],
-              ),
-            ),
-          )
-        else ...[
-          if (taskCard != null) ...[Appear(index: 1, child: taskCard), const SizedBox(height: 12)],
-          Appear(index: taskCard != null ? 2 : 1, child: nextCard),
-        ],
-        if (fresh) ...[
-          const SizedBox(height: 8),
-          Wrap(
-            children: [
-              TextButton(onPressed: actions.onOpenGuide, child: const Text('Cómo funciona Jaguar Code')),
-              TextButton(onPressed: actions.onNew, child: const Text('Ya programo: abrir un programa en blanco')),
-            ],
+        const SizedBox(height: 8),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(4, 8, 4, 12),
+          child: Text('Elige qué quieres hacer', style: theme.textTheme.titleMedium),
+        ),
+        if (taskCard != null) ...[Appear(index: 1, child: taskCard), const SizedBox(height: 12)],
+        Appear(index: 2, child: routeCard),
+        const SizedBox(height: 12),
+        Appear(index: 3, child: workshopCard),
+        const SizedBox(height: 12),
+        Appear(index: 4, child: classesCard),
+        const SizedBox(height: 8),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: TextButton.icon(
+            onPressed: actions.onOpenGuide,
+            icon: const Icon(Icons.menu_book_outlined),
+            label: const Text('Cómo funciona Jaguar Code'),
           ),
-        ] else ...[
-          const SizedBox(height: 20),
-          const _Label('Taller · recientes'),
-          if (recent.isEmpty)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
-              child: Row(
+        ),
+      ],
+    );
+  }
+}
+
+/// One of the places of the app, as a card at the portal: what it is, where
+/// the person stands in it and the one thing to do first.
+class _SectionCard extends StatelessWidget {
+  const _SectionCard({
+    required this.icon,
+    required this.kind,
+    required this.title,
+    required this.description,
+    required this.primaryLabel,
+    required this.onPrimary,
+    required this.onOpen,
+    this.color,
+    this.onColor,
+    this.status,
+    this.progress,
+    this.primaryTonal = false,
+    this.secondaryLabel,
+    this.onSecondary,
+  });
+
+  final IconData icon;
+  final String kind;
+  final String title;
+  final String description;
+  final String? status;
+  final double? progress;
+  final Color? color;
+  final Color? onColor;
+  final String primaryLabel;
+  final bool primaryTonal;
+  final VoidCallback onPrimary;
+  final String? secondaryLabel;
+  final VoidCallback? onSecondary;
+  final VoidCallback onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final muted = (onColor ?? scheme.onSurfaceVariant);
+    return _RoomCard(
+      color: color,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onOpen,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: scheme.surface.withValues(alpha: 0.7),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Icon(icon, color: onColor ?? scheme.primary),
+                  ),
+                  const SizedBox(width: 12),
                   Expanded(
-                    child: Text(
-                      'Aún no tienes programas.',
-                      style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          kind,
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: muted,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.8,
+                          ),
+                        ),
+                        Text(title, style: theme.textTheme.titleLarge?.copyWith(color: onColor)),
+                      ],
                     ),
                   ),
-                  TextButton(onPressed: actions.onNew, child: const Text('Nuevo programa')),
                 ],
               ),
-            )
-          else
-            for (final (i, program) in recent.indexed)
-              Appear(
-                index: 3 + i,
-                child: _RoomCard(
-                  margin: const EdgeInsets.only(bottom: 6),
-                  child: ListTile(
-                    minVerticalPadding: 12,
-                    title: Text(program.name, style: monoLabel(theme)),
-                    trailing: Text(timeAgo(program.updatedAt), style: theme.textTheme.bodySmall),
-                    onTap: () => actions.onOpenProgram(program),
-                  ),
+              const SizedBox(height: 8),
+              Text(description, style: theme.textTheme.bodyMedium?.copyWith(color: muted)),
+              if (status != null) ...[
+                const SizedBox(height: 6),
+                Text(
+                  status!,
+                  style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700, color: onColor),
                 ),
+              ],
+              if (progress != null) ...[const SizedBox(height: 10), _Bar(value: progress!)],
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 4,
+                children: [
+                  if (primaryTonal)
+                    FilledButton.tonal(onPressed: onPrimary, child: Text(primaryLabel))
+                  else
+                    FilledButton(onPressed: onPrimary, child: Text(primaryLabel)),
+                  if (secondaryLabel != null) TextButton(onPressed: onSecondary, child: Text(secondaryLabel!)),
+                ],
               ),
-          const SizedBox(height: 12),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: TextButton.icon(
-              onPressed: actions.onOpenGuide,
-              icon: const Icon(Icons.menu_book_outlined),
-              label: const Text('Guía: cómo funciona todo'),
-            ),
+            ],
           ),
-        ],
-      ],
+        ),
+      ),
     );
   }
 }
@@ -624,57 +670,27 @@ class _RouteRoom extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final doneLessons = settings.doneLessons;
-    final doneChallenges = settings.doneChallenges;
-    final next = nextStep(lessons: doneLessons, challenges: doneChallenges);
-    final wide = _isWide(context);
-
-    final cards = <Widget>[
-      for (final (g, group) in routeGroups.indexed)
-        Appear(
-          index: g,
-          child: _GroupCard(
-            group: group,
-            doneLessons: doneLessons,
-            doneChallenges: doneChallenges,
-            nextId: next?.id,
-            onOpen: actions.onOpenStep,
-          ),
-        ),
-    ];
-
+    final next = nextStep(lessons: settings.doneLessons, challenges: settings.doneChallenges);
+    final banners = [scheme.primaryContainer, scheme.tertiaryContainer, scheme.secondaryContainer];
     return _Page(
       children: [
-        const _Phrase('Lecciones cortas y retos con pruebas, en orden. Puedes saltar a cualquiera.'),
-        if (wide)
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final half = (constraints.maxWidth - 16) / 2;
-              // Two columns, each stacked on its own: no gaps under short cards.
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  for (final column in [0, 1]) ...[
-                    if (column == 1) const SizedBox(width: 16),
-                    SizedBox(
-                      width: half,
-                      child: Column(
-                        children: [
-                          for (var i = column; i < cards.length; i += 2)
-                            Padding(padding: const EdgeInsets.only(bottom: 16), child: cards[i]),
-                        ],
-                      ),
-                    ),
-                  ],
-                ],
-              );
-            },
-          )
-        else
-          for (final card in cards) Padding(padding: const EdgeInsets.only(bottom: 14), child: card),
+        const _Phrase('Tu camino, de arriba hacia abajo. Toca un paso para entrar; puedes saltar a cualquiera.'),
+        for (final (g, group) in routeGroups.indexed)
+          Appear(
+            index: g,
+            child: _PathGroup(
+              group: group,
+              banner: banners[g % banners.length],
+              doneLessons: settings.doneLessons,
+              doneChallenges: settings.doneChallenges,
+              nextId: next?.id,
+              onOpen: actions.onOpenStep,
+            ),
+          ),
         const SizedBox(height: 4),
         Text(
           'Nada está bloqueado: puedes saltar a cualquier lección o reto. Cada reto trae pruebas y pistas.',
+          textAlign: TextAlign.center,
           style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
         ),
       ],
@@ -682,9 +698,12 @@ class _RouteRoom extends StatelessWidget {
   }
 }
 
-class _GroupCard extends StatelessWidget {
-  const _GroupCard({
+/// A unit of the path: a banner that says what it is for and, under it, the
+/// steps as round nodes along a winding road, as in a board game.
+class _PathGroup extends StatelessWidget {
+  const _PathGroup({
     required this.group,
+    required this.banner,
     required this.doneLessons,
     required this.doneChallenges,
     required this.nextId,
@@ -692,200 +711,256 @@ class _GroupCard extends StatelessWidget {
   });
 
   final RouteGroup group;
+  final Color banner;
   final Set<String> doneLessons;
   final Set<String> doneChallenges;
   final String? nextId;
   final ValueChanged<RouteStep> onOpen;
 
+  static const _rowHeight = 136.0;
+  static const _nodeTop = 34.0;
+  static const _nodeSize = 68.0;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final done = group.steps.where((s) => isStepDone(s, lessons: doneLessons, challenges: doneChallenges)).length;
-    return _RoomCard(
-      clipBehavior: Clip.antiAlias,
+    final steps = group.steps;
+    final done = [for (final s in steps) isStepDone(s, lessons: doneLessons, challenges: doneChallenges)];
+    final count = done.where((d) => d).length;
+    final complete = count == steps.length;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+            decoration: BoxDecoration(
+              color: complete ? _pathGreen(context) : banner,
+              borderRadius: BorderRadius.circular(18),
+            ),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(group.title, style: theme.textTheme.titleMedium),
+                      Text(
+                        group.title,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: complete ? Colors.white : scheme.onSurface,
+                        ),
+                      ),
                       Text(
                         group.description,
-                        style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: complete ? Colors.white : scheme.onSurfaceVariant,
+                        ),
                       ),
                     ],
                   ),
                 ),
-                Text('$done de ${group.steps.length}', style: theme.textTheme.bodyMedium),
+                const SizedBox(width: 12),
+                Text(
+                  '$count de ${steps.length}',
+                  style: theme.textTheme.labelLarge?.copyWith(color: complete ? Colors.white : scheme.onSurface),
+                ),
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: _Bar(value: done / group.steps.length),
-          ),
-          const SizedBox(height: 6),
-          for (final step in group.steps)
-            switch (step) {
-              LessonStep() => _LessonRow(
-                lesson: step.lesson,
-                done: doneLessons.contains(step.id),
-                isNext: step.id == nextId,
-                onTap: () => onOpen(step),
-              ),
-              ChallengeStep() => _ChallengeRow(
-                challenge: step.challenge,
-                done: doneChallenges.contains(step.id),
-                isNext: step.id == nextId,
-                onTap: () => onOpen(step),
-              ),
+          const SizedBox(height: 8),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final width = constraints.maxWidth;
+              final amplitude = math.min(width * 0.26, 96.0);
+              final centers = [
+                for (var i = 0; i < steps.length; i++)
+                  Offset(width / 2 + amplitude * math.sin(i * 1.25), i * _rowHeight + _nodeTop + _nodeSize / 2),
+              ];
+              return SizedBox(
+                height: steps.length * _rowHeight,
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: CustomPaint(
+                        painter: _RoadPainter(
+                          centers: centers,
+                          done: done,
+                          doneColor: _pathGreen(context),
+                          todoColor: scheme.outlineVariant,
+                        ),
+                      ),
+                    ),
+                    for (final (i, step) in steps.indexed)
+                      Positioned(
+                        left: centers[i].dx - 80,
+                        top: i * _rowHeight,
+                        width: 160,
+                        height: _rowHeight,
+                        child: _PathNode(
+                          key: ValueKey('paso-${step.id}'),
+                          step: step,
+                          done: done[i],
+                          isNext: step.id == nextId,
+                          size: _nodeSize,
+                          top: _nodeTop,
+                          onTap: () => onOpen(step),
+                        ),
+                      ),
+                  ],
+                ),
+              );
             },
-          const SizedBox(height: 6),
+          ),
         ],
       ),
     );
   }
 }
 
-/// One row of the path: a badge, the name and what it is.
-class _StepRow extends StatelessWidget {
-  const _StepRow({
-    required this.badge,
-    required this.title,
-    required this.subtitle,
+Color _pathGreen(BuildContext context) =>
+    Theme.of(context).brightness == Brightness.dark ? const Color(0xFF7BC043) : const Color(0xFF3F8200);
+
+Color _pathGreenEdge(BuildContext context) =>
+    Theme.of(context).brightness == Brightness.dark ? const Color(0xFF4F8A24) : const Color(0xFF2D6100);
+
+/// The road between the nodes: a thick line that is green where it has been
+/// walked.
+class _RoadPainter extends CustomPainter {
+  const _RoadPainter({required this.centers, required this.done, required this.doneColor, required this.todoColor});
+
+  final List<Offset> centers;
+  final List<bool> done;
+  final Color doneColor;
+  final Color todoColor;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    for (var i = 0; i + 1 < centers.length; i++) {
+      final a = centers[i];
+      final b = centers[i + 1];
+      final mid = (a.dy + b.dy) / 2;
+      final path = Path()
+        ..moveTo(a.dx, a.dy)
+        ..cubicTo(a.dx, mid, b.dx, mid, b.dx, b.dy);
+      canvas.drawPath(
+        path,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 10
+          ..strokeCap = StrokeCap.round
+          ..color = done[i] ? doneColor : todoColor,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(_RoadPainter old) =>
+      old.centers != centers || old.done != done || old.doneColor != doneColor || old.todoColor != todoColor;
+}
+
+/// A step on the road: a round button with weight, its name under it and,
+/// on the one that follows, a bubble that says what to do.
+class _PathNode extends StatelessWidget {
+  const _PathNode({
+    super.key,
+    required this.step,
+    required this.done,
     required this.isNext,
+    required this.size,
+    required this.top,
     required this.onTap,
-    this.trailing,
   });
 
-  final Widget badge;
-  final String title;
-  final String subtitle;
+  final RouteStep step;
+  final bool done;
   final bool isNext;
+  final double size;
+  final double top;
   final VoidCallback onTap;
-  final String? trailing;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
+    final lesson = step is LessonStep;
+    final face = done ? _pathGreen(context) : (isNext ? scheme.primary : scheme.surfaceContainerHigh);
+    final edge = done
+        ? _pathGreenEdge(context)
+        : (isNext ? Color.lerp(scheme.primary, Colors.black, 0.35)! : scheme.outlineVariant);
+    final onFace = done || isNext ? scheme.onPrimary : scheme.onSurfaceVariant;
+    final icon = done ? Icons.check : (step is LessonStep ? (step as LessonStep).lesson.icon : Icons.flag);
+    final state = done ? 'hecho' : (isNext ? 'sigue' : 'pendiente');
     return Semantics(
-      selected: isNext,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
-        child: Material(
-          color: isNext ? scheme.primaryContainer : Colors.transparent,
-          borderRadius: BorderRadius.circular(10),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(10),
-            onTap: onTap,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(minHeight: 56),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                child: Row(
-                  children: [
-                    SizedBox(width: 30, child: Center(child: badge)),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            title,
-                            style: theme.textTheme.bodyLarge?.copyWith(
-                              fontWeight: isNext ? FontWeight.w600 : FontWeight.w400,
-                              color: isNext ? scheme.onPrimaryContainer : null,
-                            ),
-                          ),
-                          Text(
-                            subtitle,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: isNext ? scheme.onPrimaryContainer : scheme.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
-                      ),
+      button: true,
+      label: '${lesson ? 'Lección' : 'Reto'}: ${step.title}, $state',
+      excludeSemantics: true,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: onTap,
+        child: Stack(
+          alignment: Alignment.topCenter,
+          children: [
+            if (isNext)
+              Positioned(
+                top: 0,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: scheme.surface,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: scheme.primary, width: 2),
+                  ),
+                  child: Text(
+                    'EMPEZAR',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: scheme.primary,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 0.8,
                     ),
-                    if (isNext)
-                      Text(
-                        trailing ?? 'Continuar',
-                        style: theme.textTheme.labelLarge?.copyWith(color: scheme.onPrimaryContainer),
-                      ),
-                  ],
+                  ),
+                ),
+              ),
+            Positioned(
+              top: top,
+              child: Container(
+                width: size,
+                height: size,
+                decoration: BoxDecoration(
+                  color: face,
+                  shape: BoxShape.circle,
+                  boxShadow: [BoxShadow(color: edge, offset: const Offset(0, 5))],
+                ),
+                child: Icon(icon, size: 32, color: onFace),
+              ),
+            ),
+            Positioned(
+              top: top + size + 10,
+              left: 0,
+              right: 0,
+              child: Center(
+                // A label with its own ground, so the road passes behind it.
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(color: scheme.surface, borderRadius: BorderRadius.circular(8)),
+                  child: Text(
+                    step.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: isNext ? FontWeight.w800 : FontWeight.w600,
+                      height: 1.15,
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
+          ],
         ),
       ),
-    );
-  }
-}
-
-class _LessonRow extends StatelessWidget {
-  const _LessonRow({required this.lesson, required this.done, required this.isNext, required this.onTap});
-
-  final Lesson lesson;
-  final bool done;
-  final bool isNext;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return _StepRow(
-      badge: Hero(
-        tag: 'leccion-${lesson.id}',
-        child: Material(
-          color: Colors.transparent,
-          child: done
-              ? Icon(Icons.check_circle, color: Colors.green.shade700, semanticLabel: 'hecha')
-              : Icon(lesson.icon, color: isNext ? scheme.onPrimaryContainer : scheme.primary),
-        ),
-      ),
-      title: lesson.title,
-      subtitle: 'Lección · ${lesson.summary}',
-      isNext: isNext,
-      onTap: onTap,
-      trailing: 'Empezar',
-    );
-  }
-}
-
-class _ChallengeRow extends StatelessWidget {
-  const _ChallengeRow({required this.challenge, required this.done, required this.isNext, required this.onTap});
-
-  final Challenge challenge;
-  final bool done;
-  final bool isNext;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final index = challenges.indexOf(challenge);
-    return _StepRow(
-      badge: done
-          ? Icon(Icons.check, color: Colors.green.shade700, semanticLabel: 'hecho')
-          : Icon(
-              Icons.flag_outlined,
-              color: isNext ? scheme.onPrimaryContainer : scheme.onSurfaceVariant,
-              semanticLabel: 'reto',
-            ),
-      title: challenge.exercise.title.replaceFirst(RegExp(r'^Reto \d+ · '), ''),
-      subtitle: 'Reto ${index + 1} · ${challenge.subject}',
-      isNext: isNext,
-      onTap: onTap,
     );
   }
 }
@@ -1123,11 +1198,10 @@ class _Kind extends StatelessWidget {
 
 /// A flat card with a light outline, as the rooms draw all their groups.
 class _RoomCard extends StatelessWidget {
-  const _RoomCard({this.color, this.margin = EdgeInsets.zero, this.clipBehavior = Clip.none, required this.child});
+  const _RoomCard({this.color, this.margin = EdgeInsets.zero, required this.child});
 
   final Color? color;
   final EdgeInsetsGeometry margin;
-  final Clip clipBehavior;
   final Widget child;
 
   @override
@@ -1137,7 +1211,6 @@ class _RoomCard extends StatelessWidget {
       elevation: 0,
       color: color ?? scheme.surfaceContainerLow,
       margin: margin,
-      clipBehavior: clipBehavior,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(color: color == null ? scheme.outlineVariant : Colors.transparent),

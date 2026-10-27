@@ -6,6 +6,7 @@ import 'package:jaguar/src/lessons/lessons.dart';
 import 'package:jaguar/src/programs/program_store.dart';
 import 'package:jaguar/src/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'ayudas.dart';
 
 Future<ViewSettings> _abre(WidgetTester tester, {Size size = const Size(400, 800)}) async {
   tester.view.physicalSize = size;
@@ -44,8 +45,7 @@ Future<void> _responde(WidgetTester tester, Question q, {required bool bien}) as
 void main() {
   testWidgets('una lección completa: preguntas, explicación, resultado y queda hecha', (tester) async {
     final settings = await _abre(tester);
-    await tester.tap(find.text('Ruta'));
-    await tester.pumpAndSettle();
+    await irASala(tester, 'Ruta');
     await tester.tap(find.text('Tu primer programa'));
     await tester.pumpAndSettle();
 
@@ -64,16 +64,16 @@ void main() {
     expect(find.text('${preguntas.length} de ${preguntas.length}'), findsOneWidget);
     expect(settings.doneLessons, {lessonFirstProgram.id});
 
-    // "Seguir" lleva al reto 1 (el siguiente paso de la ruta).
-    await tester.tap(find.textContaining('Seguir:'));
+    // "Seguir con" lleva al reto 1 (el siguiente paso de la ruta).
+    expect(find.text('Ver tu ruta'), findsOneWidget);
+    await tester.tap(find.textContaining('Seguir con:'));
     await tester.pumpAndSettle();
     expect(find.text('Ruta · Nivel 1 · Reto 1'), findsOneWidget);
   });
 
   testWidgets('una respuesta mala explica por qué y la pregunta vuelve al final', (tester) async {
     await _abre(tester);
-    await tester.tap(find.text('Ruta'));
-    await tester.pumpAndSettle();
+    await irASala(tester, 'Ruta');
     await tester.tap(find.text('Tu primer programa'));
     await tester.pumpAndSettle();
 
@@ -99,10 +99,12 @@ void main() {
 
   testWidgets('las preguntas de figuras y de ordenar se pueden responder', (tester) async {
     await _abre(tester);
-    await tester.tap(find.text('Ruta'));
-    await tester.pumpAndSettle();
+    await irASala(tester, 'Ruta');
     await tester.scrollUntilVisible(find.text('Diagramas de flujo'), 200);
     await tester.ensureVisible(find.text('Diagramas de flujo'));
+    await tester.pumpAndSettle();
+    // Fuera de la barra de arriba, donde sí se puede tocar.
+    await tester.drag(find.byType(Scrollable).first, const Offset(0, 250));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Diagramas de flujo'));
     await tester.pumpAndSettle();
@@ -114,8 +116,7 @@ void main() {
   testWidgets('las lecciones sirven también en pantalla ancha', (tester) async {
     await _abre(tester, size: const Size(1400, 900));
     // Con la riel a un lado: Ruta abre la ruta, no el editor.
-    await tester.tap(find.text('Ruta'));
-    await tester.pumpAndSettle();
+    await irASala(tester, 'Ruta');
     expect(find.text('Primeros pasos'), findsOneWidget);
     await tester.tap(find.text('Tu primer programa'));
     await tester.pumpAndSettle();

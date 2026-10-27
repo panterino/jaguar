@@ -362,9 +362,9 @@ class GuideScreen extends StatelessWidget {
       intro: desktop
           ? 'En la computadora las cuatro salas están siempre en la barra de la izquierda: Inicio (lo que sigue), Ruta '
                 '(lecciones y retos), Clases (lo de tu profe) y Taller (tu editor y tus programas).'
-          : 'En el celular Jaguar tiene cuatro salas, siempre abajo: Inicio (lo que sigue), Ruta (los retos), '
-                'Clases (lo de tu profe) y Taller (tus programas). Un programa, un reto o una tarea se abre en el '
-                'editor; Atrás regresa a la sala.',
+          : 'El Inicio del celular es un portal con tres secciones: Ruta (lecciones y retos, en un camino), '
+                'Taller (tus propios programas) y Clases (lo de tu profe). Toca una para entrar y la flecha de '
+                'arriba para volver. Un programa, un reto o una tarea se abre en el editor; Atrás regresa.',
       steps: [
         'Básico muestra solo lo necesario para empezar. Completo agrega todos los menús (como Editar y Ver), '
             'atajos y más opciones. Puedes ir y venir sin perder nada.',

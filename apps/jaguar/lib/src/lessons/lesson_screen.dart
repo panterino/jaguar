@@ -13,13 +13,16 @@ import 'lessons.dart';
 /// that says why. A wrong question comes back once at the end, so it gets
 /// said twice. Finishing marks the lesson done.
 class LessonScreen extends StatefulWidget {
-  const LessonScreen({super.key, required this.lesson, required this.settings, this.onOpenNext});
+  const LessonScreen({super.key, required this.lesson, required this.settings, this.onOpenNext, this.onOpenRoute});
 
   final Lesson lesson;
   final ViewSettings settings;
 
   /// Called after the lesson, to open the step that follows it.
   final void Function(RouteStep step)? onOpenNext;
+
+  /// Called to show the whole path, with the step just done marked.
+  final VoidCallback? onOpenRoute;
 
   @override
   State<LessonScreen> createState() => _LessonScreenState();
@@ -119,6 +122,12 @@ class _LessonScreenState extends State<LessonScreen> {
       _bank = _shuffled(_current);
       _checked = false;
     });
+  }
+
+  /// Where this lesson stands in the path, counting from 1.
+  int? get _stepNumber {
+    final i = routeSteps.indexWhere((s) => s.id == widget.lesson.id);
+    return i < 0 ? null : i + 1;
   }
 
   RouteStep? get _following {
@@ -260,6 +269,18 @@ class _Playing extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      if (screen._stepNumber case final n?)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Text(
+                            'RUTA · PASO $n DE ${routeSteps.length}',
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              color: scheme.onSurfaceVariant,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.8,
+                            ),
+                          ),
+                        ),
                       Semantics(
                         header: true,
                         child: Text(
@@ -817,13 +838,13 @@ class _Result extends StatelessWidget {
               Chunky(
                 onTap: () {
                   Navigator.pop(context);
-                  if (next != null) screen.widget.onOpenNext?.call(next);
+                  screen.widget.onOpenRoute?.call();
                 },
                 fill: _green(context),
                 edge: _greenEdge(context),
                 minHeight: 54,
                 child: Text(
-                  next == null ? 'Terminar' : 'Seguir: ${next.title}',
+                  'Ver tu ruta',
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w800,
                     color: _onFace(context, green: true),
@@ -831,7 +852,14 @@ class _Result extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 6),
-              TextButton(onPressed: () => Navigator.pop(context), child: const Text('Volver a la ruta')),
+              if (next != null)
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    screen.widget.onOpenNext?.call(next);
+                  },
+                  child: Text('Seguir con: ${next.title}'),
+                ),
             ],
           ),
         ),
