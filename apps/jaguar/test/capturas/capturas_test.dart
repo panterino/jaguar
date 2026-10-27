@@ -343,6 +343,16 @@ void main() {
     await _shot(tester, 'bloques');
   });
 
+  scene('python', (tester) async {
+    await _app(
+      tester,
+      values: {'jaguar.view.mode': 'basic', 'jaguar.view.editor': 'python', 'jaguar.view.python': true},
+      source:
+          'Algoritmo mayor_de_edad\n    Definir edad Como Entero\n    Escribir "¿Cuántos años tienes?"\n    Leer edad\n    Si edad >= 18 Entonces\n        Escribir "Eres mayor de edad"\n    SiNo\n        Escribir "Aún eres menor"\n    FinSi\nFinAlgoritmo\n',
+    );
+    await _shot(tester, 'python');
+  });
+
   scene('error', (tester) async {
     await _app(
       tester,

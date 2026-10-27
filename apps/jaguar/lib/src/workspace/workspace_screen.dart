@@ -21,6 +21,7 @@ import '../editor/completions.dart';
 import '../editor/keyword_bar.dart';
 import '../diagram/diagram_editing.dart';
 import '../blocks/blocks_view.dart';
+import '../python/python_view.dart';
 import '../diagram/diagram_view.dart';
 import '../editor/syntax_controller.dart';
 import '../exercises/plan_dialog.dart';
@@ -190,7 +191,11 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
     if (!_tourActive) return null;
     void onSkip() => _settings.tourStep = 3;
     return switch (_settings.tourStep) {
-      0 when _tab == 0 && _settings.editorView != EditorView.diagram && _settings.editorView != EditorView.blocks =>
+      0
+          when _tab == 0 &&
+              _settings.editorView != EditorView.diagram &&
+              _settings.editorView != EditorView.blocks &&
+              _settings.editorView != EditorView.python =>
         TourBalloon(
           key: const ValueKey('tour-0'),
           target: _firstLineKey,
@@ -652,7 +657,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
 
   void _goToLine(int line) {
     // The line is in the code, so the code must be visible.
-    if (_settings.editorView == EditorView.diagram || _settings.editorView == EditorView.blocks) {
+    if (_settings.editorView != EditorView.code && _settings.editorView != EditorView.both) {
       _settings.editorView = EditorView.code;
     }
     setState(() => _tab = 0);
@@ -722,7 +727,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
 
   /// Runs an editor command from the menu, showing the code if needed.
   void _withEditor(void Function(CodeEditorState editor) command) {
-    if (_settings.editorView == EditorView.diagram || _settings.editorView == EditorView.blocks) {
+    if (_settings.editorView != EditorView.code && _settings.editorView != EditorView.both) {
       _settings.editorView = EditorView.both;
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -1063,6 +1068,13 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
             onSelected: () => settings.editorView = EditorView.blocks,
             shortcut: primary(LogicalKeyboardKey.digit4, alt: true),
           ),
+          if (settings.pythonEnabled)
+            AppMenuItem(
+              'Python',
+              checked: settings.editorView == EditorView.python,
+              onSelected: () => settings.editorView = EditorView.python,
+              shortcut: primary(LogicalKeyboardKey.digit5, alt: true),
+            ),
           AppMenuItem(
             'Pseudocódigo y diagrama',
             checked: settings.editorView == EditorView.both,
@@ -1240,6 +1252,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
             EditorView.code => codePane,
             EditorView.diagram => _diagram(),
             EditorView.blocks => _blocks(),
+            EditorView.python => settings.pythonEnabled ? PythonView(code: _code) : codePane,
             EditorView.both => SplitView(
               axis: Axis.horizontal,
               fraction: _diagramSplit,
@@ -1669,6 +1682,13 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
 
   /// A step of the path: a lesson opens its own screen, a challenge the editor.
   void _openStep(RouteStep step) {
+    // The Python view is off until the path reaches the part that teaches it.
+    if (levelOf(step)?.unlocksPython == true && !_settings.pythonEnabled) {
+      _settings.pythonEnabled = true;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(const SnackBar(content: Text('Se activó la vista Python. Puedes quitarla en Ajustes.')));
+    }
     switch (step) {
       case LessonStep(:final lesson):
         Navigator.push(
@@ -1832,6 +1852,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
           child: switch (view) {
             EditorView.diagram => _diagram(),
             EditorView.blocks => _blocks(),
+            EditorView.python => _settings.pythonEnabled ? PythonView(code: _code) : codePane,
             EditorView.both when wide => SplitView(
               axis: Axis.horizontal,
               fraction: _diagramSplit,
@@ -2162,18 +2183,21 @@ class _EditorViewSwitch extends StatelessWidget {
     EditorView.code: 'Código',
     EditorView.diagram: 'Diagrama',
     EditorView.blocks: 'Bloques',
+    EditorView.python: 'Python',
     EditorView.both: 'Ambos',
   };
   static const _tips = {
     EditorView.code: 'Tu programa escrito paso a paso',
     EditorView.diagram: 'Tu programa dibujado como diagrama de flujo',
     EditorView.blocks: 'Tu programa armado con bloques',
+    EditorView.python: 'Tu programa traducido a Python (solo se lee)',
     EditorView.both: 'El código y el diagrama lado a lado',
   };
   static const _icons = {
     EditorView.code: Icons.code,
     EditorView.diagram: Icons.account_tree_outlined,
     EditorView.blocks: Icons.view_agenda_outlined,
+    EditorView.python: Icons.terminal_rounded,
     EditorView.both: Icons.vertical_split_outlined,
   };
 
@@ -2184,7 +2208,13 @@ class _EditorViewSwitch extends StatelessWidget {
       label: 'Vista del programa',
       child: Row(
         children: [
-          for (final option in [EditorView.code, EditorView.diagram, EditorView.blocks, if (allowBoth) EditorView.both])
+          for (final option in [
+            EditorView.code,
+            EditorView.diagram,
+            EditorView.blocks,
+            if (settings.pythonEnabled) EditorView.python,
+            if (allowBoth) EditorView.both,
+          ])
             Expanded(
               child: Tooltip(
                 message: _tips[option]!,
@@ -2227,7 +2257,13 @@ class _EditorViewSwitch extends StatelessWidget {
       label: 'Vista del programa',
       child: SegmentedButton<EditorView>(
         segments: [
-          for (final option in [EditorView.code, EditorView.diagram, EditorView.blocks, if (allowBoth) EditorView.both])
+          for (final option in [
+            EditorView.code,
+            EditorView.diagram,
+            EditorView.blocks,
+            if (settings.pythonEnabled) EditorView.python,
+            if (allowBoth) EditorView.both,
+          ])
             ButtonSegment(
               value: option,
               // On a phone the three names need the room the icons would take.

@@ -55,6 +55,7 @@ class RouteLevel {
     required this.description,
     required this.groups,
     this.optional = false,
+    this.unlocksPython = false,
   });
 
   final String id;
@@ -66,6 +67,9 @@ class RouteLevel {
   /// it: it does not count in "paso n de N" and is not the step that follows
   /// until everything else is done.
   final bool optional;
+
+  /// Reaching this level turns on the Python view (it is off until then).
+  final bool unlocksPython;
 
   /// Short name of the level, like "Fundamentos".
   final String title;
@@ -119,6 +123,14 @@ RouteStep? nextMainStep({required Set<String> lessons, required Set<String> chal
 /// The challenge number [n] (from 1) of the first ten, which the first level
 /// uses.
 Challenge reto(int n) => challenges[n - 1];
+
+/// The level a step belongs to.
+RouteLevel? levelOf(RouteStep step) {
+  for (final level in routeLevels) {
+    if (level.steps.any((s) => s.id == step.id)) return level;
+  }
+  return null;
+}
 
 /// The challenge that follows [id] on the path (the next challenge step,
 /// skipping lessons); null if [id] is the last one or not a challenge.
