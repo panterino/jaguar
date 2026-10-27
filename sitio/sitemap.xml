@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://jaguarcode.org/</loc><lastmod>2026-10-26</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://jaguarcode.org/guias</loc><lastmod>2026-10-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://jaguarcode.org/guias/que-es-un-algoritmo</loc><lastmod>2026-10-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://jaguarcode.org/guias/que-es-el-pseudocodigo</loc><lastmod>2026-10-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://jaguarcode.org/guias/como-hacer-un-diagrama-de-flujo</loc><lastmod>2026-10-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://jaguarcode.org/guias/prueba-de-escritorio</loc><lastmod>2026-10-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://jaguarcode.org/profes</loc><lastmod>2026-10-26</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://jaguarcode.org/manual</loc><lastmod>2026-10-26</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://jaguarcode.org/</loc><lastmod>2026-10-27</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://jaguarcode.org/guias</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jaguarcode.org/guias/que-es-un-algoritmo</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jaguarcode.org/guias/que-es-el-pseudocodigo</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jaguarcode.org/guias/como-hacer-un-diagrama-de-flujo</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jaguarcode.org/guias/prueba-de-escritorio</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jaguarcode.org/guias/pseint-en-el-celular</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jaguarcode.org/guias/abrir-archivos-psc-en-android</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jaguarcode.org/retos</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jaguarcode.org/retos/algoritmo-para-saludar-por-su-nombre</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jaguarcode.org/retos/area-de-un-rectangulo-en-pseudocodigo</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jaguarcode.org/retos/algoritmo-para-calcular-el-iva</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jaguarcode.org/retos/convertir-minutos-a-horas-en-pseudocodigo</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jaguarcode.org/retos/convertir-texto-a-mayusculas-pseudocodigo</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jaguarcode.org/retos/contar-letras-de-una-palabra-pseudocodigo</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jaguarcode.org/retos/algoritmo-aprobado-o-reprobado</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jaguarcode.org/retos/numero-dentro-de-un-rango-en-pseudocodigo</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jaguarcode.org/retos/dia-de-la-semana-con-segun-en-pseudocodigo</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jaguarcode.org/retos/suma-de-numeros-hasta-el-cero-pseudocodigo</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jaguarcode.org/retos/tabla-de-multiplicar-en-pseudocodigo</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jaguarcode.org/retos/algoritmo-de-contrasena-con-repetir</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jaguarcode.org/profes</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://jaguarcode.org/manual</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
 </urlset>
