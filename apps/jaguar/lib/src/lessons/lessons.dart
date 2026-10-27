@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../challenges/challenges.dart';
+export 'ruta.dart';
 
 /// The flowchart shapes a figure question asks about.
 enum Figure {
@@ -95,48 +95,6 @@ class Lesson {
   final String summary;
   final IconData icon;
   final List<Question> questions;
-}
-
-/// A step of the path: a lesson to play or a challenge to solve.
-sealed class RouteStep {
-  const RouteStep();
-
-  String get id;
-  String get title;
-}
-
-class LessonStep extends RouteStep {
-  const LessonStep(this.lesson);
-
-  final Lesson lesson;
-
-  @override
-  String get id => lesson.id;
-  @override
-  String get title => lesson.title;
-}
-
-class ChallengeStep extends RouteStep {
-  const ChallengeStep(this.challenge);
-
-  final Challenge challenge;
-
-  @override
-  String get id => challenge.id;
-  @override
-  String get title => challenge.exercise.title.replaceFirst(RegExp(r'^Reto \d+ · '), '');
-}
-
-/// A group of the path, like a unit: a few lessons and the challenges they
-/// prepare.
-class RouteGroup {
-  const RouteGroup(this.title, this.description, this.steps);
-
-  final String title;
-
-  /// One line saying what the group is for.
-  final String description;
-  final List<RouteStep> steps;
 }
 
 const lessonFirstProgram = Lesson(
@@ -469,52 +427,6 @@ const allLessons = [
 Lesson? lessonById(String id) {
   for (final lesson in allLessons) {
     if (lesson.id == id) return lesson;
-  }
-  return null;
-}
-
-Challenge _reto(int n) => challenges[n - 1];
-
-/// The path of level 1: lessons that prepare each challenge, in order.
-final routeGroups = <RouteGroup>[
-  RouteGroup('Primeros pasos', 'Escribe y ejecuta tu primer programa.', [
-    const LessonStep(lessonFirstProgram),
-    ChallengeStep(_reto(1)),
-  ]),
-  RouteGroup('Operaciones', 'Haz cuentas con lo que escribe la persona.', [
-    const LessonStep(lessonOperations),
-    ChallengeStep(_reto(2)),
-    ChallengeStep(_reto(3)),
-    ChallengeStep(_reto(4)),
-  ]),
-  RouteGroup('Diagramas y decisiones', 'Dibuja el flujo y haz que el programa elija.', [
-    const LessonStep(lessonFlowcharts),
-    const LessonStep(lessonDecisions),
-    ChallengeStep(_reto(5)),
-    ChallengeStep(_reto(6)),
-    ChallengeStep(_reto(7)),
-  ]),
-  RouteGroup('Repetir y comprobar', 'Repite pasos y revisa tu programa a mano.', [
-    const LessonStep(lessonDeskCheck),
-    const LessonStep(lessonLoops),
-    ChallengeStep(_reto(8)),
-    ChallengeStep(_reto(9)),
-    ChallengeStep(_reto(10)),
-  ]),
-];
-
-/// Every step of the path, in order.
-List<RouteStep> get routeSteps => [for (final group in routeGroups) ...group.steps];
-
-bool isStepDone(RouteStep step, {required Set<String> lessons, required Set<String> challenges}) =>
-    step is LessonStep ? lessons.contains(step.id) : challenges.contains(step.id);
-
-/// The first step not done yet; null when the whole path is done.
-RouteStep? nextStep({required Set<String> lessons, required Set<String> challenges}) {
-  for (final step in routeSteps) {
-    if (!isStepDone(step, lessons: lessons, challenges: challenges)) {
-      return step;
-    }
   }
   return null;
 }

@@ -1060,46 +1060,294 @@ class _HeroState extends State<_Hero> with SingleTickerProviderStateMixin {
 
 TextStyle? monoLabel(ThemeData theme) => theme.textTheme.bodyMedium?.copyWith(fontFamily: 'JetBrainsMono');
 
-class _RouteRoom extends StatelessWidget {
+class _RouteRoom extends StatefulWidget {
   const _RouteRoom({required this.settings, required this.actions});
 
   final ViewSettings settings;
   final RoomActions actions;
 
   @override
+  State<_RouteRoom> createState() => _RouteRoomState();
+}
+
+class _RouteRoomState extends State<_RouteRoom> {
+  final _scroll = ScrollController();
+  final _away = ValueNotifier<bool>(false);
+
+  // Heights of the pieces of the road, to know where each one starts without
+  // building them all (the road can have many units).
+  static const _phraseHeight = 64.0;
+  static const _tabsHeight = 56.0;
+  static const _levelHeaderHeight = 176.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _scroll.addListener(_updateAway);
+    // On entering, the road opens where the person is.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_scroll.hasClients) return;
+      final target = _targetOffset();
+      if (target > 0) _scroll.jumpTo(target);
+    });
+  }
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    _away.dispose();
+    super.dispose();
+  }
+
+  bool get _manyLevels => routeLevels.length > 1;
+
+  RouteStep? get _next => nextStep(lessons: widget.settings.doneLessons, challenges: widget.settings.doneChallenges);
+
+  /// Where the level number [level] starts.
+  double _levelOffset(int level) {
+    var offset = _phraseHeight + (_manyLevels ? _tabsHeight : 0);
+    for (var i = 0; i < level; i++) {
+      offset += _levelHeaderHeight + routeLevels[i].groups.fold<double>(0, (sum, g) => sum + _PathGroup.heightFor(g));
+    }
+    return offset;
+  }
+
+  /// The scroll offset that shows the next step a third of the way down.
+  double _targetOffset() {
+    final next = _next;
+    if (next == null) return 0;
+    var level = 0;
+    var offset = 0.0;
+    for (final (l, lv) in routeLevels.indexed) {
+      var inLevel = _levelOffset(l) + _levelHeaderHeight;
+      for (final group in lv.groups) {
+        final i = group.steps.indexWhere((s) => s.id == next.id);
+        if (i >= 0) {
+          level = l;
+          offset = inLevel + _PathGroup.bannerHeight + i * _PathGroup.rowHeight;
+          break;
+        }
+        inLevel += _PathGroup.heightFor(group);
+      }
+      if (offset > 0) break;
+    }
+    if (level == 0 && offset == 0) return 0;
+    final viewport = _scroll.hasClients ? _scroll.position.viewportDimension : 600.0;
+    return math.max(0, offset - viewport * 0.3);
+  }
+
+  void _updateAway() {
+    if (!_scroll.hasClients) return;
+    final far = (_scroll.offset - _targetOffset()).abs() > _scroll.position.viewportDimension * 0.9;
+    if (far != _away.value) _away.value = far;
+  }
+
+  void _goTo(double offset) {
+    if (!_scroll.hasClients) return;
+    final max = _scroll.position.maxScrollExtent;
+    final to = math.max(0.0, math.min(offset, math.max(max, offset)));
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _scroll.jumpTo(to);
+    } else {
+      _scroll.animateTo(to, duration: const Duration(milliseconds: 500), curve: Curves.easeOutCubic);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final next = nextStep(lessons: settings.doneLessons, challenges: settings.doneChallenges);
+    final settings = widget.settings;
+    final next = _next;
     final banners = [scheme.primaryContainer, scheme.tertiaryContainer, scheme.secondaryContainer];
-    return _Page(
+    final levelColors = [PlaceColors.route(context), PlaceColors.workshop(context), PlaceColors.classes(context)];
+    return Stack(
       children: [
-        const _Phrase('Tu camino, de arriba hacia abajo. Toca un paso para entrar; puedes saltar a cualquiera.'),
-        for (final (g, group) in routeGroups.indexed)
-          Appear(
-            index: g,
-            child: _PathGroup(
-              group: group,
-              banner: banners[g % banners.length],
-              doneLessons: settings.doneLessons,
-              doneChallenges: settings.doneChallenges,
-              nextId: next?.id,
-              onOpen: actions.onOpenStep,
+        Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 640),
+            child: ListView(
+              controller: _scroll,
+              padding: EdgeInsets.fromLTRB(16, _isWide(context) ? 12 : 0, 16, 96),
+              children: [
+                SizedBox(
+                  height: _phraseHeight,
+                  child: MediaQuery.withClampedTextScaling(
+                    maxScaleFactor: 1.15,
+                    child: const _Phrase(
+                      'Tu camino, de arriba hacia abajo. Toca un paso para entrar; puedes saltar a cualquiera.',
+                    ),
+                  ),
+                ),
+                if (_manyLevels)
+                  SizedBox(
+                    height: _tabsHeight,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        for (final (l, level) in routeLevels.indexed)
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8, bottom: 8),
+                            child: ActionChip(
+                              label: Text('Nivel ${l + 1} · ${level.title}'),
+                              onPressed: () => _goTo(_levelOffset(l)),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                for (final (l, level) in routeLevels.indexed) ...[
+                  SizedBox(
+                    height: _levelHeaderHeight,
+                    child: _LevelHeader(
+                      number: l + 1,
+                      level: level,
+                      colors: levelColors[l % levelColors.length],
+                      done: level.steps
+                          .where(
+                            (st) => isStepDone(st, lessons: settings.doneLessons, challenges: settings.doneChallenges),
+                          )
+                          .length,
+                    ),
+                  ),
+                  for (final (g, group) in level.groups.indexed)
+                    Appear(
+                      index: g,
+                      child: SizedBox(
+                        height: _PathGroup.heightFor(group),
+                        child: _PathGroup(
+                          group: group,
+                          banner: banners[g % banners.length],
+                          doneLessons: settings.doneLessons,
+                          doneChallenges: settings.doneChallenges,
+                          nextId: next?.id,
+                          onOpen: widget.actions.onOpenStep,
+                        ),
+                      ),
+                    ),
+                ],
+                Text(
+                  'Nada está bloqueado: puedes saltar a cualquier lección o reto. Cada reto trae pruebas y pistas.',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                ),
+              ],
             ),
           ),
-        const SizedBox(height: 4),
-        Text(
-          'Nada está bloqueado: puedes saltar a cualquier lección o reto. Cada reto trae pruebas y pistas.',
-          textAlign: TextAlign.center,
-          style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
         ),
+        if (next != null)
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 16,
+            child: Center(
+              child: ValueListenableBuilder<bool>(
+                valueListenable: _away,
+                builder: (context, away, _) => AnimatedSlide(
+                  duration: motion(context, const Duration(milliseconds: 220)),
+                  offset: away ? Offset.zero : const Offset(0, 2),
+                  child: AnimatedOpacity(
+                    duration: motion(context, const Duration(milliseconds: 220)),
+                    opacity: away ? 1 : 0,
+                    child: IgnorePointer(
+                      ignoring: !away,
+                      child: FilledButton.icon(
+                        onPressed: () => _goTo(_targetOffset()),
+                        icon: const Icon(Icons.my_location_rounded),
+                        label: const Text('Ir a mi paso'),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
       ],
     );
   }
 }
 
+/// The big banner of a level: its number, its name, what it is about and how
+/// far along the person is.
+class _LevelHeader extends StatelessWidget {
+  const _LevelHeader({required this.number, required this.level, required this.colors, required this.done});
+
+  final int number;
+  final RouteLevel level;
+  final PlaceColors colors;
+  final int done;
+
+  @override
+  Widget build(BuildContext context) {
+    final total = level.steps.length;
+    return MediaQuery.withClampedTextScaling(
+      maxScaleFactor: 1.15,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 8, bottom: 12),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: colors.face,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [BoxShadow(color: colors.edge, offset: const Offset(0, 4))],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(18, 14, 18, 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'NIVEL $number',
+                  style: TextStyle(color: colors.soft, fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 1),
+                ),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    level.title,
+                    style: TextStyle(color: colors.ink, fontSize: 26, fontWeight: FontWeight.w900, height: 1.1),
+                  ),
+                ),
+                Text(
+                  level.description,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: colors.soft, fontSize: 14, fontWeight: FontWeight.w600),
+                ),
+                const Spacer(),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(6),
+                        child: LinearProgressIndicator(
+                          value: total == 0 ? 0 : done / total,
+                          minHeight: 10,
+                          color: colors.ink,
+                          backgroundColor: colors.ink.withValues(alpha: 0.2),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      '$done de $total',
+                      style: TextStyle(color: colors.ink, fontWeight: FontWeight.w800),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// A unit of the path: a banner that says what it is for and, under it, the
-/// steps as round nodes along a winding road, as in a board game.
+/// steps as round nodes along a winding road, as in a board game. The last
+/// node is a cup that lights up when the unit is done.
 class _PathGroup extends StatelessWidget {
   const _PathGroup({
     required this.group,
@@ -1117,9 +1365,13 @@ class _PathGroup extends StatelessWidget {
   final String? nextId;
   final ValueChanged<RouteStep> onOpen;
 
-  static const _rowHeight = 136.0;
+  static const rowHeight = 136.0;
+  static const bannerHeight = 112.0;
   static const _nodeTop = 34.0;
   static const _nodeSize = 68.0;
+
+  /// The room a unit takes: its banner, one row per step and one for the cup.
+  static double heightFor(RouteGroup group) => bannerHeight + (group.steps.length + 1) * rowHeight + 20;
 
   @override
   Widget build(BuildContext context) {
@@ -1133,55 +1385,64 @@ class _PathGroup extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 20),
       child: Column(
         children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-            decoration: BoxDecoration(
-              color: complete ? _pathGreen(context) : banner,
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        group.title,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: complete ? Colors.white : scheme.onSurface,
+          MediaQuery.withClampedTextScaling(
+            maxScaleFactor: 1.15,
+            child: Container(
+              width: double.infinity,
+              height: bannerHeight - 8,
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+              decoration: BoxDecoration(
+                color: complete ? _pathGreen(context) : banner,
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          group.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w800,
+                            color: complete ? Colors.white : scheme.onSurface,
+                          ),
                         ),
-                      ),
-                      Text(
-                        group.description,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: complete ? Colors.white : scheme.onSurfaceVariant,
+                        Text(
+                          group.description,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: complete ? Colors.white : scheme.onSurfaceVariant,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  '$count de ${steps.length}',
-                  style: theme.textTheme.labelLarge?.copyWith(color: complete ? Colors.white : scheme.onSurface),
-                ),
-              ],
+                  const SizedBox(width: 12),
+                  Text(
+                    '$count de ${steps.length}',
+                    style: theme.textTheme.labelLarge?.copyWith(color: complete ? Colors.white : scheme.onSurface),
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 8),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final width = constraints.maxWidth;
-              final amplitude = math.min(width * 0.26, 96.0);
-              final centers = [
-                for (var i = 0; i < steps.length; i++)
-                  Offset(width / 2 + amplitude * math.sin(i * 1.25), i * _rowHeight + _nodeTop + _nodeSize / 2),
-              ];
-              return SizedBox(
-                height: steps.length * _rowHeight,
-                child: Stack(
+          Expanded(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final width = constraints.maxWidth;
+                final amplitude = math.min(width * 0.26, 96.0);
+                final nodes = steps.length + 1;
+                final centers = [
+                  for (var i = 0; i < nodes; i++)
+                    Offset(width / 2 + amplitude * math.sin(i * 1.25), i * rowHeight + _nodeTop + _nodeSize / 2),
+                ];
+                return Stack(
                   children: [
                     Positioned.fill(
                       child: CustomPaint(
@@ -1196,9 +1457,9 @@ class _PathGroup extends StatelessWidget {
                     for (final (i, step) in steps.indexed)
                       Positioned(
                         left: centers[i].dx - 80,
-                        top: i * _rowHeight,
+                        top: i * rowHeight,
                         width: 160,
-                        height: _rowHeight,
+                        height: rowHeight,
                         child: _PathNode(
                           key: ValueKey('paso-${step.id}'),
                           step: step,
@@ -1209,12 +1470,88 @@ class _PathGroup extends StatelessWidget {
                           onTap: () => onOpen(step),
                         ),
                       ),
+                    Positioned(
+                      left: centers.last.dx - 80,
+                      top: steps.length * rowHeight,
+                      width: 160,
+                      height: rowHeight,
+                      child: _CupNode(complete: complete, size: _nodeSize, top: _nodeTop, steps: steps.length),
+                    ),
                   ],
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// The cup at the end of a unit: grey until its steps are done, gold after.
+class _CupNode extends StatelessWidget {
+  const _CupNode({required this.complete, required this.size, required this.top, required this.steps});
+
+  final bool complete;
+  final double size;
+  final double top;
+  final int steps;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final gold = PlaceColors.route(context);
+    return Semantics(
+      button: true,
+      label: complete ? 'Unidad completa' : 'Copa de la unidad: termina sus $steps pasos',
+      excludeSemantics: true,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: complete
+            ? null
+            : () => ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(SnackBar(content: Text('Termina los $steps pasos de esta unidad para ganar la copa.'))),
+        child: Stack(
+          alignment: Alignment.topCenter,
+          children: [
+            Positioned(
+              top: top,
+              child: Container(
+                width: size,
+                height: size,
+                decoration: BoxDecoration(
+                  color: complete ? gold.face : scheme.surfaceContainerHigh,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(color: complete ? gold.edge : scheme.outlineVariant, offset: const Offset(0, 5)),
+                  ],
+                ),
+                child: Icon(Icons.emoji_events_rounded, size: 34, color: complete ? gold.ink : scheme.outline),
+              ),
+            ),
+            Positioned(
+              top: top + size + 10,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(color: scheme.surface, borderRadius: BorderRadius.circular(8)),
+                  child: Text(
+                    complete ? 'Unidad completa' : 'Copa de la unidad',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: complete ? FontWeight.w800 : FontWeight.w600,
+                      color: complete ? null : scheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
