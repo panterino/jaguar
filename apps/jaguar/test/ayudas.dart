@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Va a una sala (Inicio, Ruta, Clases o Taller) como lo haría una persona:

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jaguar/src/blocks/blocks_view.dart';
-import 'package:jaguar/src/challenges/challenges.dart';
 import 'package:jaguar/src/diagram/diagram_editing.dart';
 import 'package:jaguar/src/editor/syntax_controller.dart';
 import 'package:jaguar/src/programs/examples.dart';
