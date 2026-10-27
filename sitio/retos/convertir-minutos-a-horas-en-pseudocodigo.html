@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Convertir minutos a horas y minutos en pseudocódigo</title>
+<meta name="description" content="Algoritmo que convierte minutos a horas y minutos con división entera y residuo (MOD): planteamiento, diagrama de flujo, pseudocódigo y Python.">
+<link rel="canonical" href="https://jaguarcode.org/retos/convertir-minutos-a-horas-en-pseudocodigo">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="apple-touch-icon" href="/icono.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Jaguar Code">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://jaguarcode.org/retos/convertir-minutos-a-horas-en-pseudocodigo">
+<meta property="og:title" content="Convertir minutos a horas y minutos en pseudocódigo">
+<meta property="og:description" content="Algoritmo que convierte minutos a horas y minutos con división entera y residuo (MOD): planteamiento, diagrama de flujo, pseudocódigo y Python.">
+<meta property="og:image" content="https://jaguarcode.org/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Convertir minutos a horas y minutos en pseudocódigo">
+<meta name="twitter:description" content="Algoritmo que convierte minutos a horas y minutos con división entera y residuo (MOD): planteamiento, diagrama de flujo, pseudocódigo y Python.">
+<meta name="twitter:image" content="https://jaguarcode.org/compartir.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": ["Article", "LearningResource"],
+      "@id": "https://jaguarcode.org/retos/convertir-minutos-a-horas-en-pseudocodigo#articulo",
+      "headline": "Convertir minutos a horas y minutos en pseudocódigo",
+      "description": "Algoritmo que convierte minutos a horas y minutos con división entera y residuo (MOD): planteamiento, diagrama de flujo, pseudocódigo y Python.",
+      "inLanguage": "es-MX",
+      "datePublished": "2026-10-27",
+      "dateModified": "2026-10-27",
+      "mainEntityOfPage": "https://jaguarcode.org/retos/convertir-minutos-a-horas-en-pseudocodigo",
+      "image": "https://jaguarcode.org/compartir.png",
+      "learningResourceType": "ejercicio",
+      "educationalLevel": "Bachillerato",
+      "teaches": "División entera y residuo",
+      "author": { "@type": "Organization", "name": "Panterino", "url": "https://jaguarcode.org/" },
+      "publisher": { "@type": "Organization", "name": "Panterino", "logo": { "@type": "ImageObject", "url": "https://jaguarcode.org/icono.png" } }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "https://jaguarcode.org/" },
+        { "@type": "ListItem", "position": 2, "name": "Retos", "item": "https://jaguarcode.org/retos" },
+        { "@type": "ListItem", "position": 3, "name": "Algoritmo para convertir minutos a horas y minutos", "item": "https://jaguarcode.org/retos/convertir-minutos-a-horas-en-pseudocodigo" }
+      ]
+    },
+    { "@type": "FAQPage", "mainEntity": [{"@type":"Question","name":"¿Qué hace MOD en pseudocódigo?","acceptedAnswer":{"@type":"Answer","text":"Da el residuo de una división. Por ejemplo, 125 MOD 60 es 5, porque 125 entre 60 es 2 y sobran 5."}},{"@type":"Question","name":"¿Cómo obtengo solo la parte entera de una división?","acceptedAnswer":{"@type":"Answer","text":"Con la función Trunc, que corta los decimales: Trunc(125 / 60) es 2."}}] }
+  ]
+}
+</script>
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/estilos.css">
+</head>
+<body>
+<header class="sitio-barra">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="/logo.svg" alt="" width="46" height="40">
+      <a class="nombre" href="/">Jaguar Code</a>
+      <a href="/guias">Guías</a>
+      <a href="/retos">Retos</a>
+      <a href="/profes">Para profes</a>
+      <a href="https://github.com/panterino/jaguar">GitHub</a>
+    </div>
+  </div>
+</header>
+<main class="guia">
+  <div class="ancho angosto">
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › <a href="/retos">Retos</a> › Minutos a horas</nav>
+    <h1>Algoritmo para convertir minutos a horas y minutos</h1>
+    <p class="resumen">La división entera y el residuo, dos operaciones que aparecen una y otra vez: horas completas y lo que sobra.</p>
+    <nav class="contenido" aria-label="Contenido de la página"><b>En esta página</b>
+      <ol>
+        <li><a href="#planteamiento">El problema y su planteamiento</a></li>
+        <li><a href="#diagrama">Diagrama de flujo</a></li>
+        <li><a href="#pseudocodigo">Pseudocódigo</a></li>
+        <li><a href="#como-pensarlo">Cómo pensarlo</a></li>
+        <li><a href="#errores">Errores comunes</a></li>
+        <li><a href="#python">El mismo programa en Python</a></li>
+        <li><a href="#preguntas">Preguntas frecuentes</a></li>
+      </ol>
+    </nav>
+    <article>
+      <section id="planteamiento">
+        <h2>El problema y su planteamiento</h2>
+        <p>Lee una cantidad de minutos y muéstrala en horas y minutos.</p>
+        <p>Con 125, muestra:<br>2 horas y 5 minutos</p>
+        <div class="tabla"><table><caption>Planteamiento: entrada, proceso y salida</caption><thead><tr><th scope="col">Entrada</th><th scope="col">Proceso</th><th scope="col">Salida</th></tr></thead><tbody><tr><td>Una cantidad de minutos (un número entero).</td><td>Dividir entre 60 para obtener las horas completas y sacar el residuo para los minutos que sobran.</td><td>El texto con las horas y los minutos, por ejemplo 2 horas y 5 minutos.</td></tr></tbody></table></div>
+      </section>
+      <section id="diagrama">
+        <h2>Diagrama de flujo</h2>
+        <p>Así se dibuja el algoritmo: el óvalo marca el inicio y el fin, el paralelogramo es una entrada o una salida, el rectángulo es un proceso y el rombo es una decisión.</p>
+        <figure class="diagrama" style="margin:0">
+          <svg viewBox="0 0 441.6 412" width="441.6" role="img" aria-labelledby="diag-tit"><title id="diag-tit">Diagrama de flujo del algoritmo minutos a horas</title><g class="linea" stroke-width="1.5" fill="none" stroke-linejoin="round"><path d="M220.8 56L220.8 84"/><path d="M220.8 124L220.8 152"/><path d="M220.8 192L220.8 220"/><path d="M220.8 260L220.8 288"/><path d="M220.8 328L220.8 356"/></g><path d="M220.8 84L216.8 76L224.8 76z" style="fill:var(--fig-linea);stroke:none"/><path d="M220.8 152L216.8 144L224.8 144z" style="fill:var(--fig-linea);stroke:none"/><path d="M220.8 220L216.8 212L224.8 212z" style="fill:var(--fig-linea);stroke:none"/><path d="M220.8 288L216.8 280L224.8 280z" style="fill:var(--fig-linea);stroke:none"/><path d="M220.8 356L216.8 348L224.8 348z" style="fill:var(--fig-linea);stroke:none"/><rect class="ini fig" x="175.8" y="16" width="90" height="40" rx="20"/><text x="220.8" y="40.5" text-anchor="middle">Inicio</text><path class="io fig" d="M159.2 84 H296.4 L282.4 124 H145.2 z"/><text x="220.8" y="108.5" text-anchor="middle">Leer minutos</text><rect class="proc fig" x="98.4" y="152" width="244.8" height="40" rx="3"/><text x="220.8" y="176.5" text-anchor="middle">horas &lt;- Trunc(minutos / 60)</text><rect class="proc fig" x="117.4" y="220" width="206.8" height="40" rx="3"/><text x="220.8" y="244.5" text-anchor="middle">resto &lt;- minutos MOD 60</text><path class="sal fig" d="M30 288 H425.6 L411.6 328 H16 z"/><text x="220.8" y="312.5" text-anchor="middle">Escribir horas, " horas y ", resto, " minutos"</text><rect class="ini fig" x="175.8" y="356" width="90" height="40" rx="20"/><text x="220.8" y="380.5" text-anchor="middle">Fin</text></svg>
+        </figure>
+      </section>
+      <section id="pseudocodigo">
+        <h2>Pseudocódigo</h2>
+        <p>Esta es una solución. Léela línea por línea con el diagrama al lado y compara con lo que tú escribirías.</p>
+        <pre class="codigo" data-entradas="125" data-salida="2 horas y 5 minutos" tabindex="0"><code>Algoritmo minutos_a_horas
+    Leer minutos
+    horas &lt;- Trunc(minutos / 60)
+    resto &lt;- minutos MOD 60
+    Escribir horas, " horas y ", resto, " minutos"
+FinAlgoritmo</code></pre>
+        <div class="tabla"><table><caption>Pruebas del reto</caption><thead><tr><th scope="col">Entrada</th><th scope="col">Salida esperada</th></tr></thead><tbody><tr><td>125</td><td>2 horas y 5 minutos</td></tr><tr><td>185</td><td>3 horas y 5 minutos</td></tr></tbody></table></div><p class="nota-tabla">Con estas entradas, el programa debe mostrar exactamente esa salida.</p>
+      </section>
+      <section id="como-pensarlo">
+        <h2>Cómo pensarlo</h2>
+        <p>En 125 minutos caben 2 horas completas (120 minutos) y sobran 5. Las horas son la parte entera de 125 entre 60, y los minutos que sobran son el residuo de esa división.</p>
+        <p>En pseudocódigo la parte entera se obtiene con Trunc(minutos / 60), y el residuo con el operador MOD: minutos MOD 60. MOD significa módulo: lo que queda al dividir.</p>
+        <p>Con menos de 60 minutos, por ejemplo 59, las horas dan 0 y el residuo son los mismos 59 minutos. El programa funciona sin tratar ese caso aparte.</p>
+      </section>
+      <section id="errores">
+        <h2>Errores comunes</h2>
+        <ul>
+          <li>Dividir con / y mostrar el resultado completo: 125 / 60 da 2.0833, no 2 horas y 5 minutos.</li>
+          <li>Calcular los minutos como minutos - horas: hay que restar horas por 60, o usar MOD.</li>
+          <li>Olvidar Trunc: sin él, las horas saldrían con decimales.</li>
+        </ul>
+      </section>
+      <section id="python">
+        <h2>El mismo programa en Python</h2>
+        <p>Si más adelante pasas a Python, así se ve la misma lógica. Cambian las palabras (<code>print</code>, <code>input</code>, <code>if</code>) y los bloques se marcan con sangría en lugar de <code>FinSi</code> o <code>FinPara</code>.</p>
+        <pre class="codigo" tabindex="0"><code># Algoritmo minutos_a_horas
+minutos = int(input())
+horas = int(minutos / 60)
+resto = minutos % 60
+print(horas, " horas y ", resto, " minutos", sep="")</code></pre>
+      </section>
+      <section id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+        <details><summary>¿Qué hace MOD en pseudocódigo?</summary><p>Da el residuo de una división. Por ejemplo, 125 MOD 60 es 5, porque 125 entre 60 es 2 y sobran 5.</p></details>
+        <details><summary>¿Cómo obtengo solo la parte entera de una división?</summary><p>Con la función Trunc, que corta los decimales: Trunc(125 / 60) es 2.</p></details>
+      </section>
+    </article>
+    <aside class="cta-guia" aria-labelledby="cta-t">
+      <h2 id="cta-t">Pruébalo paso a paso en tu celular</h2>
+      <p>En Jaguar Code escribes este algoritmo, lo ejecutas, ves su diagrama y haces la prueba de escritorio. El reto trae pistas y pruebas que te dicen si está bien. Gratis, sin anuncios y sin cuenta.</p>
+      <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir Jaguar Code</a></div>
+    </aside>
+    <h2 style="margin-top:44px">Sigue con otro reto</h2>
+    <div class="relacionadas">
+      <a href="/retos/algoritmo-para-calcular-el-iva">Algoritmo para calcular el precio con IVA<small>Una constante, una expresión con dos operaciones y un resultado: cómo se pasa una fórmula del mundo real a pseudocódigo.</small></a>
+      <a href="/retos/algoritmo-aprobado-o-reprobado">Algoritmo que dice si una calificación aprueba<small>Tu primera decisión: el programa elige entre dos caminos según una condición.</small></a>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="ancho">
+    <span class="quien"><img src="/logo.svg" alt="" width="30" height="26">Un proyecto de Panterino · hecho en México</span>
+    <a href="/guias">Guías</a>
+    <a href="/retos">Retos</a>
+    <a href="/manual">Manual</a>
+    <a href="https://www.facebook.com/jaguareducation">Facebook</a>
+    <a href="https://github.com/panterino/jaguar">Código en GitHub</a>
+  </div>
+</footer>
+<script src="/acceso.js" defer></script>
+</body>
+</html>

@@ -6,7 +6,7 @@
 import 'dart:io';
 
 const sitio = 'https://jaguarcode.org';
-const fecha = '2026-10-26';
+const fecha = '2026-10-27';
 
 class Guia {
   const Guia({
@@ -85,7 +85,7 @@ final guias = <Guia>[
   <li>Esperar tres minutos.</li>
   <li>Retirar la bolsita.</li>
 </ol>
-<p>Si cambias el orden (verter el agua antes de hervirla) el resultado ya no es el mismo. Esa es la primera idea: <b>el orden de los pasos importa</b>.</p>'''
+<p>Si cambias el orden (verter el agua antes de hervirla) el resultado ya no es el mismo. Esa es la primera idea: <b>el orden de los pasos importa</b>.</p>''',
       ),
       (
         'partes',
@@ -97,7 +97,7 @@ ${tabla('Entrada, proceso y salida', ['Parte', 'Qué es', 'En el té', 'En un pr
           ['<b>Proceso</b>', 'Lo que se hace con los datos', 'Hervir, verter, esperar', 'Sumar y dividir entre 2'],
           ['<b>Salida</b>', 'El resultado', 'Una taza de té', 'El promedio'],
         ])}
-<p>Antes de escribir un programa conviene responder estas tres preguntas. En la escuela se le llama <i>planteamiento</i> del problema.</p>'''
+<p>Antes de escribir un programa conviene responder estas tres preguntas. En la escuela se le llama <i>planteamiento</i> del problema.</p>''',
       ),
       (
         'buen-algoritmo',
@@ -108,7 +108,7 @@ ${tabla('Entrada, proceso y salida', ['Parte', 'Qué es', 'En el té', 'En un pr
   <li><b>Ser finito:</b> termina. Un algoritmo que se repite para siempre no resuelve nada.</li>
   <li><b>Estar ordenado:</b> los pasos van en una secuencia clara.</li>
   <li><b>Funcionar para varios datos:</b> el mismo algoritmo del promedio sirve para cualquier par de calificaciones, no solo para 7 y 10.</li>
-</ul>'''
+</ul>''',
       ),
       (
         'en-programa',
@@ -125,7 +125,7 @@ Algoritmo area_rectangulo
     Escribir "Área: ", area
 FinAlgoritmo
 ''', entradas: ['4', '3'], salida: 'Base:\nAltura:\nÁrea: 12')}
-<p>Con base 4 y altura 3 muestra <code>Área: 12</code>. Cambia los datos y el mismo algoritmo da otro resultado.</p>'''
+<p>Con base 4 y altura 3 muestra <code>Área: 12</code>. Cambia los datos y el mismo algoritmo da otro resultado.</p>''',
       ),
       (
         'formas',
@@ -137,7 +137,7 @@ FinAlgoritmo
   <li><b><a href="/guias/como-hacer-un-diagrama-de-flujo">Diagrama de flujo</a>:</b> figuras unidas con flechas.</li>
   <li><b>Código:</b> un lenguaje de programación como Python, C o Java.</li>
 </ul>
-<p>Son formas distintas de contar lo mismo. Para comprobar que un algoritmo funciona, puedes hacer su <a href="/guias/prueba-de-escritorio">prueba de escritorio</a>.</p>'''
+<p>Son formas distintas de contar lo mismo. Para comprobar que un algoritmo funciona, puedes hacer su <a href="/guias/prueba-de-escritorio">prueba de escritorio</a>.</p>''',
       ),
       (
         'errores',
@@ -148,21 +148,21 @@ FinAlgoritmo
   <li><b>Olvidar un caso:</b> dividir entre un número que puede ser cero.</li>
   <li><b>No terminar:</b> una repetición que nunca llega a su condición de salida.</li>
   <li><b>Mezclar el orden:</b> usar un dato antes de leerlo.</li>
-</ul>'''
+</ul>''',
       ),
     ],
     preguntas: [
       (
         '¿Un algoritmo es lo mismo que un programa?',
-        'No. El algoritmo es la idea: los pasos para resolver el problema. El programa es esa idea escrita en un lenguaje que una computadora entiende.'
+        'No. El algoritmo es la idea: los pasos para resolver el problema. El programa es esa idea escrita en un lenguaje que una computadora entiende.',
       ),
       (
         '¿Necesito una computadora para hacer un algoritmo?',
-        'No. Puedes escribirlo en papel, con frases o con un diagrama. La computadora hace falta cuando quieres ejecutarlo y ver el resultado.'
+        'No. Puedes escribirlo en papel, con frases o con un diagrama. La computadora hace falta cuando quieres ejecutarlo y ver el resultado.',
       ),
       (
         '¿Cuántos pasos debe tener un algoritmo?',
-        'Los que hagan falta, pero siempre un número finito. Un buen algoritmo es tan corto como se pueda sin dejar pasos ambiguos.'
+        'Los que hagan falta, pero siempre un número finito. Un buen algoritmo es tan corto como se pueda sin dejar pasos ambiguos.',
       ),
     ],
     relacionadas: ['que-es-el-pseudocodigo', 'como-hacer-un-diagrama-de-flujo'],
@@ -181,7 +181,7 @@ FinAlgoritmo
         'Para qué sirve',
         '''
 <p>Programar directamente obliga a pensar en la solución y en las reglas del lenguaje al mismo tiempo. El pseudocódigo separa las dos cosas: primero decides <i>qué</i> hacer y después lo traduces a Python, C, Java o el lenguaje que uses.</p>
-<p>No hay un pseudocódigo oficial; cada escuela usa pequeñas variaciones. Lo importante es que se lea con claridad y que cada paso sea preciso. En esta guía se usa el estilo que se enseña en las materias de lógica de programación, con palabras en español.</p>'''
+<p>No hay un pseudocódigo oficial; cada escuela usa pequeñas variaciones. Lo importante es que se lea con claridad y que cada paso sea preciso. En esta guía se usa el estilo que se enseña en las materias de lógica de programación, con palabras en español.</p>''',
       ),
       (
         'estructura',
@@ -195,7 +195,7 @@ Algoritmo saludo
     Escribir "Hola, ", nombre
 FinAlgoritmo
 ''', entradas: ['Ana'], salida: '¿Cómo te llamas?\nHola, Ana')}
-<p><code>Escribir</code> muestra algo en pantalla. <code>Leer</code> pide un dato y lo guarda en una <b>variable</b>: una caja con nombre donde se guarda un valor.</p>'''
+<p><code>Escribir</code> muestra algo en pantalla. <code>Leer</code> pide un dato y lo guarda en una <b>variable</b>: una caja con nombre donde se guarda un valor.</p>''',
       ),
       (
         'palabras',
@@ -210,7 +210,7 @@ ${tabla('Instrucciones básicas', ['Palabra', 'Para qué sirve', 'Ejemplo'], [
           ['<code>Para … FinPara</code>', 'Repetir un número conocido de veces', '<code>Para i &lt;- 1 Hasta 10</code>'],
           ['<code>Repetir … Hasta Que</code>', 'Repetir al menos una vez', '<code>Hasta Que clave = "jaguar"</code>'],
           ['<code>Segun … FinSegun</code>', 'Elegir entre varias opciones', '<code>Segun dia Hacer</code>'],
-        ])}'''
+        ])}''',
       ),
       (
         'decisiones',
@@ -226,7 +226,7 @@ Algoritmo aprobado
         Escribir "Reprobado"
     FinSi
 FinAlgoritmo
-''', entradas: ['8'], salida: 'Aprobado')}'''
+''', entradas: ['8'], salida: 'Aprobado')}''',
       ),
       (
         'ciclos',
@@ -251,7 +251,7 @@ Algoritmo suma_hasta_cero
     FinMientras
     Escribir "Total: ", suma
 FinAlgoritmo
-''', entradas: ['3', '4', '0'], salida: 'Total: 7')}'''
+''', entradas: ['3', '4', '0'], salida: 'Total: 7')}''',
       ),
       (
         'tipos',
@@ -264,7 +264,7 @@ Algoritmo precio
     total <- precio * 1.16
     Escribir "Total con IVA: " + total
 FinAlgoritmo
-''', entradas: ['100'], salida: 'Total con IVA: 116')}'''
+''', entradas: ['100'], salida: 'Total con IVA: 116')}''',
       ),
       (
         'a-codigo',
@@ -276,7 +276,7 @@ if calificacion &gt;= 6:
     print("Aprobado")
 else:
     print("Reprobado")</code></pre>
-<p>Cambian las palabras (<code>Si</code> por <code>if</code>, <code>Escribir</code> por <code>print</code>), pero la idea es la misma. Por eso conviene dominar primero la lógica.</p>'''
+<p>Cambian las palabras (<code>Si</code> por <code>if</code>, <code>Escribir</code> por <code>print</code>), pero la idea es la misma. Por eso conviene dominar primero la lógica.</p>''',
       ),
       (
         'errores',
@@ -287,21 +287,21 @@ else:
   <li><b>Usar una variable sin darle valor:</b> hay que leerla o asignarla antes.</li>
   <li><b>Confundir <code>=</code> con <code>&lt;-</code>:</b> la flecha guarda un valor; el igual compara.</li>
   <li><b>Un ciclo que no termina:</b> si dentro del <code>Mientras</code> nada cambia la condición, se repite para siempre.</li>
-</ul>'''
+</ul>''',
       ),
     ],
     preguntas: [
       (
         '¿Existe un pseudocódigo oficial?',
-        'No. No hay un estándar: cada libro y cada escuela usa su estilo. Si lo escribes con claridad y con pasos precisos, cualquiera lo puede seguir.'
+        'No. No hay un estándar: cada libro y cada escuela usa su estilo. Si lo escribes con claridad y con pasos precisos, cualquiera lo puede seguir.',
       ),
       (
         '¿El pseudocódigo se puede ejecutar?',
-        'Escrito en papel, no. Pero con un programa que lo entienda, como Jaguar, lo ejecutas y ves el resultado, y también puedes ver su diagrama de flujo.'
+        'Escrito en papel, no. Pero con un programa que lo entienda, como Jaguar, lo ejecutas y ves el resultado, y también puedes ver su diagrama de flujo.',
       ),
       (
         '¿Es mejor empezar por pseudocódigo o por Python?',
-        'Depende de quién lo enseñe, pero empezar por pseudocódigo permite concentrarte en la lógica sin pelear con la sintaxis. Después el paso a Python, C o Java es más corto.'
+        'Depende de quién lo enseñe, pero empezar por pseudocódigo permite concentrarte en la lógica sin pelear con la sintaxis. Después el paso a Python, C o Java es más corto.',
       ),
     ],
     relacionadas: ['que-es-un-algoritmo', 'prueba-de-escritorio'],
@@ -326,7 +326,7 @@ ${tabla('Figuras del diagrama de flujo', ['Figura', 'Nombre', 'Se usa para'], [
           ['<svg viewBox="0 0 56 30" width="56" height="30" role="img" aria-label="Rombo"><path class="f" d="M28 2l25 13-25 13L3 15z"/></svg>', 'Rombo', 'Decisión: una pregunta con dos salidas, Sí y No'],
           ['<svg viewBox="0 0 56 30" width="56" height="30" role="img" aria-label="Flecha"><path class="l" d="M4 15h42M40 9l8 6-8 6"/></svg>', 'Flecha', 'Indica el orden en que se sigue el diagrama'],
         ])}
-<p>Los libros de cada materia pueden usar variaciones (por ejemplo, otra figura para repetir), pero estas cinco bastan para casi todos los ejercicios de un primer curso.</p>'''
+<p>Los libros de cada materia pueden usar variaciones (por ejemplo, otra figura para repetir), pero estas cinco bastan para casi todos los ejercicios de un primer curso.</p>''',
       ),
       (
         'pasos',
@@ -340,7 +340,7 @@ ${tabla('Figuras del diagrama de flujo', ['Figura', 'Nombre', 'Se usa para'], [
   <li><b>Usa un rombo cuando haya una decisión.</b> Escribe la pregunta dentro y rotula las dos salidas con Sí y No.</li>
   <li><b>Une todo con flechas,</b> de arriba hacia abajo, y junta las ramas cuando terminen.</li>
   <li><b>Cierra con un óvalo de fin</b> y revisa que todo camino llegue a él.</li>
-</ol>'''
+</ol>''',
       ),
       (
         'ejemplo',
@@ -363,7 +363,7 @@ Algoritmo promedio
     FinSi
 FinAlgoritmo
 ''', entradas: ['7', '10'], salida: 'Pasaste con 8.5')}
-<p>Fíjate que cada línea del programa tiene su figura: <code>Leer</code> es el paralelogramo de entrada, la asignación es el rectángulo, el <code>Si</code> es el rombo y cada <code>Escribir</code> es un paralelogramo de salida.</p>'''
+<p>Fíjate que cada línea del programa tiene su figura: <code>Leer</code> es el paralelogramo de entrada, la asignación es el rectángulo, el <code>Si</code> es el rombo y cada <code>Escribir</code> es un paralelogramo de salida.</p>''',
       ),
       (
         'ciclos',
@@ -379,7 +379,7 @@ Algoritmo cuenta
     FinMientras
     Escribir "¡Despegue!"
 FinAlgoritmo
-''', salida: '3\n2\n1\n¡Despegue!')}'''
+''', salida: '3\n2\n1\n¡Despegue!')}''',
       ),
       (
         'reglas',
@@ -391,7 +391,7 @@ FinAlgoritmo
   <li>Cada rombo tiene dos salidas rotuladas.</li>
   <li>Dentro de cada figura, texto corto: <code>Leer a, b</code> y no «aquí el programa le pide al usuario dos números».</li>
   <li>Evita que las flechas se crucen; si pasa, reacomoda las figuras.</li>
-</ul>'''
+</ul>''',
       ),
       (
         'errores',
@@ -402,21 +402,21 @@ FinAlgoritmo
   <li>Una figura sin flecha de salida (el diagrama «se queda colgado»).</li>
   <li>Usar un rectángulo para leer datos en lugar del paralelogramo.</li>
   <li>Olvidar la flecha que regresa en un ciclo, de modo que solo se ejecuta una vez.</li>
-</ul>'''
+</ul>''',
       ),
     ],
     preguntas: [
       (
         '¿Qué programa uso para hacer un diagrama de flujo?',
-        'Puedes dibujarlo a mano o con cualquier programa de dibujo. Con Jaguar lo armas con las figuras y la app escribe el pseudocódigo, o escribes el pseudocódigo y te muestra el diagrama.'
+        'Puedes dibujarlo a mano o con cualquier programa de dibujo. Con Jaguar lo armas con las figuras y la app escribe el pseudocódigo, o escribes el pseudocódigo y te muestra el diagrama.',
       ),
       (
         '¿Cuál es la diferencia entre un diagrama de flujo y el pseudocódigo?',
-        'Dicen lo mismo con otra forma. El diagrama es visual y deja ver las decisiones y los ciclos de un vistazo; el pseudocódigo es texto y se acerca más a un programa real.'
+        'Dicen lo mismo con otra forma. El diagrama es visual y deja ver las decisiones y los ciclos de un vistazo; el pseudocódigo es texto y se acerca más a un programa real.',
       ),
       (
         '¿Todos los diagramas llevan las mismas figuras?',
-        'Las más importantes son las mismas en casi todos lados: óvalo, paralelogramo, rectángulo, rombo y flechas. Algunas materias agregan figuras para ciclos o conectores; sigue las de tu profesor.'
+        'Las más importantes son las mismas en casi todos lados: óvalo, paralelogramo, rectángulo, rombo y flechas. Algunas materias agregan figuras para ciclos o conectores; sigue las de tu profesor.',
       ),
     ],
     relacionadas: ['que-es-el-pseudocodigo', 'prueba-de-escritorio'],
@@ -435,7 +435,7 @@ FinAlgoritmo
         'Para qué sirve',
         '''
 <p>Cuando un programa no da el resultado esperado, a veces no se ve por qué. La prueba de escritorio te obliga a hacer lo que hace la computadora: una instrucción a la vez, sin saltarte nada. Así descubres dónde un valor deja de ser el que pensabas.</p>
-<p>También es una forma de comprobar tu algoritmo <i>antes</i> de escribirlo en un lenguaje, y es un ejercicio frecuente en las materias de lógica de programación.</p>'''
+<p>También es una forma de comprobar tu algoritmo <i>antes</i> de escribirlo en un lenguaje, y es un ejercicio frecuente en las materias de lógica de programación.</p>''',
       ),
       (
         'como',
@@ -447,7 +447,7 @@ FinAlgoritmo
   <li><b>Ejecuta línea por línea,</b> de arriba hacia abajo, sin adelantarte.</li>
   <li><b>Anota cada cambio.</b> Cada vez que una variable cambia de valor, agrega una fila.</li>
   <li><b>Compara</b> la salida de la tabla con lo que esperabas.</li>
-</ol>'''
+</ol>''',
       ),
       (
         'ejemplo-ciclo',
@@ -472,7 +472,7 @@ ${tabla('Prueba de escritorio de suma', ['Paso', 'i', 'suma', 'Salida'], [
           ['Cuarta vuelta', '4', '10', ''],
           ['<code>Escribir suma</code>', '—', '10', '<b>10</b>'],
         ])}
-<p>La tabla confirma que el resultado es 10, y de paso muestra cómo va creciendo <code>suma</code>.</p>'''
+<p>La tabla confirma que el resultado es 10, y de paso muestra cómo va creciendo <code>suma</code>.</p>''',
       ),
       (
         'ejemplo-si',
@@ -493,7 +493,7 @@ ${tabla('Con n = 7 y con n = 10', ['n', 'n MOD 2', '¿Es 0?', 'Salida'], [
           ['7', '1', 'No', '<b>Impar</b>'],
           ['10', '0', 'Sí', '<b>Par</b>'],
         ])}
-<p>Aquí la tabla tiene una columna para la condición. Con dos datos distintos viste las dos ramas del <code>Si</code>.</p>'''
+<p>Aquí la tabla tiene una columna para la condición. Con dos datos distintos viste las dos ramas del <code>Si</code>.</p>''',
       ),
       (
         'datos',
@@ -505,7 +505,7 @@ ${tabla('Con n = 7 y con n = 10', ['n', 'n MOD 2', '¿Es 0?', 'Salida'], [
   <li>El <b>cero</b> y, si aplica, los negativos.</li>
   <li>En un ciclo, que se repita <b>cero veces</b> y <b>una vez</b>.</li>
 </ul>
-<p>Muchos errores aparecen justo en los límites: en un <code>&gt;</code> que debía ser <code>&gt;=</code>.</p>'''
+<p>Muchos errores aparecen justo en los límites: en un <code>&gt;</code> que debía ser <code>&gt;=</code>.</p>''',
       ),
       (
         'errores',
@@ -516,30 +516,186 @@ ${tabla('Con n = 7 y con n = 10', ['n', 'n MOD 2', '¿Es 0?', 'Salida'], [
   <li>Olvidar una variable en la tabla.</li>
   <li>Probar solo un dato, que por casualidad sale bien.</li>
   <li>No volver a revisar el algoritmo cuando la tabla no da lo esperado: el error está en la lógica, no en la tabla.</li>
-</ul>'''
+</ul>''',
       ),
       (
         'jaguar',
         'La prueba de escritorio con Jaguar',
         '''
-<p>En Jaguar puedes hacerla de dos formas: dejar que la app arme la tabla sola con los datos que le des, paso a paso, o llenarla tú y que la app te marque qué acertaste. Así practicas la técnica y verificas con la computadora.</p>'''
+<p>En Jaguar puedes hacerla de dos formas: dejar que la app arme la tabla sola con los datos que le des, paso a paso, o llenarla tú y que la app te marque qué acertaste. Así practicas la técnica y verificas con la computadora.</p>''',
       ),
     ],
     preguntas: [
       (
         '¿Por qué se llama prueba de escritorio?',
-        'Porque se hace «en el escritorio», con lápiz y papel, sin necesidad de una computadora: tú haces el papel de la máquina que ejecuta el programa.'
+        'Porque se hace «en el escritorio», con lápiz y papel, sin necesidad de una computadora: tú haces el papel de la máquina que ejecuta el programa.',
       ),
       (
         '¿La prueba de escritorio sirve con diagramas de flujo?',
-        'Sí. Sigues las flechas del diagrama en lugar de las líneas del programa y anotas lo mismo: el valor de cada variable en cada paso.'
+        'Sí. Sigues las flechas del diagrama en lugar de las líneas del programa y anotas lo mismo: el valor de cada variable en cada paso.',
       ),
       (
         '¿Cuántos datos de prueba debo usar?',
-        'Los que cubran todos los caminos del programa: al menos un dato por cada rama de cada decisión, y casos límite como el cero.'
+        'Los que cubran todos los caminos del programa: al menos un dato por cada rama de cada decisión, y casos límite como el cero.',
       ),
     ],
     relacionadas: ['que-es-un-algoritmo', 'que-es-el-pseudocodigo'],
+  ),
+  Guia(
+    slug: 'pseint-en-el-celular',
+    titulo: 'PSeInt en el celular: cómo programar pseudocódigo en Android',
+    h1: 'PSeInt en el celular: cómo programar pseudocódigo en Android',
+    descripcion:
+        'PSeInt se instala en computadora. Si solo tienes celular, esto es lo que debe tener una app de pseudocódigo en Android y cómo usar Jaguar Code, gratis y sin cuenta.',
+    resumen:
+        'PSeInt es un programa de escritorio para Windows, macOS y Linux. Si tu práctica la haces desde el celular, necesitas una app que corra pseudocódigo en Android o en el navegador, y que abra tus archivos .psc.',
+    secciones: [
+      (
+        'que-es',
+        'Qué es PSeInt y dónde se instala',
+        '''
+<p>PSeInt es un programa gratuito y de código abierto para aprender a programar con pseudocódigo en español. Se descarga de su <a href="https://pseint.sourceforge.net/" rel="noopener">sitio oficial</a> y se instala en computadoras con Windows, macOS o Linux. Muchas escuelas lo usan en la materia de lógica de programación.</p>
+<p>Su archivo de trabajo es el <code>.psc</code>: un texto con el algoritmo. Ese formato es el que otras herramientas pueden abrir y guardar.</p>''',
+      ),
+      (
+        'solo-celular',
+        'Si solo tienes celular',
+        '''
+<p>Para muchos estudiantes el celular es el único aparato propio: la computadora es de la sala de cómputo o de la familia. Si la tarea es un algoritmo, lo que necesitas es una aplicación que corra pseudocódigo en el celular, ya sea instalada en Android o abierta desde el navegador.</p>
+<p>No toda app de pseudocódigo sirve igual. Antes de elegir una, revisa estos puntos.</p>''',
+      ),
+      (
+        'que-buscar',
+        'Qué buscar en una app de pseudocódigo para celular',
+        '''
+${tabla('Lista para comparar cualquier opción', ['Qué revisar', 'Por qué importa'], [
+          ['Entiende el pseudocódigo en español', 'Que acepte Algoritmo, Leer, Escribir, Si, Mientras, Para y Segun como los pide tu profesor.'],
+          ['Abre y guarda archivos <code>.psc</code>', 'Para pasar tus programas de la computadora al celular y entregarlos.'],
+          ['Funciona sin internet', 'Para practicar en el camión o donde no hay datos.'],
+          ['No pide cuenta ni muestra anuncios', 'Para empezar en un minuto y sin distracciones.'],
+          ['Los errores salen en español', 'Para saber en qué línea y cómo arreglarlo.'],
+          ['Diagrama de flujo y prueba de escritorio', 'Porque en clase casi siempre piden las dos cosas junto con el código.'],
+        ])}''',
+      ),
+      (
+        'jaguar-code',
+        'Jaguar Code como opción para el celular',
+        '''
+<p>Jaguar Code es una app gratuita para aprender lógica de programación que cumple esa lista: escribes pseudocódigo en español, lo ejecutas y ves la consola; abre y guarda archivos <code>.psc</code>; funciona sin internet, no pide cuenta ni muestra anuncios, y es software libre con licencia AGPL. Se instala en Android o se abre en el navegador, y también corre en la computadora.</p>
+<p>Además del código, trae el diagrama de flujo de tu programa, una vista de bloques, la prueba de escritorio hecha sola, doce retos con pistas y lecciones cortas. Los errores salen en español, con la línea y una sugerencia.</p>
+<p>Este es un ejemplo sencillo, como los que se hacen en clase:</p>
+${codigo('''
+Algoritmo promedio
+    Escribir "Primera calificación:"
+    Leer a
+    Escribir "Segunda calificación:"
+    Leer b
+    p <- (a + b) / 2
+    Escribir "Promedio: ", p
+FinAlgoritmo
+''', entradas: ['8', '10'], salida: 'Primera calificación:\nSegunda calificación:\nPromedio: 9')}
+<p>Jaguar Code es un proyecto independiente: no es PSeInt ni está afiliado a él. Lo mencionamos porque el pseudocódigo básico que se enseña con PSeInt es el mismo que Jaguar Code entiende.</p>''',
+      ),
+      (
+        'tus-archivos',
+        'Cómo llevar tus programas al celular',
+        '''
+<ol>
+  <li>En la computadora, guarda tu algoritmo como archivo <code>.psc</code>.</li>
+  <li>Mándatelo por correo, WhatsApp o Google Drive.</li>
+  <li>En el celular, abre Jaguar Code, entra al Taller y elige <b>Abrir archivo (.psc)</b>.</li>
+  <li>Toca Ejecutar y revisa la consola.</li>
+</ol>
+<p>Jaguar Code entiende el pseudocódigo básico (variables, decisiones, ciclos, arreglos y funciones). Si un programa usa algo muy particular de otra herramienta, la app te dice en qué línea no lo entendió. Más detalles en la guía para <a href="/guias/abrir-archivos-psc-en-android">abrir archivos .psc en Android</a>.</p>''',
+      ),
+    ],
+    preguntas: [
+      (
+        '¿En qué dispositivos se instala PSeInt?',
+        'Su sitio oficial ofrece descargas para computadoras con Windows, macOS y Linux. En el celular se usan otras aplicaciones de pseudocódigo.',
+      ),
+      (
+        '¿Puedo abrir en Jaguar Code los archivos .psc que hice en la computadora?',
+        'Sí. Jaguar Code abre y guarda archivos .psc. Entiende el pseudocódigo básico; si algo no lo entiende, te dice la línea.',
+      ),
+      (
+        '¿Jaguar Code es gratis y necesita cuenta?',
+        'Es gratis, no tiene anuncios, no pide cuenta para usarse y es software libre con licencia AGPL.',
+      ),
+      (
+        '¿Funciona sin internet?',
+        'Sí. Escribir, ejecutar, ver el diagrama y hacer la prueba de escritorio funcionan sin conexión. Solo las clases en línea necesitan internet.',
+      ),
+    ],
+    relacionadas: ['abrir-archivos-psc-en-android', 'que-es-el-pseudocodigo'],
+  ),
+  Guia(
+    slug: 'abrir-archivos-psc-en-android',
+    titulo: 'Cómo abrir un archivo .psc en el celular (Android)',
+    h1: 'Cómo abrir un archivo .psc en el celular',
+    descripcion:
+        'Un archivo .psc es un algoritmo en pseudocódigo. Aprende a abrirlo, ejecutarlo y guardarlo desde Android con Jaguar Code, sin cuenta y sin internet.',
+    resumen:
+        'Un archivo .psc es un texto con un algoritmo en pseudocódigo. Para abrirlo en el celular necesitas una app que lo entienda: con Jaguar Code se abre desde el Taller y se ejecuta al momento.',
+    secciones: [
+      (
+        'que-es',
+        'Qué es un archivo .psc',
+        '''
+<p>Un <code>.psc</code> es un archivo de texto que guarda un algoritmo escrito en pseudocódigo, por ejemplo el de un promedio o el de una tabla de multiplicar. Varias herramientas de pseudocódigo en español lo usan, así que sirve para pasar un programa de un aparato a otro. Si lo abres con un editor de texto, lo ves como cualquier texto; para ejecutarlo hace falta una app de pseudocódigo.</p>''',
+      ),
+      (
+        'pasos',
+        'Pasos para abrirlo en Android',
+        '''
+<ol>
+  <li><b>Consigue el archivo en el celular.</b> Descárgalo de tu correo, de WhatsApp o de Google Drive. Si lo tienes en la computadora, mándatelo a ti mismo.</li>
+  <li><b>Abre Jaguar Code.</b> Instálala en Android o ábrela desde el navegador en <code>app.jaguarcode.org</code>.</li>
+  <li><b>Entra al Taller</b> y toca los tres puntos de arriba a la derecha.</li>
+  <li><b>Elige «Abrir archivo (.psc)»</b> y selecciona el archivo.</li>
+  <li><b>Toca Ejecutar.</b> La consola te muestra lo que hace el programa y te pide los datos que haga falta.</li>
+</ol>
+<p>El programa se guarda en tu Taller: puedes cambiarlo y volver a ejecutarlo cuando quieras, aunque no tengas internet.</p>''',
+      ),
+      (
+        'guardar',
+        'Cómo guardar tu programa como .psc',
+        '''
+<p>Para entregar o llevar tu trabajo a otra computadora, en el mismo menú de los tres puntos elige <b>Guardar como archivo (.psc)</b>. Si quieres todos tus programas a la vez, el Taller tiene <b>Guardar todos mis programas</b>, que arma un solo archivo comprimido con un <code>.psc</code> por programa.</p>''',
+      ),
+      (
+        'si-falla',
+        'Si el archivo no abre bien',
+        '''
+<ul>
+  <li><b>Las letras con acento salen raras.</b> Pasa cuando el archivo se guardó con otra codificación de texto. Jaguar Code intenta leerlo bien, pero si falla, vuelve a guardarlo en la herramienta original como texto con acentos.</li>
+  <li><b>Aparece un error en una línea.</b> El programa usa algo que Jaguar Code no entiende. El mensaje dice la línea y una sugerencia; cambia esa instrucción por una equivalente.</li>
+  <li><b>El archivo es muy largo.</b> Funciona, pero conviene revisar primero que ejecute con datos pequeños.</li>
+</ul>
+<p>Prueba con este programa, que puedes copiar a un archivo de texto y guardar como <code>promedio.psc</code>:</p>
+${codigo('''
+Algoritmo suma
+    Leer a, b
+    Escribir "Suma: ", a + b
+FinAlgoritmo
+''', entradas: ['3', '4'], salida: 'Suma: 7')}''',
+      ),
+    ],
+    preguntas: [
+      (
+        '¿Qué app abre archivos .psc en Android?',
+        'Jaguar Code abre y guarda archivos .psc en Android y en el navegador. Es gratis, no pide cuenta y funciona sin internet.',
+      ),
+      (
+        '¿Necesito internet para abrir un .psc?',
+        'No. Una vez que tienes el archivo en el celular, abrirlo, ejecutarlo y guardarlo funciona sin conexión.',
+      ),
+      (
+        '¿Puedo convertir un .psc a otro formato?',
+        'Jaguar Code muestra tu programa como diagrama de flujo, como bloques y, si activas esa vista, traducido a Python. El diagrama se puede guardar como imagen.',
+      ),
+    ],
+    relacionadas: ['pseint-en-el-celular', 'que-es-el-pseudocodigo'],
   ),
 ];
 
@@ -583,6 +739,7 @@ $extra
       <img src="/logo.svg" alt="" width="46" height="40">
       <a class="nombre" href="/">Jaguar Code</a>
       <a href="/guias">Guías</a>
+      <a href="/retos">Retos</a>
       <a href="/profes">Para profes</a>
       <a href="https://github.com/panterino/jaguar">GitHub</a>
     </div>
@@ -595,6 +752,7 @@ const pie = '''
   <div class="ancho">
     <span class="quien"><img src="/logo.svg" alt="" width="30" height="26">Un proyecto de Panterino · hecho en México</span>
     <a href="/guias">Guías</a>
+    <a href="/retos">Retos</a>
     <a href="/manual">Manual</a>
     <a href="https://www.facebook.com/jaguareducation">Facebook</a>
     <a href="https://github.com/panterino/jaguar">Código en GitHub</a>
@@ -635,7 +793,8 @@ String pagina(Guia g) {
   final faq = g.preguntas
       .map((p) => '{"@type":"Question","name":"${json(p.$1)}","acceptedAnswer":{"@type":"Answer","text":"${json(p.$2)}"}}')
       .join(',');
-  final datos = '''
+  final datos =
+      '''
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -680,7 +839,9 @@ String pagina(Guia g) {
   }
   b.writeln('        <li><a href="#preguntas">Preguntas frecuentes</a></li>\n      </ol>\n    </nav>\n    <article>');
   for (final s in g.secciones) {
-    b.writeln('      <section id="${s.$1}">\n        <h2>${esc(s.$2)}</h2>\n${s.$3.replaceAll('@@DIAGRAMA@@', diagramaPromedio)}\n      </section>');
+    b.writeln(
+      '      <section id="${s.$1}">\n        <h2>${esc(s.$2)}</h2>\n${s.$3.replaceAll('@@DIAGRAMA@@', diagramaPromedio)}\n      </section>',
+    );
   }
   b.writeln('      <section id="preguntas">\n        <h2>Preguntas frecuentes</h2>');
   for (final p in g.preguntas) {
@@ -705,7 +866,8 @@ String indice() {
   final lista = guias
       .map((g) => '{"@type":"ListItem","position":${guias.indexOf(g) + 1},"url":"$sitio/guias/${g.slug}","name":"${json(g.h1)}"}')
       .join(',');
-  final datos = '''
+  final datos =
+      '''
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -725,12 +887,14 @@ String indice() {
   <div class="ancho">
     <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › Guías</nav>
     <h1>Guías para aprender a programar desde cero</h1>
-    <p class="resumen">Cuatro guías cortas, con ejemplos que puedes copiar y ejecutar en Jaguar. Empieza por la primera y sigue en orden, o salta a lo que necesites.</p>
+    <p class="resumen">Guías cortas, con ejemplos que puedes copiar y ejecutar en Jaguar. Empieza por la primera y sigue en orden, o salta a lo que necesites.</p>
     <div class="tarjetas">
 ''');
   var i = 0;
   for (final g in guias) {
-    b.writeln('      <article class="tarjeta revela" style="--d:${i++ % 3}"><h2 style="font-size:20px;margin:0 0 8px"><a href="/guias/${g.slug}">${esc(g.h1)}</a></h2><p>${esc(g.resumen)}</p></article>');
+    b.writeln(
+      '      <article class="tarjeta revela" style="--d:${i++ % 3}"><h2 style="font-size:20px;margin:0 0 8px"><a href="/guias/${g.slug}">${esc(g.h1)}</a></h2><p>${esc(g.resumen)}</p></article>',
+    );
   }
   b.writeln('    </div>');
   b.writeln(cta());
