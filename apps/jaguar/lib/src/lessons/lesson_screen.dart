@@ -128,7 +128,7 @@ class _LessonScreenState extends State<LessonScreen> {
 
   /// Where this lesson stands in the path, counting from 1.
   int? get _stepNumber {
-    final i = routeSteps.indexWhere((s) => s.id == widget.lesson.id);
+    final i = mainSteps.indexWhere((s) => s.id == widget.lesson.id);
     return i < 0 ? null : i + 1;
   }
 
@@ -275,7 +275,7 @@ class _Playing extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.only(bottom: 8),
                           child: Text(
-                            'RUTA · PASO $n DE ${routeSteps.length}',
+                            'RUTA · PASO $n DE ${mainSteps.length}',
                             style: theme.textTheme.labelMedium?.copyWith(
                               color: scheme.onSurfaceVariant,
                               fontWeight: FontWeight.w700,

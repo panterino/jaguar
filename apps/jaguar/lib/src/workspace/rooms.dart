@@ -393,12 +393,12 @@ class _HomeRoomState extends State<_HomeRoom> {
 
   @override
   Widget build(BuildContext context) {
-    final steps = routeSteps;
+    final steps = mainSteps;
     final flags = [
       for (final step in steps) isStepDone(step, lessons: settings.doneLessons, challenges: settings.doneChallenges),
     ];
     final solved = flags.where((d) => d).length;
-    final next = nextStep(lessons: settings.doneLessons, challenges: settings.doneChallenges);
+    final next = nextMainStep(lessons: settings.doneLessons, challenges: settings.doneChallenges);
     final task = exercises.received.lastOrNull;
     final programs = store.programs.length;
     final teacher = settings.teacher;
@@ -1190,7 +1190,7 @@ class _RouteRoomState extends State<_RouteRoom> {
                           Padding(
                             padding: const EdgeInsets.only(right: 8, bottom: 8),
                             child: ActionChip(
-                              label: Text('Nivel ${l + 1} · ${level.title}'),
+                              label: Text('Nivel ${level.number} · ${level.title}'),
                               onPressed: () => _goTo(_levelOffset(l)),
                             ),
                           ),
@@ -1201,7 +1201,7 @@ class _RouteRoomState extends State<_RouteRoom> {
                   SizedBox(
                     height: _levelHeaderHeight,
                     child: _LevelHeader(
-                      number: l + 1,
+                      number: level.number,
                       level: level,
                       colors: levelColors[l % levelColors.length],
                       done: level.steps
@@ -1298,7 +1298,7 @@ class _LevelHeader extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'NIVEL $number',
+                  level.optional ? 'NIVEL $number · OPCIONAL' : 'NIVEL $number',
                   style: TextStyle(color: colors.soft, fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 1),
                 ),
                 FittedBox(

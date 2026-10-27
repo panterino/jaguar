@@ -304,8 +304,79 @@ const challenges = <Challenge>[
   ),
 ];
 
+/// Level 0: three small challenges solved with blocks. They are not part of
+/// the twelve of level 1 (nor of their count).
+const blockChallenges = <Challenge>[
+  Challenge(
+    subject: 'Bloques',
+    topic: 'Mostrar y leer datos',
+    level: 0,
+    exercise: Exercise(
+      id: 'reto-0-01',
+      title: 'Bloques 1 · Eco',
+      statement:
+          'Arma con bloques un programa que pida una palabra y la muestre dos veces.\n\n'
+          'Si escriben hola, el programa muestra:\nhola\nhola',
+      cases: [
+        TestCase(inputs: ['hola'], expected: 'hola\nhola'),
+        TestCase(inputs: ['jaguar'], expected: 'jaguar\njaguar'),
+        TestCase(inputs: ['sol'], expected: 'sol\nsol', hidden: true),
+      ],
+    ),
+    hints: [
+      'Cambia a la vista Bloques. Con + agregas un bloque: uno para leer y otro para mostrar.',
+      'Primero un bloque Lectura con la variable palabra; después dos bloques Salida que muestren palabra.',
+      'Leer palabra\nEscribir palabra\nEscribir palabra',
+    ],
+  ),
+  Challenge(
+    subject: 'Bloques',
+    topic: 'Operaciones con datos',
+    level: 0,
+    exercise: Exercise(
+      id: 'reto-0-02',
+      title: 'Bloques 2 · Suma',
+      statement:
+          'Arma con bloques un programa que pida dos números y muestre su suma.\n\n'
+          'Si escriben 2 y 3, el programa muestra:\n5',
+      cases: [
+        TestCase(inputs: ['2', '3'], expected: '5'),
+        TestCase(inputs: ['10', '20'], expected: '30'),
+        TestCase(inputs: ['0', '0'], expected: '0', hidden: true),
+      ],
+    ),
+    hints: [
+      'Un bloque Lectura puede leer dos variables a la vez: sepáralas con coma.',
+      'Lee a y b, y en un bloque Salida muestra a + b.',
+      'Leer a, b\nEscribir a + b',
+    ],
+  ),
+  Challenge(
+    subject: 'Bloques',
+    topic: 'Decisiones',
+    level: 0,
+    exercise: Exercise(
+      id: 'reto-0-03',
+      title: 'Bloques 3 · ¿Mayor de edad?',
+      statement:
+          'Arma con bloques un programa que pida una edad y muestre Mayor si es 18 o más, y Menor si no.\n\n'
+          'Si escriben 20, el programa muestra:\nMayor',
+      cases: [
+        TestCase(inputs: ['20'], expected: 'Mayor'),
+        TestCase(inputs: ['10'], expected: 'Menor'),
+        TestCase(inputs: ['18'], expected: 'Mayor', hidden: true),
+      ],
+    ),
+    hints: [
+      'Agrega un bloque Decisión: lo que va dentro se hace solo si la condición se cumple.',
+      'La condición es edad >= 18. En el Sí va Escribir "Mayor"; en el SiNo, Escribir "Menor".',
+      'Leer edad\nSi edad >= 18 Entonces\n    Escribir "Mayor"\nSiNo\n    Escribir "Menor"\nFinSi',
+    ],
+  ),
+];
+
 Challenge? challengeById(String id) {
-  for (final challenge in challenges) {
+  for (final challenge in [...challenges, ...blockChallenges]) {
     if (challenge.id == id) return challenge;
   }
   return null;

@@ -4,6 +4,7 @@ import 'lessons.dart';
 /// each challenge.
 final nivel1 = RouteLevel(
   id: 'nivel-1',
+  number: 1,
   title: 'Fundamentos',
   description: 'Escribe, calcula, decide y repite: lo básico para programar.',
   groups: [

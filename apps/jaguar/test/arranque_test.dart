@@ -227,7 +227,7 @@ void main() {
       expect(find.byIcon(Icons.arrow_back), findsOneWidget);
       expect(find.byIcon(Icons.menu), findsNothing);
       expect(find.byIcon(Icons.qr_code_2), findsNothing);
-      expect(find.byIcon(Icons.account_tree_outlined), findsWidgets); // inside the selector only
+      expect(find.text('Bloques'), findsOneWidget); // inside the selector only
 
       expect(find.text('Código'), findsOneWidget);
       expect(find.text('Diagrama'), findsOneWidget);

@@ -20,6 +20,7 @@ import '../editor/code_editor.dart';
 import '../editor/completions.dart';
 import '../editor/keyword_bar.dart';
 import '../diagram/diagram_editing.dart';
+import '../blocks/blocks_view.dart';
 import '../diagram/diagram_view.dart';
 import '../editor/syntax_controller.dart';
 import '../exercises/plan_dialog.dart';
@@ -189,14 +190,15 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
     if (!_tourActive) return null;
     void onSkip() => _settings.tourStep = 3;
     return switch (_settings.tourStep) {
-      0 when _tab == 0 && _settings.editorView != EditorView.diagram => TourBalloon(
-        key: const ValueKey('tour-0'),
-        target: _firstLineKey,
-        arrow: TourArrow.up,
-        text: 'Escribe aquí tu programa. Cada instrucción va en su línea.',
-        onSkip: onSkip,
-        onGotIt: () => _tourAdvance(0),
-      ),
+      0 when _tab == 0 && _settings.editorView != EditorView.diagram && _settings.editorView != EditorView.blocks =>
+        TourBalloon(
+          key: const ValueKey('tour-0'),
+          target: _firstLineKey,
+          arrow: TourArrow.up,
+          text: 'Escribe aquí tu programa. Cada instrucción va en su línea.',
+          onSkip: onSkip,
+          onGotIt: () => _tourAdvance(0),
+        ),
       1 => TourBalloon(
         key: const ValueKey('tour-1'),
         target: _runKey,
@@ -252,7 +254,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
         // The first lesson; at its end the first challenge opens, and its
         // balloons start there. The four-page introduction stays in Ajustes.
         _settings.tourStep = 0;
-        _openStep(routeSteps.first);
+        _openStep(mainSteps.first);
       case WelcomeChoice.programmer:
         _settings.tourStep = 3;
         _openSource(examples.first.$2);
@@ -476,6 +478,8 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
   }
 
   void _openChallenge(Challenge challenge) {
+    // The challenges of level 0 are solved with blocks.
+    if (challenge.level == 0) _settings.editorView = EditorView.blocks;
     widget.exercises.saveReceived(challenge.exercise);
     _openExercise(challenge.exercise);
   }
@@ -648,7 +652,9 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
 
   void _goToLine(int line) {
     // The line is in the code, so the code must be visible.
-    if (_settings.editorView == EditorView.diagram) _settings.editorView = EditorView.code;
+    if (_settings.editorView == EditorView.diagram || _settings.editorView == EditorView.blocks) {
+      _settings.editorView = EditorView.code;
+    }
     setState(() => _tab = 0);
     _code.selectLine(line);
     _codeFocus.requestFocus();
@@ -716,7 +722,9 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
 
   /// Runs an editor command from the menu, showing the code if needed.
   void _withEditor(void Function(CodeEditorState editor) command) {
-    if (_settings.editorView == EditorView.diagram) _settings.editorView = EditorView.both;
+    if (_settings.editorView == EditorView.diagram || _settings.editorView == EditorView.blocks) {
+      _settings.editorView = EditorView.both;
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _codeFocus.requestFocus();
       final editor = _editorKey.currentState;
@@ -1050,6 +1058,12 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
             shortcut: primary(LogicalKeyboardKey.digit2, alt: true),
           ),
           AppMenuItem(
+            'Bloques',
+            checked: settings.editorView == EditorView.blocks,
+            onSelected: () => settings.editorView = EditorView.blocks,
+            shortcut: primary(LogicalKeyboardKey.digit4, alt: true),
+          ),
+          AppMenuItem(
             'Pseudocódigo y diagrama',
             checked: settings.editorView == EditorView.both,
             onSelected: () => settings.editorView = EditorView.both,
@@ -1225,6 +1239,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
           child: switch (settings.editorView) {
             EditorView.code => codePane,
             EditorView.diagram => _diagram(),
+            EditorView.blocks => _blocks(),
             EditorView.both => SplitView(
               axis: Axis.horizontal,
               fraction: _diagramSplit,
@@ -1371,6 +1386,20 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
     return _diagramView(intro: intro);
   }
 
+  /// The same program as blocks that fit inside each other.
+  Widget _blocks() => BlocksView(
+    code: _code,
+    executingLine: _executingLine,
+    // While a program runs the blocks show where it goes; editing waits.
+    editing: _session.isRunning ? null : DiagramEditing(code: _code, notation: Notation.pseint),
+    onUndo: _session.isRunning ? null : _undo.undo,
+    onTapLine: (line) {
+      _code.selectLine(line);
+      _settings.editorView = EditorView.code;
+      _codeFocus.requestFocus();
+    },
+  );
+
   Widget _diagramView({required bool intro}) => DiagramView(
     code: _code,
     intro: intro ? 'Es el mismo programa dibujado. Toca un bloque para ver su línea de código.' : null,
@@ -1514,6 +1543,8 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
   String _barSubtitle() {
     final exercise = _exercise;
     if (exercise == null) return 'Taller';
+    final blockIndex = blockChallenges.indexWhere((c) => c.id == exercise.id);
+    if (blockIndex >= 0) return 'Ruta · Nivel 0 · Bloques ${blockIndex + 1}';
     final index = challenges.indexWhere((c) => c.id == exercise.id);
     if (index < 0) return 'Ejercicio del profe';
     return 'Ruta · Nivel ${challenges[index].level} · Reto ${index + 1}';
@@ -1800,6 +1831,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
         Expanded(
           child: switch (view) {
             EditorView.diagram => _diagram(),
+            EditorView.blocks => _blocks(),
             EditorView.both when wide => SplitView(
               axis: Axis.horizontal,
               fraction: _diagramSplit,
@@ -2109,15 +2141,22 @@ class _EditorViewSwitch extends StatelessWidget {
   /// Fills the width with larger text (phones) instead of the toolbar's size.
   final bool expanded;
 
-  static const _labels = {EditorView.code: 'Código', EditorView.diagram: 'Diagrama', EditorView.both: 'Ambos'};
+  static const _labels = {
+    EditorView.code: 'Código',
+    EditorView.diagram: 'Diagrama',
+    EditorView.blocks: 'Bloques',
+    EditorView.both: 'Ambos',
+  };
   static const _tips = {
     EditorView.code: 'Tu programa escrito paso a paso',
     EditorView.diagram: 'Tu programa dibujado como diagrama de flujo',
+    EditorView.blocks: 'Tu programa armado con bloques',
     EditorView.both: 'El código y el diagrama lado a lado',
   };
   static const _icons = {
     EditorView.code: Icons.code,
     EditorView.diagram: Icons.account_tree_outlined,
+    EditorView.blocks: Icons.view_agenda_outlined,
     EditorView.both: Icons.vertical_split_outlined,
   };
 
@@ -2128,10 +2167,11 @@ class _EditorViewSwitch extends StatelessWidget {
       label: 'Vista del programa',
       child: SegmentedButton<EditorView>(
         segments: [
-          for (final option in [EditorView.code, EditorView.diagram, if (allowBoth) EditorView.both])
+          for (final option in [EditorView.code, EditorView.diagram, EditorView.blocks, if (allowBoth) EditorView.both])
             ButtonSegment(
               value: option,
-              icon: Icon(_icons[option], size: expanded ? 18 : 16),
+              // On a phone the three names need the room the icons would take.
+              icon: expanded ? null : Icon(_icons[option], size: 16),
               label: Text(_labels[option]!),
               tooltip: _tips[option],
             ),

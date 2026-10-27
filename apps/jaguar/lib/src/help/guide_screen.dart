@@ -149,10 +149,10 @@ class GuideScreen extends StatelessWidget {
       ],
       steps: [
         desktop
-            ? 'En la barra de arriba hay tres botones: Código, Diagrama y Ambos. Con Ambos ves el código y el '
-                  'diagrama lado a lado. Atajos: ${shortcutLabel('Alt+1')}, 2 y 3.'
-            : 'Debajo de la barra de arriba está el selector Código | Diagrama. Tócalo para cambiar entre las '
-                  'dos formas. La pestaña de abajo siempre dice Programa.',
+            ? 'En la barra de arriba hay cuatro botones: Código, Diagrama, Bloques y Ambos. Con Ambos ves el código '
+                  'y el diagrama lado a lado. Atajos: ${shortcutLabel('Alt+1')}, 2, 3 y 4.'
+            : 'Debajo de la barra de arriba está el selector Código | Diagrama | Bloques. Tócalo para cambiar entre '
+                  'las tres formas. La pestaña de abajo siempre dice Programa.',
         'Toca un bloque del diagrama para ver su línea en el código.',
         'Si el código tiene un error, el diagrama conserva el último válido y te dice en qué línea corregir.',
       ],
@@ -175,6 +175,22 @@ class GuideScreen extends StatelessWidget {
         'Si te equivocas, usa Deshacer en la barra de abajo del diagrama. Ahí mismo guardas el diagrama como imagen.',
       ],
       shots: const [_Shot('diagrama', 'Elegiste una figura: ahora toca un ＋.')],
+    ),
+    _Topic(
+      icon: Icons.view_agenda_outlined,
+      title: 'Arma con bloques',
+      summary: 'Programa con piezas que encajan',
+      intro:
+          'Los bloques son tu mismo programa, armado con piezas de colores que van unas dentro de otras. '
+          'Cada color es una idea: amarillo muestra, azul pregunta, verde guarda datos, morado decide y naranja repite.',
+      steps: [
+        'Cambia a Bloques con el selector de arriba.',
+        'Toca un ＋ donde quieres un bloque nuevo y elige cuál. Si el Si no tiene SiNo, el ＋ de abajo lo agrega.',
+        'Toca un bloque para cambiar lo que dice. Mantenlo pulsado para eliminarlo o verlo en el código.',
+        'Abajo, "Así se escribe" muestra el pseudocódigo de tus bloques: es lo mismo, escrito. Más adelante '
+            'escribirás tú ese texto.',
+      ],
+      shots: const [_Shot('bloques', 'Un programa con Si y SiNo, armado con bloques.')],
     ),
     _Topic(
       icon: Icons.error_outline,

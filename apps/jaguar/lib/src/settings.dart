@@ -8,7 +8,7 @@ enum AppMode { basic, full }
 
 /// What the code area shows: the code, its flowchart, or both side by
 /// side (desktop).
-enum EditorView { code, diagram, both }
+enum EditorView { code, diagram, blocks, both }
 
 /// How the workspace looks, remembered on the device.
 class ViewSettings extends ChangeNotifier {

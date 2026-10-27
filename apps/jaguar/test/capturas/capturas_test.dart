@@ -333,6 +333,16 @@ void main() {
     await tester.pumpAndSettle(const Duration(seconds: 11));
   });
 
+  scene('bloques', (tester) async {
+    await _app(
+      tester,
+      values: {'jaguar.view.mode': 'basic', 'jaguar.view.editor': 'blocks'},
+      source:
+          'Algoritmo mayor_de_edad\n    Definir edad Como Entero\n    Escribir "¿Cuántos años tienes?"\n    Leer edad\n    Si edad >= 18 Entonces\n        Escribir "Eres mayor de edad"\n    SiNo\n        Escribir "Aún eres menor"\n    FinSi\nFinAlgoritmo\n',
+    );
+    await _shot(tester, 'bloques');
+  });
+
   scene('error', (tester) async {
     await _app(
       tester,

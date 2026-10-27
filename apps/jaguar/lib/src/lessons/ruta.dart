@@ -1,5 +1,6 @@
 import '../challenges/challenges.dart';
 import 'lessons.dart';
+import 'nivel0.dart';
 import 'nivel1.dart';
 
 /// A step of the path: a lesson to play or a challenge to solve.
@@ -47,9 +48,24 @@ class RouteGroup {
 /// adding levels (one file each, `nivel1.dart`, `nivel2.dart`...); nothing
 /// else changes, and the progress saved by id keeps working.
 class RouteLevel {
-  const RouteLevel({required this.id, required this.title, required this.description, required this.groups});
+  const RouteLevel({
+    required this.id,
+    required this.number,
+    required this.title,
+    required this.description,
+    required this.groups,
+    this.optional = false,
+  });
 
   final String id;
+
+  /// Shown as "Nivel n"; 0 is the optional one with blocks.
+  final int number;
+
+  /// An optional level is on the path but the recommended way never waits for
+  /// it: it does not count in "paso n de N" and is not the step that follows
+  /// until everything else is done.
+  final bool optional;
 
   /// Short name of the level, like "Fundamentos".
   final String title;
@@ -62,7 +78,7 @@ class RouteLevel {
 }
 
 /// The levels of the path, in order.
-final routeLevels = <RouteLevel>[nivel1];
+final routeLevels = <RouteLevel>[nivel0, nivel1];
 
 /// Every unit of the path, in order.
 List<RouteGroup> get routeGroups => [for (final level in routeLevels) ...level.groups];
@@ -70,15 +86,32 @@ List<RouteGroup> get routeGroups => [for (final level in routeLevels) ...level.g
 /// Every step of the path, in order.
 List<RouteStep> get routeSteps => [for (final level in routeLevels) ...level.steps];
 
+/// The steps of the recommended way: those of the levels that are not
+/// optional. The progress and the "paso n de N" count these.
+List<RouteStep> get mainSteps => [
+  for (final level in routeLevels)
+    if (!level.optional) ...level.steps,
+];
+
 bool isStepDone(RouteStep step, {required Set<String> lessons, required Set<String> challenges}) =>
     step is LessonStep ? lessons.contains(step.id) : challenges.contains(step.id);
 
-/// The first step not done yet; null when the whole path is done.
+/// The first step not done yet: of the recommended way, then of the optional
+/// levels; null when the whole path is done.
 RouteStep? nextStep({required Set<String> lessons, required Set<String> challenges}) {
-  for (final step in routeSteps) {
+  for (final step in [...mainSteps, ...routeSteps]) {
     if (!isStepDone(step, lessons: lessons, challenges: challenges)) {
       return step;
     }
+  }
+  return null;
+}
+
+/// The first step of the recommended way not done yet; null when it is done
+/// (the optional levels do not count).
+RouteStep? nextMainStep({required Set<String> lessons, required Set<String> challenges}) {
+  for (final step in mainSteps) {
+    if (!isStepDone(step, lessons: lessons, challenges: challenges)) return step;
   }
   return null;
 }

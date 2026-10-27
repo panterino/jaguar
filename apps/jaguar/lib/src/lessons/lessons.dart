@@ -297,6 +297,58 @@ const lessonText = Lesson(
   ],
 );
 
+const lessonBlocks = Lesson(
+  id: 'leccion-bloques',
+  title: 'Primeros bloques',
+  summary: 'Arma un programa pieza por pieza',
+  icon: Icons.view_agenda_outlined,
+  questions: [
+    ChoiceQuestion(
+      prompt: '¿Qué bloque usas para mostrar un mensaje?',
+      options: ['Salida (Escribir)', 'Lectura (Leer)', 'Decisión (Si)', 'Ciclo (Mientras)'],
+      answer: 0,
+      right: 'La Salida muestra textos y valores: es el bloque amarillo.',
+      wrong:
+          'Para mostrar algo se usa la Salida, que escribe en la consola. Leer pide datos; Si y Mientras deciden y repiten.',
+    ),
+    ChoiceQuestion(
+      prompt: '¿Qué hace el bloque Lectura?',
+      options: [
+        'Pide un dato y lo guarda en una variable',
+        'Muestra un dato en la pantalla',
+        'Repite otros bloques',
+        'Termina el programa',
+      ],
+      answer: 0,
+      right: 'Leer espera a que la persona escriba y guarda lo que escribió.',
+      wrong: 'Lectura pide un dato y lo guarda en una variable: es la entrada del programa.',
+    ),
+    ChoiceQuestion(
+      prompt: '¿Qué muestra este programa?',
+      code: 'Escribir "Hola"\nEscribir "Adiós"',
+      options: ['Hola, Adiós', 'Adiós, Hola', 'Solo Hola', 'Un error'],
+      answer: 0,
+      output: 'Hola\nAdiós',
+      right: 'Los bloques se ejecutan de arriba hacia abajo, uno tras otro.',
+      wrong: 'Los bloques van de arriba hacia abajo: primero sale Hola y después Adiós.',
+    ),
+    ChoiceQuestion(
+      prompt: 'Un bloque Si tiene otros bloques adentro. ¿Cuándo se hacen?',
+      options: ['Solo cuando se cumple su condición', 'Siempre', 'Nunca', 'Solo la primera vez'],
+      answer: 0,
+      right: 'Lo que está dentro del Si solo ocurre si la condición es verdadera.',
+      wrong: 'Los bloques de adentro del Si solo se hacen cuando la condición se cumple.',
+    ),
+    OrderQuestion(
+      prompt: 'Pon los bloques en orden para avisar si alguien es mayor de edad.',
+      lines: ['Leer edad', 'Si edad >= 18 Entonces', '    Escribir "Mayor"', 'FinSi'],
+      inputs: ['20'],
+      right: 'Primero se lee la edad, luego se decide y lo que se muestra queda dentro del Si.',
+      wrong: 'Primero Leer, luego el Si, y dentro del Si el mensaje; FinSi cierra el bloque.',
+    ),
+  ],
+);
+
 const lessonFlowcharts = Lesson(
   id: 'leccion-diagramas',
   title: 'Diagramas de flujo',
@@ -510,6 +562,7 @@ const lessonLoops = Lesson(
 
 const allLessons = [
   lessonFirstProgram,
+  lessonBlocks,
   lessonOperations,
   lessonText,
   lessonFlowcharts,

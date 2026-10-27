@@ -42,8 +42,9 @@ void main() {
     });
 
     test('el siguiente paso es el primero sin hacer y al final no hay ninguno', () {
-      final first = routeSteps.first;
-      expect(nextStep(lessons: {}, challenges: {})!.id, first.id);
+      // The recommended way starts at level 1, not at the optional blocks.
+      expect(nextStep(lessons: {}, challenges: {})!.id, mainSteps.first.id);
+      expect(mainSteps.first.id, lessonFirstProgram.id);
       final lessons = {for (final s in routeSteps.whereType<LessonStep>()) s.id};
       final done = {for (final s in routeSteps.whereType<ChallengeStep>()) s.id};
       expect(nextStep(lessons: lessons, challenges: done), isNull);
@@ -70,13 +71,13 @@ void main() {
       await irASala(tester, 'Ruta');
       expect(find.text('NIVEL 1'), findsOneWidget);
       expect(find.text(nivel1.title), findsOneWidget);
-      expect(find.text('0 de ${routeSteps.length}'), findsOneWidget);
+      expect(find.text('0 de ${nivel1.steps.length}'), findsOneWidget);
       expect(find.text('Copa de la unidad'), findsWidgets);
     });
 
     testWidgets('abre en tu paso cuando ya avanzaste, y "Ir a mi paso" lleva de vuelta', (tester) async {
-      final lessons = [for (final s in routeSteps.take(8).whereType<LessonStep>()) s.id];
-      final retos = [for (final s in routeSteps.take(8).whereType<ChallengeStep>()) s.id];
+      final lessons = [for (final s in mainSteps.take(8).whereType<LessonStep>()) s.id];
+      final retos = [for (final s in mainSteps.take(8).whereType<ChallengeStep>()) s.id];
       await abre(tester, {'jaguar.lecciones.hechas': lessons, 'jaguar.retos.hechos': retos});
       await irASala(tester, 'Ruta');
       await tester.pumpAndSettle();
@@ -101,13 +102,14 @@ void main() {
     });
 
     testWidgets('la copa se enciende al terminar una unidad', (tester) async {
-      final group = routeGroups.first;
+      final group = nivel1.groups.first;
       await abre(tester, {
         'jaguar.lecciones.hechas': [for (final s in group.steps.whereType<LessonStep>()) s.id],
         'jaguar.retos.hechos': [for (final s in group.steps.whereType<ChallengeStep>()) s.id],
       });
       await irASala(tester, 'Ruta');
       await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(find.text('Unidad completa'), -300);
       expect(find.text('Unidad completa'), findsOneWidget);
     });
   });
