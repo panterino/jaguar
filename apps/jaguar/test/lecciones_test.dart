@@ -96,21 +96,22 @@ void main() {
     test('cada lección y cada reto aparece una sola vez', () {
       final ids = routeSteps.map((s) => s.id).toList();
       expect(ids.toSet(), hasLength(ids.length));
-      expect(ids.where((id) => id.startsWith('reto-')).length, challenges.length + blockChallenges.length);
+      expect(ids.where((id) => id.startsWith('reto-')).length, everyChallenge.length);
       expect(ids.where((id) => id.startsWith('leccion-')).length, allLessons.length);
     });
 
     test('los retos de la ruta son todos los retos, una sola vez', () {
       final retos = routeSteps.whereType<ChallengeStep>().map((s) => s.id).toList();
-      expect(retos.toSet(), [...challenges, ...blockChallenges].map((c) => c.id).toSet());
-      expect(retos, hasLength(challenges.length + blockChallenges.length));
+      expect(retos.toSet(), everyChallenge.map((c) => c.id).toSet());
+      expect(retos, hasLength(everyChallenge.length));
     });
 
     test('el siguiente reto sigue el orden de la ruta, no el de la lista', () {
       // Los textos van después de Operaciones, antes de las decisiones.
       expect(nextChallenge('reto-1-04')!.id, 'reto-1-11');
       expect(nextChallenge('reto-1-12')!.id, 'reto-1-05');
-      expect(nextChallenge('reto-1-10'), isNull);
+      expect(nextChallenge('reto-1-10')!.id, 'reto-2-01');
+      expect(nextChallenge('reto-2-12'), isNull);
     });
 
     test('el siguiente paso es el primero sin hacer, y es nulo al terminar', () {
@@ -118,10 +119,7 @@ void main() {
       expect(nextStep(lessons: {lessonFirstProgram.id}, challenges: {})!.id, 'reto-1-01');
       expect(nextStep(lessons: {lessonFirstProgram.id}, challenges: {'reto-1-01'})!.id, lessonOperations.id);
       expect(
-        nextStep(
-          lessons: allLessons.map((l) => l.id).toSet(),
-          challenges: [...challenges, ...blockChallenges].map((c) => c.id).toSet(),
-        ),
+        nextStep(lessons: allLessons.map((l) => l.id).toSet(), challenges: everyChallenge.map((c) => c.id).toSet()),
         isNull,
       );
     });

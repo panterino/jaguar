@@ -73,4 +73,12 @@ void main() {
     expect(py('Si 1 = 1 Entonces\nFinSi'), contains('    pass'));
     expect(py('print <- 3\nEscribir print'), contains('print_ = 3'));
   });
+
+  test('lo que se compara con < o > para hallar el mayor se lee como número', () {
+    final code = py('Leer a, b\nmayor <- a\nSi b > mayor Entonces\nmayor <- b\nFinSi\nEscribir mayor');
+    expect(code, contains('a = float(input())'));
+    expect(code, contains('b = float(input())'));
+    // Un texto declarado como tal sigue siendo texto.
+    expect(py('Definir p Como Texto\nLeer p\nSi p > "m" Entonces\nEscribir p\nFinSi'), contains('p = input()'));
+  });
 }

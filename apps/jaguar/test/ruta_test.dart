@@ -5,6 +5,7 @@ import 'package:jaguar/src/challenges/challenges.dart';
 import 'package:jaguar/src/exercises/exercise_store.dart';
 import 'package:jaguar/src/lessons/lessons.dart';
 import 'package:jaguar/src/lessons/nivel1.dart';
+import 'package:jaguar/src/lessons/nivel2.dart';
 import 'package:jaguar/src/programs/program_store.dart';
 import 'package:jaguar/src/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -73,6 +74,18 @@ void main() {
       expect(find.text(nivel1.title), findsOneWidget);
       expect(find.text('0 de ${nivel1.steps.length}'), findsOneWidget);
       expect(find.text('Copa de la unidad'), findsWidgets);
+    });
+
+    test('el Nivel 2 tiene cinco unidades con su lección y sus retos', () {
+      expect(nivel2.groups, hasLength(5));
+      for (final group in nivel2.groups) {
+        expect(group.steps.first, isA<LessonStep>(), reason: group.title);
+        expect(group.steps.whereType<ChallengeStep>(), isNotEmpty, reason: group.title);
+      }
+      expect(nivel2.steps.whereType<ChallengeStep>(), hasLength(challengesNivel2.length));
+      expect(routeLevels.last, same(nivel2));
+      // El Nivel 2 va después del 1 en el camino recomendado.
+      expect(mainSteps.last.id, nivel2.steps.last.id);
     });
 
     testWidgets('abre en tu paso cuando ya avanzaste, y "Ir a mi paso" lleva de vuelta', (tester) async {
