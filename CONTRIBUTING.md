@@ -3,7 +3,7 @@
 Usamos gitflow:
 
 - `main` tiene solo versiones publicadas, cada una con su etiqueta (`v0.2.0`).
-  Lo que se despliega en https://jaguar-edu.web.app sale de aquí.
+  Lo que se despliega en https://app.jaguarcode.org sale de aquí.
 - `develop` es donde se junta el trabajo del día a día.
 - `feature/<algo>` sale de `develop` y regresa a `develop` con un pull request.
   Ejemplo: `feature/retos-nivel-1`.

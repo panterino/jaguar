@@ -6,6 +6,7 @@ import 'package:jaguar/src/challenges/challenges.dart';
 import 'package:jaguar/src/exercises/exercise_store.dart';
 import 'package:jaguar/src/files/psc_files.dart';
 import 'package:jaguar/src/programs/program_store.dart';
+import 'package:jaguar/src/share/share_codec.dart';
 import 'package:jaguar/src/settings.dart';
 import 'package:jaguar_core/jaguar_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -53,6 +54,21 @@ void main() {
       final content = ZipDecoder().decodeBytes(bytes).files.single.content as List<int>;
       expect(content.contains(13), isTrue); // \r
       expect(decodeSource(content), contains('Escribir "á"'));
+    });
+  });
+
+  group('las direcciones nuevas', () {
+    test('los enlaces nuevos salen de app.jaguarcode.org', () {
+      expect(shareLink('Algoritmo a\nFinAlgoritmo\n'), startsWith('https://app.jaguarcode.org/#p='));
+    });
+
+    test('un enlace de la dirección vieja sigue abriendo el programa', () {
+      final fragment = Uri.parse(shareLink('Algoritmo a\nFinAlgoritmo\n')).fragment;
+      for (final host in ['jaguar-edu.web.app', 'app.jaguarcode.org', 'localhost:8080']) {
+        final content = contentFromLink('https://$host/#$fragment');
+        expect(content, isA<SharedProgram>(), reason: host);
+        expect((content! as SharedProgram).source, contains('Algoritmo a'));
+      }
     });
   });
 

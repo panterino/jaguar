@@ -1,0 +1,30 @@
+# Cloudflare junta las reglas que coinciden, así que ninguna ruta aparece en
+# dos: lo que cambia en cada versión no se guarda; lo demás, una hora.
+/
+  Cache-Control: no-cache
+/index.html
+  Cache-Control: no-cache
+/main.dart.js
+  Cache-Control: no-cache
+/flutter.js
+  Cache-Control: no-cache
+/flutter_bootstrap.js
+  Cache-Control: no-cache
+/flutter_service_worker.js
+  Cache-Control: no-cache
+/sw.js
+  Cache-Control: no-cache
+/version.json
+  Cache-Control: no-cache
+/manifest.json
+  Cache-Control: no-cache
+/privacidad.html
+  Cache-Control: no-cache
+/assets/*
+  Cache-Control: public, max-age=3600
+/canvaskit/*
+  Cache-Control: public, max-age=3600
+/icons/*
+  Cache-Control: public, max-age=3600
+/favicon.png
+  Cache-Control: public, max-age=3600
