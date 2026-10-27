@@ -161,8 +161,9 @@ class Interpreter {
     if (maxSteps != null && _steps > maxSteps) {
       throw _fail(
         statement,
-        'El programa se detuvo después de $maxSteps pasos.',
-        hint: '¿Hay un ciclo que nunca termina? Revisa que su condición cambie dentro del ciclo.',
+        'El programa se detuvo porque llevaba demasiados pasos ($maxSteps).',
+        hint:
+            'Parece un ciclo que no termina. Dentro del Mientras o del Repetir debe cambiar algo, por ejemplo n <- n - 1, para que la condición deje de cumplirse.',
         cause: ErrorCause.stepLimit,
       );
     }
@@ -373,18 +374,19 @@ class Interpreter {
       final suggestion = closestMatch(ref.name, _frame.values.map((v) => v.name));
       throw _fail(
         ref,
-        "La variable '${ref.name}' no existe.",
+        "No encuentro la variable '${ref.name}'.",
         hint: suggestion != null
             ? "¿Quisiste decir '$suggestion'?"
-            : "Dale un valor antes de usarla, por ejemplo '${ref.name} <- 0' o 'Leer ${ref.name}'.",
+            : "Revisa cómo la escribiste. Si es nueva, créala antes con '${ref.name} <- 0' o con 'Leer ${ref.name}'.",
       );
     }
     final value = variable.value;
     if (value == null) {
       throw _fail(
         ref,
-        "La variable '${ref.name}' todavía no tiene valor.",
-        hint: "Asígnale un valor con '${ref.name} <- ...' o 'Leer ${ref.name}' antes de usarla.",
+        "La variable '${ref.name}' todavía no tiene valor en este punto.",
+        hint:
+            "Antes de usarla dale un valor, con '${ref.name} <- 0' o con 'Leer ${ref.name}'. Esa línea debe estar más arriba que esta.",
       );
     }
     if (value is ArrayValue && !allowArray) {
@@ -539,12 +541,26 @@ class Interpreter {
       case '/':
         final dividend = _requireNumber(left, e, "La división '/'");
         final divisor = _requireNumber(right, e, "La división '/'");
-        if (divisor == 0) throw _fail(e, 'No se puede dividir entre cero.');
+        if (divisor == 0) {
+          throw _fail(
+            e,
+            'No se puede dividir entre cero.',
+            hint:
+                'El divisor valía 0 al llegar aquí. Revisa de dónde sale ese valor, o pregunta antes: Si divisor <> 0 Entonces ... FinSi',
+          );
+        }
         return _finite(dividend / divisor, e);
       case 'mod':
         final dividend = _requireInt(left, e, 'MOD');
         final divisor = _requireInt(right, e, 'MOD');
-        if (divisor == 0) throw _fail(e, 'No se puede calcular MOD entre cero.');
+        if (divisor == 0) {
+          throw _fail(
+            e,
+            'No se puede calcular MOD entre cero.',
+            hint:
+                'El valor de la derecha de MOD valía 0. Revisa de dónde sale, o pregunta antes: Si divisor <> 0 Entonces ... FinSi',
+          );
+        }
         return dividend.remainder(divisor);
       case '^':
         return _finite(

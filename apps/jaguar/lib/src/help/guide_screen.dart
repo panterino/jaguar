@@ -45,7 +45,7 @@ class GuideScreen extends StatelessWidget {
       initialIndex: teacher ? 1 : 0,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Guía de Jaguar'),
+          title: const Text('Guía de Jaguar Code'),
           bottom: const TabBar(
             tabs: [
               Tab(icon: Icon(Icons.backpack_outlined), text: 'Alumno'),
@@ -57,8 +57,8 @@ class GuideScreen extends StatelessWidget {
           children: [
             _Page(
               greeting: desktop
-                  ? '¡Hola! Aquí está lo que puedes hacer en Jaguar. Toca un tema para ver cómo se hace en la computadora.'
-                  : '¡Hola! Aquí está lo que puedes hacer en Jaguar. Toca un tema para ver cómo se hace en tu celular.',
+                  ? '¡Hola! Aquí está lo que puedes hacer en Jaguar Code. Toca un tema para ver cómo se hace en la computadora.'
+                  : '¡Hola! Aquí está lo que puedes hacer en Jaguar Code. Toca un tema para ver cómo se hace en tu celular.',
               topics: _studentTopics(desktop: desktop, go: go),
               extra: [
                 const _Heading('Si algo no sale'),
@@ -117,7 +117,8 @@ class GuideScreen extends StatelessWidget {
         _Shot('consola-leer', 'La consola espera un dato.'),
         _Shot('primer-programa', 'Tu primer programa corrió.'),
       ],
-      note: 'Para unir un texto con una variable usa +: Escribir "Hola, " + nombre. También sirven las comas: '
+      note:
+          'Para unir un texto con una variable usa +: Escribir "Hola, " + nombre. También sirven las comas: '
           'Escribir "Hola, ", nombre.',
     ),
     if (!desktop)
@@ -141,8 +142,7 @@ class GuideScreen extends StatelessWidget {
       icon: Icons.account_tree_outlined,
       title: 'Código y diagrama',
       summary: 'El mismo programa, de dos formas',
-      intro:
-          'El pseudocódigo y el diagrama de flujo son el mismo programa: lo que cambias en uno aparece en el otro.',
+      intro: 'El pseudocódigo y el diagrama de flujo son el mismo programa: lo que cambias en uno aparece en el otro.',
       shots: [
         _Shot('diagrama', 'La vista Diagrama, con su primera ayuda.'),
         if (desktop) const _Shot('computadora', 'En la computadora, con Ambos: código, diagrama y consola.'),
@@ -393,9 +393,7 @@ class GuideScreen extends StatelessWidget {
       summary: 'Únete con el código de tu profe y entrega',
       intro: 'Las clases en línea necesitan internet. Tu profe te da un código como JAG-4K7Q.',
       steps: [
-        desktop
-            ? 'Haz clic en Clases en la barra de la izquierda.'
-            : 'Abre la sala Clases y toca Mis clases en línea.',
+        desktop ? 'Haz clic en Clases en la barra de la izquierda.' : 'Abre la sala Clases y toca Mis clases en línea.',
         'Toca Entrar, elige Alumno y escribe un alias. No uses tu nombre completo ni datos personales. No '
             'necesitas correo.',
         'Toca Unirme con un código. Escribe el código y tu nombre: solo lo ve tu profe, para saber de quién es '
@@ -555,10 +553,7 @@ class GuideScreen extends StatelessWidget {
       'Cambiaste el código desde la última prueba, o todavía no has probado. Toca Probar para que vuelvan a '
           'hablar de tu programa actual.',
     ),
-    (
-      'No me sale el QR',
-      'Si el programa es muy largo no cabe en un QR. Usa Copiar enlace o guárdalo como archivo.',
-    ),
+    ('No me sale el QR', 'Si el programa es muy largo no cabe en un QR. Usa Copiar enlace o guárdalo como archivo.'),
     ('No aparece Mis clases', 'Las clases necesitan internet. Conéctate y vuelve a abrir Jaguar.'),
     (
       'No veo el menú Editar, Ver o Profesor',
@@ -706,11 +701,7 @@ class _TopicCard extends StatelessWidget {
               ),
             ),
           if (topic.moreShots.isNotEmpty) _Shots(shots: topic.moreShots),
-          if (topic.note case final note?)
-            Padding(
-              padding: const EdgeInsets.only(top: 12),
-              child: _Note(note),
-            ),
+          if (topic.note case final note?) Padding(padding: const EdgeInsets.only(top: 12), child: _Note(note)),
           if (action != null && action.$2 != null)
             Padding(
               padding: const EdgeInsets.only(top: 14),
@@ -790,7 +781,10 @@ class _Shots extends StatelessWidget {
               onPressed: () => Navigator.pop(context),
             ),
           ),
-          body: InteractiveViewer(maxScale: 4, child: Center(child: _Picture(shot: shot, border: false))),
+          body: InteractiveViewer(
+            maxScale: 4,
+            child: Center(child: _Picture(shot: shot, border: false)),
+          ),
         ),
       ),
     );

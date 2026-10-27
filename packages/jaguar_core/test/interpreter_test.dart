@@ -95,7 +95,7 @@ void main() {
 
     test('texto sin comillas en Escribir', () async {
       final error = await runError(program('Escribir Dame tu nombre'));
-      expect(error.message, contains('sin comillas'));
+      expect(error.message, contains('entre comillas'));
       expect(error.hint, contains('"Dame tu nombre"'));
       // Variables separadas por comas siguen funcionando.
       expect(await run('a <- 1\nb <- 2\nEscribir a, b'), '12\n');
@@ -211,7 +211,7 @@ void main() {
         program('i <- 0\nMientras i < 10 Hacer\nEscribir Sin Saltar ""\nFinMientras'),
         maxSteps: 500,
       );
-      expect(error.message, contains('500 pasos'));
+      expect(error.message, contains('(500)'));
       expect(error.hint, contains('ciclo'));
     });
 
@@ -306,7 +306,7 @@ void main() {
       final error = await runError(
         'SubProceso Saludar\nEscribir x\nFinSubProceso\nAlgoritmo p\nx <- 1\nSaludar\nFinAlgoritmo',
       );
-      expect(error.message, contains("'x' no existe"));
+      expect(error.message, contains("No encuentro la variable 'x'"));
     });
 
     test('número incorrecto de argumentos', () async {
@@ -429,7 +429,7 @@ void main() {
 
     test('texto sin cerrar', () async {
       final error = await runError(program('Escribir "hola'));
-      expect(error.message, contains('comillas'));
+      expect(error.message, contains('comilla'));
     });
 
     test('código fuera de Algoritmo', () async {
@@ -447,7 +447,7 @@ void main() {
       final error = await runError(source);
       expect(
         error.format(source),
-        'Error de sintaxis en la línea 2: No entiendo la instrucción \'Escrivir\'.\n'
+        'Error de escritura en la línea 2: No entiendo la instrucción \'Escrivir\'.\n'
         '2 | Escrivir "hola"\n'
         '    ^\n'
         "Sugerencia: ¿Quisiste decir 'Escribir'?",

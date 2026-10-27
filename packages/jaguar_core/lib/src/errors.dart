@@ -39,7 +39,7 @@ class JaguarError implements Exception {
   bool get unfinished =>
       kind == ErrorKind.syntax && (message.startsWith("Falta '") || RegExp(r"^Encontré '\w+', pero antes falta '").hasMatch(message));
 
-  String get title => kind == ErrorKind.syntax ? 'Error de sintaxis' : 'Error de ejecución';
+  String get title => kind == ErrorKind.syntax ? 'Error de escritura' : 'Error al ejecutar';
 
   /// Renders the error with the offending source line and a caret.
   String format(String source) {

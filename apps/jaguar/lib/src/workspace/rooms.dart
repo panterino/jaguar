@@ -94,22 +94,19 @@ class RoomsScaffold extends StatelessWidget {
   final ExerciseStore exercises;
   final RoomActions actions;
 
-  static const _titles = {Room.home: 'Jaguar', Room.route: 'Ruta', Room.classes: 'Clases', Room.workshop: 'Taller'};
+  static const _titles = {
+    Room.home: 'Jaguar Code',
+    Room.route: 'Ruta',
+    Room.classes: 'Clases',
+    Room.workshop: 'Taller',
+  };
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: room == Room.home && !_isWide(context)
-            ? Row(
-                children: [
-                  Image.asset('assets/images/mascota.png', width: 36, height: 36),
-                  const SizedBox(width: 10),
-                  const Text('Jaguar'),
-                ],
-              )
-            : Text(room == Room.home ? 'Inicio' : _titles[room]!),
+        title: Text(room == Room.home ? (_isWide(context) ? 'Inicio' : 'Jaguar Code') : _titles[room]!),
         actions: [
           if (room == Room.home)
             IconButton(
@@ -248,6 +245,22 @@ void _showExamples(BuildContext context, ValueChanged<String> onOpenSource) {
 }
 
 /// A small caps label over a group.
+/// The fixed line under the top of each room: what it is for.
+class _Phrase extends StatelessWidget {
+  const _Phrase(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.fromLTRB(4, 0, 4, 14),
+    child: Text(
+      text,
+      style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+    ),
+  );
+}
+
 class _Label extends StatelessWidget {
   const _Label(this.text);
 
@@ -320,6 +333,7 @@ class _HomeRoom extends StatelessWidget {
     final task = exercises.received.lastOrNull;
     final recent = store.programs.take(3).toList();
     final wide = _isWide(context);
+    final fresh = solved == 0 && next != null;
 
     final nextCard = _RoomCard(
       child: Padding(
@@ -328,7 +342,7 @@ class _HomeRoom extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'RUTA · TU SIGUIENTE PASO',
+              next == null ? 'RUTA COMPLETA' : (fresh ? 'EMPIEZA AQUÍ' : 'SIGUE DONDE TE QUEDASTE'),
               style: theme.textTheme.labelMedium?.copyWith(
                 color: scheme.onSurfaceVariant,
                 fontWeight: FontWeight.w700,
@@ -336,24 +350,30 @@ class _HomeRoom extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 4),
-            Text(next == null ? 'Terminaste el nivel 1' : next.title, style: theme.textTheme.titleLarge),
+            Text(next == null ? '¡Terminaste el nivel 1!' : next.title, style: theme.textTheme.titleLarge),
             const SizedBox(height: 2),
             Text(
               next == null
-                  ? 'Hiciste todas las lecciones y los retos.'
+                  ? 'Hiciste todas las lecciones y los retos. Ahora escribe tus propios programas.'
+                  : fresh
+                  ? (next is LessonStep
+                        ? 'Una lección corta: 5 preguntas, unos 2 minutos. Luego escribes tu primer programa.'
+                        : 'Un reto con pruebas que te dicen si va bien.')
                   : '${next is LessonStep ? 'Lección' : 'Reto'} · llevas $solved de ${steps.length} pasos',
               style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
             ),
             const SizedBox(height: 10),
-            _Bar(value: solved / steps.length),
-            const SizedBox(height: 12),
+            if (!fresh) ...[_Bar(value: solved / steps.length), const SizedBox(height: 12)],
             if (next != null)
               FilledButton(
                 onPressed: () => actions.onOpenStep(next),
                 child: Text(solved == 0 ? 'Empezar' : 'Continuar'),
               )
-            else
-              OutlinedButton(onPressed: () => onRoom(Room.route), child: const Text('Ver la ruta')),
+            else ...[
+              FilledButton(onPressed: actions.onNew, child: const Text('Abrir un programa nuevo')),
+              const SizedBox(height: 8),
+              OutlinedButton(onPressed: () => onRoom(Room.route), child: const Text('Repasar la Ruta')),
+            ],
           ],
         ),
       ),
@@ -362,7 +382,7 @@ class _HomeRoom extends StatelessWidget {
     final taskCard = task == null
         ? null
         : _RoomCard(
-            color: scheme.primaryContainer,
+            color: scheme.secondaryContainer,
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -371,13 +391,13 @@ class _HomeRoom extends StatelessWidget {
                   Text(
                     'DEL PROFE',
                     style: theme.textTheme.labelMedium?.copyWith(
-                      color: scheme.onPrimaryContainer,
+                      color: scheme.onSecondaryContainer,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.8,
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(task.title, style: theme.textTheme.titleLarge?.copyWith(color: scheme.onPrimaryContainer)),
+                  Text(task.title, style: theme.textTheme.titleLarge?.copyWith(color: scheme.onSecondaryContainer)),
                   const SizedBox(height: 10),
                   FilledButton(onPressed: () => actions.onOpenExercise(task), child: const Text('Abrir ejercicio')),
                 ],
@@ -409,46 +429,56 @@ class _HomeRoom extends StatelessWidget {
           if (taskCard != null) ...[Appear(index: 1, child: taskCard), const SizedBox(height: 12)],
           Appear(index: taskCard != null ? 2 : 1, child: nextCard),
         ],
-        const SizedBox(height: 20),
-        const _Label('Taller · recientes'),
-        if (recent.isEmpty)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Aún no tienes programas.',
-                    style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+        if (fresh) ...[
+          const SizedBox(height: 8),
+          Wrap(
+            children: [
+              TextButton(onPressed: actions.onOpenGuide, child: const Text('Cómo funciona Jaguar Code')),
+              TextButton(onPressed: actions.onNew, child: const Text('Ya programo: abrir un programa en blanco')),
+            ],
+          ),
+        ] else ...[
+          const SizedBox(height: 20),
+          const _Label('Taller · recientes'),
+          if (recent.isEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Aún no tienes programas.',
+                      style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+                    ),
+                  ),
+                  TextButton(onPressed: actions.onNew, child: const Text('Nuevo programa')),
+                ],
+              ),
+            )
+          else
+            for (final (i, program) in recent.indexed)
+              Appear(
+                index: 3 + i,
+                child: _RoomCard(
+                  margin: const EdgeInsets.only(bottom: 6),
+                  child: ListTile(
+                    minVerticalPadding: 12,
+                    title: Text(program.name, style: monoLabel(theme)),
+                    trailing: Text(timeAgo(program.updatedAt), style: theme.textTheme.bodySmall),
+                    onTap: () => actions.onOpenProgram(program),
                   ),
                 ),
-                TextButton(onPressed: actions.onNew, child: const Text('Nuevo programa')),
-              ],
-            ),
-          )
-        else
-          for (final (i, program) in recent.indexed)
-            Appear(
-              index: 3 + i,
-              child: _RoomCard(
-                margin: const EdgeInsets.only(bottom: 6),
-                child: ListTile(
-                  minVerticalPadding: 12,
-                  title: Text(program.name, style: monoLabel(theme)),
-                  trailing: Text(timeAgo(program.updatedAt), style: theme.textTheme.bodySmall),
-                  onTap: () => actions.onOpenProgram(program),
-                ),
               ),
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: actions.onOpenGuide,
+              icon: const Icon(Icons.menu_book_outlined),
+              label: const Text('Guía: cómo funciona todo'),
             ),
-        const SizedBox(height: 12),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: TextButton.icon(
-            onPressed: actions.onOpenGuide,
-            icon: const Icon(Icons.menu_book_outlined),
-            label: const Text('Guía: cómo funciona todo'),
           ),
-        ),
+        ],
       ],
     );
   }
@@ -536,6 +566,8 @@ class _HeroState extends State<_Hero> with SingleTickerProviderStateMixin {
               padding: const EdgeInsets.only(bottom: 14),
               child: AnimatedSwitcher(
                 duration: motion(context, const Duration(milliseconds: 280)),
+                layoutBuilder: (current, previous) =>
+                    Stack(alignment: Alignment.bottomLeft, children: [...previous, ?current]),
                 transitionBuilder: (child, animation) => ScaleTransition(
                   scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
                   alignment: Alignment.bottomLeft,
@@ -613,14 +645,28 @@ class _RouteRoom extends StatelessWidget {
 
     return _Page(
       children: [
+        const _Phrase('Lecciones cortas y retos con pruebas, en orden. Puedes saltar a cualquiera.'),
         if (wide)
           LayoutBuilder(
             builder: (context, constraints) {
               final half = (constraints.maxWidth - 16) / 2;
-              return Wrap(
-                spacing: 16,
-                runSpacing: 16,
-                children: [for (final card in cards) SizedBox(width: half, child: card)],
+              // Two columns, each stacked on its own: no gaps under short cards.
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (final column in [0, 1]) ...[
+                    if (column == 1) const SizedBox(width: 16),
+                    SizedBox(
+                      width: half,
+                      child: Column(
+                        children: [
+                          for (var i = column; i < cards.length; i += 2)
+                            Padding(padding: const EdgeInsets.only(bottom: 16), child: cards[i]),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
               );
             },
           )
@@ -670,15 +716,11 @@ class _GroupCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'NIVEL 1',
-                        style: theme.textTheme.labelMedium?.copyWith(
-                          color: scheme.onSurfaceVariant,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.8,
-                        ),
-                      ),
                       Text(group.title, style: theme.textTheme.titleMedium),
+                      Text(
+                        group.description,
+                        style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+                      ),
                     ],
                   ),
                 ),
@@ -862,13 +904,16 @@ class _ClassesRoom extends StatelessWidget {
     final received = exercises.received.reversed.toList();
     return _Page(
       children: [
+        const _Phrase(
+          'Lo que te comparte tu profe: clases en línea y ejercicios. Si no tienes profe, no necesitas esta sala.',
+        ),
         if (actions.onOpenTeacher case final openTeacher?) ...[
           _RoomCard(
             child: ListTile(
               minVerticalPadding: 14,
               leading: const Icon(Icons.school_outlined),
               title: const Text('Mis ejercicios'),
-              subtitle: const Text('Crea ejercicios, compártelos y revisa lo que entregan.'),
+              subtitle: const Text('Crea ejercicios que se revisan solos y mira lo que entrega tu grupo.'),
               trailing: const Icon(Icons.chevron_right),
               onTap: openTeacher,
             ),
@@ -882,14 +927,7 @@ class _ClassesRoom extends StatelessWidget {
             onOpenClass: (room) => actions.onOpenClass?.call(room),
           )
         else
-          _RoomCard(
-            child: ListTile(
-              minVerticalPadding: 14,
-              leading: const Icon(Icons.cloud_off_outlined),
-              title: const Text('Clases en línea'),
-              subtitle: const Text('Necesitan conexión a internet.'),
-            ),
-          ),
+          const _Phrase('Las clases en línea necesitan internet. Lo demás de esta sala funciona sin conexión.'),
         const SizedBox(height: 20),
         const _Label('Ejercicios del profe'),
         if (received.isEmpty)
@@ -978,7 +1016,7 @@ class _WorkshopRoomState extends State<_WorkshopRoom> {
               Text('Tu taller está vacío', style: theme.textTheme.titleMedium),
               const SizedBox(height: 4),
               Text(
-                'Aquí quedan tus programas, retos y tareas.',
+                'Tus programas: abre, busca, borra o crea uno en blanco.',
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
               ),
@@ -1063,7 +1101,7 @@ class _Kind extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final id = program.exerciseId;
-    final label = id == null ? 'Propio' : (challengeById(id) != null ? 'Reto' : 'Tarea');
+    final label = id == null ? 'Mío' : (challengeById(id) != null ? 'Reto' : 'Tarea');
     final scheme = Theme.of(context).colorScheme;
     final (background, foreground) = switch (label) {
       'Reto' => (scheme.tertiaryContainer, scheme.onTertiaryContainer),

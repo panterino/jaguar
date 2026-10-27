@@ -48,7 +48,7 @@ class SettingsScreen extends StatelessWidget {
         builder: (context, _) => ListView(
           padding: const EdgeInsets.symmetric(vertical: 8),
           children: [
-            const _Heading('Cómo usas Jaguar'),
+            const _Heading('Modo y perfil'),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
@@ -138,7 +138,7 @@ class SettingsScreen extends StatelessWidget {
               ),
             ListTile(
               leading: const Icon(Icons.info_outline),
-              title: const Text('Acerca de Jaguar'),
+              title: const Text('Acerca de Jaguar Code'),
               onTap: onAbout,
             ),
           ],

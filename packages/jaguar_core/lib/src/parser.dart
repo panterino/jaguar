@@ -184,7 +184,10 @@ class Parser {
     final token = _current;
     if (token.type == TokenType.word && !_reserved.contains(token.norm)) return _advance();
     if (token.type == TokenType.word) {
-      throw _error("'${token.lexeme}' es una palabra reservada y no puede usarse como nombre $context.");
+      throw _error(
+        "'${token.lexeme}' es una palabra reservada (el lenguaje ya la usa) y no puede ser un nombre $context.",
+        hint: "Elige otro nombre, por ejemplo '${token.lexeme}1' o uno que describa el dato, como 'total'.",
+      );
     }
     throw _error('Se esperaba un nombre $context, pero encontré ${token.describe()}.');
   }
@@ -211,8 +214,8 @@ class Parser {
     if (_current.type == TokenType.word && _reserved.contains(_current.norm)) return;
     if (_lineStartsWith('escribir')) {
       throw _error(
-        'Parece que falta una comilla o una coma: sobra ${_current.describe()}.',
-        hint: 'Los textos van entre comillas y se separan con comas: Escribir "Hola ", nombre',
+        'Sobra ${_current.describe()} en esta línea: falta una coma o una comilla.',
+        hint: 'Separa con comas lo que muestras y pon los textos entre comillas: Escribir "Hola ", nombre',
       );
     }
     throw _error(
@@ -309,6 +312,7 @@ class Parser {
         throw _error(
           "Encontré ${_current.describe()}, pero antes falta '$endDisplay' para cerrar "
           "el '${open.lexeme}' de la línea ${open.line}.",
+          hint: "Cierra primero el '${open.lexeme}' con '$endDisplay'. Después va ${_current.describe()}.",
         );
       }
       statements.add(_parseStatement());
@@ -319,6 +323,8 @@ class Parser {
     "Falta '$endDisplay' para cerrar el '${open.lexeme}' de la línea ${open.line}.",
     line: open.line,
     column: open.column,
+    hint:
+        "Cada '${open.lexeme}' necesita su '$endDisplay'. Escríbelo en su propia línea, debajo de lo que va dentro del bloque.",
   );
 
   // -------------------------------------------------------------------------
@@ -354,11 +360,11 @@ class Parser {
     if (_reserved.contains(name.norm)) {
       if (_isSymbol('<-', 1) || _isSymbol('=', 1) || _isSymbol('[', 1)) {
         throw _error(
-          "'${name.lexeme}' es una palabra reservada y no puede usarse como nombre de variable.",
+          "'${name.lexeme}' es una palabra reservada (el lenguaje ya la usa) y no puede ser el nombre de una variable.",
           hint: switch (name.norm) {
             'y' => "'Y' es el operador lógico. Usa otro nombre, por ejemplo 'y1' o 'coordY'.",
             'o' => "'O' es el operador lógico. Usa otro nombre, por ejemplo 'o1'.",
-            _ => 'Usa otro nombre.',
+            _ => "Elige otro nombre, por ejemplo '${name.lexeme}1'.",
           },
         );
       }
@@ -495,7 +501,7 @@ class Parser {
         words.add(_lookahead(i).lexeme);
       }
       throw _error(
-        'Parece un texto sin comillas.',
+        'Falta poner el texto entre comillas.',
         hint: 'Los textos van entre comillas: Escribir "${words.join(' ')}"',
       );
     }
@@ -604,6 +610,7 @@ class Parser {
         throw _error(
           "Encontré ${_current.describe()}, pero antes falta 'FinSegun' para cerrar "
           "el '${open.lexeme}' de la línea ${open.line}.",
+          hint: "Cierra primero el '${open.lexeme}' con 'FinSegun'. Después va ${_current.describe()}.",
         );
       }
       statements.add(_parseStatement());

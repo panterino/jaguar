@@ -68,7 +68,7 @@ const _beginnerPages = [
 List<_IntroPage> _expertPages({required bool phone}) => [
   _IntroPage(
     icon: Icons.travel_explore_outlined,
-    title: 'Así funciona Jaguar',
+    title: 'Así funciona Jaguar Code',
     body: [
       'Pseudocódigo en español: Algoritmo … FinAlgoritmo, Definir es opcional, los arreglos empiezan en 1 y la '
           'asignación es <- (o =).',
@@ -126,10 +126,7 @@ class _IntroDialogState extends State<_IntroDialog> {
                           Icon(page.icon, size: 32, color: scheme.primary),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: Semantics(
-                              header: true,
-                              child: Text(page.title, style: theme.textTheme.titleLarge),
-                            ),
+                            child: Semantics(header: true, child: Text(page.title, style: theme.textTheme.titleLarge)),
                           ),
                         ],
                       ),
