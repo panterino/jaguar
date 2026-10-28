@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>org.jaguarcode.JaguarCode</id>
+  <name>Jaguar Code</name>
+  <summary>Learn programming logic with pseudocode and flowcharts</summary>
+  <summary xml:lang="es">Aprende lógica de programación con pseudocódigo y diagramas de flujo</summary>
+  <developer id="org.jaguarcode">
+    <name>Panterino</name>
+  </developer>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>AGPL-3.0-only</project_license>
+  <description>
+    <p>Jaguar Code is a free app to learn programming logic step by step: short lessons, challenges with tests, pseudocode in Spanish, flowcharts, blocks and an automatic desk check. It works offline, with no ads and no account.</p>
+    <p>This is a test version: it may have bugs and change. Classes and community are not available on Linux.</p>
+  </description>
+  <description xml:lang="es">
+    <p>Jaguar Code es una app gratuita para aprender lógica de programación paso a paso: lecciones cortas, retos con pruebas, pseudocódigo en español, diagramas de flujo, bloques y prueba de escritorio automática. Funciona sin internet, sin anuncios y sin cuenta.</p>
+    <p>Es una versión de prueba: puede tener errores y cambiar. En Linux no están las clases ni la comunidad.</p>
+  </description>
+  <launchable type="desktop-id">org.jaguarcode.JaguarCode.desktop</launchable>
+  <url type="homepage">https://jaguarcode.org</url>
+  <url type="bugtracker">https://github.com/panterino/jaguar/issues</url>
+  <url type="vcs-browser">https://github.com/panterino/jaguar</url>
+  <categories>
+    <category>Education</category>
+    <category>Development</category>
+  </categories>
+  <keywords>
+    <keyword>programming</keyword>
+    <keyword>pseudocode</keyword>
+    <keyword>flowchart</keyword>
+    <keyword>algorithms</keyword>
+  </keywords>
+  <content_rating type="oars-1.1" />
+  <screenshots>
+    <screenshot type="default">
+      <image>https://jaguarcode.org/tiendas/computadora.png</image>
+      <caption>Write pseudocode and see its flowchart</caption>
+      <caption xml:lang="es">Escribe pseudocódigo y mira su diagrama de flujo</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://jaguarcode.org/tiendas/codigo-celular.png</image>
+      <caption>Code editor with the console</caption>
+      <caption xml:lang="es">Editor de código con la consola</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://jaguarcode.org/tiendas/diagrama-celular.png</image>
+      <caption>Flowchart that becomes pseudocode, and back</caption>
+      <caption xml:lang="es">Diagrama de flujo que se vuelve pseudocódigo, y al revés</caption>
+    </screenshot>
+  </screenshots>
+  <provides>
+    <binary>jaguar-code</binary>
+  </provides>
+  <branding>
+    <color type="primary" scheme_preference="light">#F4B723</color>
+    <color type="primary" scheme_preference="dark">#3B2410</color>
+  </branding>
+  <releases>
+    <release version="0.8.1" date="2026-10-27">
+      <description>
+        <p>Direct access to the app with a test-version notice, levels 2 and 3 of the path, and online tools.</p>
+      </description>
+    </release>
+  </releases>
+</component>

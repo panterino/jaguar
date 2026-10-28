@@ -1,0 +1,66 @@
+# Jaguar Code como snap. Se compila desde la raíz del repositorio (la app usa
+# packages/jaguar_core) y lo arma .github/workflows/escritorio.yml.
+name: jaguar-code
+title: Jaguar Code
+base: core22
+version: '0.8.1'
+summary: Aprende lógica de programación con pseudocódigo y diagramas de flujo
+description: |
+  Jaguar Code es una app gratuita para aprender lógica de programación, paso a
+  paso y en español: lecciones cortas, retos con pruebas, pseudocódigo,
+  diagramas de flujo, bloques y prueba de escritorio automática. Funciona sin
+  internet, sin anuncios y sin cuenta.
+
+  Es una versión de prueba: puede tener errores y cambiar. En Linux no están
+  las clases ni la comunidad.
+license: AGPL-3.0-only
+website: https://jaguarcode.org
+source-code: https://github.com/panterino/jaguar
+issues: https://github.com/panterino/jaguar/issues
+contact: https://jaguarcode.org
+icon: snap/gui/jaguar-code.png
+grade: stable
+confinement: strict
+architectures:
+  - build-on: amd64
+
+apps:
+  jaguar-code:
+    command: bin/jaguar
+    extensions: [gnome]
+    common-id: org.jaguarcode.JaguarCode
+    plugs:
+      - home
+      - removable-media
+      - network
+
+parts:
+  jaguar-code:
+    plugin: nil
+    source: .
+    build-packages:
+      - clang
+      - cmake
+      - curl
+      - git
+      - ninja-build
+      - pkg-config
+      - libgtk-3-dev
+      - liblzma-dev
+      - libstdc++-12-dev
+      - unzip
+      - xz-utils
+      - zip
+    stage-packages:
+      # Para el selector de archivos al abrir y guardar programas .psc.
+      - zenity
+    override-build: |
+      set -eu
+      git clone --depth 1 --branch 3.35.5 https://github.com/flutter/flutter.git "$CRAFT_PART_BUILD/../flutter-sdk"
+      export PATH="$CRAFT_PART_BUILD/../flutter-sdk/bin:$PATH"
+      export PUB_CACHE="$CRAFT_PART_BUILD/../pub-cache"
+      flutter config --no-analytics --no-cli-animations >/dev/null
+      cd apps/jaguar
+      flutter build linux --release
+      mkdir -p "$CRAFT_PART_INSTALL/bin"
+      cp -r build/linux/x64/release/bundle/. "$CRAFT_PART_INSTALL/bin/"
