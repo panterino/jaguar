@@ -161,6 +161,7 @@ String _pagina(String id) {
       <h2 id="cta-t">Pruébalo paso a paso en tu celular</h2>
       <p>En Jaguar Code escribes este algoritmo, lo ejecutas, ves su diagrama y haces la prueba de escritorio. El reto trae pistas y pruebas que te dicen si está bien. Gratis, sin anuncios y sin cuenta.</p>
       <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir Jaguar Code</a></div>
+      <p class="aviso-prueba"><b>Versión de prueba.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo.</p>
     </aside>
     <h2 style="margin-top:44px">Sigue con otro reto</h2>
     <div class="relacionadas">
@@ -396,6 +397,7 @@ Future<String> _herramienta() async {
       <h2 id="cta-t">En el celular, con diagrama y retos</h2>
       <p>Jaguar Code hace esta misma prueba de escritorio en la app, la deja llenar a mano para practicar y la combina con el diagrama de flujo, los bloques y doce retos con pistas. Gratis, sin anuncios y sin cuenta.</p>
       <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir Jaguar Code</a></div>
+      <p class="aviso-prueba"><b>Versión de prueba.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo.</p>
     </aside>
     <h2 style="margin-top:44px">Sigue aprendiendo</h2>
     <div class="relacionadas">
@@ -587,6 +589,7 @@ Future<String> _diagramaWeb() async {
       <h2 id="cta-t">Arma el diagrama con figuras en tu celular</h2>
       <p>En Jaguar Code dibujas el diagrama tocando figuras y el pseudocódigo se escribe solo, y al revés. Trae también bloques, la prueba de escritorio y doce retos con pistas. Gratis, sin anuncios y sin cuenta.</p>
       <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir Jaguar Code</a></div>
+      <p class="aviso-prueba"><b>Versión de prueba.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo.</p>
     </aside>
     <h2 style="margin-top:44px">Sigue aprendiendo</h2>
     <div class="relacionadas">
@@ -671,6 +674,7 @@ String _descargas() {
     <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › Descargas</nav>
     <h1>Descargar Jaguar Code</h1>
     <p class="resumen">Instálalo en tu celular o tu computadora, o ábrelo sin instalar nada en el navegador. Es gratis, sin anuncios y sin cuenta, y el código es abierto.</p>
+    <p class="aviso-prueba"><b>Versión de prueba.</b> Jaguar Code está en desarrollo: puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo.</p>
 
     <div class="relacionadas descargas">
       <a href="https://app.jaguarcode.org/">Navegador<small>Sin instalar. Funciona en Windows, Mac, Linux, Android, iPhone y iPad.</small></a>

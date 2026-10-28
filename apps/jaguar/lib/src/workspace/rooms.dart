@@ -5,6 +5,7 @@ import 'package:jaguar_core/jaguar_core.dart';
 
 import '../challenges/challenges.dart';
 import '../cloud/cloud.dart';
+import '../help/about_screen.dart' show jaguarVersion;
 import '../exercises/exercise_store.dart';
 import '../lessons/lessons.dart';
 import '../widgets/appear.dart';
@@ -457,7 +458,7 @@ class _HomeRoomState extends State<_HomeRoom> {
         if (room != primaryRoom) places[room]!,
     ];
 
-    return LayoutBuilder(
+    Widget portal(BuildContext context) => LayoutBuilder(
       builder: (context, constraints) {
         final h = constraints.maxHeight;
         final scale = MediaQuery.textScalerOf(context).scale(1);
@@ -468,12 +469,17 @@ class _HomeRoomState extends State<_HomeRoom> {
         final showTask = task != null && h >= 560;
         final taskHeight = showTask ? 56.0 + gap : 0.0;
         final hero = (0.17 * h).clamp(72.0, 132.0);
-        final room = h - top - bottom - hero - 2 * gap - taskHeight;
+        // The test-version notice takes its room from the rest, and goes away once read.
+        final noticeHeight = settings.betaNoticeVersion == jaguarVersion ? 0.0 : 86.0;
+        final roomBase = h - top - bottom - hero - 2 * gap - taskHeight;
+        // If the cards would get too small, they keep their size and the portal scrolls.
+        final noticeFits = roomBase - noticeHeight >= 420;
+        final room = noticeFits ? roomBase - noticeHeight : roomBase;
         final primaryHeight = (0.55 * room).clamp(168.0, 420.0);
         final rowHeight = (room - primaryHeight).clamp(150.0, 320.0);
         final leftover = math.max(0.0, room - primaryHeight - rowHeight);
         final compact = scale > 1.15 || room < 360;
-        final needsScroll = scale > 1.6 || h < 440;
+        final needsScroll = scale > 1.6 || h < 440 || (noticeHeight > 0 && !noticeFits);
 
         Widget place(_Place p, double height, {required bool wide, required int index}) => Appear(
           index: index,
@@ -495,6 +501,11 @@ class _HomeRoomState extends State<_HomeRoom> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SizedBox(height: top),
+            if (noticeHeight > 0)
+              SizedBox(
+                height: noticeHeight,
+                child: _BetaNotice(onDismiss: () => settings.betaNoticeVersion = jaguarVersion),
+              ),
             Appear(
               child: SizedBox(
                 height: hero,
@@ -539,6 +550,56 @@ class _HomeRoomState extends State<_HomeRoom> {
         );
         return padded;
       },
+    );
+    return ListenableBuilder(listenable: settings, builder: (context, _) => portal(context));
+  }
+}
+
+/// Jaguar Code is still a test version: the notice says so once per version,
+/// in plain words, and goes away with one touch.
+class _BetaNotice extends StatelessWidget {
+  const _BetaNotice({required this.onDismiss});
+
+  final VoidCallback onDismiss;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Align(
+      alignment: Alignment.topCenter,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 640),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
+          child: MediaQuery.withClampedTextScaling(
+            maxScaleFactor: 1.15,
+            child: Material(
+              color: scheme.tertiaryContainer,
+              borderRadius: BorderRadius.circular(16),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(14, 8, 6, 8),
+                child: Row(
+                  children: [
+                    Icon(Icons.science_outlined, color: scheme.onTertiaryContainer, size: 22),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        'Versión de prueba: puede tener errores y cambiar. Tus programas se guardan solo en este dispositivo.',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(color: scheme.onTertiaryContainer),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: onDismiss,
+                      style: TextButton.styleFrom(foregroundColor: scheme.onTertiaryContainer),
+                      child: const Text('Entendido'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
