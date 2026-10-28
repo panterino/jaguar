@@ -633,7 +633,7 @@ String _descargas() {
     ),
     (
       '¿Qué cambia entre la descarga y la versión web?',
-      'Es la misma app. En Windows y Linux faltan las clases y la comunidad, que dependen de un servicio que todavía no está configurado para esos sistemas; todo lo demás funciona sin internet.',
+      'Es la misma app. En Windows y Linux (tar.gz y Snap) faltan las clases y la comunidad, que dependen de un servicio que todavía no está configurado para esos sistemas; todo lo demás funciona sin internet.',
     ),
   ];
   final faq = preguntas
@@ -682,6 +682,7 @@ String _descargas() {
       <a href="$_bajar/JaguarCode-windows-x64.zip">Windows (ZIP)<small>Para Windows 10 y 11 de 64 bits. Se descomprime y se abre, sin instalador.</small></a>
       <a href="$_bajar/JaguarCode-macos.dmg">Mac (DMG)<small>Para Mac con chip de Apple o Intel.</small></a>
       <a href="$_bajar/JaguarCode-linux-x64.tar.gz">Linux (tar.gz)<small>Para Linux de 64 bits con escritorio GTK.</small></a>
+      <a href="https://snapcraft.io/jaguar-code">Linux (Snap)<small>Desde el Snap Store, en el canal beta. Se actualiza solo.</small></a>
     </div>
     <p class="nota-tabla">Todas las versiones y sus sumas de verificación están en <a href="https://github.com/panterino/jaguar/releases">la página de versiones</a>.</p>
 
@@ -712,6 +713,7 @@ String _descargas() {
       </section>
       <section id="linux">
         <h2>Cómo usarlo en Linux</h2>
+        <p>Con Snap, en una terminal: <code>sudo snap install jaguar-code --beta</code>. Se actualiza solo. Si prefieres el archivo, sigue estos pasos:</p>
         <ol>
           <li>Descomprime el archivo: <code>tar -xzf JaguarCode-linux-x64.tar.gz</code>.</li>
           <li>Entra a la carpeta y ejecuta <code>./jaguar</code>.</li>
