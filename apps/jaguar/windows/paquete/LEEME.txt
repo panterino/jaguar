@@ -1,0 +1,13 @@
+Jaguar Code para Windows (64 bits)
+
+1. Descomprime el archivo ZIP completo (no lo abras desde dentro del ZIP).
+2. Abre la carpeta y haz doble clic en jaguar.exe.
+
+La primera vez, Windows puede mostrar "Windows protegió tu PC" porque la app
+aun no esta firmada con un certificado de pago. Toca "Mas informacion" y
+despues "Ejecutar de todas formas".
+
+En Windows no estan las clases ni la comunidad (necesitan Firebase, que aqui
+aun no esta configurado); todo lo demas funciona sin internet.
+
+https://jaguarcode.org

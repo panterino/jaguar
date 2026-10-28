@@ -3,7 +3,7 @@
 #   tool/empaquetar.sh android   APK firmado con la llave de subida (ARM de 32 y 64 bits)
 #   tool/empaquetar.sh macos     DMG sin notarizar (hace falta un Mac)
 #   tool/empaquetar.sh todo      los dos
-# Linux no se puede compilar desde un Mac: lo arma .github/workflows/escritorio.yml.
+# Linux y Windows no se pueden compilar desde un Mac: los arma .github/workflows/escritorio.yml.
 # Los nombres no llevan versión para que https://github.com/panterino/jaguar/releases/latest/download/<nombre>
 # sea siempre la última.
 set -e

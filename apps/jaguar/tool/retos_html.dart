@@ -608,9 +608,9 @@ const _rutaDescargas = '/descargas';
 const _bajar = 'https://github.com/panterino/jaguar/releases/latest/download';
 
 String _descargas() {
-  const titulo = 'Descargar Jaguar Code: Android, Mac y Linux';
+  const titulo = 'Descargar Jaguar Code: Android, Windows, Mac y Linux';
   const desc =
-      'Descarga Jaguar Code gratis para Android (APK), Mac (DMG) y Linux. También funciona sin instalar en el navegador. Sin anuncios y sin cuenta.';
+      'Descarga Jaguar Code gratis para Android (APK), Windows, Mac (DMG) y Linux. También funciona sin instalar en el navegador. Sin anuncios y sin cuenta.';
   const preguntas = <(String, String)>[
     (
       '¿Es seguro instalar el APK fuera de Google Play?',
@@ -621,12 +621,16 @@ String _descargas() {
       'La app aún no está notarizada por Apple, un trámite de paga. La primera vez, haz clic derecho sobre Jaguar Code, elige Abrir y confirma. Después abre como cualquier otra.',
     ),
     (
-      '¿Hay versión para Windows o iPhone?',
-      'Todavía no. Mientras tanto, la versión web funciona en cualquier navegador, incluidos Windows, iPhone y iPad, y se puede agregar a la pantalla de inicio.',
+      '¿Hay versión para iPhone o iPad?',
+      'Todavía no como app instalable. Mientras tanto, la versión web funciona en el navegador de iPhone y iPad y se puede agregar a la pantalla de inicio.',
+    ),
+    (
+      '¿Por qué Windows dice que protegió mi PC?',
+      'Porque la app aún no está firmada con un certificado de pago. Toca Más información y luego Ejecutar de todas formas. El código es abierto y puedes revisarlo en GitHub.',
     ),
     (
       '¿Qué cambia entre la descarga y la versión web?',
-      'Es la misma app. En Linux faltan las clases y la comunidad, que dependen de un servicio sin versión para ese sistema; todo lo demás funciona sin internet.',
+      'Es la misma app. En Windows y Linux faltan las clases y la comunidad, que dependen de un servicio que todavía no está configurado para esos sistemas; todo lo demás funciona sin internet.',
     ),
   ];
   final faq = preguntas
@@ -642,7 +646,7 @@ String _descargas() {
       "@type": "SoftwareApplication",
       "name": "Jaguar Code",
       "applicationCategory": "EducationalApplication",
-      "operatingSystem": "Android, macOS, Linux, Web",
+      "operatingSystem": "Android, Windows, macOS, Linux, Web",
       "inLanguage": "es-MX",
       "isAccessibleForFree": true,
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "MXN" },
@@ -671,6 +675,7 @@ String _descargas() {
     <div class="relacionadas descargas">
       <a href="https://app.jaguarcode.org/">Navegador<small>Sin instalar. Funciona en Windows, Mac, Linux, Android, iPhone y iPad.</small></a>
       <a href="$_bajar/JaguarCode-android.apk">Android (APK)<small>Para celulares y tabletas con Android.</small></a>
+      <a href="$_bajar/JaguarCode-windows-x64.zip">Windows (ZIP)<small>Para Windows 10 y 11 de 64 bits. Se descomprime y se abre, sin instalador.</small></a>
       <a href="$_bajar/JaguarCode-macos.dmg">Mac (DMG)<small>Para Mac con chip de Apple o Intel.</small></a>
       <a href="$_bajar/JaguarCode-linux-x64.tar.gz">Linux (tar.gz)<small>Para Linux de 64 bits con escritorio GTK.</small></a>
     </div>
@@ -684,6 +689,15 @@ String _descargas() {
           <li>Ábrelo. Si Android lo pide, permite instalar apps desde esa fuente (solo para el navegador o el administrador de archivos que usaste).</li>
           <li>Toca Instalar y abre Jaguar Code.</li>
         </ol>
+      </section>
+      <section id="windows">
+        <h2>Cómo usarlo en Windows</h2>
+        <ol>
+          <li>Descarga el ZIP y descomprímelo completo (clic derecho, Extraer todo).</li>
+          <li>Abre la carpeta y haz doble clic en <code>jaguar.exe</code>.</li>
+          <li>Si Windows muestra «Windows protegió tu PC», toca Más información y luego Ejecutar de todas formas.</li>
+        </ol>
+        <p>En Windows no están las clases ni la comunidad; el resto funciona sin conexión.</p>
       </section>
       <section id="mac">
         <h2>Cómo instalarlo en Mac</h2>
