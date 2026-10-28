@@ -64,6 +64,17 @@ class ViewSettings extends ChangeNotifier {
   int get tourStep => _prefs.getInt('jaguar.view.tourStep') ?? 3;
   set tourStep(int value) => _set(() => _prefs.setInt('jaguar.view.tourStep', value));
 
+  /// The version for which the person already read "versión de prueba": the
+  /// notice shows again with each new version.
+  String? get betaNoticeVersion => _prefs.getString('jaguar.view.betaNotice');
+  set betaNoticeVersion(String? value) => _set(() {
+    if (value == null) {
+      _prefs.remove('jaguar.view.betaNotice');
+    } else {
+      _prefs.setString('jaguar.view.betaNotice', value);
+    }
+  });
+
   /// The first program that ran without error got its celebration.
   bool get firstRunDone => _prefs.getBool('jaguar.view.firstRunDone') ?? false;
   set firstRunDone(bool value) => _set(() => _prefs.setBool('jaguar.view.firstRunDone', value));

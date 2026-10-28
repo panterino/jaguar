@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jaguar/main.dart';
+import 'package:jaguar/src/help/about_screen.dart' show jaguarVersion;
 import 'package:jaguar/src/console/desk_check_screen.dart';
 import 'package:jaguar/src/editor/code_editor.dart';
 import 'package:jaguar/src/exercises/exercise_banner.dart';
@@ -181,6 +182,23 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(CodeEditor), findsNothing);
       expect(find.text('Primeros pasos'), findsOneWidget);
+    });
+
+    testWidgets('Inicio avisa que es una versión de prueba, una sola vez por versión', (tester) async {
+      await _pumpPhone(tester, values: {'jaguar.view.mode': 'basic', 'jaguar.view.tourStep': 3}, openEditor: false);
+      expect(find.textContaining('Versión de prueba'), findsOneWidget);
+      await tester.tap(find.text('Entendido'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Versión de prueba'), findsNothing);
+    });
+
+    testWidgets('el aviso de versión de prueba no sale si ya se leyó en esta versión', (tester) async {
+      await _pumpPhone(
+        tester,
+        values: {'jaguar.view.mode': 'basic', 'jaguar.view.tourStep': 3, 'jaguar.view.betaNotice': jaguarVersion},
+        openEditor: false,
+      );
+      expect(find.textContaining('Versión de prueba'), findsNothing);
     });
 
     testWidgets('la Ruta avisa que nada está bloqueado', (tester) async {
