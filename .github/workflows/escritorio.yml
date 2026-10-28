@@ -5,6 +5,11 @@ name: Escritorio
 
 on:
   workflow_dispatch:
+    inputs:
+      etiqueta:
+        description: 'Etiqueta de una publicación ya hecha a la que adjuntar el paquete (por ejemplo v0.8.0). Vacío: solo compilar.'
+        required: false
+        default: ''
   release:
     types: [published]
 
@@ -42,13 +47,14 @@ jobs:
           name: JaguarCode-linux-x64
           path: apps/jaguar/JaguarCode-linux-x64.tar.gz
       - name: Adjuntar a la publicación
-        if: github.event_name == 'release'
+        if: github.event_name == 'release' || inputs.etiqueta != ''
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "${{ github.event.release.tag_name }}" apps/jaguar/JaguarCode-linux-x64.tar.gz --clobber
+        run: gh release upload "${{ github.event.release.tag_name || inputs.etiqueta }}" apps/jaguar/JaguarCode-linux-x64.tar.gz --clobber
 
   windows:
-    runs-on: windows-latest
+    # La 2022 trae Visual Studio 2022, que es el que busca Flutter 3.35.
+    runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
@@ -78,7 +84,7 @@ jobs:
           name: JaguarCode-windows-x64
           path: apps/jaguar/JaguarCode-windows-x64.zip
       - name: Adjuntar a la publicación
-        if: github.event_name == 'release'
+        if: github.event_name == 'release' || inputs.etiqueta != ''
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "${{ github.event.release.tag_name }}" apps/jaguar/JaguarCode-windows-x64.zip --clobber
+        run: gh release upload "${{ github.event.release.tag_name || inputs.etiqueta }}" apps/jaguar/JaguarCode-windows-x64.zip --clobber
