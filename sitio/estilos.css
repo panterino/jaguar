@@ -606,3 +606,9 @@ footer .quien { margin-right: auto; display: flex; align-items: center; gap: 10p
 @media (min-width: 900px) { .herramienta.dos-columnas { margin-left: -60px; margin-right: -60px; } .herramienta .cols { grid-template-columns: 1fr 1fr; } }
 .herramienta .diagrama svg { max-width: 100%; height: auto; }
 .herramienta button:disabled { opacity: .55; cursor: not-allowed; }
+
+/* Acceso directo a la app, con el aviso de versión de prueba */
+.entrada { margin: 18px 0 6px; }
+.aviso-prueba { margin: 12px 0 16px; padding: 10px 14px; border-radius: 12px; border-left: 4px solid var(--amarillo); background: rgba(244, 183, 35, .16); font-size: 14.5px; line-height: 1.5; max-width: 520px; }
+.portada .aviso-prueba { color: var(--portada-texto); background: rgba(244, 183, 35, .14); }
+.portada .aviso-prueba b { color: var(--amarillo); }

@@ -4,7 +4,7 @@ import '../theme.dart';
 import 'privacy.dart';
 import '../widgets/mascota.dart';
 
-const jaguarVersion = '0.8.0';
+const jaguarVersion = '0.8.1';
 
 /// Acerca de: what Jaguar is, where it comes from and what it stands for.
 class AboutScreen extends StatelessWidget {
@@ -31,7 +31,7 @@ class AboutScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('Jaguar Code', style: theme.textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w800)),
-                        Text('Un proyecto de Panterino · versión $jaguarVersion', style: theme.textTheme.bodyMedium),
+                        Text('Un proyecto de Panterino · versión $jaguarVersion (de prueba)', style: theme.textTheme.bodyMedium),
                       ],
                     ),
                   ),
