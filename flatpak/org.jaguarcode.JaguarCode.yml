@@ -1,0 +1,38 @@
+# Manifiesto de Flatpak (para Flathub). Usa el paquete de Linux de cada
+# publicación (release) de GitHub; tool/actualizar_flatpak.sh pone la
+# dirección y la suma de verificación de la versión nueva.
+app-id: org.jaguarcode.JaguarCode
+runtime: org.gnome.Platform
+runtime-version: '50'
+sdk: org.gnome.Sdk
+command: jaguar-code
+finish-args:
+  - --share=ipc
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --device=dri
+  # Abrir y guardar programas .psc desde la carpeta personal.
+  - --filesystem=home
+modules:
+  - name: jaguar-code
+    buildsystem: simple
+    build-commands:
+      - mkdir -p /app/jaguar-code
+      - cp -r jaguar lib data /app/jaguar-code/
+      - install -Dm755 jaguar-code.sh /app/bin/jaguar-code
+      - install -Dm644 org.jaguarcode.JaguarCode.desktop /app/share/applications/org.jaguarcode.JaguarCode.desktop
+      - install -Dm644 org.jaguarcode.JaguarCode.metainfo.xml /app/share/metainfo/org.jaguarcode.JaguarCode.metainfo.xml
+      - install -Dm644 org.jaguarcode.JaguarCode.png /app/share/icons/hicolor/512x512/apps/org.jaguarcode.JaguarCode.png
+    sources:
+      - type: archive
+        url: https://github.com/panterino/jaguar/releases/download/v0.8.1/JaguarCode-linux-x64.tar.gz
+        sha256: f55392f018a47229f63ca7397628a8fcee3758aaea8e2a1dbf892462ad7b9871
+        strip-components: 1
+      - type: file
+        path: jaguar-code.sh
+      - type: file
+        path: org.jaguarcode.JaguarCode.desktop
+      - type: file
+        path: org.jaguarcode.JaguarCode.metainfo.xml
+      - type: file
+        path: org.jaguarcode.JaguarCode.png

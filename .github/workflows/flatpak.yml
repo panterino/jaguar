@@ -1,0 +1,34 @@
+# Prueba que el manifiesto de Flatpak compila (no publica nada: Flathub compila
+# por su cuenta cuando se acepta la solicitud). Se lanza a mano desde Actions.
+name: Flatpak
+
+on:
+  workflow_dispatch:
+
+env:
+  # Debe coincidir con runtime-version del manifiesto.
+  GNOME: '50'
+
+jobs:
+  flatpak:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Herramientas
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y flatpak flatpak-builder appstream
+          flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+          flatpak install --user -y flathub org.gnome.Platform//$GNOME org.gnome.Sdk//$GNOME
+      - name: Validar el metainfo
+        run: appstreamcli validate --no-net flatpak/org.jaguarcode.JaguarCode.metainfo.xml
+      - name: Compilar
+        working-directory: flatpak
+        run: flatpak-builder --user --force-clean --repo=repo --install build org.jaguarcode.JaguarCode.yml
+      - name: Empaquetar
+        working-directory: flatpak
+        run: flatpak build-bundle repo JaguarCode.flatpak org.jaguarcode.JaguarCode
+      - uses: actions/upload-artifact@v4
+        with:
+          name: JaguarCode-flatpak
+          path: flatpak/JaguarCode.flatpak
