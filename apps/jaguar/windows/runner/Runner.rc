@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.panterino" "\0"
-            VALUE "FileDescription", "jaguar" "\0"
+            VALUE "FileDescription", "Jaguar Code" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "jaguar" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 com.panterino. All rights reserved." "\0"
             VALUE "OriginalFilename", "jaguar.exe" "\0"
-            VALUE "ProductName", "jaguar" "\0"
+            VALUE "ProductName", "Jaguar Code" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
