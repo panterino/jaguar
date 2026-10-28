@@ -47,7 +47,7 @@
         { "@type": "ListItem", "position": 2, "name": "Descargas", "item": "https://jaguarcode.org/descargas" }
       ]
     },
-    { "@type": "FAQPage", "mainEntity": [{"@type":"Question","name":"¿Es seguro instalar el APK fuera de Google Play?","acceptedAnswer":{"@type":"Answer","text":"El APK está firmado por Panterino y su código es abierto en GitHub. Android pide permiso para instalar apps de fuera de la tienda; se da solo para el navegador o el administrador de archivos con el que lo abres. Cada descarga trae una suma de verificación SHA-256 en la página de la versión."}},{"@type":"Question","name":"¿Por qué el Mac dice que no puede verificar la app?","acceptedAnswer":{"@type":"Answer","text":"La app aún no está notarizada por Apple, un trámite de paga. La primera vez, haz clic derecho sobre Jaguar Code, elige Abrir y confirma. Después abre como cualquier otra."}},{"@type":"Question","name":"¿Hay versión para iPhone o iPad?","acceptedAnswer":{"@type":"Answer","text":"Todavía no como app instalable. Mientras tanto, la versión web funciona en el navegador de iPhone y iPad y se puede agregar a la pantalla de inicio."}},{"@type":"Question","name":"¿Por qué Windows dice que protegió mi PC?","acceptedAnswer":{"@type":"Answer","text":"Porque la app aún no está firmada con un certificado de pago. Toca Más información y luego Ejecutar de todas formas. El código es abierto y puedes revisarlo en GitHub."}},{"@type":"Question","name":"¿Qué cambia entre la descarga y la versión web?","acceptedAnswer":{"@type":"Answer","text":"Es la misma app. En Windows y Linux faltan las clases y la comunidad, que dependen de un servicio que todavía no está configurado para esos sistemas; todo lo demás funciona sin internet."}}] }
+    { "@type": "FAQPage", "mainEntity": [{"@type":"Question","name":"¿Es seguro instalar el APK fuera de Google Play?","acceptedAnswer":{"@type":"Answer","text":"El APK está firmado por Panterino y su código es abierto en GitHub. Android pide permiso para instalar apps de fuera de la tienda; se da solo para el navegador o el administrador de archivos con el que lo abres. Cada descarga trae una suma de verificación SHA-256 en la página de la versión."}},{"@type":"Question","name":"¿Por qué el Mac dice que no puede verificar la app?","acceptedAnswer":{"@type":"Answer","text":"La app aún no está notarizada por Apple, un trámite de paga. La primera vez, haz clic derecho sobre Jaguar Code, elige Abrir y confirma. Después abre como cualquier otra."}},{"@type":"Question","name":"¿Hay versión para iPhone o iPad?","acceptedAnswer":{"@type":"Answer","text":"Todavía no como app instalable. Mientras tanto, la versión web funciona en el navegador de iPhone y iPad y se puede agregar a la pantalla de inicio."}},{"@type":"Question","name":"¿Por qué Windows dice que protegió mi PC?","acceptedAnswer":{"@type":"Answer","text":"Porque la app aún no está firmada con un certificado de pago. Toca Más información y luego Ejecutar de todas formas. El código es abierto y puedes revisarlo en GitHub."}},{"@type":"Question","name":"¿Qué cambia entre la descarga y la versión web?","acceptedAnswer":{"@type":"Answer","text":"Es la misma app. En Windows y Linux (tar.gz y Snap) faltan las clases y la comunidad, que dependen de un servicio que todavía no está configurado para esos sistemas; todo lo demás funciona sin internet."}}] }
   ]
 }
 </script>
@@ -81,6 +81,7 @@
       <a href="https://github.com/panterino/jaguar/releases/latest/download/JaguarCode-windows-x64.zip">Windows (ZIP)<small>Para Windows 10 y 11 de 64 bits. Se descomprime y se abre, sin instalador.</small></a>
       <a href="https://github.com/panterino/jaguar/releases/latest/download/JaguarCode-macos.dmg">Mac (DMG)<small>Para Mac con chip de Apple o Intel.</small></a>
       <a href="https://github.com/panterino/jaguar/releases/latest/download/JaguarCode-linux-x64.tar.gz">Linux (tar.gz)<small>Para Linux de 64 bits con escritorio GTK.</small></a>
+      <a href="https://snapcraft.io/jaguar-code">Linux (Snap)<small>Desde el Snap Store, en el canal beta. Se actualiza solo.</small></a>
     </div>
     <p class="nota-tabla">Todas las versiones y sus sumas de verificación están en <a href="https://github.com/panterino/jaguar/releases">la página de versiones</a>.</p>
 
@@ -111,6 +112,7 @@
       </section>
       <section id="linux">
         <h2>Cómo usarlo en Linux</h2>
+        <p>Con Snap, en una terminal: <code>sudo snap install jaguar-code --beta</code>. Se actualiza solo. Si prefieres el archivo, sigue estos pasos:</p>
         <ol>
           <li>Descomprime el archivo: <code>tar -xzf JaguarCode-linux-x64.tar.gz</code>.</li>
           <li>Entra a la carpeta y ejecuta <code>./jaguar</code>.</li>
@@ -124,7 +126,7 @@
         <details><summary>¿Por qué el Mac dice que no puede verificar la app?</summary><p>La app aún no está notarizada por Apple, un trámite de paga. La primera vez, haz clic derecho sobre Jaguar Code, elige Abrir y confirma. Después abre como cualquier otra.</p></details>
         <details><summary>¿Hay versión para iPhone o iPad?</summary><p>Todavía no como app instalable. Mientras tanto, la versión web funciona en el navegador de iPhone y iPad y se puede agregar a la pantalla de inicio.</p></details>
         <details><summary>¿Por qué Windows dice que protegió mi PC?</summary><p>Porque la app aún no está firmada con un certificado de pago. Toca Más información y luego Ejecutar de todas formas. El código es abierto y puedes revisarlo en GitHub.</p></details>
-        <details><summary>¿Qué cambia entre la descarga y la versión web?</summary><p>Es la misma app. En Windows y Linux faltan las clases y la comunidad, que dependen de un servicio que todavía no está configurado para esos sistemas; todo lo demás funciona sin internet.</p></details>
+        <details><summary>¿Qué cambia entre la descarga y la versión web?</summary><p>Es la misma app. En Windows y Linux (tar.gz y Snap) faltan las clases y la comunidad, que dependen de un servicio que todavía no está configurado para esos sistemas; todo lo demás funciona sin internet.</p></details>
       </section>
     </article>
     <h2 style="margin-top:44px">Antes de instalar</h2>
