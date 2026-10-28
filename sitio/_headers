@@ -8,6 +8,8 @@
   Cache-Control: public, max-age=3600
 /acceso.js
   Cache-Control: public, max-age=3600
+/analitica.js
+  Cache-Control: public, max-age=3600
 /*.png
   Cache-Control: public, max-age=86400
 /*.svg

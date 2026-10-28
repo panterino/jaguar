@@ -29,6 +29,27 @@ void main() {
     expect(carpetas.last.listSync().whereType<File>().length, greaterThanOrEqualTo(13));
   });
 
+  test('la analítica es la misma en la landing y en la app, y cada página la carga', () {
+    final landing = File('../../sitio/analitica.js').readAsStringSync();
+    expect(
+      File('../../apps/jaguar/web/analitica.js').readAsStringSync(),
+      landing,
+      reason: 'Copia sitio/analitica.js a apps/jaguar/web/',
+    );
+    expect(landing, contains('G-1T1QH5RR0E'));
+    // Nada de Google se pide antes de aceptar: el script solo se agrega en cargar().
+    expect(landing, isNot(contains("<script src=\"https://www.googletagmanager")));
+    final paginas = Directory(
+      '../../sitio',
+    ).listSync(recursive: true).whereType<File>().where((f) => f.path.endsWith('.html')).toList();
+    expect(paginas, isNotEmpty);
+    for (final f in paginas) {
+      expect(f.readAsStringSync(), contains('analitica.js'), reason: f.path);
+    }
+    expect(File('../../apps/jaguar/web/index.html').readAsStringSync(), contains('analitica.js'));
+    expect(File('../../apps/jaguar/web/privacidad.html').readAsStringSync(), contains('analitica.js'));
+  });
+
   test('el generador de diagramas tiene su página y su núcleo compilado', () {
     final html = File('../../sitio/herramientas/diagrama-de-flujo-online.html').readAsStringSync();
     expect(html, contains('id="bajar-svg"'));
