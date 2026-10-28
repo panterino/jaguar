@@ -186,7 +186,7 @@ void main() {
     testWidgets('la Ruta avisa que nada está bloqueado', (tester) async {
       await _pumpPhone(tester, values: {'jaguar.view.mode': 'basic', 'jaguar.view.tourStep': 3}, openEditor: false);
       await irASala(tester, 'Ruta');
-      await tester.scrollUntilVisible(find.textContaining('Nada está bloqueado'), 200);
+      await tester.scrollUntilVisible(find.textContaining('Nada está bloqueado'), 200, maxScrolls: 500);
       expect(find.textContaining('Nada está bloqueado'), findsOneWidget);
     });
 

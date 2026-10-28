@@ -80,6 +80,13 @@ class _Translator {
     return '$text\n';
   }
 
+  /// The variable or array a plain reference stands for, in lowercase.
+  String? _nameOf(Expr e) => switch (e) {
+    VarRef(:final name) => name.toLowerCase(),
+    IndexExpr(:final name) => name.toLowerCase(),
+    _ => null,
+  };
+
   // Types --------------------------------------------------------------------
 
   /// Marks which variables are numbers and which are text, from how they are
@@ -118,7 +125,8 @@ class _Translator {
             if (right is StringLit) text(left);
             if (const {'<', '>', '<=', '>='}.contains(op) && left is! StringLit && right is! StringLit) {
               for (final side in [left, right]) {
-                if (side is VarRef) _ordered.add(side.name.toLowerCase());
+                final name = _nameOf(side);
+                if (name != null) _ordered.add(name);
               }
             }
             // Two values added with nothing that says text: they are numbers.
@@ -171,7 +179,9 @@ class _Translator {
           expr(value);
           if (value is StringLit && target is VarRef) _text.add(target.name.toLowerCase());
           if (value is NumberLit && target is VarRef) _numeric.add(target.name.toLowerCase());
-          if (value is VarRef && target is VarRef) _copies.add((target.name.toLowerCase(), value.name.toLowerCase()));
+          final to = _nameOf(target);
+          final from = _nameOf(value);
+          if (to != null && from != null) _copies.add((to, from));
         case WriteStmt(:final values):
           values.forEach(expr);
         case IfStmt(:final condition, :final thenBody, :final elseBody):

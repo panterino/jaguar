@@ -111,7 +111,8 @@ void main() {
       expect(nextChallenge('reto-1-04')!.id, 'reto-1-11');
       expect(nextChallenge('reto-1-12')!.id, 'reto-1-05');
       expect(nextChallenge('reto-1-10')!.id, 'reto-2-01');
-      expect(nextChallenge('reto-2-12'), isNull);
+      expect(nextChallenge('reto-2-12')!.id, 'reto-3-01');
+      expect(nextChallenge('reto-3-12'), isNull);
     });
 
     test('el siguiente paso es el primero sin hacer, y es nulo al terminar', () {

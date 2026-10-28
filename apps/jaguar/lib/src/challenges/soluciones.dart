@@ -296,4 +296,198 @@ Algoritmo escalera
     FinPara
 FinAlgoritmo
 ''',
+  'reto-3-01': '''
+Algoritmo al_reves
+    Dimension a[5]
+    Para i <- 1 Hasta 5 Hacer
+        Leer a[i]
+    FinPara
+    Para i <- 5 Hasta 1 Con Paso -1 Hacer
+        Escribir a[i]
+    FinPara
+FinAlgoritmo
+''',
+  'reto-3-02': '''
+Algoritmo suma_y_promedio
+    Leer n
+    Dimension a[n]
+    suma <- 0
+    Para i <- 1 Hasta n Hacer
+        Leer a[i]
+        suma <- suma + a[i]
+    FinPara
+    Escribir "Suma: ", suma
+    Escribir "Promedio: ", suma / n
+FinAlgoritmo
+''',
+  'reto-3-03': '''
+Algoritmo cuantos_pares
+    Leer n
+    Dimension a[n]
+    pares <- 0
+    Para i <- 1 Hasta n Hacer
+        Leer a[i]
+        Si a[i] MOD 2 = 0 Entonces
+            pares <- pares + 1
+        FinSi
+    FinPara
+    Escribir "Pares: ", pares
+FinAlgoritmo
+''',
+  'reto-3-04': '''
+Algoritmo mayor_y_posicion
+    Leer n
+    Dimension a[n]
+    Para i <- 1 Hasta n Hacer
+        Leer a[i]
+    FinPara
+    mayor <- a[1]
+    pos <- 1
+    Para i <- 2 Hasta n Con Paso 1 Hacer
+        Si a[i] > mayor Entonces
+            mayor <- a[i]
+            pos <- i
+        FinSi
+    FinPara
+    Escribir "Mayor: ", mayor, " en la posición ", pos
+FinAlgoritmo
+''',
+  'reto-3-05': '''
+Algoritmo buscar_un_numero
+    Leer n
+    Dimension a[n]
+    Para i <- 1 Hasta n Hacer
+        Leer a[i]
+    FinPara
+    Leer buscado
+    pos <- 0
+    Para i <- 1 Hasta n Hacer
+        Si a[i] = buscado Y pos = 0 Entonces
+            pos <- i
+        FinSi
+    FinPara
+    Si pos = 0 Entonces
+        Escribir "No está"
+    SiNo
+        Escribir "Está en la posición ", pos
+    FinSi
+FinAlgoritmo
+''',
+  'reto-3-06': '''
+Algoritmo menor_y_mayor
+    Leer n
+    Dimension a[n]
+    Para i <- 1 Hasta n Hacer
+        Leer a[i]
+    FinPara
+    menor <- a[1]
+    mayor <- a[1]
+    Para i <- 2 Hasta n Con Paso 1 Hacer
+        Si a[i] < menor Entonces
+            menor <- a[i]
+        FinSi
+        Si a[i] > mayor Entonces
+            mayor <- a[i]
+        FinSi
+    FinPara
+    Escribir "Menor: ", menor
+    Escribir "Mayor: ", mayor
+FinAlgoritmo
+''',
+  'reto-3-07': '''
+Algoritmo contar_vocales
+    Definir palabra Como Texto
+    Leer palabra
+    vocales <- 0
+    Para i <- 1 Hasta Longitud(palabra) Hacer
+        letra <- Subcadena(palabra, i, i)
+        Si letra = "a" O letra = "e" O letra = "i" O letra = "o" O letra = "u" Entonces
+            vocales <- vocales + 1
+        FinSi
+    FinPara
+    Escribir "Vocales: ", vocales
+FinAlgoritmo
+''',
+  'reto-3-08': '''
+Algoritmo palindromo
+    Definir palabra Como Texto
+    Leer palabra
+    n <- Longitud(palabra)
+    es <- Verdadero
+    Para i <- 1 Hasta n Hacer
+        Si Subcadena(palabra, i, i) <> Subcadena(palabra, n - i + 1, n - i + 1) Entonces
+            es <- Falso
+        FinSi
+    FinPara
+    Si es Entonces
+        Escribir "Es palíndromo"
+    SiNo
+        Escribir "No es palíndromo"
+    FinSi
+FinAlgoritmo
+''',
+  'reto-3-09': '''
+Algoritmo texto_al_reves
+    Definir texto Como Texto
+    Leer texto
+    al <- ""
+    Para i <- Longitud(texto) Hasta 1 Con Paso -1 Hacer
+        al <- al + Subcadena(texto, i, i)
+    FinPara
+    Escribir al
+FinAlgoritmo
+''',
+  'reto-3-10': '''
+Algoritmo suma_por_filas
+    Dimension m[2, 3]
+    Para i <- 1 Hasta 2 Hacer
+        Para j <- 1 Hasta 3 Hacer
+            Leer m[i, j]
+        FinPara
+    FinPara
+    Para i <- 1 Hasta 2 Hacer
+        suma <- 0
+        Para j <- 1 Hasta 3 Hacer
+            suma <- suma + m[i, j]
+        FinPara
+        Escribir "Fila ", i, ": ", suma
+    FinPara
+FinAlgoritmo
+''',
+  'reto-3-11': '''
+Algoritmo ordenar
+    Leer n
+    Dimension a[n]
+    Para i <- 1 Hasta n Hacer
+        Leer a[i]
+    FinPara
+    Para pasada <- 1 Hasta n - 1 Con Paso 1 Hacer
+        Para i <- 1 Hasta n - 1 Con Paso 1 Hacer
+            Si a[i] > a[i + 1] Entonces
+                aux <- a[i]
+                a[i] <- a[i + 1]
+                a[i + 1] <- aux
+            FinSi
+        FinPara
+    FinPara
+    Para i <- 1 Hasta n Hacer
+        Escribir a[i]
+    FinPara
+FinAlgoritmo
+''',
+  'reto-3-12': '''
+Algoritmo diagonal
+    Dimension m[3, 3]
+    Para i <- 1 Hasta 3 Hacer
+        Para j <- 1 Hasta 3 Hacer
+            Leer m[i, j]
+        FinPara
+    FinPara
+    suma <- 0
+    Para i <- 1 Hasta 3 Hacer
+        suma <- suma + m[i, i]
+    FinPara
+    Escribir "Diagonal: ", suma
+FinAlgoritmo
+''',
 };

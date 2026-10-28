@@ -1556,9 +1556,9 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
     if (exercise == null) return 'Taller';
     final blockIndex = blockChallenges.indexWhere((c) => c.id == exercise.id);
     if (blockIndex >= 0) return 'Ruta · Nivel 0 · Bloques ${blockIndex + 1}';
-    final index = [...challenges, ...challengesNivel2].indexWhere((c) => c.id == exercise.id);
+    final index = [...challenges, ...challengesNivel2, ...challengesNivel3].indexWhere((c) => c.id == exercise.id);
     if (index < 0) return 'Ejercicio del profe';
-    final challenge = [...challenges, ...challengesNivel2][index];
+    final challenge = [...challenges, ...challengesNivel2, ...challengesNivel3][index];
     return 'Ruta · Nivel ${challenge.level} · Reto ${index + 1}';
   }
 

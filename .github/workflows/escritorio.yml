@@ -1,0 +1,84 @@
+# Compila Jaguar Code para Linux y Windows (no se puede desde un Mac) y lo adjunta a la
+# publicación (release) de GitHub. También se puede lanzar a mano desde la
+# pestaña Actions para probar el paquete.
+name: Escritorio
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  linux:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.35.5
+          channel: stable
+          cache: true
+      - name: Dependencias de compilación
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev
+      - name: Compilar
+        working-directory: apps/jaguar
+        run: flutter build linux --release
+      - name: Empaquetar
+        working-directory: apps/jaguar
+        run: |
+          paquete=JaguarCode
+          mkdir "$paquete"
+          cp -R build/linux/x64/release/bundle/. "$paquete/"
+          cp linux/paquete/* "$paquete/"
+          tar -czf JaguarCode-linux-x64.tar.gz "$paquete"
+          sha256sum JaguarCode-linux-x64.tar.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: JaguarCode-linux-x64
+          path: apps/jaguar/JaguarCode-linux-x64.tar.gz
+      - name: Adjuntar a la publicación
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ github.event.release.tag_name }}" apps/jaguar/JaguarCode-linux-x64.tar.gz --clobber
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.35.5
+          channel: stable
+          cache: true
+      - name: Compilar
+        working-directory: apps/jaguar
+        run: flutter build windows --release
+      - name: Empaquetar
+        working-directory: apps/jaguar
+        shell: pwsh
+        run: |
+          $paquete = "JaguarCode"
+          New-Item -ItemType Directory $paquete | Out-Null
+          Copy-Item -Recurse build/windows/x64/runner/Release/* $paquete/
+          # Las librerías de Visual C++, para que abra en equipos que no las tengan.
+          foreach ($dll in "msvcp140.dll", "vcruntime140.dll", "vcruntime140_1.dll") {
+            Copy-Item "$env:SystemRoot/System32/$dll" $paquete/
+          }
+          Copy-Item windows/paquete/LEEME.txt $paquete/
+          Compress-Archive -Path $paquete -DestinationPath JaguarCode-windows-x64.zip
+          (Get-FileHash JaguarCode-windows-x64.zip -Algorithm SHA256).Hash
+      - uses: actions/upload-artifact@v4
+        with:
+          name: JaguarCode-windows-x64
+          path: apps/jaguar/JaguarCode-windows-x64.zip
+      - name: Adjuntar a la publicación
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ github.event.release.tag_name }}" apps/jaguar/JaguarCode-windows-x64.zip --clobber
