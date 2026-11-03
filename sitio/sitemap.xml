@@ -4,8 +4,14 @@
   <url><loc>https://jaguarcode.org/guias</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://jaguarcode.org/guias/que-es-un-algoritmo</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://jaguarcode.org/guias/que-es-el-pseudocodigo</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jaguarcode.org/guias/variables-y-tipos-de-datos</loc><lastmod>2026-11-03</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jaguarcode.org/guias/condicionales-si-y-segun</loc><lastmod>2026-11-03</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jaguarcode.org/guias/ciclos-mientras-para-repetir</loc><lastmod>2026-11-03</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jaguarcode.org/guias/arreglos-en-pseudocodigo</loc><lastmod>2026-11-03</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://jaguarcode.org/guias/como-hacer-un-diagrama-de-flujo</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jaguarcode.org/guias/pseudocodigo-diagrama-de-flujo-y-bloques</loc><lastmod>2026-11-03</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://jaguarcode.org/guias/prueba-de-escritorio</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jaguarcode.org/guias/de-pseudocodigo-a-python</loc><lastmod>2026-11-03</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://jaguarcode.org/guias/pseint-en-el-celular</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://jaguarcode.org/guias/abrir-archivos-psc-en-android</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://jaguarcode.org/descargas</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
@@ -26,4 +32,5 @@
   <url><loc>https://jaguarcode.org/retos/algoritmo-de-contrasena-con-repetir</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://jaguarcode.org/profes</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://jaguarcode.org/manual</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://jaguarcode.org/por-que-jaguar</loc><lastmod>2026-11-03</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
 </urlset>

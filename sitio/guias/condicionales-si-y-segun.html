@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Condicionales en pseudocódigo: Si, SiNo y Segun con ejemplos</title>
+<meta name="description" content="Cómo tomar decisiones en pseudocódigo con Si, SiNo, Si anidados y Segun. Ejemplos ejecutables, su diagrama de flujo, condiciones con Y y O, y los errores más comunes.">
+<link rel="canonical" href="https://jaguarcode.org/guias/condicionales-si-y-segun">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="apple-touch-icon" href="/icono.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Jaguar Code">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://jaguarcode.org/guias/condicionales-si-y-segun">
+<meta property="og:title" content="Condicionales en pseudocódigo: Si, SiNo y Segun con ejemplos">
+<meta property="og:description" content="Cómo tomar decisiones en pseudocódigo con Si, SiNo, Si anidados y Segun. Ejemplos ejecutables, su diagrama de flujo, condiciones con Y y O, y los errores más comunes.">
+<meta property="og:image" content="https://jaguarcode.org/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Condicionales en pseudocódigo: Si, SiNo y Segun con ejemplos">
+<meta name="twitter:description" content="Cómo tomar decisiones en pseudocódigo con Si, SiNo, Si anidados y Segun. Ejemplos ejecutables, su diagrama de flujo, condiciones con Y y O, y los errores más comunes.">
+<meta name="twitter:image" content="https://jaguarcode.org/compartir.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://jaguarcode.org/guias/condicionales-si-y-segun#articulo",
+      "headline": "Condicionales en pseudocódigo: Si, SiNo y Segun con ejemplos",
+      "description": "Cómo tomar decisiones en pseudocódigo con Si, SiNo, Si anidados y Segun. Ejemplos ejecutables, su diagrama de flujo, condiciones con Y y O, y los errores más comunes.",
+      "inLanguage": "es-MX",
+      "datePublished": "2026-11-03",
+      "dateModified": "2026-11-03",
+      "mainEntityOfPage": "https://jaguarcode.org/guias/condicionales-si-y-segun",
+      "image": "https://jaguarcode.org/compartir.png",
+      "author": { "@type": "Organization", "name": "Panterino", "url": "https://jaguarcode.org/" },
+      "publisher": { "@type": "Organization", "name": "Panterino", "logo": { "@type": "ImageObject", "url": "https://jaguarcode.org/icono.png" } }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "https://jaguarcode.org/" },
+        { "@type": "ListItem", "position": 2, "name": "Guías", "item": "https://jaguarcode.org/guias" },
+        { "@type": "ListItem", "position": 3, "name": "Condicionales en pseudocódigo: Si y Segun", "item": "https://jaguarcode.org/guias/condicionales-si-y-segun" }
+      ]
+    },
+    { "@type": "FAQPage", "mainEntity": [{"@type":"Question","name":"¿Qué es una estructura condicional en pseudocódigo?","acceptedAnswer":{"@type":"Answer","text":"Es una instrucción que hace que el programa elija qué pasos ejecutar según si una condición es verdadera o falsa. Las más comunes son Si … Entonces … SiNo … FinSi y Segun … FinSegun."}},{"@type":"Question","name":"¿Cuál es la diferencia entre Si y Segun?","acceptedAnswer":{"@type":"Answer","text":"Si evalúa cualquier condición verdadera o falsa, incluidas comparaciones y rangos. Segun compara una sola variable contra valores exactos. Para un menú de opciones Segun es más claro; para rangos o condiciones combinadas se usa Si."}},{"@type":"Question","name":"¿Es obligatorio poner SiNo?","acceptedAnswer":{"@type":"Answer","text":"No. Si solo hay que hacer algo cuando la condición se cumple, basta con Si … Entonces … FinSi. El SiNo se agrega cuando también hay algo que hacer en el caso contrario."}},{"@type":"Question","name":"¿Cuántos Si puedo poner uno dentro de otro?","acceptedAnswer":{"@type":"Answer","text":"Los que necesites, pero con más de tres niveles el programa se vuelve difícil de leer. Si todas las preguntas son sobre el valor exacto de una variable, conviene usar Segun."}}] }
+  ]
+}
+</script>
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/estilos.css">
+</head>
+<body>
+<header class="sitio-barra">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="/logo.svg" alt="" width="46" height="40">
+      <a class="nombre" href="/">Jaguar Code</a>
+      <a href="/guias">Guías</a>
+      <a href="/retos">Retos</a>
+      <a href="/profes">Para profes</a>
+      <a href="https://github.com/panterino/jaguar">GitHub</a>
+    </div>
+  </div>
+</header>
+<main class="guia">
+  <div class="ancho angosto">
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › <a href="/guias">Guías</a> › Condicionales en pseudocódigo: Si y Segun</nav>
+    <h1>Condicionales en pseudocódigo: Si y Segun</h1>
+    <p class="resumen">Una condicional hace que el programa elija qué hacer según un dato. Con Si … Entonces … SiNo eliges entre dos caminos, y con Segun eliges entre varias opciones de una misma variable.</p>
+    <nav class="contenido" aria-label="Contenido de la guía"><b>En esta guía</b>
+      <ol>
+        <li><a href="#que-es">Qué es una condicional</a></li>
+        <li><a href="#si-simple">Si simple: hacer algo solo cuando se cumple</a></li>
+        <li><a href="#si-sino">Si … SiNo: elegir entre dos caminos</a></li>
+        <li><a href="#compuestas">Condiciones compuestas: Y, O, NO</a></li>
+        <li><a href="#anidados">Si anidados: más de dos opciones</a></li>
+        <li><a href="#segun">Segun: elegir entre varias opciones</a></li>
+        <li><a href="#si-o-segun">¿Si o Segun?</a></li>
+        <li><a href="#probar">Cómo probar una condicional</a></li>
+        <li><a href="#errores">Errores comunes</a></li>
+        <li><a href="#preguntas">Preguntas frecuentes</a></li>
+      </ol>
+    </nav>
+    <article>
+      <section id="que-es">
+        <h2>Qué es una condicional</h2>
+<p>Hasta ahora, un programa hace todos sus pasos, uno tras otro. Pero muchas veces la respuesta depende de un dato: si llueve, llevas paraguas; si no, no. Una <b>condicional</b> (también llamada estructura de decisión o selectiva) hace justo eso: revisa una condición y, según el resultado, sigue un camino u otro.</p>
+<p>La condición siempre es una pregunta que se responde con verdadero o falso, como <code>edad &gt;= 18</code> o <code>respuesta = "si"</code>. Los operadores de comparación están en la guía de <a href="/guias/variables-y-tipos-de-datos">variables y operadores</a>.</p>
+      </section>
+      <section id="si-simple">
+        <h2>Si simple: hacer algo solo cuando se cumple</h2>
+<p>Lo que está entre <code>Si … Entonces</code> y <code>FinSi</code> solo se ejecuta cuando la condición es verdadera. Si es falsa, el programa se lo salta y sigue después del <code>FinSi</code>. En este ejemplo, una compra de más de 500 pesos tiene 10 % de descuento:</p>
+<pre class="codigo" data-entradas="800" data-salida="A pagar: 720" tabindex="0"><code>Algoritmo descuento
+    Leer total
+    Si total &gt; 500 Entonces
+        total &lt;- total * 0.9
+    FinSi
+    Escribir "A pagar: ", total
+FinAlgoritmo</code></pre>
+<p>Con 800 se cumple la condición y se aplica el descuento. Con 300 no se cumple: el programa salta directo al <code>Escribir</code> y muestra 300.</p>
+      </section>
+      <section id="si-sino">
+        <h2>Si … SiNo: elegir entre dos caminos</h2>
+<p>Cuando hay algo que hacer en los dos casos, se agrega <code>SiNo</code>. Siempre se ejecuta exactamente uno de los dos bloques, nunca ambos:</p>
+<pre class="codigo" data-entradas="7" data-salida="7 es impar" tabindex="0"><code>Algoritmo par_o_impar
+    Leer n
+    Si n MOD 2 = 0 Entonces
+        Escribir n, " es par"
+    SiNo
+        Escribir n, " es impar"
+    FinSi
+FinAlgoritmo</code></pre>
+<p>En el diagrama de flujo, la condición es un rombo con dos salidas: una para «Sí» y otra para «No». Las dos ramas se vuelven a juntar antes de seguir.</p>
+<figure class="diagrama" style="max-width:563px;overflow-x:auto"><svg style="max-width:523px;min-width:418px" viewBox="0 0 522.4 365.6" width="520" role="img" aria-labelledby="diag-1"><title id="diag-1">Diagrama de flujo de Algoritmo par_o_impar</title><g class="linea" stroke-width="1.5" fill="none" stroke-linejoin="round"><path d="M268.8 56L268.8 84"/><path d="M268.8 124L268.8 152"/><path d="M184.4 180L133.4 180L133.4 224.8"/><path d="M353.2 180L396.6 180L396.6 224.8"/><path d="M133.4 264.8L133.4 281.6L268.8 281.6"/><path d="M396.6 264.8L396.6 281.6L268.8 281.6"/><path d="M268.8 281.6L268.8 309.6"/></g><path d="M268.8 84L264.8 76L272.8 76z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M268.8 152L264.8 144L272.8 144z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M133.4 224.8L129.4 216.8L137.4 216.8z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M396.6 224.8L392.6 216.8L400.6 216.8z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M268.8 309.6L264.8 301.6L272.8 301.6z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><rect class="ini fig" x="223.8" y="16" width="90" height="40" rx="20"/><text x="268.8" y="40.5" text-anchor="middle">Inicio</text><path class="io fig" d="M230 84 H321.6 L307.6 124 H216 z"/><text x="268.8" y="108.5" text-anchor="middle">Leer n</text><path class="dec fig" d="M268.8 152 L353.2 180 L268.8 208 L184.4 180 z"/><text x="268.8" y="184.5" text-anchor="middle">n MOD 2 = 0</text><path class="sal fig" d="M30 224.8 H250.8 L236.8 264.8 H16 z"/><text x="133.4" y="249.3" text-anchor="middle">Escribir n, " es impar"</text><path class="sal fig" d="M300.8 224.8 H506.4 L492.4 264.8 H286.8 z"/><text x="396.6" y="249.3" text-anchor="middle">Escribir n, " es par"</text><rect class="ini fig" x="223.8" y="309.6" width="90" height="40" rx="20"/><text x="268.8" y="334.1" text-anchor="middle">Fin</text><text x="162.4" y="164" font-size="11">No</text><text x="359.2" y="164" font-size="11">Sí</text></svg></figure>
+      </section>
+      <section id="compuestas">
+        <h2>Condiciones compuestas: Y, O, NO</h2>
+<p>A veces una sola comparación no alcanza. Para entrar a un concierto quizá necesitas boleto <i>y</i> ser mayor de edad. Para eso se combinan condiciones:</p>
+<ul>
+  <li><code>Y</code>: se cumple si <b>las dos</b> partes son verdaderas.</li>
+  <li><code>O</code>: se cumple si <b>al menos una</b> es verdadera.</li>
+  <li><code>NO</code>: invierte el resultado.</li>
+</ul>
+<pre class="codigo" data-entradas="11" data-salida="Fuera de rango" tabindex="0"><code>Algoritmo rango_valido
+    Leer calificacion
+    Si calificacion &gt;= 0 Y calificacion &lt;= 10 Entonces
+        Escribir "Calificación válida"
+    SiNo
+        Escribir "Fuera de rango"
+    FinSi
+FinAlgoritmo</code></pre>
+<p>Un error frecuente es escribir <code>0 &lt;= calificacion &lt;= 10</code>, como en matemáticas. En pseudocódigo hay que escribir las dos comparaciones completas y unirlas con <code>Y</code>.</p>
+      </section>
+      <section id="anidados">
+        <h2>Si anidados: más de dos opciones</h2>
+<p>Un <code>Si</code> puede ir dentro de otro. Así se resuelven decisiones con tres o más resultados. Este programa clasifica una calificación:</p>
+<pre class="codigo" data-entradas="7" data-salida="Aprobado" tabindex="0"><code>Algoritmo calificacion_letra
+    Leer calificacion
+    Si calificacion &gt;= 9 Entonces
+        Escribir "Excelente"
+    SiNo
+        Si calificacion &gt;= 6 Entonces
+            Escribir "Aprobado"
+        SiNo
+            Escribir "Reprobado"
+        FinSi
+    FinSi
+FinAlgoritmo</code></pre>
+<p>El orden de las preguntas importa. Primero se pregunta por el caso más alto (9 o más). Si no se cumple, ya sabes que es menor que 9 y solo falta distinguir entre aprobado y reprobado. Fíjate también en la sangría: cada <code>FinSi</code> cierra el <code>Si</code> que está a su misma altura.</p>
+<p>En el diagrama se ve que hay tres caminos posibles y que, para cada dato, el programa recorre solo uno:</p>
+<figure class="diagrama" style="max-width:773px;overflow-x:auto"><svg style="max-width:733px;min-width:586px" viewBox="0 0 732.4 455.2" width="520" role="img" aria-labelledby="diag-2"><title id="diag-2">Diagrama de flujo de Algoritmo calificacion_letra</title><g class="linea" stroke-width="1.5" fill="none" stroke-linejoin="round"><path d="M486.4 56L486.4 84"/><path d="M486.4 124L486.4 152"/><path d="M371.2 180L246 180L246 224.8"/><path d="M130.8 252.8L122 252.8L122 297.6"/><path d="M361.2 252.8L366.2 252.8L366.2 297.6"/><path d="M122 337.6L122 354.4L246 354.4"/><path d="M366.2 337.6L366.2 354.4L246 354.4"/><path d="M601.6 180L610.4 180L610.4 224.8"/><path d="M246 354.4L246 371.2L486.4 371.2"/><path d="M610.4 264.8L610.4 371.2L486.4 371.2"/><path d="M486.4 371.2L486.4 399.2"/></g><path d="M486.4 84L482.4 76L490.4 76z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M486.4 152L482.4 144L490.4 144z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M246 224.8L242 216.8L250 216.8z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M122 297.6L118 289.6L126 289.6z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M366.2 297.6L362.2 289.6L370.2 289.6z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M610.4 224.8L606.4 216.8L614.4 216.8z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M486.4 399.2L482.4 391.2L490.4 391.2z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><rect class="ini fig" x="441.4" y="16" width="90" height="40" rx="20"/><text x="486.4" y="40.5" text-anchor="middle">Inicio</text><path class="io fig" d="M405.8 84 H581 L567 124 H391.8 z"/><text x="486.4" y="108.5" text-anchor="middle">Leer calificacion</text><path class="dec fig" d="M486.4 152 L601.6 180 L486.4 208 L371.2 180 z"/><text x="486.4" y="184.5" text-anchor="middle">calificacion &gt;= 9</text><path class="dec fig" d="M246 224.8 L361.2 252.8 L246 280.8 L130.8 252.8 z"/><text x="246" y="257.3" text-anchor="middle">calificacion &gt;= 6</text><path class="sal fig" d="M30 297.6 H228 L214 337.6 H16 z"/><text x="122" y="322.1" text-anchor="middle">Escribir "Reprobado"</text><path class="sal fig" d="M278 297.6 H468.4 L454.4 337.6 H264 z"/><text x="366.2" y="322.1" text-anchor="middle">Escribir "Aprobado"</text><path class="sal fig" d="M518.4 224.8 H716.4 L702.4 264.8 H504.4 z"/><text x="610.4" y="249.3" text-anchor="middle">Escribir "Excelente"</text><rect class="ini fig" x="441.4" y="399.2" width="90" height="40" rx="20"/><text x="486.4" y="423.7" text-anchor="middle">Fin</text><text x="349.2" y="164" font-size="11">No</text><text x="108.8" y="236.8" font-size="11">No</text><text x="367.2" y="236.8" font-size="11">Sí</text><text x="607.6" y="164" font-size="11">Sí</text></svg></figure>
+      </section>
+      <section id="segun">
+        <h2>Segun: elegir entre varias opciones</h2>
+<p>Cuando la decisión depende de los valores exactos de <b>una sola variable</b>, <code>Segun</code> es más claro que muchos <code>Si</code> anidados. Cada opción lleva el valor, dos puntos y lo que hay que hacer. <code>De Otro Modo</code> atrapa cualquier valor que no esté en la lista:</p>
+<pre class="codigo" data-entradas="6" data-salida="Fin de semana" tabindex="0"><code>Algoritmo dia_de_la_semana
+    Leer dia
+    Segun dia Hacer
+        1: Escribir "Lunes"
+        2: Escribir "Martes"
+        3: Escribir "Miércoles"
+        4: Escribir "Jueves"
+        5: Escribir "Viernes"
+        6, 7: Escribir "Fin de semana"
+        De Otro Modo: Escribir "Ese día no existe"
+    FinSegun
+FinAlgoritmo</code></pre>
+<p>Una opción puede tener varios valores separados por comas, como <code>6, 7</code>. <code>Segun</code> sirve para valores exactos (1, 2, 3 o "a", "b"), no para rangos: si necesitas «de 6 a 8», usa <code>Si</code>. Hay un reto completo con esta estructura: <a href="/retos/dia-de-la-semana-con-segun-en-pseudocodigo">día de la semana con Segun</a>.</p>
+      </section>
+      <section id="si-o-segun">
+        <h2>¿Si o Segun?</h2>
+<div class="tabla"><table><caption>Cuándo usar cada uno</caption><thead><tr><th scope="col">Situación</th><th scope="col">Usa</th><th scope="col">Ejemplo</th></tr></thead><tbody><tr><td>Dos caminos</td><td><code>Si … SiNo</code></td><td>¿Aprobó o no?</td></tr><tr><td>Rangos de valores</td><td><code>Si</code> anidados</td><td>Calificación: 9-10, 6-8, 0-5</td></tr><tr><td>Condiciones con Y / O</td><td><code>Si</code></td><td>Tiene boleto y es mayor de edad</td></tr><tr><td>Valores exactos de una variable</td><td><code>Segun</code></td><td>Opción de un menú: 1, 2, 3</td></tr></tbody></table></div>
+      </section>
+      <section id="probar">
+        <h2>Cómo probar una condicional</h2>
+<p>Un programa con decisiones necesita varios datos de prueba: al menos uno por cada camino, y los valores justo en el límite. Para el programa de calificaciones, prueba 10, 9, 8, 6, 5 y 0. Si la regla dice «6 o más», el 6 es el dato que descubre si escribiste <code>&gt;</code> en lugar de <code>&gt;=</code>.</p>
+<p>La prueba de escritorio muestra qué camino tomó el programa. Con 800 en el ejemplo del descuento, se ve que entra al <code>Si</code> y <code>total</code> cambia:</p>
+<div class="tabla"><table><caption>Prueba de escritorio de descuento con total = 800</caption><thead><tr><th scope="col">Paso</th><th scope="col">Línea</th><th scope="col">Instrucción</th><th scope="col">total</th><th scope="col">Pantalla</th></tr></thead><tbody><tr><td>1</td><td>3</td><td class="instr">Leer total</td><td class="cambio">800</td><td></td></tr><tr><td>2</td><td>4</td><td class="instr">Si total &gt; 500 Entonces</td><td>800</td><td></td></tr><tr><td>3</td><td>5</td><td class="instr">total &lt;- total * 0.9</td><td class="cambio">720</td><td></td></tr><tr><td>4</td><td>7</td><td class="instr">Escribir "A pagar: ", total</td><td>720</td><td>A pagar: 720</td></tr></tbody></table></div>
+      </section>
+      <section id="errores">
+        <h2>Errores comunes</h2>
+<ul>
+  <li><b>Olvidar el <code>FinSi</code></b>, sobre todo en los anidados. Cada <code>Si</code> necesita el suyo.</li>
+  <li><b>Usar <code>&lt;-</code> en la condición.</b> <code>Si edad &lt;- 18</code> no compara: lo correcto es <code>Si edad &gt;= 18</code>.</li>
+  <li><b>Condiciones que se enciman.</b> Si preguntas primero <code>calificacion &gt;= 6</code> y luego <code>calificacion &gt;= 9</code>, un 10 nunca llegará a «Excelente». Ordena de lo más específico a lo más general.</li>
+  <li><b>Comparar textos sin comillas.</b> <code>Si respuesta = si</code> busca una variable llamada si. Lo correcto es <code>Si respuesta = "si"</code>.</li>
+  <li><b>Escribir el rango como en matemáticas</b> (<code>0 &lt;= x &lt;= 10</code>) en lugar de <code>x &gt;= 0 Y x &lt;= 10</code>.</li>
+</ul>
+      </section>
+      <section id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+        <details><summary>¿Qué es una estructura condicional en pseudocódigo?</summary><p>Es una instrucción que hace que el programa elija qué pasos ejecutar según si una condición es verdadera o falsa. Las más comunes son Si … Entonces … SiNo … FinSi y Segun … FinSegun.</p></details>
+        <details><summary>¿Cuál es la diferencia entre Si y Segun?</summary><p>Si evalúa cualquier condición verdadera o falsa, incluidas comparaciones y rangos. Segun compara una sola variable contra valores exactos. Para un menú de opciones Segun es más claro; para rangos o condiciones combinadas se usa Si.</p></details>
+        <details><summary>¿Es obligatorio poner SiNo?</summary><p>No. Si solo hay que hacer algo cuando la condición se cumple, basta con Si … Entonces … FinSi. El SiNo se agrega cuando también hay algo que hacer en el caso contrario.</p></details>
+        <details><summary>¿Cuántos Si puedo poner uno dentro de otro?</summary><p>Los que necesites, pero con más de tres niveles el programa se vuelve difícil de leer. Si todas las preguntas son sobre el valor exacto de una variable, conviene usar Segun.</p></details>
+      </section>
+    </article>
+<aside class="cta-guia" aria-labelledby="cta-t">
+  <h2 id="cta-t">Practica esto en Jaguar Code</h2>
+  <p>Escribe pseudocódigo, mira su diagrama y haz la prueba de escritorio desde el celular. Gratis, sin anuncios y sin cuenta.</p>
+  <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir la app</a></div>
+  <p class="aviso-prueba"><b>Versión de prueba.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo.</p>
+</aside>
+    <h2 style="margin-top:44px">Sigue aprendiendo</h2>
+    <div class="relacionadas">
+      <a href="/guias/variables-y-tipos-de-datos">Variables, tipos de datos y operadores<small>Una variable es un espacio con nombre donde el programa guarda un dato.</small></a>
+      <a href="/guias/ciclos-mientras-para-repetir">Ciclos en pseudocódigo: Mientras, Para y Repetir<small>Un ciclo repite un grupo de instrucciones.</small></a>
+      <a href="/guias/como-hacer-un-diagrama-de-flujo">Cómo hacer un diagrama de flujo<small>Un diagrama de flujo representa un algoritmo con figuras unidas por flechas.</small></a>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="ancho">
+    <span class="quien"><img src="/logo.svg" alt="" width="30" height="26">Un proyecto de Panterino · hecho en México</span>
+    <a href="/guias">Guías</a>
+    <a href="/retos">Retos</a>
+    <a href="/descargas">Descargas</a>
+    <a href="/manual">Manual</a>
+    <a href="https://www.facebook.com/jaguareducation">Facebook</a>
+    <a href="https://github.com/panterino/jaguar">Código en GitHub</a>
+    <a href="#" data-analitica-cambiar>Analítica</a>
+  </div>
+</footer>
+<script src="/acceso.js" defer></script>
+<script src="/analitica.js" defer></script>
+</body>
+</html>
