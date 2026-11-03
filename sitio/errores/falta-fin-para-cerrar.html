@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Error «Falta FinAlgoritmo para cerrar el Algoritmo»: qué significa y cómo arreglarlo</title>
+<meta name="description" content="Qué significa el error «Falta FinAlgoritmo (o FinSi, FinPara, FinMientras) para cerrar el … de la línea …» y cómo arreglarlo, con ejemplos en pseudocódigo.">
+<link rel="canonical" href="https://jaguarcode.org/errores/falta-fin-para-cerrar">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="apple-touch-icon" href="/icono.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Jaguar Code">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://jaguarcode.org/errores/falta-fin-para-cerrar">
+<meta property="og:title" content="Error «Falta FinAlgoritmo para cerrar el Algoritmo»: qué significa y cómo arreglarlo">
+<meta property="og:description" content="Qué significa el error «Falta FinAlgoritmo (o FinSi, FinPara, FinMientras) para cerrar el … de la línea …» y cómo arreglarlo, con ejemplos en pseudocódigo.">
+<meta property="og:image" content="https://jaguarcode.org/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Error «Falta FinAlgoritmo para cerrar el Algoritmo»: qué significa y cómo arreglarlo">
+<meta name="twitter:description" content="Qué significa el error «Falta FinAlgoritmo (o FinSi, FinPara, FinMientras) para cerrar el … de la línea …» y cómo arreglarlo, con ejemplos en pseudocódigo.">
+<meta name="twitter:image" content="https://jaguarcode.org/compartir.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://jaguarcode.org/errores/falta-fin-para-cerrar#articulo",
+      "headline": "Error «Falta FinAlgoritmo para cerrar el Algoritmo»: qué significa y cómo arreglarlo",
+      "description": "Qué significa el error «Falta FinAlgoritmo (o FinSi, FinPara, FinMientras) para cerrar el … de la línea …» y cómo arreglarlo, con ejemplos en pseudocódigo.",
+      "inLanguage": "es-MX",
+      "datePublished": "2026-11-03",
+      "dateModified": "2026-11-03",
+      "mainEntityOfPage": "https://jaguarcode.org/errores/falta-fin-para-cerrar",
+      "image": "https://jaguarcode.org/compartir.png",
+      "author": { "@type": "Organization", "name": "Panterino", "url": "https://jaguarcode.org/" },
+      "publisher": { "@type": "Organization", "name": "Panterino", "logo": { "@type": "ImageObject", "url": "https://jaguarcode.org/icono.png" } }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "https://jaguarcode.org/" },
+        { "@type": "ListItem", "position": 2, "name": "Errores", "item": "https://jaguarcode.org/errores" },
+        { "@type": "ListItem", "position": 3, "name": "Falta FinAlgoritmo, FinSi o FinPara para cerrar un bloque", "item": "https://jaguarcode.org/errores/falta-fin-para-cerrar" }
+      ]
+    },
+    { "@type": "FAQPage", "mainEntity": [{"@type":"Question","name":"¿Algoritmo y Proceso son lo mismo?","acceptedAnswer":{"@type":"Answer","text":"Sí, las dos palabras abren el programa principal. Lo importante es cerrar con la pareja correcta: Algoritmo con FinAlgoritmo y Proceso con FinProceso."}},{"@type":"Question","name":"¿Por qué el error marca la línea 1 si lo que falta está al final?","acceptedAnswer":{"@type":"Answer","text":"Porque el mensaje señala dónde se abrió el bloque que quedó sin cerrar. Así sabes cuál de todos los bloques es el que necesita su cierre."}}] }
+  ]
+}
+</script>
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/estilos.css">
+</head>
+<body>
+<header class="sitio-barra">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="/logo.svg" alt="" width="46" height="40">
+      <a class="nombre" href="/">Jaguar Code</a>
+      <a href="/guias">Guías</a>
+      <a href="/retos">Retos</a>
+      <a href="/profes">Para profes</a>
+      <a href="https://github.com/panterino/jaguar">GitHub</a>
+    </div>
+  </div>
+</header>
+<main class="guia">
+  <div class="ancho angosto">
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › <a href="/errores">Errores</a> › Falta FinAlgoritmo, FinSi o FinPara para cerrar un bloque</nav>
+    <h1>Falta FinAlgoritmo, FinSi o FinPara para cerrar un bloque</h1>
+    <p class="resumen">Jaguar llegó al final de tu programa y un bloque seguía abierto. El mensaje dice qué cierre falta y en qué línea empieza el bloque que lo necesita.</p>
+    <nav class="contenido" aria-label="Contenido de la página"><b>En esta página</b>
+      <ol>
+        <li><a href="#que-significa">Qué significa</a></li>
+        <li><a href="#ejemplos">Ejemplo y cómo arreglarlo</a></li>
+        <li><a href="#causas">Por qué aparece</a></li>
+        <li><a href="#evitarlo">Cómo evitarlo</a></li>
+        <li><a href="#preguntas">Preguntas frecuentes</a></li>
+      </ol>
+    </nav>
+    <article>
+      <section id="que-significa">
+        <h2>Qué significa</h2>
+<p class="aviso-error" role="note"><b>Error de escritura en la línea 1</b><br>Falta 'FinAlgoritmo' para cerrar el 'Algoritmo' de la línea 1. Cada 'Algoritmo' necesita su 'FinAlgoritmo'. Escríbelo en su propia línea, debajo de lo que va dentro del bloque.</p>
+<p>Cada bloque que se abre necesita su cierre: <code>Algoritmo</code> con <code>FinAlgoritmo</code>, <code>Si</code> con <code>FinSi</code>, <code>Para</code> con <code>FinPara</code>, <code>Mientras</code> con <code>FinMientras</code>, <code>Segun</code> con <code>FinSegun</code> y <code>Funcion</code> con <code>FinFuncion</code>.</p>
+<p>Este mensaje aparece cuando Jaguar llega al <b>final del archivo</b> y todavía hay un bloque abierto. Es muy parecido a <a href="/errores/encontre-pero-antes-falta">«Encontré …, pero antes falta …»</a>; la diferencia es que aquí no hubo ningún otro cierre después: el programa simplemente se acabó. Lo más común es que falte el <code>FinAlgoritmo</code> del final.</p>
+      </section>
+      <section id="ejemplos">
+        <h2>Ejemplo y cómo arreglarlo</h2>
+<pre class="codigo" data-entradas="Ana" data-error="Falta 'FinAlgoritmo' para cerrar el 'Algoritmo' de la línea 1." tabindex="0"><code>Algoritmo saludo
+    Leer nombre
+    Escribir "Hola, ", nombre</code></pre><p class="aviso-error" role="note"><b>Error de escritura en la línea 1</b><br>Falta 'FinAlgoritmo' para cerrar el 'Algoritmo' de la línea 1. Cada 'Algoritmo' necesita su 'FinAlgoritmo'. Escríbelo en su propia línea, debajo de lo que va dentro del bloque.</p>
+<p>Basta con agregar <code>FinAlgoritmo</code> en la última línea:</p>
+<pre class="codigo" data-entradas="Ana" data-salida="Hola, Ana" tabindex="0"><code>Algoritmo saludo
+    Leer nombre
+    Escribir "Hola, ", nombre
+FinAlgoritmo</code></pre>
+
+      </section>
+      <section id="causas">
+        <h2>Por qué aparece</h2>
+<ul>
+  <li>El programa se quedó a medias o se cortó al copiarlo.</li>
+  <li>Escribiste <code>Fin</code> solo, o <code>Fin Algoritm</code> con un error de dedo: Jaguar no lo reconoce como cierre.</li>
+  <li>Usaste <code>Proceso</code> para abrir y <code>FinAlgoritmo</code> para cerrar, o al revés. Cada apertura va con su cierre: <code>Proceso</code> con <code>FinProceso</code>.</li>
+</ul>
+      </section>
+      <section id="evitarlo">
+        <h2>Cómo evitarlo</h2>
+<p>Empieza cada programa escribiendo las dos líneas, <code>Algoritmo nombre</code> y <code>FinAlgoritmo</code>, y después escribe en medio. Haz lo mismo con cada bloque: al abrir un <code>Si</code>, escribe de inmediato su <code>FinSi</code>.</p>
+      </section>
+      <section id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+        <details><summary>¿Algoritmo y Proceso son lo mismo?</summary><p>Sí, las dos palabras abren el programa principal. Lo importante es cerrar con la pareja correcta: Algoritmo con FinAlgoritmo y Proceso con FinProceso.</p></details>
+        <details><summary>¿Por qué el error marca la línea 1 si lo que falta está al final?</summary><p>Porque el mensaje señala dónde se abrió el bloque que quedó sin cerrar. Así sabes cuál de todos los bloques es el que necesita su cierre.</p></details>
+      </section>
+    </article>
+<aside class="cta-guia" aria-labelledby="cta-t">
+  <h2 id="cta-t">Practica esto en Jaguar Code</h2>
+  <p>Escribe pseudocódigo, mira su diagrama y haz la prueba de escritorio desde el celular. Gratis, sin anuncios y sin cuenta.</p>
+  <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir la app</a></div>
+  <p class="aviso-prueba"><b>Versión de prueba.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo.</p>
+</aside>
+    <h2 style="margin-top:44px">Sigue aprendiendo</h2>
+    <div class="relacionadas">
+      <a href="/errores/encontre-pero-antes-falta">«Encontré …, pero antes falta …»: un bloque sin cerrar<small>Este error aparece cuando un bloque, como un Si, un Para o un Mientras, no se cerró antes de que llegara el cierre de otro bloque.</small></a>
+      <a href="/errores/el-codigo-debe-ir-dentro-de-algoritmo">El código debe ir dentro de Algoritmo … FinAlgoritmo<small>Todo programa tiene un bloque principal que empieza con Algoritmo y termina con FinAlgoritmo, y las instrucciones van dentro de él.</small></a>
+      <a href="/guias/que-es-el-pseudocodigo">Qué es el pseudocódigo<small>El pseudocódigo es una forma de escribir un algoritmo con palabras parecidas a las de un lenguaje de programación, pero sin reglas estrictas de sintaxis.</small></a>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="ancho">
+    <span class="quien"><img src="/logo.svg" alt="" width="30" height="26">Un proyecto de Panterino · hecho en México</span>
+    <a href="/guias">Guías</a>
+    <a href="/retos">Retos</a>
+    <a href="/descargas">Descargas</a>
+    <a href="/manual">Manual</a>
+    <a href="https://www.facebook.com/jaguareducation">Facebook</a>
+    <a href="https://github.com/panterino/jaguar">Código en GitHub</a>
+    <a href="#" data-analitica-cambiar>Analítica</a>
+  </div>
+</footer>
+<script src="/acceso.js" defer></script>
+<script src="/analitica.js" defer></script>
+</body>
+</html>

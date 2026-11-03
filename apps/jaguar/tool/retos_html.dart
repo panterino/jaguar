@@ -748,6 +748,8 @@ String _mapa() {
     url('/', 'weekly', '1.0'),
     url('/guias', 'monthly', '0.8'),
     for (final guia in g.guias) url('/guias/${guia.slug}', 'monthly', '0.8', guia.publicada),
+    url('/errores', 'monthly', '0.7', '2026-11-03'),
+    for (final error in g.errores) url('/errores/${error.slug}', 'monthly', '0.6', error.publicada),
     url('/descargas', 'monthly', '0.8'),
     url('/herramientas/prueba-de-escritorio', 'monthly', '0.9'),
     url('/herramientas/diagrama-de-flujo-online', 'monthly', '0.9'),

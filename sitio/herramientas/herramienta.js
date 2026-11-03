@@ -2,6 +2,42 @@
 // intérprete de la app, compilado a JavaScript) se descarga la primera vez que
 // se usa; todo corre en el navegador y nada se envía a ningún servidor.
 (function () {
+  // Cada error de escritura tiene su página en /errores con una explicación larga.
+  // (La misma lista está en herramienta.js y diagrama.js.)
+  var paginasDeError = [
+    [/^Encontré '.+', pero antes falta/, 'encontre-pero-antes-falta'],
+    [/^Falta '.+' para cerrar/, 'falta-fin-para-cerrar'],
+    [/^Falta la comilla/, 'falta-la-comilla-que-cierra-este-texto'],
+    [/^Falta poner el texto entre comillas/, 'falta-poner-el-texto-entre-comillas'],
+    [/^(No entiendo la instrucción|Esta línea no empieza|No se esperaba)/, 'no-entiendo-la-instruccion'],
+    [/^Sobra /, 'sobra-al-final-de-la-instruccion'],
+    [/^(Se esperaba un valor|Falta un valor)/, 'se-esperaba-un-valor'],
+    [/^Se esperaba '[)\]]'/, 'se-esperaba-cerrar-parentesis'],
+    [/^Se esperaba '<-' para asignar/, 'se-esperaba-flecha-para-asignar'],
+    [/es una palabra reservada/, 'es-una-palabra-reservada'],
+    [/(en el ciclo Para|^Se esperaba '<-' después de|^Se esperaba 'Paso')/, 'se-esperaba-hasta-en-el-ciclo-para'],
+    [/(^Se esperaba 'Como'|no es un tipo de dato válido|^Se esperaba un nombre)/, 'se-esperaba-como-y-un-tipo'],
+    [/^Se esperaba '\[' con el tamaño/, 'se-esperaba-corchete-en-dimension'],
+    [/^Dentro de 'Segun'/, 'cada-opcion-de-segun-empieza-con-un-valor'],
+    [/(recibe \d+ valor|^No existe ninguna función|no devuelve ningún valor|ya fue definida|^Después de 'Por')/, 'errores-al-usar-funciones'],
+    [/^(El código debe ir dentro|Falta el bloque principal|Solo puede haber un Algoritmo)/, 'el-codigo-debe-ir-dentro-de-algoritmo'],
+    [/^No reconozco el carácter/, 'no-reconozco-el-caracter'],
+    [/^Se esperaba 'Segundos'/, 'se-esperaba-segundos-o-milisegundos'],
+  ];
+
+  function enlaceDeError(error) {
+    if (error.title !== 'Error de escritura') return null;
+    for (var i = 0; i < paginasDeError.length; i++) {
+      if (paginasDeError[i][0].test(error.message)) {
+        var a = document.createElement('a');
+        a.href = '/errores/' + paginasDeError[i][1];
+        a.textContent = '¿Qué significa este error?';
+        return a;
+      }
+    }
+    return null;
+  }
+
   var fuente = document.getElementById('fuente');
   var entradas = document.getElementById('entradas');
   var boton = document.getElementById('generar');
@@ -48,6 +84,11 @@
       caja.appendChild(t);
       caja.appendChild(document.createElement('br'));
       caja.appendChild(document.createTextNode(r.error.message + (r.error.hint ? ' ' + r.error.hint : '')));
+      var enlace = enlaceDeError(r.error);
+      if (enlace) {
+        caja.appendChild(document.createTextNode(' '));
+        caja.appendChild(enlace);
+      }
       salida.appendChild(caja);
     }
     if (!r.rows.length) {

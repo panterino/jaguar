@@ -19,6 +19,7 @@ class Guia {
     required this.preguntas,
     required this.relacionadas,
     this.publicada = fecha,
+    this.carpeta = 'guias',
   });
 
   final String slug;
@@ -34,15 +35,20 @@ class Guia {
 
   /// Fecha de publicación (AAAA-MM-DD), para los datos estructurados y el mapa del sitio.
   final String publicada;
+
+  /// Sección del sitio: 'guias' o 'errores' (las páginas de cada error de escritura).
+  final String carpeta;
 }
 
 String esc(String s) => s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 
-/// Un bloque de código de ejemplo que la prueba ejecuta.
-String codigo(String fuente, {List<String> entradas = const [], String? salida}) {
+/// Un bloque de código de ejemplo que la prueba ejecuta. Con [error], el
+/// ejemplo está mal a propósito y la prueba revisa que Jaguar dé ese mensaje.
+String codigo(String fuente, {List<String> entradas = const [], String? salida, String? error}) {
   final atributos = [
     if (entradas.isNotEmpty) 'data-entradas="${entradas.map(esc).join('|')}"',
     if (salida != null) 'data-salida="${esc(salida).replaceAll('\n', '&#10;')}"',
+    if (error != null) 'data-error="${esc(error).replaceAll('"', '&quot;')}"',
   ].join(' ');
   return '<pre class="codigo" ${atributos.isEmpty ? '' : '$atributos '}tabindex="0"><code>${esc(fuente.trimRight())}</code></pre>';
 }
@@ -294,7 +300,8 @@ else:
   <li><b>Usar una variable sin darle valor:</b> hay que leerla o asignarla antes.</li>
   <li><b>Confundir <code>=</code> con <code>&lt;-</code>:</b> la flecha guarda un valor; el igual compara.</li>
   <li><b>Un ciclo que no termina:</b> si dentro del <code>Mientras</code> nada cambia la condición, se repite para siempre.</li>
-</ul>''',
+</ul>
+<p>Cada mensaje de error que muestra Jaguar tiene su página, con ejemplos y cómo arreglarlo: <a href="/errores">errores de escritura explicados</a>.</p>''',
       ),
     ],
     preguntas: [
@@ -474,7 +481,8 @@ FinAlgoritmo
   <li><b>Confundir <code>=</code> con <code>&lt;-</code>.</b> La flecha guarda; el igual compara. Algunas escuelas aceptan <code>=</code> para asignar, pero usar la flecha evita confusiones.</li>
   <li><b>Olvidar las comillas.</b> <code>Escribir Hola</code> busca una variable llamada Hola. Lo que quieres es <code>Escribir "Hola"</code>.</li>
   <li><b>Escribir el nombre de dos formas.</b> <code>Promedio</code> y <code>promedio</code> son la misma variable en PSeInt y en Jaguar, pero <code>promedio</code> y <code>promedo</code> no.</li>
-</ul>''',
+</ul>
+<p>Si Jaguar te muestra un mensaje que no entiendes, búscalo en <a href="/errores">la lista de errores explicados</a>. Por ejemplo, <a href="/errores/es-una-palabra-reservada">por qué no puedes llamar <code>y</code> a una variable</a>.</p>''',
       ),
     ],
     preguntas: [
@@ -643,7 +651,8 @@ ${tabla('Cuándo usar cada uno', ['Situación', 'Usa', 'Ejemplo'], [
   <li><b>Condiciones que se enciman.</b> Si preguntas primero <code>calificacion &gt;= 6</code> y luego <code>calificacion &gt;= 9</code>, un 10 nunca llegará a «Excelente». Ordena de lo más específico a lo más general.</li>
   <li><b>Comparar textos sin comillas.</b> <code>Si respuesta = si</code> busca una variable llamada si. Lo correcto es <code>Si respuesta = "si"</code>.</li>
   <li><b>Escribir el rango como en matemáticas</b> (<code>0 &lt;= x &lt;= 10</code>) en lugar de <code>x &gt;= 0 Y x &lt;= 10</code>.</li>
-</ul>''',
+</ul>
+<p>Si olvidas un <code>FinSi</code>, Jaguar te dice cuál y en qué línea empezó el bloque: <a href="/errores/encontre-pero-antes-falta">«Encontré …, pero antes falta …»</a>.</p>''',
       ),
     ],
     preguntas: [
@@ -826,7 +835,8 @@ FinAlgoritmo
   <li><b>Dar una vuelta de más o de menos.</b> <code>Para i &lt;- 1 Hasta 10</code> da 10 vueltas; <code>Para i &lt;- 0 Hasta 10</code> da 11.</li>
   <li><b>Invertir la condición del Repetir.</b> «Repetir hasta que la clave sea correcta» se escribe <code>Hasta Que clave = "jaguar"</code>, no con <code>&lt;&gt;</code>.</li>
   <li><b>Poner el <code>Escribir</code> del resultado dentro del ciclo</b>, cuando solo debía mostrarse una vez al final.</li>
-</ul>''',
+</ul>
+<p>Los mensajes que da Jaguar cuando un ciclo está mal escrito, con su explicación: <a href="/errores/se-esperaba-hasta-en-el-ciclo-para">errores al escribir un Para</a> y <a href="/errores/encontre-pero-antes-falta">bloques sin cerrar</a>.</p>''',
       ),
     ],
     preguntas: [
@@ -1778,6 +1788,1620 @@ FinAlgoritmo
   ),
 ];
 
+/// El índice de /errores.
+const indiceErrores = (
+  titulo: 'Errores de escritura en pseudocódigo: qué significan y cómo arreglarlos',
+  desc:
+      'Cada error de escritura que muestra Jaguar, explicado: qué significa, por qué aparece, un ejemplo con el error y cómo arreglarlo. Las causas son las mismas en PSeInt.',
+  h1: 'Errores de escritura en pseudocódigo',
+  resumen:
+      'Cuando Jaguar encuentra algo que no puede leer en tu programa, te dice en qué línea está y qué falta. Aquí está cada uno de esos mensajes explicado con calma, con un ejemplo del error y cómo se arregla.',
+);
+
+/// Una página por cada error de escritura que muestra Jaguar
+/// (packages/jaguar_core/lib/src/lexer.dart y parser.dart).
+final errores = <Guia>[
+  Guia(
+    carpeta: 'errores',
+    slug: 'encontre-pero-antes-falta',
+    titulo: 'Error «Encontré FinAlgoritmo, pero antes falta FinSi»: qué significa y cómo arreglarlo',
+    h1: '«Encontré …, pero antes falta …»: un bloque sin cerrar',
+    descripcion:
+        'Qué significa el error «Encontré FinAlgoritmo, pero antes falta FinSi» (o FinPara, FinMientras, Hasta Que) en pseudocódigo, por qué aparece y cómo arreglarlo, con ejemplos.',
+    resumen:
+        'Este error aparece cuando un bloque, como un Si, un Para o un Mientras, no se cerró antes de que llegara el cierre de otro bloque. Casi siempre falta un FinSi, un FinPara o un FinMientras.',
+    publicada: '2026-11-03',
+    secciones: [
+      (
+        'que-significa',
+        'Qué significa',
+        '''
+<p class="aviso-error" role="note"><b>Error de escritura en la línea 5</b><br>Encontré 'FinAlgoritmo', pero antes falta 'FinSi' para cerrar el 'Si' de la línea 3. Cierra primero el 'Si' con 'FinSi'. Después va 'FinAlgoritmo'.</p>
+<p>Los bloques del pseudocódigo se abren y se cierran en orden, como cajas una dentro de otra: la última que abres es la primera que cierras. Si abres un <code>Si</code> dentro del <code>Algoritmo</code>, primero va el <code>FinSi</code> y después el <code>FinAlgoritmo</code>.</p>
+<p>Jaguar lee tu programa de arriba hacia abajo. Cuando encuentra un cierre (por ejemplo <code>FinAlgoritmo</code>) mientras todavía hay un bloque abierto adentro (el <code>Si</code>), te avisa: encontré esto, pero antes falta aquello. El mensaje te dice tres cosas: qué cierre encontró, qué cierre falta y en qué línea se abrió el bloque que quedó abierto.</p>''',
+      ),
+      (
+        'ejemplos',
+        'Ejemplos y cómo arreglarlos',
+        '''
+<h3>Falta el FinSi</h3>
+<p>El caso más común: un <code>Si</code> que nunca se cerró.</p>
+${codigo('''
+Algoritmo positivo
+    Leer n
+    Si n > 0 Entonces
+        Escribir "Es positivo"
+FinAlgoritmo
+''', error: 'Encontré \'FinAlgoritmo\', pero antes falta \'FinSi\' para cerrar el \'Si\' de la línea 3.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 5</b><br>Encontré 'FinAlgoritmo', pero antes falta 'FinSi' para cerrar el 'Si' de la línea 3. Cierra primero el 'Si' con 'FinSi'. Después va 'FinAlgoritmo'.</p>
+<p>Se arregla agregando el <code>FinSi</code> donde termina lo que va dentro del <code>Si</code>, antes del <code>FinAlgoritmo</code>:</p>
+${codigo('''
+Algoritmo positivo
+    Leer n
+    Si n > 0 Entonces
+        Escribir "Es positivo"
+    FinSi
+FinAlgoritmo
+''', entradas: ['4'], salida: 'Es positivo')}
+<h3>Un Si dentro de un Para</h3>
+<p>Con bloques anidados, el error dice qué cierre llegó antes de tiempo. Aquí el <code>FinPara</code> llegó cuando el <code>Si</code> de adentro seguía abierto:</p>
+${codigo('''
+Algoritmo pares
+    Para i <- 1 Hasta 6 Hacer
+        Si i MOD 2 = 0 Entonces
+            Escribir i
+    FinPara
+FinAlgoritmo
+''', error: 'Encontré \'FinPara\', pero antes falta \'FinSi\' para cerrar el \'Si\' de la línea 3.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 5</b><br>Encontré 'FinPara', pero antes falta 'FinSi' para cerrar el 'Si' de la línea 3. Cierra primero el 'Si' con 'FinSi'. Después va 'FinPara'.</p>
+<p>El <code>FinSi</code> va antes del <code>FinPara</code>, porque el <code>Si</code> se abrió después:</p>
+${codigo('''
+Algoritmo pares
+    Para i <- 1 Hasta 6 Hacer
+        Si i MOD 2 = 0 Entonces
+            Escribir i
+        FinSi
+    FinPara
+FinAlgoritmo
+''', salida: '2\n4\n6')}
+<h3>Repetir sin Hasta Que</h3>
+<p>El <code>Repetir</code> no se cierra con una palabra «Fin», sino con <code>Hasta Que</code> y una condición:</p>
+${codigo('''
+Algoritmo contrasena
+    Repetir
+        Leer clave
+FinAlgoritmo
+''', error: 'Encontré \'FinAlgoritmo\', pero antes falta \'Hasta Que\' para cerrar el \'Repetir\' de la línea 2.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 4</b><br>Encontré 'FinAlgoritmo', pero antes falta 'Hasta Que' para cerrar el 'Repetir' de la línea 2. Cierra primero el 'Repetir' con 'Hasta Que'. Después va 'FinAlgoritmo'.</p>
+<p>Así queda arreglado:</p>
+${codigo('''
+Algoritmo contrasena
+    Repetir
+        Leer clave
+    Hasta Que clave = "jaguar"
+    Escribir "Correcta"
+FinAlgoritmo
+''', entradas: ['jaguar'], salida: 'Correcta')}
+''',
+      ),
+      (
+        'causas',
+        'Por qué aparece',
+        '''
+<ul>
+  <li>Olvidaste escribir el cierre (<code>FinSi</code>, <code>FinPara</code>, <code>FinMientras</code>, <code>FinSegun</code> o <code>Hasta Que</code>).</li>
+  <li>Escribiste los cierres en el orden equivocado: cerraste primero el bloque de afuera.</li>
+  <li>Borraste una línea y con ella se fue un cierre.</li>
+  <li>Copiaste un fragmento de otro programa sin su cierre.</li>
+</ul>''',
+      ),
+      (
+        'evitarlo',
+        'Cómo evitarlo',
+        '''
+<p>Escribe el cierre en cuanto abras el bloque, y luego rellena lo de adentro: primero <code>Si … Entonces</code> y <code>FinSi</code>, después lo que va en medio. Y cuida la sangría: si cada cierre queda a la misma altura que su apertura, un cierre que falta se nota a simple vista.</p>
+<p>En Jaguar, la vista de diagrama o de bloques también ayuda: mientras falta un cierre, no se puede dibujar el programa, y en cuanto lo pones aparece completo.</p>''',
+      ),
+    ],
+    preguntas: [
+      (
+        '¿Por qué dice que falta FinSi si el error está en la línea del FinAlgoritmo?',
+        'Porque ahí es donde Jaguar se da cuenta. Al llegar a FinAlgoritmo, el Si todavía estaba abierto. El mensaje te dice en qué línea empezó el Si, para que sepas cuál quedó sin cerrar.',
+      ),
+      (
+        '¿Se puede escribir Fin Si con espacio?',
+        'Sí. Jaguar acepta FinSi y Fin Si, igual que FinPara y Fin Para. Lo que no puede faltar es el cierre.',
+      ),
+      (
+        '¿Este error sale también en PSeInt?',
+        'PSeInt avisa de este problema con otro mensaje, pero la causa es la misma: un bloque sin cerrar. El código arreglado de esta página funciona igual en PSeInt.',
+      ),
+    ],
+    relacionadas: ['falta-fin-para-cerrar', 'condicionales-si-y-segun', 'ciclos-mientras-para-repetir'],
+  ),
+  Guia(
+    carpeta: 'errores',
+    slug: 'falta-fin-para-cerrar',
+    titulo: 'Error «Falta FinAlgoritmo para cerrar el Algoritmo»: qué significa y cómo arreglarlo',
+    h1: 'Falta FinAlgoritmo, FinSi o FinPara para cerrar un bloque',
+    descripcion:
+        'Qué significa el error «Falta FinAlgoritmo (o FinSi, FinPara, FinMientras) para cerrar el … de la línea …» y cómo arreglarlo, con ejemplos en pseudocódigo.',
+    resumen:
+        'Jaguar llegó al final de tu programa y un bloque seguía abierto. El mensaje dice qué cierre falta y en qué línea empieza el bloque que lo necesita.',
+    publicada: '2026-11-03',
+    secciones: [
+      (
+        'que-significa',
+        'Qué significa',
+        '''
+<p class="aviso-error" role="note"><b>Error de escritura en la línea 1</b><br>Falta 'FinAlgoritmo' para cerrar el 'Algoritmo' de la línea 1. Cada 'Algoritmo' necesita su 'FinAlgoritmo'. Escríbelo en su propia línea, debajo de lo que va dentro del bloque.</p>
+<p>Cada bloque que se abre necesita su cierre: <code>Algoritmo</code> con <code>FinAlgoritmo</code>, <code>Si</code> con <code>FinSi</code>, <code>Para</code> con <code>FinPara</code>, <code>Mientras</code> con <code>FinMientras</code>, <code>Segun</code> con <code>FinSegun</code> y <code>Funcion</code> con <code>FinFuncion</code>.</p>
+<p>Este mensaje aparece cuando Jaguar llega al <b>final del archivo</b> y todavía hay un bloque abierto. Es muy parecido a <a href="/errores/encontre-pero-antes-falta">«Encontré …, pero antes falta …»</a>; la diferencia es que aquí no hubo ningún otro cierre después: el programa simplemente se acabó. Lo más común es que falte el <code>FinAlgoritmo</code> del final.</p>''',
+      ),
+      (
+        'ejemplos',
+        'Ejemplo y cómo arreglarlo',
+        '''
+${codigo('''
+Algoritmo saludo
+    Leer nombre
+    Escribir "Hola, ", nombre
+''', entradas: ['Ana'], error: 'Falta \'FinAlgoritmo\' para cerrar el \'Algoritmo\' de la línea 1.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 1</b><br>Falta 'FinAlgoritmo' para cerrar el 'Algoritmo' de la línea 1. Cada 'Algoritmo' necesita su 'FinAlgoritmo'. Escríbelo en su propia línea, debajo de lo que va dentro del bloque.</p>
+<p>Basta con agregar <code>FinAlgoritmo</code> en la última línea:</p>
+${codigo('''
+Algoritmo saludo
+    Leer nombre
+    Escribir "Hola, ", nombre
+FinAlgoritmo
+''', entradas: ['Ana'], salida: 'Hola, Ana')}
+''',
+      ),
+      (
+        'causas',
+        'Por qué aparece',
+        '''
+<ul>
+  <li>El programa se quedó a medias o se cortó al copiarlo.</li>
+  <li>Escribiste <code>Fin</code> solo, o <code>Fin Algoritm</code> con un error de dedo: Jaguar no lo reconoce como cierre.</li>
+  <li>Usaste <code>Proceso</code> para abrir y <code>FinAlgoritmo</code> para cerrar, o al revés. Cada apertura va con su cierre: <code>Proceso</code> con <code>FinProceso</code>.</li>
+</ul>''',
+      ),
+      (
+        'evitarlo',
+        'Cómo evitarlo',
+        '''
+<p>Empieza cada programa escribiendo las dos líneas, <code>Algoritmo nombre</code> y <code>FinAlgoritmo</code>, y después escribe en medio. Haz lo mismo con cada bloque: al abrir un <code>Si</code>, escribe de inmediato su <code>FinSi</code>.</p>''',
+      ),
+    ],
+    preguntas: [
+      (
+        '¿Algoritmo y Proceso son lo mismo?',
+        'Sí, las dos palabras abren el programa principal. Lo importante es cerrar con la pareja correcta: Algoritmo con FinAlgoritmo y Proceso con FinProceso.',
+      ),
+      (
+        '¿Por qué el error marca la línea 1 si lo que falta está al final?',
+        'Porque el mensaje señala dónde se abrió el bloque que quedó sin cerrar. Así sabes cuál de todos los bloques es el que necesita su cierre.',
+      ),
+    ],
+    relacionadas: ['encontre-pero-antes-falta', 'el-codigo-debe-ir-dentro-de-algoritmo', 'que-es-el-pseudocodigo'],
+  ),
+  Guia(
+    carpeta: 'errores',
+    slug: 'falta-la-comilla-que-cierra-este-texto',
+    titulo: 'Error «Falta la comilla que cierra este texto»: qué significa y cómo arreglarlo',
+    h1: 'Falta la comilla que cierra este texto',
+    descripcion:
+        'Qué significa el error «Falta la comilla que cierra este texto» en pseudocódigo, por qué aparece con Escribir y cómo arreglarlo, con ejemplos.',
+    resumen:
+        'Un texto empieza con comillas y debe terminar con comillas en la misma línea. Este error aparece cuando abriste las comillas y la línea se acabó sin cerrarlas.',
+    publicada: '2026-11-03',
+    secciones: [
+      (
+        'que-significa',
+        'Qué significa',
+        '''
+<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>Falta la comilla que cierra este texto. Cierra el texto con " en la misma línea.</p>
+<p>En pseudocódigo, los textos van entre comillas: <code>"Hola"</code>. Las comillas le dicen a Jaguar dónde empieza y dónde termina el texto. Si abres unas comillas y no las cierras, Jaguar no sabe dónde acaba el texto y no puede seguir leyendo el resto de la línea.</p>
+<p>El texto tiene que cerrarse en la <b>misma línea</b>. No se puede empezar un texto en una línea y terminarlo en la siguiente. Puedes usar comillas dobles (<code>"Hola"</code>) o sencillas (<code>'Hola'</code>), pero el texto debe cerrar con la misma que lo abrió.</p>''',
+      ),
+      (
+        'ejemplos',
+        'Ejemplos y cómo arreglarlos',
+        '''
+<h3>Se olvidó la comilla final</h3>
+${codigo('''
+Algoritmo saludo
+    Escribir "Hola, bienvenido
+FinAlgoritmo
+''', error: 'Falta la comilla que cierra este texto.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>Falta la comilla que cierra este texto. Cierra el texto con " en la misma línea.</p>
+<p>Así queda arreglado:</p>
+${codigo('''
+Algoritmo saludo
+    Escribir "Hola, bienvenido"
+FinAlgoritmo
+''', salida: 'Hola, bienvenido')}
+<h3>Un texto junto a una variable</h3>
+<p>Un caso muy común: al combinar texto y variables, la comilla de cierre se queda del lado equivocado de la coma.</p>
+${codigo('''
+Algoritmo total
+    total <- 250
+    Escribir "El total es: , total
+FinAlgoritmo
+''', error: 'Falta la comilla que cierra este texto.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 3</b><br>Falta la comilla que cierra este texto. Cierra el texto con " en la misma línea.</p>
+<p>La comilla cierra el texto <i>antes</i> de la coma. La variable va afuera de las comillas, porque si quedara adentro se mostraría la palabra «total» y no su valor:</p>
+${codigo('''
+Algoritmo total
+    total <- 250
+    Escribir "El total es: ", total
+FinAlgoritmo
+''', salida: 'El total es: 250')}
+''',
+      ),
+      (
+        'causas',
+        'Por qué aparece',
+        '''
+<ul>
+  <li>Se olvidó la comilla del final.</li>
+  <li>La comilla quedó después de una variable que debía ir afuera.</li>
+  <li>El texto abre con comilla doble y cierra con sencilla, o al revés.</li>
+  <li>Al copiar desde un documento, las comillas cambiaron por comillas «curvas» de procesador de textos. Jaguar entiende las comillas curvas dobles, pero conviene escribirlas de nuevo con el teclado.</li>
+</ul>''',
+      ),
+      (
+        'evitarlo',
+        'Cómo evitarlo',
+        '''
+<p>Escribe las dos comillas juntas, <code>""</code>, y luego escribe el texto en medio. Así nunca queda una sin pareja.</p>''',
+      ),
+    ],
+    preguntas: [
+      (
+        '¿Puedo usar comillas sencillas en lugar de dobles?',
+        'Sí. Jaguar acepta "Hola" y \'Hola\'. Lo que importa es que el texto cierre con el mismo tipo de comilla con el que abrió.',
+      ),
+      (
+        '¿Cómo escribo un texto que ocupa varias líneas?',
+        'Cada línea es un Escribir distinto, con su texto entre comillas. Un texto no puede empezar en una línea y terminar en otra.',
+      ),
+      (
+        '¿Cómo pongo comillas dentro de un texto?',
+        'Si el texto va entre comillas dobles, puedes usar sencillas adentro: Escribir "Dijo \'hola\'". También funciona al revés.',
+      ),
+    ],
+    relacionadas: ['falta-poner-el-texto-entre-comillas', 'sobra-al-final-de-la-instruccion', 'variables-y-tipos-de-datos'],
+  ),
+  Guia(
+    carpeta: 'errores',
+    slug: 'falta-poner-el-texto-entre-comillas',
+    titulo: 'Error «Falta poner el texto entre comillas»: qué significa y cómo arreglarlo',
+    h1: 'Falta poner el texto entre comillas',
+    descripcion:
+        'Qué significa el error «Falta poner el texto entre comillas» al usar Escribir en pseudocódigo, y cómo distinguir un texto de una variable.',
+    resumen:
+        'Jaguar encontró varias palabras sueltas después de Escribir. Seguramente querías mostrar un texto, y los textos van entre comillas.',
+    publicada: '2026-11-03',
+    secciones: [
+      (
+        'que-significa',
+        'Qué significa',
+        '''
+<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>Falta poner el texto entre comillas. Los textos van entre comillas: Escribir "Hola mundo"</p>
+<p>Para Jaguar, una palabra sin comillas es el <b>nombre de una variable</b>. Si escribes <code>Escribir Hola mundo</code>, entiende que quieres mostrar el valor de una variable llamada <code>Hola</code> y otra llamada <code>mundo</code>, una pegada a la otra, y eso no tiene sentido. Como lo más probable es que quisieras mostrar el texto «Hola mundo», te lo dice y en la sugerencia te escribe cómo queda.</p>
+<p>La regla es sencilla: lo que quieres que aparezca <i>tal cual</i> en la pantalla va entre comillas; lo que quieres que se reemplace por su valor va sin comillas.</p>''',
+      ),
+      (
+        'ejemplos',
+        'Ejemplo y cómo arreglarlo',
+        '''
+${codigo('''
+Algoritmo saludo
+    Escribir Hola mundo
+FinAlgoritmo
+''', error: 'Falta poner el texto entre comillas.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>Falta poner el texto entre comillas. Los textos van entre comillas: Escribir "Hola mundo"</p>
+<p>Así queda arreglado:</p>
+${codigo('''
+Algoritmo saludo
+    Escribir "Hola mundo"
+FinAlgoritmo
+''', salida: 'Hola mundo')}
+''',
+      ),
+      (
+        'causas',
+        'Por qué aparece',
+        '''
+<ul>
+  <li>Escribiste el texto sin comillas.</li>
+  <li>Querías mostrar un texto y una variable, pero faltaron las comillas del texto y la coma que los separa: <code>Escribir "Tu edad es ", edad</code>.</li>
+</ul>''',
+      ),
+      (
+        'evitarlo',
+        'Cómo evitarlo',
+        '''
+<p>Antes de escribir algo después de <code>Escribir</code>, pregúntate: ¿quiero que salga esta palabra o el valor guardado en ella? Si es la palabra, comillas. Si es el valor, sin comillas. Si son las dos cosas, sepáralas con comas.</p>''',
+      ),
+    ],
+    preguntas: [
+      (
+        '¿Qué diferencia hay entre Escribir nombre y Escribir "nombre"?',
+        'Sin comillas, Jaguar muestra lo que hay guardado en la variable nombre (por ejemplo, Ana). Con comillas, muestra la palabra «nombre» tal cual.',
+      ),
+      (
+        '¿Y si solo es una palabra, como Escribir Hola?',
+        'Entonces Jaguar busca una variable llamada Hola. Si no existe, el error será «No encuentro la variable». Con una sola palabra también hacen falta las comillas: Escribir "Hola".',
+      ),
+    ],
+    relacionadas: ['falta-la-comilla-que-cierra-este-texto', 'sobra-al-final-de-la-instruccion', 'que-es-el-pseudocodigo'],
+  ),
+  Guia(
+    carpeta: 'errores',
+    slug: 'no-entiendo-la-instruccion',
+    titulo: 'Error «No entiendo la instrucción» en pseudocódigo: qué significa y cómo arreglarlo',
+    h1: 'No entiendo la instrucción',
+    descripcion:
+        'Qué significan los errores «No entiendo la instrucción», «Esta línea no empieza con una instrucción válida» y «No se esperaba … aquí», y cómo arreglarlos.',
+    resumen:
+        'Cada línea de un programa debe empezar con una instrucción que Jaguar conozca, como Escribir, Leer, Si o una asignación. Este error aparece cuando la primera palabra de la línea no es ninguna de ellas.',
+    publicada: '2026-11-03',
+    secciones: [
+      (
+        'que-significa',
+        'Qué significa',
+        '''
+<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>No entiendo la instrucción 'Escrivir'. ¿Quisiste decir 'Escribir'?</p>
+<p>Jaguar conoce un número fijo de instrucciones: <code>Definir</code>, <code>Dimension</code>, <code>Escribir</code>, <code>Leer</code>, <code>Si</code>, <code>Segun</code>, <code>Mientras</code>, <code>Repetir</code>, <code>Para</code>, <code>Esperar</code> y <code>Borrar Pantalla</code>. Además, una línea puede ser una asignación (<code>x &lt;- 5</code>) o una llamada a una función tuya.</p>
+<p>Si una línea empieza con una palabra que no es nada de eso, Jaguar no sabe qué hacer con ella. Casi siempre es una palabra mal escrita, y si se parece a una instrucción conocida, Jaguar te sugiere cuál: «¿Quisiste decir 'Escribir'?».</p>
+<p>Hay dos mensajes parecidos. <b>«Esta línea no empieza con una instrucción válida»</b> aparece cuando la línea empieza con algo que ni siquiera es una palabra, como un número o un símbolo. <b>«No se esperaba … aquí»</b> aparece cuando empieza con una palabra del lenguaje que no puede ir al inicio, como <code>Entonces</code> o <code>Hacer</code>.</p>''',
+      ),
+      (
+        'ejemplos',
+        'Ejemplos y cómo arreglarlos',
+        '''
+<h3>Una instrucción mal escrita</h3>
+${codigo('''
+Algoritmo saludo
+    Escrivir "Hola"
+FinAlgoritmo
+''', error: 'No entiendo la instrucción \'Escrivir\'.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>No entiendo la instrucción 'Escrivir'. ¿Quisiste decir 'Escribir'?</p>
+<p>Así queda arreglado:</p>
+${codigo('''
+Algoritmo saludo
+    Escribir "Hola"
+FinAlgoritmo
+''', salida: 'Hola')}
+<h3>La asignación al revés</h3>
+<p>En una asignación, la variable va a la izquierda de la flecha y el valor a la derecha. Al revés, la línea empieza con un número:</p>
+${codigo('''
+Algoritmo asignar
+    5 <- x
+    Escribir x
+FinAlgoritmo
+''', error: 'Esta línea no empieza con una instrucción válida (encontré \'5\').')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>Esta línea no empieza con una instrucción válida (encontré '5').</p>
+<p>Así queda arreglado:</p>
+${codigo('''
+Algoritmo asignar
+    x <- 5
+    Escribir x
+FinAlgoritmo
+''', salida: '5')}
+<h3>Entonces en su propia línea</h3>
+<p><code>Entonces</code> va en la misma línea que el <code>Si</code> y su condición, no sola:</p>
+${codigo('''
+Algoritmo mayor
+    Leer edad
+    Si edad >= 18
+    Entonces
+        Escribir "Mayor de edad"
+    FinSi
+FinAlgoritmo
+''', entradas: ['20'], error: 'No se esperaba \'Entonces\' aquí.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 4</b><br>No se esperaba 'Entonces' aquí.</p>
+<p>Así queda arreglado:</p>
+${codigo('''
+Algoritmo mayor
+    Leer edad
+    Si edad >= 18 Entonces
+        Escribir "Mayor de edad"
+    FinSi
+FinAlgoritmo
+''', entradas: ['20'], salida: 'Mayor de edad')}
+''',
+      ),
+      (
+        'causas',
+        'Por qué aparece',
+        '''
+<ul>
+  <li>Un error de dedo en el nombre de la instrucción: <code>Escrivir</code>, <code>Lerr</code>, <code>Mientars</code>.</li>
+  <li>Usar una palabra de otro lenguaje o de otro estilo de pseudocódigo, como <code>Imprime</code> o <code>print</code>.</li>
+  <li>Escribir la asignación al revés (<code>5 &lt;- x</code>).</li>
+  <li>Partir una instrucción en dos líneas, dejando <code>Entonces</code> o <code>Hacer</code> solos.</li>
+</ul>''',
+      ),
+      (
+        'evitarlo',
+        'Cómo evitarlo',
+        '''
+<p>Si dudas de cómo se escribe una instrucción, usa la vista de bloques de Jaguar: ahí todas las instrucciones están en la lista y no tienes que recordarlas. También puedes consultar la tabla de palabras en la guía de <a href="/guias/que-es-el-pseudocodigo">qué es el pseudocódigo</a>.</p>''',
+      ),
+    ],
+    preguntas: [
+      (
+        '¿Jaguar distingue mayúsculas y minúsculas en las instrucciones?',
+        'No. Escribir, escribir y ESCRIBIR son lo mismo, y tampoco importan los acentos: Según y Segun funcionan igual. Lo que sí importa es que las letras sean las correctas.',
+      ),
+      (
+        '¿Puedo usar Imprimir o Mostrar en lugar de Escribir?',
+        'Sí, Jaguar acepta Imprimir y Mostrar como sinónimos de Escribir, igual que PSeInt.',
+      ),
+    ],
+    relacionadas: ['es-una-palabra-reservada', 'se-esperaba-un-valor', 'que-es-el-pseudocodigo'],
+  ),
+  Guia(
+    carpeta: 'errores',
+    slug: 'sobra-al-final-de-la-instruccion',
+    titulo: 'Error «Sobra … al final de la instrucción»: qué significa y cómo arreglarlo',
+    h1: 'Sobra algo al final de la instrucción',
+    descripcion:
+        'Qué significan los errores «Sobra … al final de la instrucción» y «Sobra … en esta línea: falta una coma o una comilla» en pseudocódigo, con ejemplos para arreglarlos.',
+    resumen:
+        'Jaguar terminó de leer una instrucción completa y todavía quedaba algo en la línea. Casi siempre falta una coma entre dos valores o un operador entre dos números.',
+    publicada: '2026-11-03',
+    secciones: [
+      (
+        'que-significa',
+        'Qué significa',
+        '''
+<p class="aviso-error" role="note"><b>Error de escritura en la línea 3</b><br>Sobra 'total' en esta línea: falta una coma o una comilla. Separa con comas lo que muestras y pon los textos entre comillas: Escribir "Hola ", nombre</p>
+<p>Cada instrucción tiene una forma. Por ejemplo, una asignación es <code>variable &lt;- valor</code>. Cuando Jaguar termina de leer esa forma completa y en la línea todavía queda algo, no sabe qué hacer con lo que sobra, y te dice exactamente qué es.</p>
+<p>En una línea con <code>Escribir</code>, el mensaje cambia a <b>«falta una coma o una comilla»</b>, porque ahí la causa casi siempre es esa: dos cosas que se quieren mostrar juntas sin una coma entre ellas.</p>''',
+      ),
+      (
+        'ejemplos',
+        'Ejemplos y cómo arreglarlos',
+        '''
+<h3>Falta la coma en Escribir</h3>
+${codigo('''
+Algoritmo total
+    total <- 250
+    Escribir "Total: " total
+FinAlgoritmo
+''', error: 'Sobra \'total\' en esta línea: falta una coma o una comilla.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 3</b><br>Sobra 'total' en esta línea: falta una coma o una comilla. Separa con comas lo que muestras y pon los textos entre comillas: Escribir "Hola ", nombre</p>
+<p>Lo que muestras se separa con comas:</p>
+${codigo('''
+Algoritmo total
+    total <- 250
+    Escribir "Total: ", total
+FinAlgoritmo
+''', salida: 'Total: 250')}
+<h3>Falta un operador</h3>
+<p>Dos números juntos, sin un operador en medio:</p>
+${codigo('''
+Algoritmo area
+    area <- 5 3
+    Escribir area
+FinAlgoritmo
+''', error: 'Sobra \'3\' al final de la instrucción.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>Sobra '3' al final de la instrucción. Pon cada instrucción en su propia línea o sepáralas con ";".</p>
+<p>Así queda arreglado:</p>
+${codigo('''
+Algoritmo area
+    area <- 5 * 3
+    Escribir area
+FinAlgoritmo
+''', salida: '15')}
+''',
+      ),
+      (
+        'causas',
+        'Por qué aparece',
+        '''
+<ul>
+  <li>Falta una coma entre las cosas que muestra <code>Escribir</code>.</li>
+  <li>Falta un operador (<code>+</code>, <code>*</code>, etc.) entre dos valores.</li>
+  <li>Hay dos instrucciones en la misma línea. Se pueden separar con <code>;</code>, pero es más claro poner cada una en su línea.</li>
+  <li>Un nombre de variable con espacio, como <code>precio total</code>: Jaguar lee <code>precio</code> y le sobra <code>total</code>. Usa <code>precio_total</code>.</li>
+</ul>''',
+      ),
+    ],
+    preguntas: [
+      (
+        '¿Puedo poner dos instrucciones en una línea?',
+        'Sí, separadas con punto y coma: a <- 1; b <- 2. Pero un programa se lee mejor con una instrucción por línea.',
+      ),
+      (
+        '¿Los nombres de variables pueden tener espacios?',
+        'No. Usa guion bajo (precio_total) o junta las palabras (precioTotal).',
+      ),
+    ],
+    relacionadas: ['falta-poner-el-texto-entre-comillas', 'se-esperaba-un-valor', 'variables-y-tipos-de-datos'],
+  ),
+  Guia(
+    carpeta: 'errores',
+    slug: 'se-esperaba-un-valor',
+    titulo: 'Error «Se esperaba un valor» o «Falta un valor» en pseudocódigo: cómo arreglarlo',
+    h1: 'Se esperaba un valor',
+    descripcion:
+        'Qué significan los errores «Se esperaba un valor, pero encontré …» y «Falta un valor: la instrucción termina antes de tiempo», incluida la condición que falta en un Si.',
+    resumen:
+        'En ese lugar de la instrucción debía ir un valor, como un número, un texto, una variable o una operación, y Jaguar encontró otra cosa o nada.',
+    publicada: '2026-11-03',
+    secciones: [
+      (
+        'que-significa',
+        'Qué significa',
+        '''
+<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>Falta un valor: la instrucción termina antes de tiempo.</p>
+<p>Muchas instrucciones necesitan un valor: después de la flecha de una asignación, después de <code>Si</code> (la condición), después de <code>Escribir</code>, a cada lado de un <code>+</code>. Un valor puede ser un número (<code>5</code>), un texto (<code>"hola"</code>), una variable (<code>edad</code>), una operación (<code>a + b</code>) o una función (<code>Raiz(16)</code>).</p>
+<p>El mensaje tiene tres formas, según lo que Jaguar encontró en lugar del valor:</p>
+<ul>
+  <li><b>«Falta un valor: la instrucción termina antes de tiempo»</b>: la línea se acabó y el valor nunca llegó.</li>
+  <li><b>«Se esperaba un valor, pero encontré la palabra …»</b>: en su lugar hay una palabra del lenguaje. Si es <code>Entonces</code> o <code>Hacer</code>, falta la condición.</li>
+  <li><b>«Se esperaba un valor, pero encontré …»</b>: hay un símbolo que no va ahí, como dos operadores seguidos.</li>
+</ul>''',
+      ),
+      (
+        'ejemplos',
+        'Ejemplos y cómo arreglarlos',
+        '''
+<h3>La asignación sin valor</h3>
+${codigo('''
+Algoritmo asignar
+    total <-
+    Escribir total
+FinAlgoritmo
+''', error: 'Falta un valor: la instrucción termina antes de tiempo.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>Falta un valor: la instrucción termina antes de tiempo.</p>
+<p>Así queda arreglado:</p>
+${codigo('''
+Algoritmo asignar
+    total <- 0
+    Escribir total
+FinAlgoritmo
+''', salida: '0')}
+<h3>Un Si sin condición</h3>
+${codigo('''
+Algoritmo revisar
+    Leer n
+    Si Entonces
+        Escribir "Es positivo"
+    FinSi
+FinAlgoritmo
+''', entradas: ['3'], error: 'Se esperaba un valor, pero encontré la palabra \'Entonces\'.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 3</b><br>Se esperaba un valor, pero encontré la palabra 'Entonces'. Parece que falta la condición antes de 'Entonces'.</p>
+<p>Entre <code>Si</code> y <code>Entonces</code> va la pregunta que se responde con verdadero o falso:</p>
+${codigo('''
+Algoritmo revisar
+    Leer n
+    Si n > 0 Entonces
+        Escribir "Es positivo"
+    FinSi
+FinAlgoritmo
+''', entradas: ['3'], salida: 'Es positivo')}
+<h3>Dos operadores seguidos</h3>
+${codigo('''
+Algoritmo cuenta
+    x <- 5 * * 2
+    Escribir x
+FinAlgoritmo
+''', error: 'Se esperaba un valor, pero encontré \'*\'.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>Se esperaba un valor, pero encontré '*'.</p>
+<p>Entre dos operadores siempre va un valor. Si querías una potencia, el operador es <code>^</code>:</p>
+${codigo('''
+Algoritmo cuenta
+    x <- 5 ^ 2
+    Escribir x
+FinAlgoritmo
+''', salida: '25')}
+''',
+      ),
+      (
+        'causas',
+        'Por qué aparece',
+        '''
+<ul>
+  <li>Se quedó a medias una asignación (<code>x &lt;-</code>) o una operación (<code>a +</code>).</li>
+  <li>Falta la condición de un <code>Si</code> o de un <code>Mientras</code>.</li>
+  <li>Hay dos operadores juntos, o una coma de más en <code>Escribir</code>.</li>
+  <li>Escribiste <code>**</code> para potencia, como en Python. En pseudocódigo se usa <code>^</code>.</li>
+</ul>''',
+      ),
+    ],
+    preguntas: [
+      (
+        '¿Qué cuenta como un valor?',
+        'Un número, un texto entre comillas, Verdadero o Falso, una variable, una operación entre valores o una función como Raiz(16).',
+      ),
+      (
+        '¿Cómo se escribe una potencia?',
+        'Con ^. Por ejemplo, 2 ^ 3 es 8. El ** de Python no funciona en pseudocódigo.',
+      ),
+    ],
+    relacionadas: ['sobra-al-final-de-la-instruccion', 'se-esperaba-cerrar-parentesis', 'condicionales-si-y-segun'],
+  ),
+  Guia(
+    carpeta: 'errores',
+    slug: 'se-esperaba-cerrar-parentesis',
+    titulo: 'Error «Se esperaba \')\' para cerrar el paréntesis» en pseudocódigo: cómo arreglarlo',
+    h1: 'Se esperaba \')\' para cerrar el paréntesis',
+    descripcion:
+        'Qué significa el error «Se esperaba \')\' para cerrar el paréntesis» (o la llamada a una función, o \']\' para cerrar el índice) y cómo arreglarlo.',
+    resumen:
+        'Abriste un paréntesis o un corchete y la línea se terminó, o apareció otra cosa, antes de cerrarlo.',
+    publicada: '2026-11-03',
+    secciones: [
+      (
+        'que-significa',
+        'Qué significa',
+        '''
+<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>Se esperaba ')' para cerrar el paréntesis, pero encontré el fin de la línea.</p>
+<p>Los paréntesis y los corchetes van en pareja: cada <code>(</code> necesita su <code>)</code> y cada <code>[</code> su <code>]</code>. Jaguar avisa en cuanto encuentra algo que no debería estar antes del cierre, o cuando la línea se acaba.</p>
+<p>El mensaje dice para qué era el paréntesis que falta cerrar:</p>
+<ul>
+  <li><b>«para cerrar el paréntesis»</b>: un paréntesis de agrupación en una operación, como <code>(a + b) / 2</code>.</li>
+  <li><b>«para cerrar la llamada a …»</b>: los paréntesis de una función, como <code>Raiz(16)</code>.</li>
+  <li><b>«para cerrar el índice»</b>: el corchete de un arreglo, como <code>v[3]</code>.</li>
+</ul>''',
+      ),
+      (
+        'ejemplos',
+        'Ejemplos y cómo arreglarlos',
+        '''
+<h3>Un paréntesis de agrupación</h3>
+${codigo('''
+Algoritmo promedio
+    p <- (8 + 9 + 10 / 3
+    Escribir p
+FinAlgoritmo
+''', error: 'Se esperaba \')\' para cerrar el paréntesis, pero encontré el fin de la línea.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>Se esperaba ')' para cerrar el paréntesis, pero encontré el fin de la línea.</p>
+<p>Ojo con dónde va el cierre: lo que quede dentro del paréntesis se calcula primero. Para un promedio, la suma completa va adentro:</p>
+${codigo('''
+Algoritmo promedio
+    p <- (8 + 9 + 10) / 3
+    Escribir p
+FinAlgoritmo
+''', salida: '9')}
+<h3>La llamada a una función</h3>
+${codigo('''
+Algoritmo raiz
+    Escribir Raiz(81
+FinAlgoritmo
+''', error: 'Se esperaba \')\' para cerrar la llamada a Raiz, pero encontré el fin de la línea.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>Se esperaba ')' para cerrar la llamada a Raiz, pero encontré el fin de la línea.</p>
+<p>Así queda arreglado:</p>
+${codigo('''
+Algoritmo raiz
+    Escribir Raiz(81)
+FinAlgoritmo
+''', salida: '9')}
+<h3>El corchete de un arreglo</h3>
+${codigo('''
+Algoritmo arreglo
+    Dimension v[3
+FinAlgoritmo
+''', error: 'Se esperaba \']\' para cerrar el índice, pero encontré el fin de la línea.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>Se esperaba ']' para cerrar el índice, pero encontré el fin de la línea.</p>
+<p>Así queda arreglado:</p>
+${codigo('''
+Algoritmo arreglo
+    Dimension v[3]
+    v[1] <- 7
+    Escribir v[1]
+FinAlgoritmo
+''', salida: '7')}
+''',
+      ),
+      (
+        'causas',
+        'Por qué aparece',
+        '''
+<ul>
+  <li>Se olvidó el cierre, sobre todo con varios paréntesis anidados: <code>Raiz((a + b)</code>.</li>
+  <li>Se cerró con el símbolo equivocado: <code>(a + b]</code>.</li>
+  <li>Falta una coma entre los valores de una función, y Jaguar encuentra el segundo valor donde esperaba el cierre.</li>
+</ul>''',
+      ),
+      (
+        'evitarlo',
+        'Cómo evitarlo',
+        '''
+<p>Cuenta los paréntesis: debe haber tantos que abren como que cierran. Igual que con las comillas, escribir la pareja <code>()</code> y luego rellenar el contenido evita olvidos.</p>''',
+      ),
+    ],
+    preguntas: [
+      (
+        '¿Puedo usar corchetes para agrupar operaciones?',
+        'No. Los corchetes son para los arreglos (v[3]). Para agrupar operaciones se usan solo paréntesis, aunque haya varios niveles: ((a + b) * c) / 2.',
+      ),
+      (
+        '¿Se puede usar v(3) en lugar de v[3]?',
+        'Sí, si el arreglo se creó con Dimension: Jaguar entiende v(3) como en DFD. Pero la forma de PSeInt, v[3], es la más común.',
+      ),
+    ],
+    relacionadas: ['se-esperaba-un-valor', 'se-esperaba-corchete-en-dimension', 'variables-y-tipos-de-datos'],
+  ),
+  Guia(
+    carpeta: 'errores',
+    slug: 'se-esperaba-flecha-para-asignar',
+    titulo: 'Error «Se esperaba \'<-\' para asignar un valor» en pseudocódigo: cómo arreglarlo',
+    h1: 'Se esperaba \'<-\' para asignar un valor',
+    descripcion:
+        'Qué significa el error «Se esperaba \'<-\' para asignar un valor a …» en pseudocódigo, cómo se escribe una asignación y por qué falta la flecha.',
+    resumen:
+        'Jaguar entendió que querías guardar un valor en una variable o en una casilla de un arreglo, pero no encontró la flecha <- que hace la asignación.',
+    publicada: '2026-11-03',
+    secciones: [
+      (
+        'que-significa',
+        'Qué significa',
+        '''
+<p class="aviso-error" role="note"><b>Error de escritura en la línea 3</b><br>Se esperaba '&lt;-' para asignar un valor a 'v'.</p>
+<p>Una asignación guarda un valor en una variable y siempre tiene la misma forma: el nombre, la flecha y el valor. <code>edad &lt;- 15</code> se lee «guarda 15 en edad». La flecha se escribe con el signo menor que y un guion: <code>&lt;-</code>.</p>
+<p>Este error aparece cuando la línea empieza como una asignación (por ejemplo, con el nombre de un arreglo y su posición, <code>v[1]</code>) pero después no viene la flecha. Jaguar también acepta <code>=</code> y <code>:=</code> para asignar, pero la flecha es la forma más clara porque no se confunde con comparar.</p>''',
+      ),
+      (
+        'ejemplos',
+        'Ejemplo y cómo arreglarlo',
+        '''
+${codigo('''
+Algoritmo arreglo
+    Dimension v[3]
+    v[1] 10
+    Escribir v[1]
+FinAlgoritmo
+''', error: 'Se esperaba \'<-\' para asignar un valor a \'v\'.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 3</b><br>Se esperaba '&lt;-' para asignar un valor a 'v'.</p>
+<p>Así queda arreglado:</p>
+${codigo('''
+Algoritmo arreglo
+    Dimension v[3]
+    v[1] <- 10
+    Escribir v[1]
+FinAlgoritmo
+''', salida: '10')}
+''',
+      ),
+      (
+        'causas',
+        'Por qué aparece',
+        '''
+<ul>
+  <li>Se olvidó la flecha entre la variable y el valor.</li>
+  <li>La flecha se escribió con espacio en medio (<code>&lt; -</code>) o al revés (<code>-&gt;</code>).</li>
+  <li>Se usó otro símbolo, como <code>:</code> solo.</li>
+</ul>''',
+      ),
+    ],
+    preguntas: [
+      (
+        '¿Puedo usar = para asignar?',
+        'Sí, Jaguar acepta x = 5 y x := 5 como asignación. Pero = también sirve para comparar dentro de un Si, así que la flecha <- deja más claro qué estás haciendo.',
+      ),
+      (
+        '¿Cómo escribo la flecha en el celular?',
+        'Con el signo menor que (<) seguido de un guion (-), sin espacio entre ellos. En Jaguar también está en la barra de símbolos sobre el teclado.',
+      ),
+    ],
+    relacionadas: ['se-esperaba-un-valor', 'no-entiendo-la-instruccion', 'variables-y-tipos-de-datos'],
+  ),
+  Guia(
+    carpeta: 'errores',
+    slug: 'es-una-palabra-reservada',
+    titulo: 'Error «es una palabra reservada» en pseudocódigo: qué significa y cómo arreglarlo',
+    h1: 'Es una palabra reservada y no puede ser un nombre',
+    descripcion:
+        'Qué significa el error «es una palabra reservada (el lenguaje ya la usa) y no puede ser un nombre» y qué nombres de variable no se pueden usar en pseudocódigo.',
+    resumen:
+        'Usaste como nombre de variable una palabra que el pseudocódigo ya usa para otra cosa, como Si, Para, Y u O. Hay que elegir otro nombre.',
+    publicada: '2026-11-03',
+    secciones: [
+      (
+        'que-significa',
+        'Qué significa',
+        '''
+<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>'y' es una palabra reservada (el lenguaje ya la usa) y no puede ser un nombre de variable. Elige otro nombre, por ejemplo 'y1' o uno que describa el dato, como 'total'.</p>
+<p>Algunas palabras tienen un significado fijo en el pseudocódigo: las instrucciones (<code>Leer</code>, <code>Para</code>, <code>Mientras</code>), las partes de los bloques (<code>Entonces</code>, <code>Hacer</code>, <code>Hasta</code>), los operadores (<code>Y</code>, <code>O</code>, <code>NO</code>, <code>MOD</code>) y los valores <code>Verdadero</code> y <code>Falso</code>. Se llaman <b>palabras reservadas</b>.</p>
+<p>Si usas una de ellas como nombre de variable, Jaguar no puede saber si te refieres a la variable o a la palabra del lenguaje, así que no lo permite.</p>
+<p>La trampa más común son las coordenadas: <code>x</code> funciona, pero <code>y</code> no, porque <code>Y</code> es el operador lógico (no importan las mayúsculas). Lo mismo pasa con <code>o</code>.</p>''',
+      ),
+      (
+        'ejemplos',
+        'Ejemplos y cómo arreglarlos',
+        '''
+<h3>La variable y</h3>
+${codigo('''
+Algoritmo punto
+    Leer x, y
+    Escribir "(", x, ", ", y, ")"
+FinAlgoritmo
+''', entradas: ['3', '4'], error: '\'y\' es una palabra reservada (el lenguaje ya la usa) y no puede ser un nombre de variable.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>'y' es una palabra reservada (el lenguaje ya la usa) y no puede ser un nombre de variable. Elige otro nombre, por ejemplo 'y1' o uno que describa el dato, como 'total'.</p>
+<p>Así queda arreglado:</p>
+${codigo('''
+Algoritmo punto
+    Leer x, coordY
+    Escribir "(", x, ", ", coordY, ")"
+FinAlgoritmo
+''', entradas: ['3', '4'], salida: '(3, 4)')}
+<h3>Una instrucción como nombre</h3>
+${codigo('''
+Algoritmo pago
+    Definir para Como Real
+FinAlgoritmo
+''', error: '\'para\' es una palabra reservada (el lenguaje ya la usa) y no puede ser un nombre de variable.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>'para' es una palabra reservada (el lenguaje ya la usa) y no puede ser un nombre de variable. Elige otro nombre, por ejemplo 'para1' o uno que describa el dato, como 'total'.</p>
+<p>Un nombre que describa el dato es mejor de todos modos:</p>
+${codigo('''
+Algoritmo pago
+    Definir pago_total Como Real
+    pago_total <- 99.5
+    Escribir pago_total
+FinAlgoritmo
+''', salida: '99.5')}
+''',
+      ),
+      (
+        'causas',
+        'Por qué aparece',
+        '''
+<ul>
+  <li>Usar <code>y</code> u <code>o</code> como variable (por ejemplo, coordenadas o contadores).</li>
+  <li>Usar el nombre de una instrucción como variable: <code>leer</code>, <code>para</code>, <code>fin</code>.</li>
+  <li>Llamar a una variable <code>no</code>, <code>mod</code>, <code>verdadero</code> o <code>falso</code>.</li>
+</ul>''',
+      ),
+      (
+        'evitarlo',
+        'Cómo evitarlo',
+        '''
+<p>Usa nombres que digan qué guarda la variable: <code>total</code>, <code>edad</code>, <code>coordY</code>. Además de evitar este error, hacen que el programa se entienda mejor.</p>''',
+      ),
+    ],
+    preguntas: [
+      (
+        '¿Por qué x funciona y y no?',
+        'Porque Y es el operador lógico «y» (como en a > 0 Y b > 0). El pseudocódigo no distingue mayúsculas, así que y también es el operador. X no es ninguna palabra del lenguaje.',
+      ),
+      (
+        '¿Qué palabras no puedo usar como nombre?',
+        'Las instrucciones y partes de bloques (Algoritmo, Definir, Leer, Escribir, Si, Entonces, SiNo, Segun, Mientras, Repetir, Hasta, Que, Para, Con, Paso, Hacer, Fin…), los operadores (Y, O, NO, MOD) y Verdadero y Falso.',
+      ),
+    ],
+    relacionadas: ['no-entiendo-la-instruccion', 'se-esperaba-como-y-un-tipo', 'variables-y-tipos-de-datos'],
+  ),
+  Guia(
+    carpeta: 'errores',
+    slug: 'se-esperaba-hasta-en-el-ciclo-para',
+    titulo: 'Error «Se esperaba \'Hasta\' en el ciclo Para» y otros errores del Para: cómo arreglarlos',
+    h1: 'Errores al escribir un ciclo Para',
+    descripcion:
+        'Qué significan los errores «Se esperaba \'Hasta\' en el ciclo Para», «Se esperaba \'<-\' después de i», «Se esperaba \'Paso\' después de \'Con\'» y «Se esperaba \'De\' en el ciclo Para Cada».',
+    resumen:
+        'El ciclo Para tiene una forma fija: Para variable <- inicio Hasta fin Con Paso n Hacer. Estos errores aparecen cuando falta o está mal escrita una de sus partes.',
+    publicada: '2026-11-03',
+    secciones: [
+      (
+        'que-significa',
+        'Qué significa',
+        '''
+<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>Se esperaba 'Hasta' en el ciclo Para, pero encontré 'A'.</p>
+<p>Un <code>Para</code> completo se ve así: <code>Para i &lt;- 1 Hasta 10 Con Paso 2 Hacer</code>. Cada parte tiene su lugar:</p>
+<ul>
+  <li><code>i &lt;- 1</code>: la variable que cuenta y su valor inicial, con flecha.</li>
+  <li><code>Hasta 10</code>: el valor final.</li>
+  <li><code>Con Paso 2</code>: cuánto avanza en cada vuelta. Es opcional; sin él avanza de 1 en 1.</li>
+  <li><code>Hacer</code>: también es opcional en Jaguar.</li>
+</ul>
+<p>Jaguar te dice qué parte esperaba y qué encontró en su lugar. Para recorrer un arreglo existe además <code>Para Cada x De arreglo Hacer</code>, donde la palabra es <code>De</code>.</p>''',
+      ),
+      (
+        'ejemplos',
+        'Ejemplos y cómo arreglarlos',
+        '''
+<h3>Se esperaba 'Hasta'</h3>
+<p>En lugar de <code>Hasta</code> se usó otra palabra, como en «del 1 al 10»:</p>
+${codigo('''
+Algoritmo contar
+    Para i <- 1 A 5 Hacer
+        Escribir i
+    FinPara
+FinAlgoritmo
+''', error: 'Se esperaba \'Hasta\' en el ciclo Para, pero encontré \'A\'.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>Se esperaba 'Hasta' en el ciclo Para, pero encontré 'A'.</p>
+<p>Así queda arreglado:</p>
+${codigo('''
+Algoritmo contar
+    Para i <- 1 Hasta 5 Hacer
+        Escribir i
+    FinPara
+FinAlgoritmo
+''', salida: '1\n2\n3\n4\n5')}
+<h3>Se esperaba '<-' después de la variable</h3>
+${codigo('''
+Algoritmo contar
+    Para i Hasta 5 Hacer
+        Escribir i
+    FinPara
+FinAlgoritmo
+''', error: 'Se esperaba \'<-\' después de \'i\'.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>Se esperaba '&lt;-' después de 'i'. Por ejemplo: Para i &lt;- 1 Hasta 10 Hacer</p>
+<p>El <code>Para</code> necesita saber desde dónde empieza a contar:</p>
+${codigo('''
+Algoritmo contar
+    Para i <- 1 Hasta 5 Hacer
+        Escribir i
+    FinPara
+FinAlgoritmo
+''', salida: '1\n2\n3\n4\n5')}
+<h3>Se esperaba 'Paso' después de 'Con'</h3>
+${codigo('''
+Algoritmo pares
+    Para i <- 2 Hasta 10 Con 2 Hacer
+        Escribir i
+    FinPara
+FinAlgoritmo
+''', error: 'Se esperaba \'Paso\' después de \'Con\', pero encontré \'2\'.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>Se esperaba 'Paso' después de 'Con', pero encontré '2'.</p>
+<p>Así queda arreglado:</p>
+${codigo('''
+Algoritmo pares
+    Para i <- 2 Hasta 10 Con Paso 2 Hacer
+        Escribir i
+    FinPara
+FinAlgoritmo
+''', salida: '2\n4\n6\n8\n10')}
+<h3>Se esperaba 'De' en el Para Cada</h3>
+${codigo('''
+Algoritmo recorrer
+    Dimension v[2]
+    v[1] <- 5
+    v[2] <- 8
+    Para Cada x En v Hacer
+        Escribir x
+    FinPara
+FinAlgoritmo
+''', error: 'Se esperaba \'De\' en el ciclo Para Cada, pero encontré \'En\'.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 5</b><br>Se esperaba 'De' en el ciclo Para Cada, pero encontré 'En'.</p>
+<p>Así queda arreglado:</p>
+${codigo('''
+Algoritmo recorrer
+    Dimension v[2]
+    v[1] <- 5
+    v[2] <- 8
+    Para Cada x De v Hacer
+        Escribir x
+    FinPara
+FinAlgoritmo
+''', salida: '5\n8')}
+''',
+      ),
+      (
+        'causas',
+        'Por qué aparece',
+        '''
+<ul>
+  <li>Escribir el <code>Para</code> como se diría en voz alta («del 1 al 10») en lugar de con <code>Hasta</code>.</li>
+  <li>Olvidar el valor inicial o la flecha.</li>
+  <li>Escribir <code>Con 2</code> o <code>Paso 2</code> en lugar de <code>Con Paso 2</code>.</li>
+  <li>Usar <code>En</code> en un <code>Para Cada</code>, como el <code>in</code> de Python. En pseudocódigo es <code>De</code>.</li>
+</ul>''',
+      ),
+    ],
+    preguntas: [
+      (
+        '¿Cómo cuento hacia atrás con Para?',
+        'Con un paso negativo: Para i <- 10 Hasta 1 Con Paso -1 Hacer. En Jaguar, si el inicio es mayor que el fin y no pones paso, también cuenta hacia atrás.',
+      ),
+      (
+        '¿Es obligatorio escribir Hacer?',
+        'En Jaguar, no. Pero escribirlo es la forma más común y la que se espera en muchos cursos, así que conviene ponerlo.',
+      ),
+    ],
+    relacionadas: ['ciclos-mientras-para-repetir', 'se-esperaba-flecha-para-asignar', 'arreglos-en-pseudocodigo'],
+  ),
+  Guia(
+    carpeta: 'errores',
+    slug: 'se-esperaba-como-y-un-tipo',
+    titulo: 'Error «Se esperaba \'Como\' y un tipo» y «no es un tipo de dato válido»: cómo arreglarlos',
+    h1: 'Errores al usar Definir',
+    descripcion:
+        'Qué significan los errores de Definir en pseudocódigo: «Se esperaba \'Como\' y un tipo», «… no es un tipo de dato válido» y «Se esperaba un nombre de variable».',
+    resumen:
+        'Definir declara de qué tipo es una variable y siempre se escribe igual: Definir nombre Como Tipo. Estos errores aparecen cuando falta Como, el tipo no existe o el nombre no es válido.',
+    publicada: '2026-11-03',
+    secciones: [
+      (
+        'que-significa',
+        'Qué significa',
+        '''
+<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>Se esperaba 'Como' y un tipo, por ejemplo: Definir edad Como Entero.</p>
+<p>La forma de <code>Definir</code> es: la palabra <code>Definir</code>, uno o varios nombres separados por comas, la palabra <code>Como</code> y un tipo. Por ejemplo: <code>Definir edad, año Como Entero</code>.</p>
+<p>Los tipos que existen son <code>Entero</code>, <code>Real</code> (o <code>Numero</code>), <code>Logico</code>, <code>Caracter</code> (o <code>Texto</code> o <code>Cadena</code>). Si escribes un tipo parecido pero con otra forma, como <code>Enteros</code>, Jaguar te sugiere el correcto.</p>
+<p>Recuerda que en el pseudocódigo flexible no es obligatorio usar <code>Definir</code>. Si tu profe no lo pide, puedes asignar directamente.</p>''',
+      ),
+      (
+        'ejemplos',
+        'Ejemplos y cómo arreglarlos',
+        '''
+<h3>Falta 'Como'</h3>
+${codigo('''
+Algoritmo tipos
+    Definir edad Entero
+FinAlgoritmo
+''', error: 'Se esperaba \'Como\' y un tipo, por ejemplo: Definir edad Como Entero.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>Se esperaba 'Como' y un tipo, por ejemplo: Definir edad Como Entero.</p>
+<p>Así queda arreglado:</p>
+${codigo('''
+Algoritmo tipos
+    Definir edad Como Entero
+    edad <- 16
+    Escribir edad
+FinAlgoritmo
+''', salida: '16')}
+<h3>Un tipo que no existe</h3>
+${codigo('''
+Algoritmo tipos
+    Definir edad Como Enteros
+FinAlgoritmo
+''', error: '\'Enteros\' no es un tipo de dato válido.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>'Enteros' no es un tipo de dato válido. ¿Quisiste decir 'Entero'?</p>
+<p>El tipo va en singular:</p>
+${codigo('''
+Algoritmo tipos
+    Definir edad Como Entero
+    edad <- 16
+    Escribir edad
+FinAlgoritmo
+''', salida: '16')}
+<h3>Un nombre que no es válido</h3>
+${codigo('''
+Algoritmo tipos
+    Definir 1er_lugar Como Caracter
+FinAlgoritmo
+''', error: 'Se esperaba un nombre de variable, pero encontré \'1\'.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>Se esperaba un nombre de variable, pero encontré '1'.</p>
+<p>Los nombres de variable empiezan con una letra:</p>
+${codigo('''
+Algoritmo tipos
+    Definir primer_lugar Como Caracter
+    primer_lugar <- "Sofía"
+    Escribir primer_lugar
+FinAlgoritmo
+''', salida: 'Sofía')}
+''',
+      ),
+      (
+        'causas',
+        'Por qué aparece',
+        '''
+<ul>
+  <li>Olvidar la palabra <code>Como</code>.</li>
+  <li>Escribir el tipo en plural, abreviado o en inglés (<code>Enteros</code>, <code>Int</code>, <code>String</code>).</li>
+  <li>Usar un nombre que empieza con número o tiene símbolos.</li>
+  <li>Usar una palabra reservada como nombre; ese caso tiene su propio mensaje: <a href="/errores/es-una-palabra-reservada">es una palabra reservada</a>.</li>
+</ul>''',
+      ),
+    ],
+    preguntas: [
+      (
+        '¿Qué tipos de datos hay en pseudocódigo?',
+        'Entero (números sin decimales), Real (con decimales), Logico (Verdadero o Falso) y Caracter o Texto (letras y palabras). Jaguar también acepta Numero como sinónimo de Real y Cadena como sinónimo de Texto.',
+      ),
+      (
+        '¿Puedo definir varias variables en una línea?',
+        'Sí, si son del mismo tipo: Definir a, b, c Como Entero.',
+      ),
+    ],
+    relacionadas: ['es-una-palabra-reservada', 'variables-y-tipos-de-datos', 'se-esperaba-corchete-en-dimension'],
+  ),
+  Guia(
+    carpeta: 'errores',
+    slug: 'se-esperaba-corchete-en-dimension',
+    titulo: 'Error «Se esperaba \'[\' con el tamaño del arreglo» en Dimension: cómo arreglarlo',
+    h1: 'Se esperaba \'[\' con el tamaño del arreglo',
+    descripcion:
+        'Qué significa el error «Se esperaba \'[\' con el tamaño del arreglo, por ejemplo: Dimension v[10]» en pseudocódigo y cómo crear un arreglo correctamente.',
+    resumen:
+        'Para crear un arreglo con Dimension hay que decir cuántas casillas tiene, entre corchetes, justo después del nombre.',
+    publicada: '2026-11-03',
+    secciones: [
+      (
+        'que-significa',
+        'Qué significa',
+        '''
+<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>Se esperaba '[' con el tamaño del arreglo, por ejemplo: Dimension v[10].</p>
+<p><code>Dimension</code> crea un arreglo: una variable con varias casillas numeradas. Para eso necesita dos cosas, el nombre y el tamaño, y el tamaño va entre corchetes: <code>Dimension calificaciones[30]</code>. Para una matriz, se ponen las dos medidas separadas por coma: <code>Dimension tabla[3, 4]</code>.</p>
+<p>Si después del nombre no hay un corchete, Jaguar no sabe de qué tamaño hacer el arreglo y te muestra cómo se escribe, usando el nombre de tu arreglo.</p>''',
+      ),
+      (
+        'ejemplos',
+        'Ejemplos y cómo arreglarlos',
+        '''
+<h3>El tamaño entre paréntesis</h3>
+${codigo('''
+Algoritmo lista
+    Dimension v(5)
+FinAlgoritmo
+''', error: 'Se esperaba \'[\' con el tamaño del arreglo, por ejemplo: Dimension v[10].')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>Se esperaba '[' con el tamaño del arreglo, por ejemplo: Dimension v[10].</p>
+<p>En <code>Dimension</code>, el tamaño siempre va entre corchetes:</p>
+${codigo('''
+Algoritmo lista
+    Dimension v[5]
+    v[5] <- 1
+    Escribir v[5]
+FinAlgoritmo
+''', salida: '1')}
+<h3>Sin tamaño</h3>
+${codigo('''
+Algoritmo lista
+    Dimension nombres
+FinAlgoritmo
+''', error: 'Se esperaba \'[\' con el tamaño del arreglo, por ejemplo: Dimension nombres[10].')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>Se esperaba '[' con el tamaño del arreglo, por ejemplo: Dimension nombres[10].</p>
+<p>Así queda arreglado:</p>
+${codigo('''
+Algoritmo lista
+    Dimension nombres[3]
+    nombres[1] <- "Ana"
+    Escribir nombres[1]
+FinAlgoritmo
+''', salida: 'Ana')}
+''',
+      ),
+      (
+        'causas',
+        'Por qué aparece',
+        '''
+<ul>
+  <li>Usar paréntesis en lugar de corchetes al crear el arreglo.</li>
+  <li>Olvidar el tamaño.</li>
+  <li>Querer crear el arreglo sin saber cuántos datos habrá. El tamaño puede ser una variable que ya tenga valor: <code>Leer n</code> y luego <code>Dimension v[n]</code>.</li>
+</ul>''',
+      ),
+    ],
+    preguntas: [
+      (
+        '¿El tamaño puede ser una variable?',
+        'Sí, mientras la variable ya tenga un valor cuando se ejecuta Dimension. Por ejemplo: Leer n y después Dimension v[n].',
+      ),
+      (
+        '¿Desde qué número empiezan las posiciones?',
+        'En PSeInt (perfil flexible) y en Jaguar, desde 1. Un arreglo creado con Dimension v[5] tiene las posiciones 1 a 5.',
+      ),
+    ],
+    relacionadas: ['arreglos-en-pseudocodigo', 'se-esperaba-cerrar-parentesis', 'se-esperaba-como-y-un-tipo'],
+  ),
+  Guia(
+    carpeta: 'errores',
+    slug: 'cada-opcion-de-segun-empieza-con-un-valor',
+    titulo: 'Error «Dentro de Segun cada opción empieza con un valor seguido de \':\'»: cómo arreglarlo',
+    h1: 'Dentro de Segun, cada opción empieza con un valor seguido de \':\'',
+    descripcion:
+        'Qué significa el error «Dentro de \'Segun\' cada opción empieza con un valor seguido de \':\'» en pseudocódigo y cómo escribir bien las opciones de un Segun.',
+    resumen:
+        'Cada opción de un Segun se escribe con el valor, dos puntos y lo que hay que hacer. Este error aparece cuando una opción no tiene esa forma, casi siempre porque faltan los dos puntos.',
+    publicada: '2026-11-03',
+    secciones: [
+      (
+        'que-significa',
+        'Qué significa',
+        '''
+<p class="aviso-error" role="note"><b>Error de escritura en la línea 4</b><br>Dentro de 'Segun' cada opción empieza con un valor seguido de ':'. Por ejemplo:  1: Escribir "uno"</p>
+<p>En un <code>Segun</code>, cada opción empieza con el valor que se compara, luego dos puntos (<code>:</code>) y después las instrucciones de esa opción. Por ejemplo: <code>1: Escribir "Lunes"</code>. Varias opciones con la misma acción se separan con comas (<code>6, 7:</code>), y la opción para todo lo demás es <code>De Otro Modo:</code>.</p>
+<p>Los dos puntos son los que le dicen a Jaguar dónde termina el valor y dónde empieza lo que hay que hacer. Sin ellos, no puede distinguir una opción nueva de una instrucción más.</p>''',
+      ),
+      (
+        'ejemplos',
+        'Ejemplo y cómo arreglarlo',
+        '''
+${codigo('''
+Algoritmo menu
+    Leer opcion
+    Segun opcion Hacer
+        1 Escribir "Nuevo juego"
+        2: Escribir "Salir"
+    FinSegun
+FinAlgoritmo
+''', entradas: ['1'], error: 'Dentro de \'Segun\' cada opción empieza con un valor seguido de \':\'.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 4</b><br>Dentro de 'Segun' cada opción empieza con un valor seguido de ':'. Por ejemplo:  1: Escribir "uno"</p>
+<p>Así queda arreglado:</p>
+${codigo('''
+Algoritmo menu
+    Leer opcion
+    Segun opcion Hacer
+        1: Escribir "Nuevo juego"
+        2: Escribir "Salir"
+    FinSegun
+FinAlgoritmo
+''', entradas: ['1'], salida: 'Nuevo juego')}
+''',
+      ),
+      (
+        'causas',
+        'Por qué aparece',
+        '''
+<ul>
+  <li>Se olvidaron los dos puntos después del valor.</li>
+  <li>Se escribió una condición como opción (<code>opcion &gt; 3:</code>). <code>Segun</code> compara valores exactos; para rangos se usa <code>Si</code>.</li>
+  <li>Se puso una instrucción antes de la primera opción, justo después de <code>Segun … Hacer</code>.</li>
+</ul>''',
+      ),
+    ],
+    preguntas: [
+      (
+        '¿Puedo poner un rango en una opción de Segun?',
+        'No. Segun compara contra valores exactos. Para «de 6 a 8» usa Si con una condición como calificacion >= 6 Y calificacion <= 8.',
+      ),
+      (
+        '¿Las opciones pueden ser textos?',
+        'Sí: "a": Escribir "Opción A". El texto de la opción va entre comillas.',
+      ),
+    ],
+    relacionadas: ['condicionales-si-y-segun', 'encontre-pero-antes-falta', 'se-esperaba-un-valor'],
+  ),
+  Guia(
+    carpeta: 'errores',
+    slug: 'errores-al-usar-funciones',
+    titulo: 'Errores de funciones en pseudocódigo: «recibe 1 valor, pero se le dieron 2» y otros',
+    h1: 'Errores al usar funciones y subprocesos',
+    descripcion:
+        'Qué significan los errores «… recibe 1 valor, pero se le dieron 2», «No existe ninguna función llamada …», «… no devuelve ningún valor» y «La función … ya fue definida», con ejemplos.',
+    resumen:
+        'Al usar una función hay que llamarla con su nombre exacto y con el número de valores que espera. Y solo las funciones que devuelven un resultado pueden usarse dentro de una operación.',
+    publicada: '2026-11-03',
+    secciones: [
+      (
+        'que-significa',
+        'Qué significa',
+        '''
+<p class="aviso-error" role="note"><b>Error de escritura en la línea 6</b><br>'Doble' recibe 1 valor, pero se le dieron 2.</p>
+<p>Una función es un pedazo de programa con nombre que recibe valores (los <b>parámetros</b>) y puede devolver un resultado. Pueden ser de Jaguar, como <code>Raiz(x)</code> o <code>Longitud(texto)</code>, o tuyas, definidas con <code>Funcion</code> o <code>SubProceso</code>.</p>
+<p>Antes de ejecutar, Jaguar revisa todas las llamadas del programa y avisa si algo no cuadra:</p>
+<ul>
+  <li><b>«… recibe 1 valor, pero se le dieron 2»</b>: la llamada tiene más (o menos) valores que los parámetros de la función.</li>
+  <li><b>«No existe ninguna función llamada …»</b>: el nombre no coincide con ninguna función de Jaguar ni tuya. Si hay una parecida, te sugiere cuál.</li>
+  <li><b>«… no devuelve ningún valor, así que no puede usarse dentro de una expresión»</b>: usaste un subproceso (que solo hace cosas) como si diera un resultado.</li>
+  <li><b>«La función … ya fue definida en la línea …»</b>: hay dos funciones con el mismo nombre.</li>
+  <li><b>«Después de 'Por' se esperaba 'Referencia' o 'Valor'»</b>: en los parámetros, <code>Por</code> solo puede ir seguido de una de esas dos palabras.</li>
+</ul>''',
+      ),
+      (
+        'ejemplos',
+        'Ejemplos y cómo arreglarlos',
+        '''
+<h3>Más valores de los que recibe</h3>
+${codigo('''
+Funcion resultado <- Doble(x)
+    resultado <- x * 2
+FinFuncion
+
+Algoritmo usar_doble
+    Escribir Doble(4, 5)
+FinAlgoritmo
+''', error: '\'Doble\' recibe 1 valor, pero se le dieron 2.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 6</b><br>'Doble' recibe 1 valor, pero se le dieron 2.</p>
+<p><code>Doble</code> tiene un solo parámetro, así que se llama con un solo valor:</p>
+${codigo('''
+Funcion resultado <- Doble(x)
+    resultado <- x * 2
+FinFuncion
+
+Algoritmo usar_doble
+    Escribir Doble(4)
+FinAlgoritmo
+''', salida: '8')}
+<h3>Una función que no existe</h3>
+${codigo('''
+Algoritmo raiz
+    Escribir Raices(49)
+FinAlgoritmo
+''', error: 'No existe ninguna función llamada \'Raices\'.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>No existe ninguna función llamada 'Raices'.</p>
+<p>La función de Jaguar para la raíz cuadrada es <code>Raiz</code> (también <code>RC</code>):</p>
+${codigo('''
+Algoritmo raiz
+    Escribir Raiz(49)
+FinAlgoritmo
+''', salida: '7')}
+<h3>Un subproceso usado como función</h3>
+${codigo('''
+SubProceso Saludar(nombre)
+    Escribir "Hola, ", nombre
+FinSubProceso
+
+Algoritmo saludo
+    mensaje <- Saludar("Ana")
+FinAlgoritmo
+''', error: '\'Saludar\' no devuelve ningún valor, así que no puede usarse dentro de una expresión.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 6</b><br>'Saludar' no devuelve ningún valor, así que no puede usarse dentro de una expresión. Para que devuelva un valor defínela como 'Funcion resultado &lt;- Saludar(...)'.</p>
+<p>Un subproceso se llama solo, en su propia línea. Si necesitas un resultado para guardarlo, define una función con <code>Funcion resultado &lt;- Nombre(...)</code>:</p>
+${codigo('''
+SubProceso Saludar(nombre)
+    Escribir "Hola, ", nombre
+FinSubProceso
+
+Algoritmo saludo
+    Saludar("Ana")
+FinAlgoritmo
+''', salida: 'Hola, Ana')}
+<h3>Dos funciones con el mismo nombre</h3>
+${codigo('''
+Funcion r <- Area(b, h)
+    r <- b * h
+FinFuncion
+
+Funcion r <- Area(lado)
+    r <- lado * lado
+FinFuncion
+
+Algoritmo areas
+    Escribir Area(3, 4)
+FinAlgoritmo
+''', error: 'La función \'Area\' ya fue definida en la línea 1.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 5</b><br>La función 'Area' ya fue definida en la línea 1.</p>
+<p>Cada función necesita un nombre distinto:</p>
+${codigo('''
+Funcion r <- AreaRectangulo(b, h)
+    r <- b * h
+FinFuncion
+
+Funcion r <- AreaCuadrado(lado)
+    r <- lado * lado
+FinFuncion
+
+Algoritmo areas
+    Escribir AreaRectangulo(3, 4)
+    Escribir AreaCuadrado(5)
+FinAlgoritmo
+''', salida: '12\n25')}
+''',
+      ),
+      (
+        'causas',
+        'Por qué aparece',
+        '''
+<ul>
+  <li>Pasar más o menos valores de los que la función espera, a veces por una coma de más.</li>
+  <li>Escribir mal el nombre de la función, o usar el nombre que tiene en otro lenguaje (<code>sqrt</code> funciona, pero <code>Raices</code> no).</li>
+  <li>Confundir un <code>SubProceso</code>, que solo hace cosas, con una <code>Funcion</code> que devuelve un valor.</li>
+  <li>Copiar una función dos veces en el mismo archivo.</li>
+</ul>''',
+      ),
+    ],
+    preguntas: [
+      (
+        '¿Qué diferencia hay entre Funcion y SubProceso?',
+        'En Jaguar, como en PSeInt, una función que devuelve un valor se escribe Funcion resultado <- Nombre(parámetros), y se puede usar dentro de operaciones. Una sin resultado solo ejecuta pasos y se llama en su propia línea.',
+      ),
+      (
+        '¿Qué funciones trae Jaguar?',
+        'Raiz, Abs, Redon, Trunc, Azar, Aleatorio, Longitud, Mayusculas, Minusculas, Subcadena, Concatenar, ConvertirANumero, ConvertirATexto, las trigonométricas (Sen, Cos, Tan…), Ln, Exp y la constante PI.',
+      ),
+    ],
+    relacionadas: ['no-entiendo-la-instruccion', 'se-esperaba-cerrar-parentesis', 'variables-y-tipos-de-datos'],
+  ),
+  Guia(
+    carpeta: 'errores',
+    slug: 'el-codigo-debe-ir-dentro-de-algoritmo',
+    titulo: 'Error «El código debe ir dentro de \'Algoritmo\' … \'FinAlgoritmo\'»: cómo arreglarlo',
+    h1: 'El código debe ir dentro de Algoritmo … FinAlgoritmo',
+    descripcion:
+        'Qué significan los errores «El código debe ir dentro de \'Algoritmo\' … \'FinAlgoritmo\'», «Falta el bloque principal» y «Solo puede haber un Algoritmo por archivo».',
+    resumen:
+        'Todo programa tiene un bloque principal que empieza con Algoritmo y termina con FinAlgoritmo, y las instrucciones van dentro de él. Afuera solo pueden ir funciones.',
+    publicada: '2026-11-03',
+    secciones: [
+      (
+        'que-significa',
+        'Qué significa',
+        '''
+<p class="aviso-error" role="note"><b>Error de escritura en la línea 1</b><br>El código debe ir dentro de 'Algoritmo' ... 'FinAlgoritmo'. Empieza con "Algoritmo mi_programa" y termina con "FinAlgoritmo".</p>
+<p>Un archivo de pseudocódigo tiene una estructura fija: un bloque principal, <code>Algoritmo nombre … FinAlgoritmo</code> (o <code>Proceso … FinProceso</code>), y, si los necesitas, funciones y subprocesos antes o después de él. Las instrucciones como <code>Escribir</code> o <code>Leer</code> van <b>dentro</b> del bloque principal o de una función, nunca sueltas en el archivo.</p>
+<p>Hay tres mensajes relacionados con esta estructura:</p>
+<ul>
+  <li><b>«El código debe ir dentro de 'Algoritmo' … 'FinAlgoritmo'»</b>: hay una instrucción fuera de cualquier bloque, casi siempre antes del <code>Algoritmo</code> o después del <code>FinAlgoritmo</code>.</li>
+  <li><b>«Falta el bloque principal 'Algoritmo … FinAlgoritmo'»</b>: el archivo tiene funciones, pero ningún <code>Algoritmo</code>.</li>
+  <li><b>«Solo puede haber un Algoritmo por archivo»</b>: hay dos bloques principales. Cada programa tiene uno solo.</li>
+</ul>''',
+      ),
+      (
+        'ejemplos',
+        'Ejemplos y cómo arreglarlos',
+        '''
+<h3>Una instrucción afuera</h3>
+${codigo('''
+Escribir "Bienvenido"
+Algoritmo saludo
+    Escribir "Hola"
+FinAlgoritmo
+''', error: 'El código debe ir dentro de \'Algoritmo\' ... \'FinAlgoritmo\'.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 1</b><br>El código debe ir dentro de 'Algoritmo' ... 'FinAlgoritmo'. Empieza con "Algoritmo mi_programa" y termina con "FinAlgoritmo".</p>
+<p>Así queda arreglado:</p>
+${codigo('''
+Algoritmo saludo
+    Escribir "Bienvenido"
+    Escribir "Hola"
+FinAlgoritmo
+''', salida: 'Bienvenido\nHola')}
+<h3>Dos algoritmos en el mismo archivo</h3>
+${codigo('''
+Algoritmo suma
+    Escribir 2 + 3
+FinAlgoritmo
+
+Algoritmo resta
+    Escribir 5 - 3
+FinAlgoritmo
+''', error: 'Solo puede haber un Algoritmo por archivo; ya hay uno en la línea 1.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 5</b><br>Solo puede haber un Algoritmo por archivo; ya hay uno en la línea 1.</p>
+<p>Si son dos ejercicios distintos, cada uno va en su propio archivo. Si son parte del mismo programa, junta sus instrucciones en un solo <code>Algoritmo</code>:</p>
+${codigo('''
+Algoritmo operaciones
+    Escribir 2 + 3
+    Escribir 5 - 3
+FinAlgoritmo
+''', salida: '5\n2')}
+''',
+      ),
+      (
+        'causas',
+        'Por qué aparece',
+        '''
+<ul>
+  <li>Escribir instrucciones antes de <code>Algoritmo</code> o después de <code>FinAlgoritmo</code>.</li>
+  <li>Juntar varios ejercicios en el mismo archivo, cada uno con su <code>Algoritmo</code>.</li>
+  <li>Copiar solo una parte de un programa, sin su encabezado.</li>
+</ul>''',
+      ),
+      (
+        'evitarlo',
+        'Cómo evitarlo',
+        '''
+<p>Empieza cada ejercicio en un archivo nuevo con su <code>Algoritmo nombre</code> y su <code>FinAlgoritmo</code>, y escribe todo entre esas dos líneas.</p>
+<p>En las herramientas en línea de Jaguar (<a href="/herramientas/prueba-de-escritorio">prueba de escritorio</a> y <a href="/herramientas/diagrama-de-flujo-online">diagrama de flujo</a>) puedes pegar solo un fragmento sin <code>Algoritmo</code>: la herramienta lo envuelve por ti.</p>''',
+      ),
+    ],
+    preguntas: [
+      (
+        '¿Puedo poner funciones fuera del Algoritmo?',
+        'Sí. Las funciones y subprocesos van fuera del bloque principal, antes o después de él. Lo que no puede ir afuera son instrucciones sueltas como Escribir o Leer.',
+      ),
+      (
+        '¿Algoritmo y Proceso son lo mismo?',
+        'Sí. Los dos abren el bloque principal. Cierra cada uno con su pareja: FinAlgoritmo o FinProceso.',
+      ),
+    ],
+    relacionadas: ['falta-fin-para-cerrar', 'errores-al-usar-funciones', 'que-es-el-pseudocodigo'],
+  ),
+  Guia(
+    carpeta: 'errores',
+    slug: 'no-reconozco-el-caracter',
+    titulo: 'Error «No reconozco el carácter» en pseudocódigo: qué significa y cómo arreglarlo',
+    h1: 'No reconozco el carácter',
+    descripcion:
+        'Qué significa el error «No reconozco el carácter …» en pseudocódigo, qué símbolos sí se pueden usar fuera de los textos y cómo arreglarlo.',
+    resumen:
+        'Fuera de los textos entre comillas, un programa solo puede tener letras, números y ciertos símbolos. Este error aparece cuando hay un símbolo que el pseudocódigo no usa.',
+    publicada: '2026-11-03',
+    secciones: [
+      (
+        'que-significa',
+        'Qué significa',
+        '''
+<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>No reconozco el carácter '€'.</p>
+<p>Dentro de un texto entre comillas puedes escribir lo que quieras: acentos, signos de interrogación, emojis. Pero <b>fuera de las comillas</b>, el programa solo puede tener nombres, números y los símbolos que el pseudocódigo conoce: operadores (<code>+ - * / ^ %</code>), comparaciones (<code>= &lt;&gt; &lt; &gt; &lt;= &gt;=</code>), la flecha <code>&lt;-</code>, paréntesis, corchetes, comas, punto y coma, dos puntos, y <code>&amp;</code> o <code>|</code> como «y» y «o».</p>
+<p>Si aparece otro símbolo, Jaguar no sabe qué significa y te dice exactamente cuál es. Lo más común es un símbolo de moneda, un signo de apertura (<code>¿</code> o <code>¡</code>) fuera de las comillas o un carácter que se coló al copiar de un documento.</p>''',
+      ),
+      (
+        'ejemplos',
+        'Ejemplos y cómo arreglarlos',
+        '''
+<h3>Un símbolo de moneda</h3>
+${codigo('''
+Algoritmo precio
+    total <- 100 * 1.16 €
+    Escribir total
+FinAlgoritmo
+''', error: 'No reconozco el carácter \'€\'.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>No reconozco el carácter '€'.</p>
+<p>Los números van solos. Si quieres que se vea el símbolo, ponlo en el texto que muestras:</p>
+${codigo('''
+Algoritmo precio
+    total <- 100 * 1.16
+    Escribir "\$", total, " pesos"
+FinAlgoritmo
+''', salida: '\$116 pesos')}
+<h3>Un signo de interrogación afuera de las comillas</h3>
+${codigo('''
+Algoritmo pregunta
+    Escribir ¿"Cómo te llamas?"
+    Leer nombre
+FinAlgoritmo
+''', error: 'No reconozco el carácter \'¿\'.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>No reconozco el carácter '¿'.</p>
+<p>Así queda arreglado:</p>
+${codigo('''
+Algoritmo pregunta
+    Escribir "¿Cómo te llamas?"
+    Leer nombre
+    Escribir "Hola, ", nombre
+FinAlgoritmo
+''', entradas: ['Luis'], salida: '¿Cómo te llamas?\nHola, Luis')}
+''',
+      ),
+      (
+        'causas',
+        'Por qué aparece',
+        '''
+<ul>
+  <li>Un símbolo de moneda, porcentaje con letra u otro signo pegado a un número.</li>
+  <li>Un signo de apertura (<code>¿</code>, <code>¡</code>) fuera de las comillas.</li>
+  <li>Caracteres que se copiaron de un PDF o de un procesador de textos, como guiones largos (—) en lugar del signo menos.</li>
+</ul>''',
+      ),
+      (
+        'evitarlo',
+        'Cómo evitarlo',
+        '''
+<p>Si copiaste el código de un documento y aparece este error, borra el carácter que te señala Jaguar y escríbelo de nuevo con el teclado. En las operaciones usa el guion normal (<code>-</code>) para restar.</p>''',
+      ),
+    ],
+    preguntas: [
+      (
+        '¿Puedo usar acentos y la ñ en los nombres de variables?',
+        'Sí. Jaguar acepta nombres como año o número. Eso sí, año y ano son dos variables distintas: escribe el nombre siempre igual.',
+      ),
+      (
+        '¿Qué símbolo uso para el porcentaje?',
+        'En pseudocódigo, % es el residuo de una división (igual que MOD), no el porcentaje. Para calcular un 16 % multiplica por 0.16.',
+      ),
+    ],
+    relacionadas: ['falta-la-comilla-que-cierra-este-texto', 'sobra-al-final-de-la-instruccion', 'variables-y-tipos-de-datos'],
+  ),
+  Guia(
+    carpeta: 'errores',
+    slug: 'se-esperaba-segundos-o-milisegundos',
+    titulo: 'Error «Se esperaba \'Segundos\' o \'Milisegundos\'» en Esperar: cómo arreglarlo',
+    h1: 'Se esperaba \'Segundos\' o \'Milisegundos\' en Esperar',
+    descripcion:
+        'Qué significa el error «Se esperaba \'Segundos\' o \'Milisegundos\', por ejemplo: Esperar 2 Segundos» en pseudocódigo y cómo usar Esperar.',
+    resumen:
+        'La instrucción Esperar pausa el programa. Necesita la cantidad y la unidad de tiempo: Esperar 2 Segundos o Esperar 500 Milisegundos.',
+    publicada: '2026-11-03',
+    secciones: [
+      (
+        'que-significa',
+        'Qué significa',
+        '''
+<p class="aviso-error" role="note"><b>Error de escritura en la línea 4</b><br>Se esperaba 'Segundos' o 'Milisegundos', por ejemplo: Esperar 2 Segundos.</p>
+<p><code>Esperar</code> detiene el programa un momento antes de seguir. Sirve para hacer una cuenta regresiva o para que dé tiempo de leer un mensaje. Tiene dos formas:</p>
+<ul>
+  <li><code>Esperar Tecla</code>: espera hasta que el usuario presione una tecla.</li>
+  <li><code>Esperar 2 Segundos</code> o <code>Esperar 500 Milisegundos</code>: espera ese tiempo.</li>
+</ul>
+<p>Si escribes un número sin la unidad, Jaguar no sabe si son segundos o milisegundos, y la diferencia es de mil veces.</p>''',
+      ),
+      (
+        'ejemplos',
+        'Ejemplo y cómo arreglarlo',
+        '''
+${codigo('''
+Algoritmo cuenta_regresiva
+    Para i <- 3 Hasta 1 Con Paso -1 Hacer
+        Escribir i
+        Esperar 1
+    FinPara
+    Escribir "¡Listo!"
+FinAlgoritmo
+''', error: 'Se esperaba \'Segundos\' o \'Milisegundos\', por ejemplo: Esperar 2 Segundos.')}<p class="aviso-error" role="note"><b>Error de escritura en la línea 4</b><br>Se esperaba 'Segundos' o 'Milisegundos', por ejemplo: Esperar 2 Segundos.</p>
+<p>Así queda arreglado:</p>
+${codigo('''
+Algoritmo cuenta_regresiva
+    Para i <- 3 Hasta 1 Con Paso -1 Hacer
+        Escribir i
+        Esperar 1 Segundos
+    FinPara
+    Escribir "¡Listo!"
+FinAlgoritmo
+''', salida: '3\n2\n1\n¡Listo!')}
+''',
+      ),
+      (
+        'causas',
+        'Por qué aparece',
+        '''
+<ul>
+  <li>Escribir solo el número, sin <code>Segundos</code> o <code>Milisegundos</code>.</li>
+  <li>Abreviar la unidad (<code>seg</code>, <code>ms</code>).</li>
+</ul>''',
+      ),
+    ],
+    preguntas: [
+      (
+        '¿Se puede escribir Esperar 1 Segundo, en singular?',
+        'Sí. Jaguar acepta Segundo y Segundos, Milisegundo y Milisegundos.',
+      ),
+      (
+        '¿Esperar cambia el resultado de la prueba de escritorio?',
+        'No. Esperar solo pausa el programa; no cambia ninguna variable ni lo que se muestra en pantalla.',
+      ),
+    ],
+    relacionadas: ['se-esperaba-hasta-en-el-ciclo-para', 'no-entiendo-la-instruccion', 'ciclos-mientras-para-repetir'],
+  ),
+];
+
 String cabeza({required String titulo, required String descripcion, required String ruta, String tipo = 'article', String extra = ''}) =>
     '''<!doctype html>
 <html lang="es-MX">
@@ -1856,7 +3480,9 @@ String cta() => '''
 String json(String s) => s.replaceAll('\\', '\\\\').replaceAll('"', '\\"').replaceAll('\n', ' ');
 
 String pagina(Guia g) {
-  final ruta = '/guias/${g.slug}';
+  final ruta = '/${g.carpeta}/${g.slug}';
+  final esError = g.carpeta == 'errores';
+  final seccion = esError ? 'Errores' : 'Guías';
   final faq = g.preguntas
       .map((p) => '{"@type":"Question","name":"${json(p.$1)}","acceptedAnswer":{"@type":"Answer","text":"${json(p.$2)}"}}')
       .join(',');
@@ -1883,7 +3509,7 @@ String pagina(Guia g) {
       "@type": "BreadcrumbList",
       "itemListElement": [
         { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "$sitio/" },
-        { "@type": "ListItem", "position": 2, "name": "Guías", "item": "$sitio/guias" },
+        { "@type": "ListItem", "position": 2, "name": "$seccion", "item": "$sitio/${g.carpeta}" },
         { "@type": "ListItem", "position": 3, "name": "${json(g.h1)}", "item": "$sitio$ruta" }
       ]
     },
@@ -1895,10 +3521,10 @@ String pagina(Guia g) {
   b.write('''
 <main class="guia">
   <div class="ancho angosto">
-    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › <a href="/guias">Guías</a> › ${esc(g.h1)}</nav>
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › <a href="/${g.carpeta}">$seccion</a> › ${esc(g.h1)}</nav>
     <h1>${esc(g.h1)}</h1>
     <p class="resumen">${esc(g.resumen)}</p>
-    <nav class="contenido" aria-label="Contenido de la guía"><b>En esta guía</b>
+    <nav class="contenido" aria-label="${esError ? 'Contenido de la página' : 'Contenido de la guía'}"><b>${esError ? 'En esta página' : 'En esta guía'}</b>
       <ol>
 ''');
   for (final s in g.secciones) {
@@ -1918,20 +3544,28 @@ String pagina(Guia g) {
   b.writeln(cta());
   b.writeln('    <h2 style="margin-top:44px">Sigue aprendiendo</h2>\n    <div class="relacionadas">');
   for (final r in g.relacionadas) {
-    final o = guias.firstWhere((x) => x.slug == r);
-    b.writeln('      <a href="/guias/${o.slug}">${esc(o.h1)}<small>${esc(o.resumen.split('. ').first)}.</small></a>');
+    final o = [...guias, ...errores].firstWhere((x) => x.slug == r);
+    b.writeln('      <a href="/${o.carpeta}/${o.slug}">${esc(o.h1)}<small>${esc(o.resumen.split('. ').first)}.</small></a>');
   }
   b.writeln('    </div>\n  </div>\n</main>');
   b.write(pie);
   return b.toString();
 }
 
-String indice() {
-  const titulo = 'Guías para aprender a programar desde cero | Jaguar Code';
-  const desc =
-      'Guías cortas y con ejemplos para aprender lógica de programación: qué es un algoritmo, el pseudocódigo, los diagramas de flujo y la prueba de escritorio.';
-  final lista = guias
-      .map((g) => '{"@type":"ListItem","position":${guias.indexOf(g) + 1},"url":"$sitio/guias/${g.slug}","name":"${json(g.h1)}"}')
+String indice({
+  String carpeta = 'guias',
+  String miga = 'Guías',
+  String titulo = 'Guías para aprender a programar desde cero | Jaguar Code',
+  String desc =
+      'Guías cortas y con ejemplos para aprender lógica de programación: qué es un algoritmo, el pseudocódigo, los diagramas de flujo y la prueba de escritorio.',
+  String h1 = 'Guías para aprender a programar desde cero',
+  String resumen =
+      'Guías cortas, con ejemplos que puedes copiar y ejecutar en Jaguar. Empieza por la primera y sigue en orden, o salta a lo que necesites.',
+  List<Guia>? paginas,
+}) {
+  final todas = paginas ?? guias;
+  final lista = todas
+      .map((g) => '{"@type":"ListItem","position":${todas.indexOf(g) + 1},"url":"$sitio/$carpeta/${g.slug}","name":"${json(g.h1)}"}')
       .join(',');
   final datos =
       '''
@@ -1939,28 +3573,28 @@ String indice() {
 {
   "@context": "https://schema.org",
   "@graph": [
-    { "@type": "CollectionPage", "name": "${json(titulo)}", "url": "$sitio/guias", "inLanguage": "es-MX" },
+    { "@type": "CollectionPage", "name": "${json(titulo)}", "url": "$sitio/$carpeta", "inLanguage": "es-MX" },
     { "@type": "ItemList", "itemListElement": [$lista] },
     { "@type": "BreadcrumbList", "itemListElement": [
       { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "$sitio/" },
-      { "@type": "ListItem", "position": 2, "name": "Guías", "item": "$sitio/guias" }
+      { "@type": "ListItem", "position": 2, "name": "$miga", "item": "$sitio/$carpeta" }
     ] }
   ]
 }
 </script>''';
-  final b = StringBuffer(cabeza(titulo: titulo, descripcion: desc, ruta: '/guias', tipo: 'website', extra: datos));
+  final b = StringBuffer(cabeza(titulo: titulo, descripcion: desc, ruta: '/$carpeta', tipo: 'website', extra: datos));
   b.write('''
 <main class="guia">
   <div class="ancho">
-    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › Guías</nav>
-    <h1>Guías para aprender a programar desde cero</h1>
-    <p class="resumen">Guías cortas, con ejemplos que puedes copiar y ejecutar en Jaguar. Empieza por la primera y sigue en orden, o salta a lo que necesites.</p>
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › $miga</nav>
+    <h1>${esc(h1)}</h1>
+    <p class="resumen">${esc(resumen)}</p>
     <div class="tarjetas">
 ''');
   var i = 0;
-  for (final g in guias) {
+  for (final g in todas) {
     b.writeln(
-      '      <article class="tarjeta revela" style="--d:${i++ % 3}"><h2 style="font-size:20px;margin:0 0 8px"><a href="/guias/${g.slug}">${esc(g.h1)}</a></h2><p>${esc(g.resumen)}</p></article>',
+      '      <article class="tarjeta revela" style="--d:${i++ % 3}"><h2 style="font-size:20px;margin:0 0 8px"><a href="/$carpeta/${g.slug}">${esc(g.h1)}</a></h2><p>${esc(g.resumen)}</p></article>',
     );
   }
   b.writeln('    </div>');
@@ -1979,4 +3613,20 @@ void main() {
     File('${carpeta.path}/${g.slug}.html').writeAsStringSync(pagina(g));
   }
   stdout.writeln('Listo: ${guias.length + 1} páginas en sitio/guias');
+  final carpetaErrores = Directory('sitio/errores')..createSync(recursive: true);
+  File('${carpetaErrores.path}/index.html').writeAsStringSync(
+    indice(
+      carpeta: 'errores',
+      miga: 'Errores',
+      titulo: indiceErrores.titulo,
+      desc: indiceErrores.desc,
+      h1: indiceErrores.h1,
+      resumen: indiceErrores.resumen,
+      paginas: errores,
+    ),
+  );
+  for (final e in errores) {
+    File('${carpetaErrores.path}/${e.slug}.html').writeAsStringSync(pagina(e));
+  }
+  stdout.writeln('Listo: ${errores.length + 1} páginas en sitio/errores');
 }
