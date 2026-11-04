@@ -5,6 +5,7 @@ import 'package:jaguar/src/editor/code_editor.dart';
 import 'package:jaguar/src/editor/keyword_bar.dart';
 import 'package:jaguar/src/exercises/exercise_editor_screen.dart';
 import 'package:jaguar/src/exercises/exercise_store.dart';
+import 'package:jaguar/src/exercises/exercises_screen.dart';
 import 'package:jaguar/src/settings.dart';
 import 'package:jaguar/src/workspace/settings_screen.dart';
 import 'package:jaguar_core/jaguar_core.dart';
@@ -180,6 +181,157 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
       await tester.pumpAndSettle();
       expect(find.text('Ajustes'), findsNothing);
+    });
+  });
+
+  group('editor de ejercicio, en todos los tamaños', () {
+    for (final MapEntry(key: name, value: size) in _sizes.entries) {
+      for (final scale in [1.0, 1.3]) {
+        testWidgets('no desborda en $name con letra x$scale', (tester) async {
+          final store = await _store();
+          await _pump(
+            tester,
+            ExerciseEditorScreen(store: store, exercise: _par),
+            size,
+            textScale: scale,
+          );
+          expect(find.text('Tu solución'), findsOneWidget);
+          expect(find.byType(CodeEditor), findsOneWidget);
+          // On a phone the rest is below: it must be reachable by scrolling.
+          await tester.scrollUntilVisible(
+            find.text('Generar casos con mi solución'),
+            200,
+            scrollable: find.byType(Scrollable).first,
+          );
+        });
+        testWidgets('un ejercicio nuevo sin casos tampoco desborda en $name con letra x$scale', (tester) async {
+          final store = await _store();
+          await _pump(tester, ExerciseEditorScreen(store: store), size, textScale: scale);
+          await tester.scrollUntilVisible(
+            find.textContaining('Aún no hay casos'),
+            200,
+            scrollable: find.byType(Scrollable).first,
+          );
+        });
+      }
+    }
+
+    testWidgets('en escritorio la solución va al lado y no debajo del enunciado', (tester) async {
+      final store = await _store();
+      await _pump(tester, ExerciseEditorScreen(store: store, exercise: _par), _sizes['escritorio']!);
+      final statement = tester.getTopLeft(
+        find.byWidgetPredicate((w) => w is TextField && w.decoration?.labelText == 'Enunciado'),
+      );
+      final editor = tester.getTopLeft(find.byType(CodeEditor));
+      expect(editor.dx, greaterThan(statement.dx + 400));
+      // The editor takes the height that is left, not a fixed box.
+      expect(tester.getSize(find.byType(CodeEditor)).height, greaterThan(400));
+    });
+
+    testWidgets('Ctrl+S guarda sin cerrar', (tester) async {
+      final store = await _store();
+      await _pump(tester, ExerciseEditorScreen(store: store), _sizes['escritorio']!);
+      await tester.enterText(find.widgetWithText(TextField, 'Título'), 'Mi ejercicio');
+      // Needs a case to be valid.
+      await tester.tap(find.text('Agregar caso'));
+      await tester.pump();
+      await tester.enterText(find.widgetWithText(TextField, 'Salida esperada'), 'hola');
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyS);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+      await tester.pump();
+      expect(find.text('Guardado'), findsOneWidget);
+      expect(store.authored.map((e) => e.title), contains('Mi ejercicio'));
+      expect(find.text('Nuevo ejercicio'), findsOneWidget); // still here
+    });
+  });
+
+  group('mis ejercicios', () {
+    Future<ExerciseStore> two() async {
+      final store = await _store();
+      store.saveAuthored(
+        const Exercise(
+          id: 'suma',
+          title: 'Suma de dos números',
+          statement: 'Suma a y b.',
+          cases: [
+            TestCase(inputs: ['1', '2'], expected: '3'),
+          ],
+        ),
+      );
+      return store;
+    }
+
+    for (final MapEntry(key: name, value: size) in _sizes.entries) {
+      for (final scale in [1.0, 1.3]) {
+        testWidgets('con ejercicios no desborda en $name con letra x$scale', (tester) async {
+          final store = await two();
+          await _pump(
+            tester,
+            ExercisesScreen(store: store, onTryAsStudent: (_) {}),
+            size,
+            textScale: scale,
+          );
+          expect(find.text('Par o impar'), findsWidgets);
+        });
+        testWidgets('sin ejercicios no desborda en $name con letra x$scale', (tester) async {
+          SharedPreferences.setMockInitialValues({});
+          final store = ExerciseStore(await SharedPreferences.getInstance());
+          await _pump(
+            tester,
+            ExercisesScreen(store: store, onTryAsStudent: (_) {}),
+            size,
+            textScale: scale,
+          );
+          expect(find.text('Crear mi primer ejercicio'), findsOneWidget);
+        });
+      }
+    }
+
+    testWidgets('en escritorio muestra el detalle del seleccionado y cambia al elegir otro', (tester) async {
+      final store = await two();
+      await _pump(tester, ExercisesScreen(store: store, onTryAsStudent: (_) {}), _sizes['escritorio']!);
+      expect(find.text('Lee un número entero y muestra si es par o impar.'), findsOneWidget);
+      expect(find.text('8 es par'), findsOneWidget);
+      expect(find.text('Proyectar'), findsOneWidget);
+      expect(find.text('Probar como alumno'), findsOneWidget);
+      expect(find.text('Con solución guardada'), findsOneWidget);
+      await tester.tap(find.text('Suma de dos números'));
+      await tester.pumpAndSettle();
+      expect(find.text('Suma a y b.'), findsOneWidget);
+      expect(find.text('Sin solución'), findsOneWidget);
+      expect(find.text('1 caso'), findsWidgets);
+    });
+
+    testWidgets('en escritorio Ctrl+N abre un ejercicio nuevo', (tester) async {
+      final store = await two();
+      await _pump(tester, ExercisesScreen(store: store, onTryAsStudent: (_) {}), _sizes['escritorio']!);
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyN);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+      await tester.pumpAndSettle();
+      expect(find.text('Nuevo ejercicio'), findsOneWidget);
+      expect(find.byType(CodeEditor), findsOneWidget);
+    });
+
+    testWidgets('eliminar pide confirmar y deja el siguiente seleccionado', (tester) async {
+      final store = await two();
+      await _pump(tester, ExercisesScreen(store: store, onTryAsStudent: (_) {}), _sizes['escritorio']!);
+      await tester.tap(find.text('Eliminar'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('¿Eliminar "Par o impar"?'), findsOneWidget);
+      await tester.tap(find.widgetWithText(FilledButton, 'Eliminar'));
+      await tester.pumpAndSettle();
+      expect(store.authored.map((e) => e.id), ['suma']);
+      expect(find.text('Suma a y b.'), findsOneWidget);
+    });
+
+    testWidgets('en celular sigue siendo una lista con su menú', (tester) async {
+      final store = await two();
+      await _pump(tester, ExercisesScreen(store: store, onTryAsStudent: (_) {}), _sizes['celular']!);
+      expect(find.byTooltip('Opciones'), findsNWidgets(2));
+      expect(find.text('Nuevo ejercicio'), findsOneWidget); // the floating button
+      expect(find.text('Comparación flexible'), findsNothing);
     });
   });
 }
