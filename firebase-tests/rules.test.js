@@ -41,6 +41,10 @@ async function seedClass() {
     await setDoc(doc(admin, 'classes/c1/assignments/a1'), {
       title: 'Par o impar',
       exercise: { id: 'x', t: 'Par o impar', c: [] },
+      hiddenCount: 1,
+    });
+    await setDoc(doc(admin, 'classes/c1/hiddenCases/a1'), {
+      cases: [{ i: ['0'], e: 'Par', h: true }],
     });
   });
 }
@@ -136,6 +140,74 @@ describe('clases', () => {
   });
 });
 
+describe('seguridad de las clases', () => {
+  test('los casos ocultos solo los lee el profesor', async () => {
+    await seedClass();
+    await assertSucceeds(setDoc(doc(db('ana'), 'classes/c1/members/ana'), member()));
+    // El profesor los lee y los escribe.
+    await assertSucceeds(getDoc(doc(db('profe'), 'classes/c1/hiddenCases/a1')));
+    await assertSucceeds(setDoc(doc(db('profe'), 'classes/c1/hiddenCases/a2'), { cases: [] }));
+    // Una alumna de la clase no los ve, ni por documento ni listando.
+    await assertFails(getDoc(doc(db('ana'), 'classes/c1/hiddenCases/a1')));
+    await assertFails(getDocs(collection(db('ana'), 'classes/c1/hiddenCases')));
+    // Tampoco quien no es de la clase, ni una visita sin cuenta.
+    await assertFails(getDoc(doc(db('beto'), 'classes/c1/hiddenCases/a1')));
+    await assertFails(getDoc(doc(db(null), 'classes/c1/hiddenCases/a1')));
+    // Y nadie más los cambia.
+    await assertFails(setDoc(doc(db('ana'), 'classes/c1/hiddenCases/a1'), { cases: [] }));
+    await assertFails(deleteDoc(doc(db('ana'), 'classes/c1/hiddenCases/a1')));
+    // Solo el campo permitido y un tamaño razonable.
+    await assertFails(setDoc(doc(db('profe'), 'classes/c1/hiddenCases/a3'), { cases: [], extra: 1 }));
+    await assertFails(setDoc(doc(db('profe'), 'classes/c1/hiddenCases/a4'), { cases: new Array(51).fill({}) }));
+  });
+
+  test('la tarea dice cuántos casos ocultos tiene, con un número sensato', async () => {
+    await seedClass();
+    const exercise = { id: 'x', t: 'Otro', c: [] };
+    await assertSucceeds(setDoc(doc(db('profe'), 'classes/c1/assignments/a5'), { title: 'Otro', exercise, hiddenCount: 3 }));
+    await assertFails(setDoc(doc(db('profe'), 'classes/c1/assignments/a6'), { title: 'Otro', exercise, hiddenCount: -1 }));
+    await assertFails(setDoc(doc(db('profe'), 'classes/c1/assignments/a7'), { title: 'Otro', exercise, hiddenCount: 51 }));
+    await assertFails(setDoc(doc(db('profe'), 'classes/c1/assignments/a8'), { title: 'Otro', exercise, hiddenCount: 'tres' }));
+    await assertFails(setDoc(doc(db('ana'), 'classes/c1/assignments/a9'), { title: 'Otro', exercise, hiddenCount: 1 }));
+  });
+
+  test('el profesor cierra la clase y nadie nuevo se une; al abrirla, sí', async () => {
+    await seedClass();
+    const clase = { name: '1A', ownerId: 'profe', ownerAlias: 'Profe', code: 'JAG-4K7Q' };
+    await assertSucceeds(setDoc(doc(db('profe'), 'classes/c1'), { ...clase, open: false }));
+    await assertFails(setDoc(doc(db('ana'), 'classes/c1/members/ana'), member()));
+    await assertSucceeds(setDoc(doc(db('profe'), 'classes/c1'), { ...clase, open: true }));
+    await assertSucceeds(setDoc(doc(db('ana'), 'classes/c1/members/ana'), member()));
+    // Quien ya estaba dentro sigue dentro al cerrarla.
+    await assertSucceeds(setDoc(doc(db('profe'), 'classes/c1'), { ...clase, open: false }));
+    await assertSucceeds(getDoc(doc(db('ana'), 'classes/c1')));
+    await assertSucceeds(setDoc(doc(db('ana'), 'classes/c1/members/ana'), { ...member(), name: 'Ana P.' }));
+  });
+
+  test('solo el profesor cambia la clase, y solo sus campos', async () => {
+    await seedClass();
+    const clase = { name: '1A', ownerId: 'profe', ownerAlias: 'Profe', code: 'JAG-4K7Q' };
+    await assertFails(setDoc(doc(db('ana'), 'classes/c1'), { ...clase, open: false }));
+    await assertFails(setDoc(doc(db('profe'), 'classes/c1'), { ...clase, open: 'si' }));
+    await assertFails(setDoc(doc(db('profe'), 'classes/c1'), { ...clase, secreto: 'algo' }));
+    await assertFails(setDoc(doc(db('profe'), 'classes/c1'), { ...clase, code: 'JAG-OTRO' }));
+    await assertFails(setDoc(doc(db('profe'), 'classes/c1'), { ...clase, ownerId: 'beto' }));
+    await assertFails(setDoc(doc(db('profe'), 'classes/c1'), { ...clase, name: '' }));
+    await assertSucceeds(setDoc(doc(db('profe'), 'classes/c1'), { ...clase, name: '1A Lógica' }));
+  });
+
+  test('una entrega con números absurdos se rechaza', async () => {
+    await seedClass();
+    await setDoc(doc(db('ana'), 'classes/c1/members/ana'), member());
+    const path = 'classes/c1/assignments/a1/submissions/ana';
+    const entrega = { name: 'Ana', source: 'Algoritmo a\nFinAlgoritmo', passed: 1, total: 2, updatedAt: serverTimestamp() };
+    await assertSucceeds(setDoc(doc(db('ana'), path), entrega));
+    await assertFails(setDoc(doc(db('ana'), path), { ...entrega, passed: 3 }));
+    await assertFails(setDoc(doc(db('ana'), path), { ...entrega, passed: -1 }));
+    await assertFails(setDoc(doc(db('ana'), path), { ...entrega, passed: 600, total: 600 }));
+  });
+});
+
 describe('comunidad', () => {
   const publication = (authorId) => ({
     kind: 'programa',
@@ -160,9 +232,39 @@ describe('comunidad', () => {
 
   test('lo oculto solo lo ve su autor; nadie edita lo ajeno', async () => {
     await setDoc(doc(db('ana'), 'publications/p1'), publication('ana'));
-    await assertSucceeds(setDoc(doc(db('ana'), 'publications/p1'), { ...publication('ana'), status: 'oculto' }));
+    const createdAt = (await getDoc(doc(db('ana'), 'publications/p1'))).data().createdAt;
+    await assertSucceeds(setDoc(doc(db('ana'), 'publications/p1'), { ...publication('ana'), createdAt, status: 'oculto' }));
     await assertFails(getDoc(doc(db('beto'), 'publications/p1')));
     await assertFails(deleteDoc(doc(db('beto'), 'publications/p1')));
+  });
+
+  test('lo que un moderador marcó no lo deshace el autor', async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      const { createdAt, ...rest } = publication('ana');
+      await setDoc(doc(ctx.firestore(), 'publications/m1'), { ...rest, createdAt: new Date(0), status: 'moderado' });
+    });
+    await assertFails(setDoc(doc(db('ana'), 'publications/m1'), { ...publication('ana'), createdAt: new Date(0), status: 'publicado' }));
+    await assertFails(setDoc(doc(db('ana'), 'publications/m1'), { ...publication('ana'), createdAt: new Date(0), status: 'oculto' }));
+    // El público no lo ve, y su autor sí.
+    await assertFails(getDoc(doc(db(null), 'publications/m1')));
+    await assertSucceeds(getDoc(doc(db('ana'), 'publications/m1')));
+  });
+
+  test('el autor corrige lo suyo, con límites y sin cambiar de quién es', async () => {
+    const original = { ...publication('ana'), createdAt: new Date(0) };
+    await env.withSecurityRulesDisabled((ctx) => setDoc(doc(ctx.firestore(), 'publications/e1'), original));
+    const edit = (change) => setDoc(doc(db('ana'), 'publications/e1'), { ...original, ...change });
+    await assertSucceeds(edit({ title: 'Adivina el número 2' }));
+    await assertFails(edit({ title: '' }));
+    await assertFails(edit({ title: 'x'.repeat(121) }));
+    await assertFails(edit({ description: 'x'.repeat(2001) }));
+    await assertFails(edit({ content: 'no es un mapa' }));
+    await assertFails(edit({ authorId: 'beto' }));
+    await assertFails(edit({ kind: 'tutorial' }));
+    await assertFails(edit({ createdAt: new Date(1) }));
+    await assertFails(edit({ extra: 'algo' }));
+    await assertFails(edit({ status: 'moderado' }));
+    await assertFails(setDoc(doc(db('beto'), 'publications/e1'), { ...original, title: 'Ajeno' }));
   });
 
   test('"me sirvió" una vez por persona; reportar sin leer reportes', async () => {
@@ -209,14 +311,19 @@ describe('mensajes de la página', () => {
 });
 
 describe('acceso anticipado de la página', () => {
-  test('cualquiera deja su correo una vez; nadie lo lee ni lo cambia', async () => {
+  test('cualquiera deja su correo; nadie lo lee ni lo cambia', async () => {
     const entry = { correo: 'ana@correo.mx', origen: 'acceso', creado: serverTimestamp() };
     await assertSucceeds(setDoc(doc(db(null), 'accesoAnticipado/a1'), entry));
     await assertFails(getDoc(doc(db(null), 'accesoAnticipado/a1')));
     await assertFails(getDocs(collection(db('ana'), 'accesoAnticipado')));
-    // The same address again lands on the same id: it is an update, refused.
     await assertFails(setDoc(doc(db(null), 'accesoAnticipado/a1'), { ...entry, origen: 'inicio' }));
     await assertFails(deleteDoc(doc(db(null), 'accesoAnticipado/a1')));
+  });
+
+  test('el mismo correo otra vez se acepta con otro id: no se puede averiguar quién está en la lista', async () => {
+    const entry = { correo: 'ana@correo.mx', origen: 'acceso', creado: serverTimestamp() };
+    await assertSucceeds(setDoc(doc(db(null), 'accesoAnticipado/id-uno'), entry));
+    await assertSucceeds(setDoc(doc(db(null), 'accesoAnticipado/id-dos'), entry));
   });
 
   test('solo correos con forma de correo, y los campos permitidos', async () => {

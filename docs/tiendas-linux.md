@@ -33,4 +33,4 @@ Archivos: `flatpak/` (manifiesto, metainfo, escritorio, ícono) y `tool/actualiz
 Limitaciones conocidas:
 - El selector de archivos de la app usa `zenity`. El snap lo incluye; el Flatpak no, así que abrir y guardar archivos `.psc` puede fallar ahí hasta resolverlo.
 - `--filesystem=home` es un permiso amplio y los revisores pueden pedir quitarlo.
-- En Linux no están las clases ni la comunidad (Firebase no tiene versión para Linux).
+- Las clases y la comunidad funcionan en Linux: la app habla con el servicio por la red, sin SDK nativo.

@@ -33,11 +33,7 @@ void main() {
 
   test('la analítica es la misma en la landing y en la app, y cada página la carga', () {
     final landing = File('../../sitio/analitica.js').readAsStringSync();
-    expect(
-      File('web/analitica.js').readAsStringSync(),
-      landing,
-      reason: 'Copia sitio/analitica.js a apps/jaguar/web/',
-    );
+    expect(File('web/analitica.js').readAsStringSync(), landing, reason: 'Copia sitio/analitica.js a apps/jaguar/web/');
     expect(landing, contains('G-1T1QH5RR0E'));
     // Nada de Google se pide antes de aceptar: el script solo se agrega en cargar().
     expect(landing, isNot(contains("<script src=\"https://www.googletagmanager")));

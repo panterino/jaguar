@@ -1,15 +1,12 @@
 import 'dart:convert';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:jaguar_core/jaguar_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../firebase_options.dart';
 import 'cloud_backend.dart';
-import 'firebase_backend.dart';
+import 'firebase_rest.dart';
+import 'rest_backend.dart';
 
 export 'cloud_backend.dart';
 
@@ -17,7 +14,7 @@ export 'cloud_backend.dart';
 /// community. Jaguar works fully without it; when it is available the same
 /// app becomes a suite for students and teachers.
 class Cloud extends ChangeNotifier {
-  Cloud(this.backend, this._prefs) {
+  Cloud(this.backend, this._prefs, {DateTime Function() now = DateTime.now}) : _now = now {
     final raw = _prefs.getString(_linksKey);
     if (raw != null) _links.addAll((jsonDecode(raw) as Map).cast<String, String>());
   }
@@ -30,6 +27,15 @@ class Cloud extends ChangeNotifier {
 
   final CloudBackend backend;
   final SharedPreferences _prefs;
+  final DateTime Function() _now;
+
+  /// What Probar last sent for each assignment, so pressing it again and
+  /// again does not spend the free daily writes of the project.
+  final Map<String, ({String source, int passed, int total, DateTime at})> _lastSent = {};
+
+  /// Same program with another result is sent at once; the same result with
+  /// edits, at most this often.
+  static const minSendGap = Duration(seconds: 20);
 
   /// Exercise id → `classId/assignmentId`, for the exercises opened from a
   /// class: their Probar results go to the teacher.
@@ -85,16 +91,26 @@ class Cloud extends ChangeNotifier {
     final link = _links[exercise.id];
     if (link == null || !signedIn) return false;
     final [classId, assignmentId] = link.split('/');
+    final passed = result.passedCount;
+    final total = exercise.cases.length;
+    final before = _lastSent[link];
+    final now = _now();
+    if (before != null && before.passed == passed && before.total == total) {
+      // Nothing new for the teacher: skip if the program is the same, or if
+      // only the text changed a moment ago.
+      if (before.source == source || now.difference(before.at) < minSendGap) return true;
+    }
     try {
       await backend.submit(
         classId: classId,
         assignmentId: assignmentId,
         name: studentName,
         source: source,
-        passed: result.passedCount,
-        total: exercise.cases.length,
+        passed: passed,
+        total: total,
         pastedLines: pastedLines,
       );
+      _lastSent[link] = (source: source, passed: passed, total: total, at: now);
       return true;
     } on Object {
       return false;
@@ -102,21 +118,24 @@ class Cloud extends ChangeNotifier {
   }
 }
 
-/// Connects to Firebase. Returns null where it can't (no configuration for
-/// this platform, no network on first start): Jaguar then works offline.
-Future<Cloud?> connectCloud(SharedPreferences prefs) async {
-  try {
-    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-    // `--dart-define=JAGUAR_EMULATORS=true` uses the local emulators.
-    if (const bool.fromEnvironment('JAGUAR_EMULATORS')) {
-      FirebaseFirestore.instance.useFirestoreEmulator('127.0.0.1', 8080);
-      await FirebaseAuth.instance.useAuthEmulator('127.0.0.1', 9099);
-    }
-    final cloud = Cloud(FirebaseBackend(), prefs);
-    await cloud.restore();
-    return cloud;
-  } on Object catch (error) {
-    debugPrint('Jaguar sin nube: $error');
-    return null;
-  }
+/// The Firebase project of Jaguar. The key is public (it identifies the
+/// project, like the one in the landing page): what protects the data is
+/// `firestore.rules`.
+const _apiKey = 'AIzaSyD771Ak8TGNvnW1B_vRhMb6AG0IxPssrcE';
+const _projectId = 'jaguarapp-50a15';
+
+/// Connects the online side. There is nothing to install or start: the calls
+/// go through Firebase's REST APIs (see [FirebaseRest]), so it is the same on
+/// every platform. Without a connection the calls fail with a message and
+/// Jaguar keeps working offline.
+Future<Cloud> connectCloud(SharedPreferences prefs, {FirebaseRest? rest}) async {
+  // `--dart-define=JAGUAR_EMULATORS=true` uses the local emulators.
+  final firebase =
+      rest ??
+      (const bool.fromEnvironment('JAGUAR_EMULATORS')
+          ? FirebaseRest.emulator(projectId: _projectId)
+          : FirebaseRest(apiKey: _apiKey, projectId: _projectId));
+  final cloud = Cloud(RestBackend(firebase, prefs), prefs);
+  await cloud.restore();
+  return cloud;
 }

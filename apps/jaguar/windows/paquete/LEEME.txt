@@ -7,7 +7,7 @@ La primera vez, Windows puede mostrar "Windows protegió tu PC" porque la app
 aun no esta firmada con un certificado de pago. Toca "Mas informacion" y
 despues "Ejecutar de todas formas".
 
-En Windows no estan las clases ni la comunidad (necesitan Firebase, que aqui
-aun no esta configurado); todo lo demas funciona sin internet.
+Las clases y la comunidad necesitan conexion; todo lo demas funciona sin
+internet.
 
 https://jaguarcode.org

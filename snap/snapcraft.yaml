@@ -11,8 +11,7 @@ description: |
   diagramas de flujo, bloques y prueba de escritorio automática. Funciona sin
   internet, sin anuncios y sin cuenta.
 
-  Es una versión de prueba: puede tener errores y cambiar. En Linux no están
-  las clases ni la comunidad.
+  Es una versión de prueba: puede tener errores y cambiar.
 license: AGPL-3.0-only
 website: https://jaguarcode.org
 source-code: https://github.com/panterino/jaguar

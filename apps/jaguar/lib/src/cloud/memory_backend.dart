@@ -94,10 +94,27 @@ class MemoryBackend implements CloudBackend {
   }
 
   @override
+  Future<void> setClassOpen(String classId, {required bool open}) async {
+    _requireOwner(classId);
+    final room = _classes[classId]!;
+    _classes[classId] = ClassRoom(
+      id: room.id,
+      name: room.name,
+      code: room.code,
+      ownerId: room.ownerId,
+      ownerAlias: room.ownerAlias,
+      open: open,
+    );
+  }
+
+  @override
   Future<ClassRoom> joinClass({required String code, required String name}) async {
     final normalized = normalizeClassCode(code);
     final room = _classes.values.where((c) => c.code == normalized).firstOrNull;
     if (room == null) throw CloudException('No existe ninguna clase con el código $normalized.');
+    if (!room.open) {
+      throw const CloudException('Esa clase no está recibiendo alumnos nuevos. Pídele a tu profe que la abra.');
+    }
     (_members[room.id] ??= {})[_me.uid] = Member(uid: _me.uid, name: name);
     (_joined[_me.uid] ??= {}).add(room.id);
     return room;
@@ -120,12 +137,34 @@ class MemoryBackend implements CloudBackend {
   }
 
   @override
-  Future<List<Assignment>> assignments(String classId) async => [...?_assignments[classId]];
+  Future<List<Assignment>> assignments(String classId) async {
+    final mine = _classes[classId]?.ownerId == _me.uid;
+    return [
+      for (final a in _assignments[classId] ?? const <Assignment>[])
+        // A student gets the visible tests and the number of the hidden ones.
+        if (mine)
+          a
+        else
+          Assignment(
+            id: a.id,
+            classId: a.classId,
+            exercise: splitHiddenCases(a.exercise).visible,
+            createdAt: a.createdAt,
+            hiddenCount: a.hiddenCount,
+          ),
+    ];
+  }
 
   @override
   Future<Assignment> assign(String classId, Exercise exercise) async {
     _requireOwner(classId);
-    final assignment = Assignment(id: _id(), classId: classId, exercise: exercise, createdAt: DateTime.now());
+    final assignment = Assignment(
+      id: _id(),
+      classId: classId,
+      exercise: exercise,
+      createdAt: DateTime.now(),
+      hiddenCount: exercise.cases.where((c) => c.hidden).length,
+    );
     (_assignments[classId] ??= []).add(assignment);
     return assignment;
   }
