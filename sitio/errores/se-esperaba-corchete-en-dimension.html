@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Error «Se esperaba '[' con el tamaño del arreglo» en Dimension: cómo arreglarlo</title>
+<meta name="description" content="Qué significa el error «Se esperaba '[' con el tamaño del arreglo, por ejemplo: Dimension v[10]» en pseudocódigo y cómo crear un arreglo correctamente.">
+<link rel="canonical" href="https://jaguarcode.org/errores/se-esperaba-corchete-en-dimension">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="apple-touch-icon" href="/icono.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Jaguar Code">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://jaguarcode.org/errores/se-esperaba-corchete-en-dimension">
+<meta property="og:title" content="Error «Se esperaba '[' con el tamaño del arreglo» en Dimension: cómo arreglarlo">
+<meta property="og:description" content="Qué significa el error «Se esperaba '[' con el tamaño del arreglo, por ejemplo: Dimension v[10]» en pseudocódigo y cómo crear un arreglo correctamente.">
+<meta property="og:image" content="https://jaguarcode.org/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Error «Se esperaba '[' con el tamaño del arreglo» en Dimension: cómo arreglarlo">
+<meta name="twitter:description" content="Qué significa el error «Se esperaba '[' con el tamaño del arreglo, por ejemplo: Dimension v[10]» en pseudocódigo y cómo crear un arreglo correctamente.">
+<meta name="twitter:image" content="https://jaguarcode.org/compartir.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://jaguarcode.org/errores/se-esperaba-corchete-en-dimension#articulo",
+      "headline": "Error «Se esperaba '[' con el tamaño del arreglo» en Dimension: cómo arreglarlo",
+      "description": "Qué significa el error «Se esperaba '[' con el tamaño del arreglo, por ejemplo: Dimension v[10]» en pseudocódigo y cómo crear un arreglo correctamente.",
+      "inLanguage": "es-MX",
+      "datePublished": "2026-11-03",
+      "dateModified": "2026-11-03",
+      "mainEntityOfPage": "https://jaguarcode.org/errores/se-esperaba-corchete-en-dimension",
+      "image": "https://jaguarcode.org/compartir.png",
+      "author": { "@type": "Organization", "name": "Panterino", "url": "https://jaguarcode.org/" },
+      "publisher": { "@type": "Organization", "name": "Panterino", "logo": { "@type": "ImageObject", "url": "https://jaguarcode.org/icono.png" } }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "https://jaguarcode.org/" },
+        { "@type": "ListItem", "position": 2, "name": "Errores", "item": "https://jaguarcode.org/errores" },
+        { "@type": "ListItem", "position": 3, "name": "Se esperaba '[' con el tamaño del arreglo", "item": "https://jaguarcode.org/errores/se-esperaba-corchete-en-dimension" }
+      ]
+    },
+    { "@type": "FAQPage", "mainEntity": [{"@type":"Question","name":"¿El tamaño puede ser una variable?","acceptedAnswer":{"@type":"Answer","text":"Sí, mientras la variable ya tenga un valor cuando se ejecuta Dimension. Por ejemplo: Leer n y después Dimension v[n]."}},{"@type":"Question","name":"¿Desde qué número empiezan las posiciones?","acceptedAnswer":{"@type":"Answer","text":"En PSeInt (perfil flexible) y en Jaguar, desde 1. Un arreglo creado con Dimension v[5] tiene las posiciones 1 a 5."}}] }
+  ]
+}
+</script>
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/estilos.css">
+</head>
+<body>
+<header class="sitio-barra">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="/logo.svg" alt="" width="46" height="40">
+      <a class="nombre" href="/">Jaguar Code</a>
+      <a href="/guias">Guías</a>
+      <a href="/retos">Retos</a>
+      <a href="/profes">Para profes</a>
+      <a href="https://github.com/panterino/jaguar">GitHub</a>
+    </div>
+  </div>
+</header>
+<main class="guia">
+  <div class="ancho angosto">
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › <a href="/errores">Errores</a> › Se esperaba '[' con el tamaño del arreglo</nav>
+    <h1>Se esperaba '[' con el tamaño del arreglo</h1>
+    <p class="resumen">Para crear un arreglo con Dimension hay que decir cuántas casillas tiene, entre corchetes, justo después del nombre.</p>
+    <nav class="contenido" aria-label="Contenido de la página"><b>En esta página</b>
+      <ol>
+        <li><a href="#que-significa">Qué significa</a></li>
+        <li><a href="#ejemplos">Ejemplos y cómo arreglarlos</a></li>
+        <li><a href="#causas">Por qué aparece</a></li>
+        <li><a href="#preguntas">Preguntas frecuentes</a></li>
+      </ol>
+    </nav>
+    <article>
+      <section id="que-significa">
+        <h2>Qué significa</h2>
+<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>Se esperaba '[' con el tamaño del arreglo, por ejemplo: Dimension v[10].</p>
+<p><code>Dimension</code> crea un arreglo: una variable con varias casillas numeradas. Para eso necesita dos cosas, el nombre y el tamaño, y el tamaño va entre corchetes: <code>Dimension calificaciones[30]</code>. Para una matriz, se ponen las dos medidas separadas por coma: <code>Dimension tabla[3, 4]</code>.</p>
+<p>Si después del nombre no hay un corchete, Jaguar no sabe de qué tamaño hacer el arreglo y te muestra cómo se escribe, usando el nombre de tu arreglo.</p>
+      </section>
+      <section id="ejemplos">
+        <h2>Ejemplos y cómo arreglarlos</h2>
+<h3>El tamaño entre paréntesis</h3>
+<pre class="codigo" data-error="Se esperaba '[' con el tamaño del arreglo, por ejemplo: Dimension v[10]." tabindex="0"><code>Algoritmo lista
+    Dimension v(5)
+FinAlgoritmo</code></pre><p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>Se esperaba '[' con el tamaño del arreglo, por ejemplo: Dimension v[10].</p>
+<p>En <code>Dimension</code>, el tamaño siempre va entre corchetes:</p>
+<pre class="codigo" data-salida="1" tabindex="0"><code>Algoritmo lista
+    Dimension v[5]
+    v[5] &lt;- 1
+    Escribir v[5]
+FinAlgoritmo</code></pre>
+<h3>Sin tamaño</h3>
+<pre class="codigo" data-error="Se esperaba '[' con el tamaño del arreglo, por ejemplo: Dimension nombres[10]." tabindex="0"><code>Algoritmo lista
+    Dimension nombres
+FinAlgoritmo</code></pre><p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>Se esperaba '[' con el tamaño del arreglo, por ejemplo: Dimension nombres[10].</p>
+<p>Así queda arreglado:</p>
+<pre class="codigo" data-salida="Ana" tabindex="0"><code>Algoritmo lista
+    Dimension nombres[3]
+    nombres[1] &lt;- "Ana"
+    Escribir nombres[1]
+FinAlgoritmo</code></pre>
+
+      </section>
+      <section id="causas">
+        <h2>Por qué aparece</h2>
+<ul>
+  <li>Usar paréntesis en lugar de corchetes al crear el arreglo.</li>
+  <li>Olvidar el tamaño.</li>
+  <li>Querer crear el arreglo sin saber cuántos datos habrá. El tamaño puede ser una variable que ya tenga valor: <code>Leer n</code> y luego <code>Dimension v[n]</code>.</li>
+</ul>
+      </section>
+      <section id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+        <details><summary>¿El tamaño puede ser una variable?</summary><p>Sí, mientras la variable ya tenga un valor cuando se ejecuta Dimension. Por ejemplo: Leer n y después Dimension v[n].</p></details>
+        <details><summary>¿Desde qué número empiezan las posiciones?</summary><p>En PSeInt (perfil flexible) y en Jaguar, desde 1. Un arreglo creado con Dimension v[5] tiene las posiciones 1 a 5.</p></details>
+      </section>
+    </article>
+<aside class="cta-guia" aria-labelledby="cta-t">
+  <h2 id="cta-t">Practica esto en Jaguar Code</h2>
+  <p>Escribe pseudocódigo, mira su diagrama y haz la prueba de escritorio desde el celular. Gratis, sin anuncios y sin cuenta.</p>
+  <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir la app</a></div>
+  <p class="aviso-prueba"><b>Acceso abierto antes del lanzamiento.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo. Lanzamiento oficial: 11 de enero de 2027.</p>
+</aside>
+    <h2 style="margin-top:44px">Sigue aprendiendo</h2>
+    <div class="relacionadas">
+      <a href="/guias/arreglos-en-pseudocodigo">Arreglos en pseudocódigo<small>Un arreglo es una variable que guarda varios valores del mismo tipo, cada uno en una posición numerada.</small></a>
+      <a href="/errores/se-esperaba-cerrar-parentesis">Se esperaba ')' para cerrar el paréntesis<small>Abriste un paréntesis o un corchete y la línea se terminó, o apareció otra cosa, antes de cerrarlo..</small></a>
+      <a href="/errores/se-esperaba-como-y-un-tipo">Errores al usar Definir<small>Definir declara de qué tipo es una variable y siempre se escribe igual: Definir nombre Como Tipo.</small></a>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="ancho">
+    <span class="quien"><img src="/logo.svg" alt="" width="30" height="26">Un proyecto de Panterino · hecho en México</span>
+    <a href="/guias">Guías</a>
+    <a href="/retos">Retos</a>
+    <a href="/descargas">Descargas</a>
+    <a href="/manual">Manual</a>
+    <a href="https://www.facebook.com/jaguareducation">Facebook</a>
+    <a href="https://github.com/panterino/jaguar">Código en GitHub</a>
+    <a href="#" data-analitica-cambiar>Analítica</a>
+  </div>
+</footer>
+<script src="/acceso.js" defer></script>
+<script src="/analitica.js" defer></script>
+</body>
+</html>

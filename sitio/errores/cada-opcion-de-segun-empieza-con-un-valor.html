@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Error «Dentro de Segun cada opción empieza con un valor seguido de ':'»: cómo arreglarlo</title>
+<meta name="description" content="Qué significa el error «Dentro de 'Segun' cada opción empieza con un valor seguido de ':'» en pseudocódigo y cómo escribir bien las opciones de un Segun.">
+<link rel="canonical" href="https://jaguarcode.org/errores/cada-opcion-de-segun-empieza-con-un-valor">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="apple-touch-icon" href="/icono.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Jaguar Code">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://jaguarcode.org/errores/cada-opcion-de-segun-empieza-con-un-valor">
+<meta property="og:title" content="Error «Dentro de Segun cada opción empieza con un valor seguido de ':'»: cómo arreglarlo">
+<meta property="og:description" content="Qué significa el error «Dentro de 'Segun' cada opción empieza con un valor seguido de ':'» en pseudocódigo y cómo escribir bien las opciones de un Segun.">
+<meta property="og:image" content="https://jaguarcode.org/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Error «Dentro de Segun cada opción empieza con un valor seguido de ':'»: cómo arreglarlo">
+<meta name="twitter:description" content="Qué significa el error «Dentro de 'Segun' cada opción empieza con un valor seguido de ':'» en pseudocódigo y cómo escribir bien las opciones de un Segun.">
+<meta name="twitter:image" content="https://jaguarcode.org/compartir.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://jaguarcode.org/errores/cada-opcion-de-segun-empieza-con-un-valor#articulo",
+      "headline": "Error «Dentro de Segun cada opción empieza con un valor seguido de ':'»: cómo arreglarlo",
+      "description": "Qué significa el error «Dentro de 'Segun' cada opción empieza con un valor seguido de ':'» en pseudocódigo y cómo escribir bien las opciones de un Segun.",
+      "inLanguage": "es-MX",
+      "datePublished": "2026-11-03",
+      "dateModified": "2026-11-03",
+      "mainEntityOfPage": "https://jaguarcode.org/errores/cada-opcion-de-segun-empieza-con-un-valor",
+      "image": "https://jaguarcode.org/compartir.png",
+      "author": { "@type": "Organization", "name": "Panterino", "url": "https://jaguarcode.org/" },
+      "publisher": { "@type": "Organization", "name": "Panterino", "logo": { "@type": "ImageObject", "url": "https://jaguarcode.org/icono.png" } }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "https://jaguarcode.org/" },
+        { "@type": "ListItem", "position": 2, "name": "Errores", "item": "https://jaguarcode.org/errores" },
+        { "@type": "ListItem", "position": 3, "name": "Dentro de Segun, cada opción empieza con un valor seguido de ':'", "item": "https://jaguarcode.org/errores/cada-opcion-de-segun-empieza-con-un-valor" }
+      ]
+    },
+    { "@type": "FAQPage", "mainEntity": [{"@type":"Question","name":"¿Puedo poner un rango en una opción de Segun?","acceptedAnswer":{"@type":"Answer","text":"No. Segun compara contra valores exactos. Para «de 6 a 8» usa Si con una condición como calificacion >= 6 Y calificacion <= 8."}},{"@type":"Question","name":"¿Las opciones pueden ser textos?","acceptedAnswer":{"@type":"Answer","text":"Sí: \"a\": Escribir \"Opción A\". El texto de la opción va entre comillas."}}] }
+  ]
+}
+</script>
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/estilos.css">
+</head>
+<body>
+<header class="sitio-barra">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="/logo.svg" alt="" width="46" height="40">
+      <a class="nombre" href="/">Jaguar Code</a>
+      <a href="/guias">Guías</a>
+      <a href="/retos">Retos</a>
+      <a href="/profes">Para profes</a>
+      <a href="https://github.com/panterino/jaguar">GitHub</a>
+    </div>
+  </div>
+</header>
+<main class="guia">
+  <div class="ancho angosto">
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › <a href="/errores">Errores</a> › Dentro de Segun, cada opción empieza con un valor seguido de ':'</nav>
+    <h1>Dentro de Segun, cada opción empieza con un valor seguido de ':'</h1>
+    <p class="resumen">Cada opción de un Segun se escribe con el valor, dos puntos y lo que hay que hacer. Este error aparece cuando una opción no tiene esa forma, casi siempre porque faltan los dos puntos.</p>
+    <nav class="contenido" aria-label="Contenido de la página"><b>En esta página</b>
+      <ol>
+        <li><a href="#que-significa">Qué significa</a></li>
+        <li><a href="#ejemplos">Ejemplo y cómo arreglarlo</a></li>
+        <li><a href="#causas">Por qué aparece</a></li>
+        <li><a href="#preguntas">Preguntas frecuentes</a></li>
+      </ol>
+    </nav>
+    <article>
+      <section id="que-significa">
+        <h2>Qué significa</h2>
+<p class="aviso-error" role="note"><b>Error de escritura en la línea 4</b><br>Dentro de 'Segun' cada opción empieza con un valor seguido de ':'. Por ejemplo:  1: Escribir "uno"</p>
+<p>En un <code>Segun</code>, cada opción empieza con el valor que se compara, luego dos puntos (<code>:</code>) y después las instrucciones de esa opción. Por ejemplo: <code>1: Escribir "Lunes"</code>. Varias opciones con la misma acción se separan con comas (<code>6, 7:</code>), y la opción para todo lo demás es <code>De Otro Modo:</code>.</p>
+<p>Los dos puntos son los que le dicen a Jaguar dónde termina el valor y dónde empieza lo que hay que hacer. Sin ellos, no puede distinguir una opción nueva de una instrucción más.</p>
+      </section>
+      <section id="ejemplos">
+        <h2>Ejemplo y cómo arreglarlo</h2>
+<pre class="codigo" data-entradas="1" data-error="Dentro de 'Segun' cada opción empieza con un valor seguido de ':'." tabindex="0"><code>Algoritmo menu
+    Leer opcion
+    Segun opcion Hacer
+        1 Escribir "Nuevo juego"
+        2: Escribir "Salir"
+    FinSegun
+FinAlgoritmo</code></pre><p class="aviso-error" role="note"><b>Error de escritura en la línea 4</b><br>Dentro de 'Segun' cada opción empieza con un valor seguido de ':'. Por ejemplo:  1: Escribir "uno"</p>
+<p>Así queda arreglado:</p>
+<pre class="codigo" data-entradas="1" data-salida="Nuevo juego" tabindex="0"><code>Algoritmo menu
+    Leer opcion
+    Segun opcion Hacer
+        1: Escribir "Nuevo juego"
+        2: Escribir "Salir"
+    FinSegun
+FinAlgoritmo</code></pre>
+
+      </section>
+      <section id="causas">
+        <h2>Por qué aparece</h2>
+<ul>
+  <li>Se olvidaron los dos puntos después del valor.</li>
+  <li>Se escribió una condición como opción (<code>opcion &gt; 3:</code>). <code>Segun</code> compara valores exactos; para rangos se usa <code>Si</code>.</li>
+  <li>Se puso una instrucción antes de la primera opción, justo después de <code>Segun … Hacer</code>.</li>
+</ul>
+      </section>
+      <section id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+        <details><summary>¿Puedo poner un rango en una opción de Segun?</summary><p>No. Segun compara contra valores exactos. Para «de 6 a 8» usa Si con una condición como calificacion &gt;= 6 Y calificacion &lt;= 8.</p></details>
+        <details><summary>¿Las opciones pueden ser textos?</summary><p>Sí: "a": Escribir "Opción A". El texto de la opción va entre comillas.</p></details>
+      </section>
+    </article>
+<aside class="cta-guia" aria-labelledby="cta-t">
+  <h2 id="cta-t">Practica esto en Jaguar Code</h2>
+  <p>Escribe pseudocódigo, mira su diagrama y haz la prueba de escritorio desde el celular. Gratis, sin anuncios y sin cuenta.</p>
+  <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir la app</a></div>
+  <p class="aviso-prueba"><b>Acceso abierto antes del lanzamiento.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo. Lanzamiento oficial: 11 de enero de 2027.</p>
+</aside>
+    <h2 style="margin-top:44px">Sigue aprendiendo</h2>
+    <div class="relacionadas">
+      <a href="/guias/condicionales-si-y-segun">Condicionales en pseudocódigo: Si y Segun<small>Una condicional hace que el programa elija qué hacer según un dato.</small></a>
+      <a href="/errores/encontre-pero-antes-falta">«Encontré …, pero antes falta …»: un bloque sin cerrar<small>Este error aparece cuando un bloque, como un Si, un Para o un Mientras, no se cerró antes de que llegara el cierre de otro bloque.</small></a>
+      <a href="/errores/se-esperaba-un-valor">Se esperaba un valor<small>En ese lugar de la instrucción debía ir un valor, como un número, un texto, una variable o una operación, y Jaguar encontró otra cosa o nada..</small></a>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="ancho">
+    <span class="quien"><img src="/logo.svg" alt="" width="30" height="26">Un proyecto de Panterino · hecho en México</span>
+    <a href="/guias">Guías</a>
+    <a href="/retos">Retos</a>
+    <a href="/descargas">Descargas</a>
+    <a href="/manual">Manual</a>
+    <a href="https://www.facebook.com/jaguareducation">Facebook</a>
+    <a href="https://github.com/panterino/jaguar">Código en GitHub</a>
+    <a href="#" data-analitica-cambiar>Analítica</a>
+  </div>
+</footer>
+<script src="/acceso.js" defer></script>
+<script src="/analitica.js" defer></script>
+</body>
+</html>

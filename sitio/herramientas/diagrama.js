@@ -2,6 +2,51 @@
 // de la app, compilado a JavaScript) se descarga la primera vez que se usa;
 // todo corre en el navegador y nada se envía a ningún servidor.
 (function () {
+  // Cada error de escritura tiene su página en /errores con una explicación larga.
+  // (La misma lista está en herramienta.js y diagrama.js.)
+  var paginasDeError = [
+    [/^Encontré '.+', pero antes falta/, 'encontre-pero-antes-falta'],
+    [/^Falta '.+' para cerrar/, 'falta-fin-para-cerrar'],
+    [/^Falta la comilla/, 'falta-la-comilla-que-cierra-este-texto'],
+    [/^Falta poner el texto entre comillas/, 'falta-poner-el-texto-entre-comillas'],
+    [/^(No entiendo la instrucción|Esta línea no empieza|No se esperaba)/, 'no-entiendo-la-instruccion'],
+    [/^Sobra /, 'sobra-al-final-de-la-instruccion'],
+    [/^(Se esperaba un valor|Falta un valor)/, 'se-esperaba-un-valor'],
+    [/^Se esperaba '[)\]]'/, 'se-esperaba-cerrar-parentesis'],
+    [/^Se esperaba '<-' para asignar/, 'se-esperaba-flecha-para-asignar'],
+    [/es una palabra reservada/, 'es-una-palabra-reservada'],
+    [/(en el ciclo Para|^Se esperaba '<-' después de|^Se esperaba 'Paso')/, 'se-esperaba-hasta-en-el-ciclo-para'],
+    [/(^Se esperaba 'Como'|no es un tipo de dato válido|^Se esperaba un nombre)/, 'se-esperaba-como-y-un-tipo'],
+    [/^Se esperaba '\[' con el tamaño/, 'se-esperaba-corchete-en-dimension'],
+    [/^Dentro de 'Segun'/, 'cada-opcion-de-segun-empieza-con-un-valor'],
+    [/(recibe \d+ valor|^No existe ninguna función|no devuelve ningún valor|ya fue definida|^Después de 'Por')/, 'errores-al-usar-funciones'],
+    [/^(El código debe ir dentro|Falta el bloque principal|Solo puede haber un Algoritmo)/, 'el-codigo-debe-ir-dentro-de-algoritmo'],
+    [/^No reconozco el carácter/, 'no-reconozco-el-caracter'],
+    [/^Se esperaba 'Segundos'/, 'se-esperaba-segundos-o-milisegundos'],
+    [/^(No encuentro la variable|La variable '.+' todavía no tiene valor)/, 'variable-sin-valor'],
+    [/(está fuera del arreglo|^Esa posición del arreglo|no es un arreglo|es un arreglo; indica)/, 'posicion-fuera-del-arreglo'],
+    [/^(No se puede guardar el número|Se esperaba (un número|Verdadero o Falso) para)/, 'valor-que-no-corresponde-al-tipo'],
+    [/^El programa pidió un dato con Leer/, 'no-hay-mas-datos-para-leer'],
+    [/^El programa se detuvo porque llevaba demasiados pasos/, 'demasiados-pasos-ciclo-infinito'],
+    [/^No se puede (dividir entre cero|calcular MOD)/, 'division-entre-cero'],
+    [/^La condición del '.+' debe ser/, 'la-condicion-debe-ser-verdadero-o-falso'],
+    [/(necesita números, pero recibió|^No se puede comparar)/, 'operacion-con-texto-y-numero'],
+    [/(^Demasiadas llamadas a funciones|terminó sin darle un valor)/, 'errores-de-funciones-al-ejecutar'],
+    [/(raíz cuadrada de un número negativo|^Ln solo funciona|^El tamaño del arreglo debe|^El paso del ciclo Para no puede)/, 'valor-no-valido-en-una-funcion-o-un-ciclo'],
+  ];
+
+  function enlaceDeError(error) {
+    for (var i = 0; i < paginasDeError.length; i++) {
+      if (paginasDeError[i][0].test(error.message)) {
+        var a = document.createElement('a');
+        a.href = '/errores/' + paginasDeError[i][1];
+        a.textContent = '¿Qué significa este error?';
+        return a;
+      }
+    }
+    return null;
+  }
+
   var fuente = document.getElementById('fuente');
   var ejemplo = document.getElementById('ejemplo');
   var salida = document.getElementById('diagrama-salida');
@@ -41,6 +86,11 @@
     caja.appendChild(t);
     caja.appendChild(document.createElement('br'));
     caja.appendChild(document.createTextNode(error.message + (error.hint ? ' ' + error.hint : '')));
+    var enlace = enlaceDeError(error);
+    if (enlace) {
+      caja.appendChild(document.createTextNode(' '));
+      caja.appendChild(enlace);
+    }
     return caja;
   }
 

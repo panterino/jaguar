@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Error «No entiendo la instrucción» en pseudocódigo: qué significa y cómo arreglarlo</title>
+<meta name="description" content="Qué significan los errores «No entiendo la instrucción», «Esta línea no empieza con una instrucción válida» y «No se esperaba … aquí», y cómo arreglarlos.">
+<link rel="canonical" href="https://jaguarcode.org/errores/no-entiendo-la-instruccion">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="apple-touch-icon" href="/icono.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Jaguar Code">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://jaguarcode.org/errores/no-entiendo-la-instruccion">
+<meta property="og:title" content="Error «No entiendo la instrucción» en pseudocódigo: qué significa y cómo arreglarlo">
+<meta property="og:description" content="Qué significan los errores «No entiendo la instrucción», «Esta línea no empieza con una instrucción válida» y «No se esperaba … aquí», y cómo arreglarlos.">
+<meta property="og:image" content="https://jaguarcode.org/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Error «No entiendo la instrucción» en pseudocódigo: qué significa y cómo arreglarlo">
+<meta name="twitter:description" content="Qué significan los errores «No entiendo la instrucción», «Esta línea no empieza con una instrucción válida» y «No se esperaba … aquí», y cómo arreglarlos.">
+<meta name="twitter:image" content="https://jaguarcode.org/compartir.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://jaguarcode.org/errores/no-entiendo-la-instruccion#articulo",
+      "headline": "Error «No entiendo la instrucción» en pseudocódigo: qué significa y cómo arreglarlo",
+      "description": "Qué significan los errores «No entiendo la instrucción», «Esta línea no empieza con una instrucción válida» y «No se esperaba … aquí», y cómo arreglarlos.",
+      "inLanguage": "es-MX",
+      "datePublished": "2026-11-03",
+      "dateModified": "2026-11-03",
+      "mainEntityOfPage": "https://jaguarcode.org/errores/no-entiendo-la-instruccion",
+      "image": "https://jaguarcode.org/compartir.png",
+      "author": { "@type": "Organization", "name": "Panterino", "url": "https://jaguarcode.org/" },
+      "publisher": { "@type": "Organization", "name": "Panterino", "logo": { "@type": "ImageObject", "url": "https://jaguarcode.org/icono.png" } }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "https://jaguarcode.org/" },
+        { "@type": "ListItem", "position": 2, "name": "Errores", "item": "https://jaguarcode.org/errores" },
+        { "@type": "ListItem", "position": 3, "name": "No entiendo la instrucción", "item": "https://jaguarcode.org/errores/no-entiendo-la-instruccion" }
+      ]
+    },
+    { "@type": "FAQPage", "mainEntity": [{"@type":"Question","name":"¿Jaguar distingue mayúsculas y minúsculas en las instrucciones?","acceptedAnswer":{"@type":"Answer","text":"No. Escribir, escribir y ESCRIBIR son lo mismo, y tampoco importan los acentos: Según y Segun funcionan igual. Lo que sí importa es que las letras sean las correctas."}},{"@type":"Question","name":"¿Puedo usar Imprimir o Mostrar en lugar de Escribir?","acceptedAnswer":{"@type":"Answer","text":"Sí, Jaguar acepta Imprimir y Mostrar como sinónimos de Escribir, igual que PSeInt."}}] }
+  ]
+}
+</script>
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/estilos.css">
+</head>
+<body>
+<header class="sitio-barra">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="/logo.svg" alt="" width="46" height="40">
+      <a class="nombre" href="/">Jaguar Code</a>
+      <a href="/guias">Guías</a>
+      <a href="/retos">Retos</a>
+      <a href="/profes">Para profes</a>
+      <a href="https://github.com/panterino/jaguar">GitHub</a>
+    </div>
+  </div>
+</header>
+<main class="guia">
+  <div class="ancho angosto">
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › <a href="/errores">Errores</a> › No entiendo la instrucción</nav>
+    <h1>No entiendo la instrucción</h1>
+    <p class="resumen">Cada línea de un programa debe empezar con una instrucción que Jaguar conozca, como Escribir, Leer, Si o una asignación. Este error aparece cuando la primera palabra de la línea no es ninguna de ellas.</p>
+    <nav class="contenido" aria-label="Contenido de la página"><b>En esta página</b>
+      <ol>
+        <li><a href="#que-significa">Qué significa</a></li>
+        <li><a href="#ejemplos">Ejemplos y cómo arreglarlos</a></li>
+        <li><a href="#causas">Por qué aparece</a></li>
+        <li><a href="#evitarlo">Cómo evitarlo</a></li>
+        <li><a href="#preguntas">Preguntas frecuentes</a></li>
+      </ol>
+    </nav>
+    <article>
+      <section id="que-significa">
+        <h2>Qué significa</h2>
+<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>No entiendo la instrucción 'Escrivir'. ¿Quisiste decir 'Escribir'?</p>
+<p>Jaguar conoce un número fijo de instrucciones: <code>Definir</code>, <code>Dimension</code>, <code>Escribir</code>, <code>Leer</code>, <code>Si</code>, <code>Segun</code>, <code>Mientras</code>, <code>Repetir</code>, <code>Para</code>, <code>Esperar</code> y <code>Borrar Pantalla</code>. Además, una línea puede ser una asignación (<code>x &lt;- 5</code>) o una llamada a una función tuya.</p>
+<p>Si una línea empieza con una palabra que no es nada de eso, Jaguar no sabe qué hacer con ella. Casi siempre es una palabra mal escrita, y si se parece a una instrucción conocida, Jaguar te sugiere cuál: «¿Quisiste decir 'Escribir'?».</p>
+<p>Hay dos mensajes parecidos. <b>«Esta línea no empieza con una instrucción válida»</b> aparece cuando la línea empieza con algo que ni siquiera es una palabra, como un número o un símbolo. <b>«No se esperaba … aquí»</b> aparece cuando empieza con una palabra del lenguaje que no puede ir al inicio, como <code>Entonces</code> o <code>Hacer</code>.</p>
+      </section>
+      <section id="ejemplos">
+        <h2>Ejemplos y cómo arreglarlos</h2>
+<h3>Una instrucción mal escrita</h3>
+<pre class="codigo" data-error="No entiendo la instrucción 'Escrivir'." tabindex="0"><code>Algoritmo saludo
+    Escrivir "Hola"
+FinAlgoritmo</code></pre><p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>No entiendo la instrucción 'Escrivir'. ¿Quisiste decir 'Escribir'?</p>
+<p>Así queda arreglado:</p>
+<pre class="codigo" data-salida="Hola" tabindex="0"><code>Algoritmo saludo
+    Escribir "Hola"
+FinAlgoritmo</code></pre>
+<h3>La asignación al revés</h3>
+<p>En una asignación, la variable va a la izquierda de la flecha y el valor a la derecha. Al revés, la línea empieza con un número:</p>
+<pre class="codigo" data-error="Esta línea no empieza con una instrucción válida (encontré '5')." tabindex="0"><code>Algoritmo asignar
+    5 &lt;- x
+    Escribir x
+FinAlgoritmo</code></pre><p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>Esta línea no empieza con una instrucción válida (encontré '5').</p>
+<p>Así queda arreglado:</p>
+<pre class="codigo" data-salida="5" tabindex="0"><code>Algoritmo asignar
+    x &lt;- 5
+    Escribir x
+FinAlgoritmo</code></pre>
+<h3>Entonces en su propia línea</h3>
+<p><code>Entonces</code> va en la misma línea que el <code>Si</code> y su condición, no sola:</p>
+<pre class="codigo" data-entradas="20" data-error="No se esperaba 'Entonces' aquí." tabindex="0"><code>Algoritmo mayor
+    Leer edad
+    Si edad &gt;= 18
+    Entonces
+        Escribir "Mayor de edad"
+    FinSi
+FinAlgoritmo</code></pre><p class="aviso-error" role="note"><b>Error de escritura en la línea 4</b><br>No se esperaba 'Entonces' aquí.</p>
+<p>Así queda arreglado:</p>
+<pre class="codigo" data-entradas="20" data-salida="Mayor de edad" tabindex="0"><code>Algoritmo mayor
+    Leer edad
+    Si edad &gt;= 18 Entonces
+        Escribir "Mayor de edad"
+    FinSi
+FinAlgoritmo</code></pre>
+
+      </section>
+      <section id="causas">
+        <h2>Por qué aparece</h2>
+<ul>
+  <li>Un error de dedo en el nombre de la instrucción: <code>Escrivir</code>, <code>Lerr</code>, <code>Mientars</code>.</li>
+  <li>Usar una palabra de otro lenguaje o de otro estilo de pseudocódigo, como <code>Imprime</code> o <code>print</code>.</li>
+  <li>Escribir la asignación al revés (<code>5 &lt;- x</code>).</li>
+  <li>Partir una instrucción en dos líneas, dejando <code>Entonces</code> o <code>Hacer</code> solos.</li>
+</ul>
+      </section>
+      <section id="evitarlo">
+        <h2>Cómo evitarlo</h2>
+<p>Si dudas de cómo se escribe una instrucción, usa la vista de bloques de Jaguar: ahí todas las instrucciones están en la lista y no tienes que recordarlas. También puedes consultar la tabla de palabras en la guía de <a href="/guias/que-es-el-pseudocodigo">qué es el pseudocódigo</a>.</p>
+      </section>
+      <section id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+        <details><summary>¿Jaguar distingue mayúsculas y minúsculas en las instrucciones?</summary><p>No. Escribir, escribir y ESCRIBIR son lo mismo, y tampoco importan los acentos: Según y Segun funcionan igual. Lo que sí importa es que las letras sean las correctas.</p></details>
+        <details><summary>¿Puedo usar Imprimir o Mostrar en lugar de Escribir?</summary><p>Sí, Jaguar acepta Imprimir y Mostrar como sinónimos de Escribir, igual que PSeInt.</p></details>
+      </section>
+    </article>
+<aside class="cta-guia" aria-labelledby="cta-t">
+  <h2 id="cta-t">Practica esto en Jaguar Code</h2>
+  <p>Escribe pseudocódigo, mira su diagrama y haz la prueba de escritorio desde el celular. Gratis, sin anuncios y sin cuenta.</p>
+  <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir la app</a></div>
+  <p class="aviso-prueba"><b>Acceso abierto antes del lanzamiento.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo. Lanzamiento oficial: 11 de enero de 2027.</p>
+</aside>
+    <h2 style="margin-top:44px">Sigue aprendiendo</h2>
+    <div class="relacionadas">
+      <a href="/errores/es-una-palabra-reservada">Es una palabra reservada y no puede ser un nombre<small>Usaste como nombre de variable una palabra que el pseudocódigo ya usa para otra cosa, como Si, Para, Y u O.</small></a>
+      <a href="/errores/se-esperaba-un-valor">Se esperaba un valor<small>En ese lugar de la instrucción debía ir un valor, como un número, un texto, una variable o una operación, y Jaguar encontró otra cosa o nada..</small></a>
+      <a href="/guias/que-es-el-pseudocodigo">Qué es el pseudocódigo<small>El pseudocódigo es una forma de escribir un algoritmo con palabras parecidas a las de un lenguaje de programación, pero sin reglas estrictas de sintaxis.</small></a>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="ancho">
+    <span class="quien"><img src="/logo.svg" alt="" width="30" height="26">Un proyecto de Panterino · hecho en México</span>
+    <a href="/guias">Guías</a>
+    <a href="/retos">Retos</a>
+    <a href="/descargas">Descargas</a>
+    <a href="/manual">Manual</a>
+    <a href="https://www.facebook.com/jaguareducation">Facebook</a>
+    <a href="https://github.com/panterino/jaguar">Código en GitHub</a>
+    <a href="#" data-analitica-cambiar>Analítica</a>
+  </div>
+</footer>
+<script src="/acceso.js" defer></script>
+<script src="/analitica.js" defer></script>
+</body>
+</html>

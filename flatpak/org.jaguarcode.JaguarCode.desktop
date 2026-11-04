@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Jaguar Code
+Comment=Learn programming logic with pseudocode, flowcharts and challenges
+Comment[es]=Aprende lógica de programación con pseudocódigo, diagramas de flujo y retos
+Exec=jaguar-code
+Icon=org.jaguarcode.JaguarCode
+Terminal=false
+Categories=Education;Development;
+StartupWMClass=com.panterino.jaguar

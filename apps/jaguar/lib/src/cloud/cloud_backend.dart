@@ -27,15 +27,20 @@ class ClassRoom {
     required this.code,
     required this.ownerId,
     required this.ownerAlias,
+    this.open = true,
   });
 
   final String id;
   final String name;
 
-  /// What students type to join, like `JAG-4K7Q`.
+  /// What students type to join, like `JAG-K7Q4M2XP` (older classes have
+  /// shorter ones, like `JAG-4K7Q`).
   final String code;
   final String ownerId;
   final String ownerAlias;
+
+  /// A closed class takes no new students; the ones already in stay.
+  final bool open;
 }
 
 class Member {
@@ -46,12 +51,24 @@ class Member {
 }
 
 class Assignment {
-  const Assignment({required this.id, required this.classId, required this.exercise, this.createdAt});
+  const Assignment({
+    required this.id,
+    required this.classId,
+    required this.exercise,
+    this.createdAt,
+    this.hiddenCount = 0,
+  });
 
   final String id;
   final String classId;
+
+  /// What the person who asks gets: the teacher, every test; a student, only
+  /// the visible ones (the hidden ones never leave the teacher's side).
   final Exercise exercise;
   final DateTime? createdAt;
+
+  /// How many hidden tests the assignment has. A student sees only the number.
+  final int hiddenCount;
 
   String get title => exercise.title;
 }
@@ -166,6 +183,9 @@ abstract class CloudBackend {
 
   // Classes.
   Future<ClassRoom> createClass(String name);
+
+  /// Closes the class to new students, or opens it again. Only its teacher.
+  Future<void> setClassOpen(String classId, {required bool open});
   Future<ClassRoom> joinClass({required String code, required String name});
   Future<List<ClassRoom>> myClasses();
   Future<List<Member>> members(String classId);
@@ -207,10 +227,42 @@ abstract class CloudBackend {
 const _codeAlphabet = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 
 /// A class code easy to read aloud and to copy from the board: no 0/O, 1/I/L.
-String newClassCode([math.Random? random]) {
+/// Eight characters, so it cannot be found by trying them one by one (the
+/// first ones were four).
+String newClassCode([math.Random? random, int length = 8]) {
   final r = random ?? math.Random.secure();
-  return 'JAG-${List.generate(4, (_) => _codeAlphabet[r.nextInt(_codeAlphabet.length)]).join()}';
+  return 'JAG-${List.generate(length, (_) => _codeAlphabet[r.nextInt(_codeAlphabet.length)]).join()}';
 }
+
+/// An exercise split in what students may see and what only the teacher may:
+/// its hidden tests (see `firestore.rules`, `hiddenCases`).
+({Exercise visible, List<TestCase> hidden}) splitHiddenCases(Exercise exercise) => (
+  visible: Exercise(
+    id: exercise.id,
+    title: exercise.title,
+    statement: exercise.statement,
+    mode: exercise.mode,
+    revision: exercise.revision,
+    cases: [
+      for (final c in exercise.cases)
+        if (!c.hidden) c,
+    ],
+  ),
+  hidden: [
+    for (final c in exercise.cases)
+      if (c.hidden) c,
+  ],
+);
+
+/// The whole exercise again, for the teacher: the visible tests, then the hidden ones.
+Exercise withHiddenCases(Exercise visible, List<TestCase> hidden) => Exercise(
+  id: visible.id,
+  title: visible.title,
+  statement: visible.statement,
+  mode: visible.mode,
+  revision: visible.revision,
+  cases: [...visible.cases, ...hidden],
+);
 
 /// Codes are typed by hand: accept `jag4k7q`, `JAG 4K7Q`, `4k7q`.
 String normalizeClassCode(String input) {

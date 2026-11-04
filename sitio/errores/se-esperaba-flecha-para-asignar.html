@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Error «Se esperaba '&lt;-' para asignar un valor» en pseudocódigo: cómo arreglarlo</title>
+<meta name="description" content="Qué significa el error «Se esperaba '&lt;-' para asignar un valor a …» en pseudocódigo, cómo se escribe una asignación y por qué falta la flecha.">
+<link rel="canonical" href="https://jaguarcode.org/errores/se-esperaba-flecha-para-asignar">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="apple-touch-icon" href="/icono.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Jaguar Code">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://jaguarcode.org/errores/se-esperaba-flecha-para-asignar">
+<meta property="og:title" content="Error «Se esperaba '&lt;-' para asignar un valor» en pseudocódigo: cómo arreglarlo">
+<meta property="og:description" content="Qué significa el error «Se esperaba '&lt;-' para asignar un valor a …» en pseudocódigo, cómo se escribe una asignación y por qué falta la flecha.">
+<meta property="og:image" content="https://jaguarcode.org/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Error «Se esperaba '&lt;-' para asignar un valor» en pseudocódigo: cómo arreglarlo">
+<meta name="twitter:description" content="Qué significa el error «Se esperaba '&lt;-' para asignar un valor a …» en pseudocódigo, cómo se escribe una asignación y por qué falta la flecha.">
+<meta name="twitter:image" content="https://jaguarcode.org/compartir.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://jaguarcode.org/errores/se-esperaba-flecha-para-asignar#articulo",
+      "headline": "Error «Se esperaba '<-' para asignar un valor» en pseudocódigo: cómo arreglarlo",
+      "description": "Qué significa el error «Se esperaba '<-' para asignar un valor a …» en pseudocódigo, cómo se escribe una asignación y por qué falta la flecha.",
+      "inLanguage": "es-MX",
+      "datePublished": "2026-11-03",
+      "dateModified": "2026-11-03",
+      "mainEntityOfPage": "https://jaguarcode.org/errores/se-esperaba-flecha-para-asignar",
+      "image": "https://jaguarcode.org/compartir.png",
+      "author": { "@type": "Organization", "name": "Panterino", "url": "https://jaguarcode.org/" },
+      "publisher": { "@type": "Organization", "name": "Panterino", "logo": { "@type": "ImageObject", "url": "https://jaguarcode.org/icono.png" } }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "https://jaguarcode.org/" },
+        { "@type": "ListItem", "position": 2, "name": "Errores", "item": "https://jaguarcode.org/errores" },
+        { "@type": "ListItem", "position": 3, "name": "Se esperaba '<-' para asignar un valor", "item": "https://jaguarcode.org/errores/se-esperaba-flecha-para-asignar" }
+      ]
+    },
+    { "@type": "FAQPage", "mainEntity": [{"@type":"Question","name":"¿Puedo usar = para asignar?","acceptedAnswer":{"@type":"Answer","text":"Sí, Jaguar acepta x = 5 y x := 5 como asignación. Pero = también sirve para comparar dentro de un Si, así que la flecha <- deja más claro qué estás haciendo."}},{"@type":"Question","name":"¿Cómo escribo la flecha en el celular?","acceptedAnswer":{"@type":"Answer","text":"Con el signo menor que (<) seguido de un guion (-), sin espacio entre ellos. En Jaguar también está en la barra de símbolos sobre el teclado."}}] }
+  ]
+}
+</script>
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/estilos.css">
+</head>
+<body>
+<header class="sitio-barra">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="/logo.svg" alt="" width="46" height="40">
+      <a class="nombre" href="/">Jaguar Code</a>
+      <a href="/guias">Guías</a>
+      <a href="/retos">Retos</a>
+      <a href="/profes">Para profes</a>
+      <a href="https://github.com/panterino/jaguar">GitHub</a>
+    </div>
+  </div>
+</header>
+<main class="guia">
+  <div class="ancho angosto">
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › <a href="/errores">Errores</a> › Se esperaba '&lt;-' para asignar un valor</nav>
+    <h1>Se esperaba '&lt;-' para asignar un valor</h1>
+    <p class="resumen">Jaguar entendió que querías guardar un valor en una variable o en una casilla de un arreglo, pero no encontró la flecha &lt;- que hace la asignación.</p>
+    <nav class="contenido" aria-label="Contenido de la página"><b>En esta página</b>
+      <ol>
+        <li><a href="#que-significa">Qué significa</a></li>
+        <li><a href="#ejemplos">Ejemplo y cómo arreglarlo</a></li>
+        <li><a href="#causas">Por qué aparece</a></li>
+        <li><a href="#preguntas">Preguntas frecuentes</a></li>
+      </ol>
+    </nav>
+    <article>
+      <section id="que-significa">
+        <h2>Qué significa</h2>
+<p class="aviso-error" role="note"><b>Error de escritura en la línea 3</b><br>Se esperaba '&lt;-' para asignar un valor a 'v'.</p>
+<p>Una asignación guarda un valor en una variable y siempre tiene la misma forma: el nombre, la flecha y el valor. <code>edad &lt;- 15</code> se lee «guarda 15 en edad». La flecha se escribe con el signo menor que y un guion: <code>&lt;-</code>.</p>
+<p>Este error aparece cuando la línea empieza como una asignación (por ejemplo, con el nombre de un arreglo y su posición, <code>v[1]</code>) pero después no viene la flecha. Jaguar también acepta <code>=</code> y <code>:=</code> para asignar, pero la flecha es la forma más clara porque no se confunde con comparar.</p>
+      </section>
+      <section id="ejemplos">
+        <h2>Ejemplo y cómo arreglarlo</h2>
+<pre class="codigo" data-error="Se esperaba '&lt;-' para asignar un valor a 'v'." tabindex="0"><code>Algoritmo arreglo
+    Dimension v[3]
+    v[1] 10
+    Escribir v[1]
+FinAlgoritmo</code></pre><p class="aviso-error" role="note"><b>Error de escritura en la línea 3</b><br>Se esperaba '&lt;-' para asignar un valor a 'v'.</p>
+<p>Así queda arreglado:</p>
+<pre class="codigo" data-salida="10" tabindex="0"><code>Algoritmo arreglo
+    Dimension v[3]
+    v[1] &lt;- 10
+    Escribir v[1]
+FinAlgoritmo</code></pre>
+
+      </section>
+      <section id="causas">
+        <h2>Por qué aparece</h2>
+<ul>
+  <li>Se olvidó la flecha entre la variable y el valor.</li>
+  <li>La flecha se escribió con espacio en medio (<code>&lt; -</code>) o al revés (<code>-&gt;</code>).</li>
+  <li>Se usó otro símbolo, como <code>:</code> solo.</li>
+</ul>
+      </section>
+      <section id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+        <details><summary>¿Puedo usar = para asignar?</summary><p>Sí, Jaguar acepta x = 5 y x := 5 como asignación. Pero = también sirve para comparar dentro de un Si, así que la flecha &lt;- deja más claro qué estás haciendo.</p></details>
+        <details><summary>¿Cómo escribo la flecha en el celular?</summary><p>Con el signo menor que (&lt;) seguido de un guion (-), sin espacio entre ellos. En Jaguar también está en la barra de símbolos sobre el teclado.</p></details>
+      </section>
+    </article>
+<aside class="cta-guia" aria-labelledby="cta-t">
+  <h2 id="cta-t">Practica esto en Jaguar Code</h2>
+  <p>Escribe pseudocódigo, mira su diagrama y haz la prueba de escritorio desde el celular. Gratis, sin anuncios y sin cuenta.</p>
+  <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir la app</a></div>
+  <p class="aviso-prueba"><b>Acceso abierto antes del lanzamiento.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo. Lanzamiento oficial: 11 de enero de 2027.</p>
+</aside>
+    <h2 style="margin-top:44px">Sigue aprendiendo</h2>
+    <div class="relacionadas">
+      <a href="/errores/se-esperaba-un-valor">Se esperaba un valor<small>En ese lugar de la instrucción debía ir un valor, como un número, un texto, una variable o una operación, y Jaguar encontró otra cosa o nada..</small></a>
+      <a href="/errores/no-entiendo-la-instruccion">No entiendo la instrucción<small>Cada línea de un programa debe empezar con una instrucción que Jaguar conozca, como Escribir, Leer, Si o una asignación.</small></a>
+      <a href="/guias/variables-y-tipos-de-datos">Variables, tipos de datos y operadores<small>Una variable es un espacio con nombre donde el programa guarda un dato.</small></a>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="ancho">
+    <span class="quien"><img src="/logo.svg" alt="" width="30" height="26">Un proyecto de Panterino · hecho en México</span>
+    <a href="/guias">Guías</a>
+    <a href="/retos">Retos</a>
+    <a href="/descargas">Descargas</a>
+    <a href="/manual">Manual</a>
+    <a href="https://www.facebook.com/jaguareducation">Facebook</a>
+    <a href="https://github.com/panterino/jaguar">Código en GitHub</a>
+    <a href="#" data-analitica-cambiar>Analítica</a>
+  </div>
+</footer>
+<script src="/acceso.js" defer></script>
+<script src="/analitica.js" defer></script>
+</body>
+</html>

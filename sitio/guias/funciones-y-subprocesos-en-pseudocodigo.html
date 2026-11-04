@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Funciones y subprocesos en pseudocódigo: parámetros, Por Referencia y recursión, con ejemplos</title>
+<meta name="description" content="Aprende a escribir funciones y subprocesos en pseudocódigo: qué los diferencia, los parámetros por valor y Por Referencia, las variables locales, los arreglos y la recursión, con ejemplos que puedes ejecutar.">
+<link rel="canonical" href="https://jaguarcode.org/guias/funciones-y-subprocesos-en-pseudocodigo">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="apple-touch-icon" href="/icono.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Jaguar Code">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://jaguarcode.org/guias/funciones-y-subprocesos-en-pseudocodigo">
+<meta property="og:title" content="Funciones y subprocesos en pseudocódigo: parámetros, Por Referencia y recursión, con ejemplos">
+<meta property="og:description" content="Aprende a escribir funciones y subprocesos en pseudocódigo: qué los diferencia, los parámetros por valor y Por Referencia, las variables locales, los arreglos y la recursión, con ejemplos que puedes ejecutar.">
+<meta property="og:image" content="https://jaguarcode.org/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Funciones y subprocesos en pseudocódigo: parámetros, Por Referencia y recursión, con ejemplos">
+<meta name="twitter:description" content="Aprende a escribir funciones y subprocesos en pseudocódigo: qué los diferencia, los parámetros por valor y Por Referencia, las variables locales, los arreglos y la recursión, con ejemplos que puedes ejecutar.">
+<meta name="twitter:image" content="https://jaguarcode.org/compartir.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://jaguarcode.org/guias/funciones-y-subprocesos-en-pseudocodigo#articulo",
+      "headline": "Funciones y subprocesos en pseudocódigo: parámetros, Por Referencia y recursión, con ejemplos",
+      "description": "Aprende a escribir funciones y subprocesos en pseudocódigo: qué los diferencia, los parámetros por valor y Por Referencia, las variables locales, los arreglos y la recursión, con ejemplos que puedes ejecutar.",
+      "inLanguage": "es-MX",
+      "datePublished": "2026-11-05",
+      "dateModified": "2026-11-05",
+      "mainEntityOfPage": "https://jaguarcode.org/guias/funciones-y-subprocesos-en-pseudocodigo",
+      "image": "https://jaguarcode.org/compartir.png",
+      "author": { "@type": "Organization", "name": "Panterino", "url": "https://jaguarcode.org/" },
+      "publisher": { "@type": "Organization", "name": "Panterino", "logo": { "@type": "ImageObject", "url": "https://jaguarcode.org/icono.png" } }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "https://jaguarcode.org/" },
+        { "@type": "ListItem", "position": 2, "name": "Guías", "item": "https://jaguarcode.org/guias" },
+        { "@type": "ListItem", "position": 3, "name": "Funciones y subprocesos en pseudocódigo", "item": "https://jaguarcode.org/guias/funciones-y-subprocesos-en-pseudocodigo" }
+      ]
+    },
+    { "@type": "FAQPage", "mainEntity": [{"@type":"Question","name":"¿Cuál es la diferencia entre una función y un subproceso?","acceptedAnswer":{"@type":"Answer","text":"La función devuelve un valor y se usa dentro de una expresión, como Escribir Doble(4). El subproceso no devuelve nada y se llama como una instrucción, como Saludar(\"Ana\")."}},{"@type":"Question","name":"¿Cuándo uso Por Referencia?","acceptedAnswer":{"@type":"Answer","text":"Cuando quieres que la función cambie la variable original, por ejemplo para intercambiar dos valores. Si solo necesitas leer el dato, déjalo por valor, que es más seguro."}},{"@type":"Question","name":"¿Puedo usar variables del algoritmo dentro de una función?","acceptedAnswer":{"@type":"Answer","text":"No directamente. Cada función tiene sus propias variables y Jaguar no tiene variables globales. Lo que necesite lo recibe por parámetros."}},{"@type":"Question","name":"¿Cuántas llamadas recursivas aguanta Jaguar?","acceptedAnswer":{"@type":"Answer","text":"Hasta 200 llamadas, una dentro de otra. Una recursión con caso base, como sumar hasta 190, funciona sin problema."}}] }
+  ]
+}
+</script>
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/estilos.css">
+</head>
+<body>
+<header class="sitio-barra">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="/logo.svg" alt="" width="46" height="40">
+      <a class="nombre" href="/">Jaguar Code</a>
+      <a href="/guias">Guías</a>
+      <a href="/retos">Retos</a>
+      <a href="/profes">Para profes</a>
+      <a href="https://github.com/panterino/jaguar">GitHub</a>
+    </div>
+  </div>
+</header>
+<main class="guia">
+  <div class="ancho angosto">
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › <a href="/guias">Guías</a> › Funciones y subprocesos en pseudocódigo</nav>
+    <h1>Funciones y subprocesos en pseudocódigo</h1>
+    <p class="resumen">Una función es un pedazo de programa con nombre que puedes usar muchas veces. La función devuelve un valor; el subproceso solo hace algo. Los dos reciben datos por parámetros y tienen sus propias variables.</p>
+    <nav class="contenido" aria-label="Contenido de la guía"><b>En esta guía</b>
+      <ol>
+        <li><a href="#que-es">Para qué sirven</a></li>
+        <li><a href="#funcion">La función: devuelve un valor</a></li>
+        <li><a href="#subproceso">El subproceso: hace algo, sin devolver nada</a></li>
+        <li><a href="#parametros">Parámetros: por valor y Por Referencia</a></li>
+        <li><a href="#variables-locales">Cada función tiene sus propias variables</a></li>
+        <li><a href="#arreglos">Los arreglos se comparten</a></li>
+        <li><a href="#recursion">Recursión: una función que se llama a sí misma</a></li>
+        <li><a href="#donde">Dónde se escriben</a></li>
+        <li><a href="#errores">Los errores más comunes</a></li>
+        <li><a href="#preguntas">Preguntas frecuentes</a></li>
+      </ol>
+    </nav>
+    <article>
+      <section id="que-es">
+        <h2>Para qué sirven</h2>
+<p>Cuando un programa crece, empiezas a repetir las mismas líneas: calcular un área, mostrar un saludo, revisar si un número es par. En lugar de copiarlas, las escribes una vez, les pones un nombre y las <b>llamas</b> cada vez que las necesitas. Eso es una función o un subproceso.</p>
+<p>Tienen la misma estructura, pero con una diferencia:</p>
+<div class="tabla"><table><caption>Función y subproceso</caption><thead><tr><th scope="col"></th><th scope="col">Función</th><th scope="col">Subproceso</th></tr></thead><tbody><tr><td>Se escribe con</td><td><code>Funcion … FinFuncion</code></td><td><code>SubProceso … FinSubProceso</code></td></tr><tr><td>Devuelve un valor</td><td>Sí, uno</td><td>No</td></tr><tr><td>Se usa</td><td>Dentro de una expresión: <code>Escribir Doble(4)</code></td><td>Como una instrucción: <code>Saludar("Ana")</code></td></tr><tr><td>Ejemplo</td><td>Calcular el área</td><td>Mostrar un saludo</td></tr></tbody></table></div>
+<p>Si lo que necesitas es una respuesta (un número, un texto, Verdadero o Falso), usa una función. Si solo necesitas que algo suceda, usa un subproceso.</p>
+      </section>
+      <section id="funcion">
+        <h2>La función: devuelve un valor</h2>
+<p>Una función se declara con <code>Funcion</code>, el nombre de la variable que guardará el resultado, una flecha, el nombre de la función y sus parámetros entre paréntesis. Dentro, el resultado se guarda en esa variable, y eso es lo que devuelve:</p>
+<pre class="codigo" data-salida="12&#10;11" tabindex="0"><code>Funcion a &lt;- AreaRectangulo(base, altura)
+    a &lt;- base * altura
+FinFuncion
+
+Algoritmo areas
+    Escribir AreaRectangulo(3, 4)
+    Escribir AreaRectangulo(5, 2) + 1
+FinAlgoritmo</code></pre>
+<p>Aquí <code>a</code> es el resultado de la función. Como devuelve un valor, la llamada se puede usar en cualquier lugar donde iría un número: en un <code>Escribir</code>, en una suma, en una condición.</p>
+<p>Una función también puede devolver texto:</p>
+<pre class="codigo" data-entradas="8" data-salida="Aprobado" tabindex="0"><code>Funcion t &lt;- Etiqueta(n)
+    Si n &gt;= 6 Entonces
+        t &lt;- "Aprobado"
+    SiNo
+        t &lt;- "Reprobado"
+    FinSi
+FinFuncion
+
+Algoritmo calificacion
+    Leer c
+    Escribir Etiqueta(c)
+FinAlgoritmo</code></pre>
+      </section>
+      <section id="subproceso">
+        <h2>El subproceso: hace algo, sin devolver nada</h2>
+<p>Un subproceso no tiene variable de resultado. Se llama como una instrucción suelta:</p>
+<pre class="codigo" data-salida="Hola, Ana&#10;Hola, Luis" tabindex="0"><code>SubProceso Saludar(nombre)
+    Escribir "Hola, ", nombre
+FinSubProceso
+
+Algoritmo saludos
+    Saludar("Ana")
+    Saludar("Luis")
+FinAlgoritmo</code></pre>
+<p>Escribimos <code>Saludar</code> una vez y la usamos dos veces con datos distintos. Esa es la ventaja: si mañana quieres cambiar el saludo, lo cambias en un solo lugar.</p>
+      </section>
+      <section id="parametros">
+        <h2>Parámetros: por valor y Por Referencia</h2>
+<p>Los <b>parámetros</b> son los datos que le pasas a la función entre paréntesis. Hay dos formas de pasarlos.</p>
+<h3>Por valor (lo normal)</h3>
+<p>La función recibe una <i>copia</i>. Si la cambia, la variable de afuera no se entera:</p>
+<pre class="codigo" data-salida="Dentro: 10&#10;Fuera: 5" tabindex="0"><code>SubProceso Duplicar(n)
+    n &lt;- n * 2
+    Escribir "Dentro: ", n
+FinSubProceso
+
+Algoritmo copia
+    x &lt;- 5
+    Duplicar(x)
+    Escribir "Fuera: ", x
+FinAlgoritmo</code></pre>
+<h3>Por referencia</h3>
+<p>Con <code>Por Referencia</code>, la función trabaja con la variable original, y lo que cambie adentro se ve afuera:</p>
+<pre class="codigo" data-salida="10" tabindex="0"><code>SubProceso Duplicar(n Por Referencia)
+    n &lt;- n * 2
+FinSubProceso
+
+Algoritmo referencia
+    x &lt;- 5
+    Duplicar(x)
+    Escribir x
+FinAlgoritmo</code></pre>
+<p>Es la forma de lograr que un subproceso «devuelva» más de un valor, como en el intercambio de dos variables:</p>
+<pre class="codigo" data-salida="2 1" tabindex="0"><code>SubProceso Intercambiar(a Por Referencia, b Por Referencia)
+    aux &lt;- a
+    a &lt;- b
+    b &lt;- aux
+FinSubProceso
+
+Algoritmo cambio
+    p &lt;- 1
+    q &lt;- 2
+    Intercambiar(p, q)
+    Escribir p, " ", q
+FinAlgoritmo</code></pre>
+<p>Un parámetro <code>Por Referencia</code> necesita una variable al llamar, no un valor suelto: <code>Duplicar(x)</code> sirve, <code>Duplicar(5)</code> no, porque no hay una caja donde guardar el cambio.</p>
+      </section>
+      <section id="variables-locales">
+        <h2>Cada función tiene sus propias variables</h2>
+<p>Las variables que creas dentro de una función existen solo ahí, y las del algoritmo no se ven adentro. Jaguar no tiene variables globales: lo que una función necesita se lo pasas por parámetros.</p>
+<pre class="codigo" data-error="No encuentro la variable 'total'." tabindex="0"><code>SubProceso MostrarTotal()
+    Escribir total
+FinSubProceso
+
+Algoritmo a
+    total &lt;- 10
+    MostrarTotal()
+FinAlgoritmo</code></pre>
+<p>La función no ve el <code>total</code> del algoritmo. Se arregla pasándolo como parámetro:</p>
+<pre class="codigo" data-salida="10" tabindex="0"><code>SubProceso MostrarTotal(total)
+    Escribir total
+FinSubProceso
+
+Algoritmo a
+    total &lt;- 10
+    MostrarTotal(total)
+FinAlgoritmo</code></pre>
+<p>Que cada función tenga sus variables evita sorpresas: puedes usar <code>i</code> o <code>suma</code> en todas sin que se mezclen. Si te sale un error así, está explicado en <a href="/errores/variable-sin-valor">«No encuentro la variable»</a>.</p>
+      </section>
+      <section id="arreglos">
+        <h2>Los arreglos se comparten</h2>
+<p>Los arreglos son la excepción: cuando se lo pasas a una función, no se copia, sino que se comparte. Lo que la función cambie en sus casillas se ve afuera, sin necesidad de <code>Por Referencia</code>:</p>
+<pre class="codigo" data-salida="14" tabindex="0"><code>SubProceso LlenarCon(v, valor, n)
+    Para i &lt;- 1 Hasta n Hacer
+        v[i] &lt;- valor
+    FinPara
+FinSubProceso
+
+Algoritmo arreglo
+    Dimension notas[3]
+    LlenarCon(notas, 7, 3)
+    Escribir notas[1] + notas[3]
+FinAlgoritmo</code></pre>
+<p>Más sobre arreglos en <a href="/guias/arreglos-en-pseudocodigo">la guía de arreglos</a>.</p>
+      </section>
+      <section id="recursion">
+        <h2>Recursión: una función que se llama a sí misma</h2>
+<p>Una función puede llamarse a sí misma. Es útil cuando un problema se parte en uno más chico del mismo tipo, como el factorial: <code>5! = 5 × 4!</code>. Necesita un <b>caso base</b>, el momento en que responde sin llamar de nuevo, o no termina nunca:</p>
+<pre class="codigo" data-salida="120" tabindex="0"><code>Funcion r &lt;- Factorial(n)
+    Si n &lt;= 1 Entonces
+        r &lt;- 1
+    SiNo
+        r &lt;- n * Factorial(n - 1)
+    FinSi
+FinFuncion
+
+Algoritmo recursion
+    Escribir Factorial(5)
+FinAlgoritmo</code></pre>
+<p>El caso base es <code>n &lt;= 1</code>, y cada llamada se acerca a él restando uno. Si olvidas el caso base, aparece el error <a href="/errores/errores-de-funciones-al-ejecutar">«Demasiadas llamadas a funciones»</a>.</p>
+      </section>
+      <section id="donde">
+        <h2>Dónde se escriben</h2>
+<p>Las funciones y los subprocesos se pueden escribir antes o después del <code>Algoritmo</code>; Jaguar los encuentra igual:</p>
+<pre class="codigo" data-salida="42" tabindex="0"><code>Algoritmo despues
+    Escribir Doble(21)
+FinAlgoritmo
+
+Funcion r &lt;- Doble(n)
+    r &lt;- n * 2
+FinFuncion</code></pre>
+<p>Por orden, lo normal es ponerlas arriba, antes del algoritmo, para que quien lea el programa conozca las piezas antes de ver cómo se usan.</p>
+      </section>
+      <section id="errores">
+        <h2>Los errores más comunes</h2>
+<ul>
+  <li><b>Pasar un número distinto de argumentos:</b> «'Suma' recibe 2 valores, pero se le dieron 1». Hay que dar un dato por cada parámetro. Está explicado en <a href="/errores/errores-al-usar-funciones">errores al usar funciones</a>.</li>
+  <li><b>Una función que termina sin dar valor:</b> olvidaste guardar el resultado en la variable que nombra la función.</li>
+  <li><b>Recursión sin caso base:</b> las llamadas no terminan nunca.</li>
+  <li><b>Usar como nombre una palabra del lenguaje:</b> <code>Mostrar</code>, <code>Leer</code> o <code>y</code> ya significan algo, y no sirven de nombre.</li>
+</ul>
+      </section>
+      <section id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+        <details><summary>¿Cuál es la diferencia entre una función y un subproceso?</summary><p>La función devuelve un valor y se usa dentro de una expresión, como Escribir Doble(4). El subproceso no devuelve nada y se llama como una instrucción, como Saludar("Ana").</p></details>
+        <details><summary>¿Cuándo uso Por Referencia?</summary><p>Cuando quieres que la función cambie la variable original, por ejemplo para intercambiar dos valores. Si solo necesitas leer el dato, déjalo por valor, que es más seguro.</p></details>
+        <details><summary>¿Puedo usar variables del algoritmo dentro de una función?</summary><p>No directamente. Cada función tiene sus propias variables y Jaguar no tiene variables globales. Lo que necesite lo recibe por parámetros.</p></details>
+        <details><summary>¿Cuántas llamadas recursivas aguanta Jaguar?</summary><p>Hasta 200 llamadas, una dentro de otra. Una recursión con caso base, como sumar hasta 190, funciona sin problema.</p></details>
+      </section>
+    </article>
+<aside class="cta-guia" aria-labelledby="cta-t">
+  <h2 id="cta-t">Practica esto en Jaguar Code</h2>
+  <p>Escribe pseudocódigo, mira su diagrama y haz la prueba de escritorio desde el celular. Gratis, sin anuncios y sin cuenta.</p>
+  <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir la app</a></div>
+  <p class="aviso-prueba"><b>Acceso abierto antes del lanzamiento.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo. Lanzamiento oficial: 11 de enero de 2027.</p>
+</aside>
+    <h2 style="margin-top:44px">Sigue aprendiendo</h2>
+    <div class="relacionadas">
+      <a href="/guias/arreglos-en-pseudocodigo">Arreglos en pseudocódigo<small>Un arreglo es una variable que guarda varios valores del mismo tipo, cada uno en una posición numerada.</small></a>
+      <a href="/guias/ciclos-mientras-para-repetir">Ciclos en pseudocódigo: Mientras, Para y Repetir<small>Un ciclo repite un grupo de instrucciones.</small></a>
+      <a href="/guias/de-pseudocodigo-a-python">De pseudocódigo a Python<small>Si ya sabes pseudocódigo, ya sabes la parte difícil de programar: la lógica.</small></a>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="ancho">
+    <span class="quien"><img src="/logo.svg" alt="" width="30" height="26">Un proyecto de Panterino · hecho en México</span>
+    <a href="/guias">Guías</a>
+    <a href="/retos">Retos</a>
+    <a href="/descargas">Descargas</a>
+    <a href="/manual">Manual</a>
+    <a href="https://www.facebook.com/jaguareducation">Facebook</a>
+    <a href="https://github.com/panterino/jaguar">Código en GitHub</a>
+    <a href="#" data-analitica-cambiar>Analítica</a>
+  </div>
+</footer>
+<script src="/acceso.js" defer></script>
+<script src="/analitica.js" defer></script>
+</body>
+</html>

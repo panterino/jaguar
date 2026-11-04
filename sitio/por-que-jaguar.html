@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Por qué Jaguar Code: más que un intérprete de pseudocódigo</title>
+<meta name="description" content="Jaguar no solo ejecuta pseudocódigo: muestra el programa como diagrama de flujo, bloques y prueba de escritorio, explica los errores en español y acompaña al profe.">
+<link rel="canonical" href="https://jaguarcode.org/por-que-jaguar">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="favicon.png">
+<link rel="icon" type="image/svg+xml" href="logo.svg">
+<link rel="apple-touch-icon" href="icono.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Jaguar Code">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://jaguarcode.org/por-que-jaguar">
+<meta property="og:title" content="Por qué Jaguar Code: más que un intérprete de pseudocódigo">
+<meta property="og:description" content="Jaguar no solo ejecuta pseudocódigo: muestra el programa como diagrama de flujo, bloques y prueba de escritorio, explica los errores en español y acompaña al profe.">
+<meta property="og:image" content="https://jaguarcode.org/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "AboutPage",
+      "@id": "https://jaguarcode.org/por-que-jaguar#pagina",
+      "name": "Por qué Jaguar Code: más que un intérprete de pseudocódigo",
+      "description": "Jaguar no solo ejecuta pseudocódigo: muestra el programa como diagrama de flujo, bloques y prueba de escritorio, explica los errores en español y acompaña al profe.",
+      "url": "https://jaguarcode.org/por-que-jaguar",
+      "inLanguage": "es-MX",
+      "datePublished": "2026-11-03",
+      "about": {
+        "@type": "SoftwareApplication",
+        "name": "Jaguar Code",
+        "url": "https://jaguarcode.org/"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Panterino",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://jaguarcode.org/icono.png"
+        }
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Jaguar Code",
+          "item": "https://jaguarcode.org/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Por qué Jaguar",
+          "item": "https://jaguarcode.org/por-que-jaguar"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "¿Jaguar reemplaza a PSeInt?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No es la idea. PSeInt es un programa para computadora que muchas escuelas usan desde hace años, y Jaguar entiende el mismo pseudocódigo: un .psc hecho en la sala de cómputo se abre en Jaguar, y al revés. Jaguar lleva esa práctica al celular y le agrega diagramas conectados, bloques, prueba de escritorio y retos."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Es un curso?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No es un curso cerrado. Es una herramienta para practicar lo que ves en clase, con una ruta opcional de lecciones y retos para quien aprende por su cuenta. El profe decide los ejercicios, el ritmo y cómo evaluar."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Por qué es gratis y sin anuncios?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Porque está pensado para estudiantes que muchas veces no tienen otra opción, y muchos son menores de edad. Es un proyecto independiente y de código abierto: cualquiera puede revisar cómo funciona."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Necesito internet?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No para lo básico: escribir pseudocódigo, ver el diagrama, ejecutar y hacer la prueba de escritorio funcionan sin conexión. Solo las clases en línea y la comunidad necesitan internet."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face { font-family: "Nunito"; src: url("/fuentes/nunito.woff2") format("woff2"); font-weight: 200 1000; font-style: normal; font-display: swap; }
+:root {
+  --cafe: #3B2410; --amarillo: #F4B723; --azul: #00A8F0;
+  --fondo: #FFF8F0; --superficie: #FFFFFF; --superficie-2: #FBF1E4;
+  --texto: #2A1A0B; --suave: #6B5645; --borde: #EADBC8; --enlace: #8A4B00;
+  --portada: #3B2410; --portada-texto: #FFF3E0; --portada-suave: #E6CFB4;
+  --marca: rgba(244,183,35,.28);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fondo: #1A120B; --superficie: #241810; --superficie-2: #20150D;
+    --texto: #F5EADF; --suave: #C9B6A2; --borde: #3E2C1C; --enlace: #F4B723;
+    --portada: #24170B; --marca: rgba(244,183,35,.22);
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--fondo); color: var(--texto);
+  font: 17px/1.6 "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  overflow-x: hidden;
+}
+a { color: var(--enlace); text-underline-offset: 3px; }
+:focus-visible { outline: 3px solid var(--azul); outline-offset: 3px; border-radius: 6px; }
+.ancho { max-width: 920px; margin: 0 auto; padding: 0 16px; }
+
+.portada { background: var(--portada); color: var(--portada-texto); padding: 18px 0 56px; }
+.barra-sup { display: flex; align-items: center; gap: 10px; margin-bottom: 40px; }
+.barra-sup img { width: 46px; height: auto; }
+.barra-sup .nombre { font-size: 22px; font-weight: 800; margin-right: auto; color: inherit; text-decoration: none; }
+.barra-sup a:not(.nombre) { color: var(--portada-texto); text-decoration: none; font-size: 15px; opacity: .9; }
+.barra-sup a:not(.nombre):hover { opacity: 1; text-decoration: underline; }
+.barra-sup a + a { margin-left: 14px; }
+.pronto {
+  display: inline-block; background: var(--amarillo); color: var(--cafe);
+  font-weight: 800; font-size: 13px; letter-spacing: .12em; text-transform: uppercase;
+  padding: 6px 14px; border-radius: 999px; margin: 0;
+}
+h1 { font-size: clamp(32px, 5.6vw, 50px); line-height: 1.08; margin: 18px 0 16px; letter-spacing: -.02em; }
+h1 span { color: var(--amarillo); }
+.lema { font-size: 19px; color: var(--portada-suave); margin: 0 0 26px; max-width: 34em; }
+.botones { display: flex; flex-wrap: wrap; gap: 12px; }
+.boton {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 48px;
+  padding: 12px 22px; border-radius: 999px; font-weight: 700; font-size: 16px; text-decoration: none;
+}
+.boton.principal { background: var(--amarillo); color: var(--cafe); }
+.boton.principal:hover { background: #FFC94A; }
+.boton.borde { color: var(--portada-texto); box-shadow: inset 0 0 0 1.5px #A88A6C; }
+
+section { padding: 56px 0; }
+.franja { background: var(--superficie-2); border-block: 1px solid var(--borde); }
+.eti { margin: 0 0 6px; font-size: 13px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #A06A00; }
+@media (prefers-color-scheme: dark) { .eti { color: var(--amarillo); } }
+h2 { font-size: clamp(26px, 4vw, 34px); line-height: 1.15; margin: 0 0 12px; letter-spacing: -.01em; }
+h3 { font-size: 19px; margin: 0 0 6px; }
+.intro { color: var(--suave); max-width: 40em; margin: 0 0 28px; font-size: 18px; }
+p { margin: 0 0 14px; }
+
+.tabla { overflow-x: auto; background: var(--superficie); border: 1px solid var(--borde); border-radius: 14px; }
+table { border-collapse: collapse; width: 100%; min-width: 520px; font-size: 15.5px; }
+th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--borde); vertical-align: top; }
+th { font-size: 13px; color: var(--suave); text-transform: uppercase; letter-spacing: .06em; background: var(--superficie-2); }
+tr:last-child td { border-bottom: 0; }
+td:first-child { font-weight: 600; }
+.fuente { font-size: 14px; color: var(--suave); margin-top: 12px; }
+
+.pasos { list-style: none; counter-reset: paso; padding: 0; margin: 0; display: grid; gap: 14px; }
+.pasos li {
+  counter-increment: paso; position: relative; padding: 18px 18px 18px 64px;
+  background: var(--superficie); border: 1px solid var(--borde); border-radius: 14px;
+}
+.pasos li::before {
+  content: counter(paso); position: absolute; left: 16px; top: 16px;
+  width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--amarillo); color: var(--cafe); font-weight: 800;
+}
+.pasos p { margin: 0; color: var(--suave); }
+
+.dos { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.tarjeta { background: var(--superficie); border: 1px solid var(--borde); border-radius: 14px; padding: 22px; }
+.tarjeta p { color: var(--suave); margin: 0; }
+.tarjeta ul { margin: 8px 0 0; padding-left: 20px; color: var(--suave); }
+.tarjeta li { margin: 6px 0; }
+
+details { border-bottom: 1px solid var(--borde); }
+details:first-of-type { border-top: 1px solid var(--borde); }
+summary { cursor: pointer; list-style: none; padding: 16px 36px 16px 0; position: relative; font-weight: 700; font-size: 17.5px; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; position: absolute; right: 6px; top: 50%; transform: translateY(-50%); font-size: 26px; font-weight: 400; color: var(--enlace); }
+details[open] summary::after { content: "−"; }
+details p { color: var(--suave); }
+
+.cierre { background: var(--portada); color: var(--portada-texto); text-align: center; }
+.cierre p { color: var(--portada-suave); max-width: 34em; margin: 0 auto 24px; }
+.cierre .botones { justify-content: center; }
+
+footer { padding: 28px 0 40px; color: var(--suave); font-size: 15px; }
+footer .ancho { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; }
+footer span { margin-right: auto; }
+
+@media (max-width: 640px) {
+  body { font-size: 16px; }
+  section { padding: 44px 0; }
+  .dos { grid-template-columns: 1fr; }
+  .boton { flex: 1 1 100%; }
+  .barra-sup { margin-bottom: 28px; }
+  .barra-sup a + a { margin-left: 4px; }
+  .pasos li { padding: 16px 16px 16px 58px; }
+  /* The table becomes a list of cards: no sideways scrolling. */
+  table { min-width: 0; }
+  thead { display: none; }
+  tr { display: block; border-bottom: 1px solid var(--borde); padding: 12px 14px; }
+  tr:last-child { border-bottom: 0; }
+  td { display: block; padding: 0; border: 0; }
+  td + td { color: var(--suave); margin-top: 4px; }
+}
+
+.error-ejemplo { background: #FBE3E0; color: #7A1D14; border-radius: 12px; padding: 12px 14px; margin: 12px 0 0; font-size: 15.5px; }
+@media (prefers-color-scheme: dark) { .error-ejemplo { background: #44201D; color: #FFB4AC; } }
+</style>
+</head>
+<body>
+
+<header class="portada">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="logo.svg" alt="" width="46" height="40">
+      <a class="nombre" href="/">Jaguar Code</a>
+      <a href="/">Inicio</a>
+      <a href="/guias">Guías</a>
+      <a href="/retos">Retos</a>
+      <a href="/profes">Para profes</a>
+    </div>
+    <p class="pronto">Por qué Jaguar</p>
+    <h1>Más que un <span>intérprete</span> de pseudocódigo</h1>
+    <p class="lema">Un intérprete ejecuta tu programa y te dice si funcionó. Jaguar está hecho para lo que pasa antes y después: entender por qué funciona, descubrir por qué no y aprender a pensarlo.</p>
+    <div class="botones">
+      <a class="boton principal" href="https://app.jaguarcode.org/">Abrir la app</a>
+      <a class="boton borde" href="#ideas">Cómo está pensado</a>
+    </div>
+  </div>
+</header>
+
+<main>
+<section id="idea">
+  <div class="ancho">
+    <p class="eti">La idea</p>
+    <h2>Ejecutar no es lo mismo que entender</h2>
+    <p class="intro">Cuando aprendes lógica de programación, que el programa corra es lo de menos. Lo difícil es saber qué hace cada línea, por qué toma un camino y no otro, y qué guarda cada variable en cada momento. Un intérprete solo responde «funcionó» o «no funcionó». Jaguar quiere responder <i>por qué</i>.</p>
+    <div class="tabla">
+      <table>
+        <thead><tr><th>Lo que hace un intérprete</th><th>Lo que hace Jaguar</th></tr></thead>
+        <tbody>
+          <tr><td>Ejecuta el programa y muestra el resultado</td><td>También, y te deja ir paso a paso: la línea que se ejecuta se ilumina en el código y en el diagrama.</td></tr>
+          <tr><td>Marca que hay un error</td><td>Dice en español qué pasó, en qué línea y cómo arreglarlo.</td></tr>
+          <tr><td>Muestra tu código</td><td>Muestra el mismo programa como pseudocódigo, diagrama de flujo y bloques. Cambias uno y cambian los otros.</td></tr>
+          <tr><td>—</td><td>Hace la prueba de escritorio sola, o te deja llenarla a ti y revisa cada celda.</td></tr>
+          <tr><td>—</td><td>Propone retos que empiezan por el planteamiento y dan pistas sin regalar la respuesta.</td></tr>
+          <tr><td>—</td><td>Le da al profe clases con código, ejercicios que se revisan solos y las entregas en un solo lugar.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="franja" id="ideas">
+  <div class="ancho">
+    <p class="eti">Cómo está pensado</p>
+    <h2>Cinco ideas detrás de Jaguar</h2>
+    <p class="intro">Cada función de la app sale de una de estas ideas. Si algo no ayuda a entender, no entra.</p>
+    <ol class="pasos">
+      <li>
+        <h3>Ver el mismo programa de varias formas</h3>
+        <p>El pseudocódigo da el detalle, el diagrama de flujo muestra el camino y los bloques muestran qué va dentro de qué. La investigación sobre aprendizaje dice que varias representaciones ayudan cuando quien aprende puede relacionarlas, y que esa traducción es lo más difícil. Por eso en Jaguar están conectadas. <a href="/guias/pseudocodigo-diagrama-de-flujo-y-bloques">Por qué tres formatos y no uno</a>.</p>
+      </li>
+      <li>
+        <h3>Ver lo que pasa en la memoria</h3>
+        <p>La prueba de escritorio es la forma clásica de entender un algoritmo: seguirlo línea por línea y anotar qué vale cada variable. Jaguar la arma sola para que veas lo que pasó, o te deja llenarla a ti y te dice qué celdas están bien. <a href="/guias/prueba-de-escritorio">Qué es la prueba de escritorio</a>.</p>
+      </li>
+      <li>
+        <h3>Errores que enseñan</h3>
+        <p>Un error es el mejor momento para aprender, si se entiende. Este es un mensaje real de Jaguar cuando falta cerrar un ciclo:</p>
+        <p class="error-ejemplo"><b>Error de escritura en la línea 4</b><br>Encontré 'FinAlgoritmo', pero antes falta 'FinPara' para cerrar el 'Para' de la línea 2. Cierra primero el 'Para' con 'FinPara'. Después va 'FinAlgoritmo'.</p>
+        <p style="margin-top:12px">Y si aun así no queda claro, cada mensaje tiene su página con ejemplos y cómo arreglarlo. <a href="/errores">Los errores, explicados</a>.</p>
+      </li>
+      <li>
+        <h3>Pensar antes de teclear</h3>
+        <p>Los retos empiezan por el planteamiento: qué datos entran, qué se hace con ellos y qué sale. Primero se piensa el problema y después se escribe el código. Las pistas van de una idea a un ejemplo, sin dar la solución.</p>
+      </li>
+      <li>
+        <h3>Un puente, no un callejón sin salida</h3>
+        <p>El pseudocódigo en español sirve para concentrarse en la lógica. Cuando estés listo, la vista de Python (apagada al principio) muestra el mismo programa en un lenguaje de verdad. Lo que aprendiste no se queda en la escuela. <a href="/guias/de-pseudocodigo-a-python">Cómo pasar de pseudocódigo a Python</a>.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section id="para-quien">
+  <div class="ancho">
+    <p class="eti">Para quién</p>
+    <h2>Hecho para aprender con lo que tienes</h2>
+    <p class="intro">PSeInt y los programas parecidos son para computadora. Muchos estudiantes hacen la tarea desde el celular, sin computadora en casa y a veces sin internet. Jaguar empezó por ahí.</p>
+    <div class="dos">
+      <div class="tarjeta">
+        <h3>Si estudias</h3>
+        <ul>
+          <li>Funciona en el celular, en el navegador y en computadora.</li>
+          <li>Lo básico funciona sin internet y sin crear cuenta.</li>
+          <li>Abre y guarda los archivos .psc que usas en la escuela.</li>
+          <li>Lecciones cortas y retos para practicar por tu cuenta.</li>
+        </ul>
+      </div>
+      <div class="tarjeta">
+        <h3>Si das clase</h3>
+        <ul>
+          <li>Clases con código, sin pedir correo a tus alumnos.</li>
+          <li>Ejercicios con casos de prueba que se revisan solos.</li>
+          <li>Ves el código de cada entrega y cuántas pruebas pasó.</li>
+          <li>Para tu clase: cómo armar los ejercicios y revisar las entregas. <a href="/profes">Guía para profes</a>.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="franja" id="reglas">
+  <div class="ancho">
+    <p class="eti">Lo que sí y lo que no</p>
+    <h2>Reglas que no cambian</h2>
+    <p class="intro">Muchos usuarios de Jaguar son menores de edad que aprenden en el celular. Eso decide cómo está hecho.</p>
+    <div class="dos">
+      <div class="tarjeta">
+        <h3>Lo que sí</h3>
+        <ul>
+          <li>Gratis, completo, sin versión «pro».</li>
+          <li>Software libre (licencia AGPL): el código está en <a href="https://github.com/panterino/jaguar">GitHub</a>.</li>
+          <li>Compatible con PSeInt (.psc) y con la forma de escribir de DFD.</li>
+          <li>Tus programas se guardan en tu dispositivo.</li>
+        </ul>
+      </div>
+      <div class="tarjeta">
+        <h3>Lo que no</h3>
+        <ul>
+          <li>Anuncios.</li>
+          <li>Cuenta obligatoria para practicar.</li>
+          <li>Nombres reales o fotos de alumnos: en las clases se usa un alias.</li>
+          <li>Medir visitas sin tu permiso. <a href="https://app.jaguarcode.org/privacidad">Aviso de privacidad</a>.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="historia">
+  <div class="ancho">
+    <p class="eti">De dónde viene</p>
+    <h2>Una idea de prepa que regresó</h2>
+    <p class="intro">Jaguar nació en 2019 en una preparatoria de México, como el proyecto Panterino: un «Duolingo de programación» para quien no tuviera computadora, internet o dinero para cursos. Lo intentamos varias veces y nunca pasamos de la pantalla de inicio de sesión. En 2026 regresó con una idea más sencilla: no inventar un lenguaje nuevo, sino usar el pseudocódigo y los diagramas que ya se enseñan en las escuelas, y hacer que funcionen en cualquier equipo.</p>
+  </div>
+</section>
+
+<section class="franja" id="preguntas">
+  <div class="ancho">
+    <p class="eti">Preguntas</p>
+    <h2>Preguntas frecuentes</h2>
+    <details><summary>¿Jaguar reemplaza a PSeInt?</summary><p>No es la idea. PSeInt es un programa para computadora que muchas escuelas usan desde hace años, y Jaguar entiende el mismo pseudocódigo: un .psc hecho en la sala de cómputo se abre en Jaguar, y al revés. Jaguar lleva esa práctica al celular y le agrega diagramas conectados, bloques, prueba de escritorio y retos.</p></details>
+    <details><summary>¿Es un curso?</summary><p>No es un curso cerrado. Es una herramienta para practicar lo que ves en clase, con una ruta opcional de lecciones y retos para quien aprende por su cuenta. El profe decide los ejercicios, el ritmo y cómo evaluar.</p></details>
+    <details><summary>¿Por qué es gratis y sin anuncios?</summary><p>Porque está pensado para estudiantes que muchas veces no tienen otra opción, y muchos son menores de edad. Es un proyecto independiente y de código abierto: cualquiera puede revisar cómo funciona.</p></details>
+    <details><summary>¿Necesito internet?</summary><p>No para lo básico: escribir pseudocódigo, ver el diagrama, ejecutar y hacer la prueba de escritorio funcionan sin conexión. Solo las clases en línea y la comunidad necesitan internet.</p></details>
+  </div>
+</section>
+
+<section class="cierre">
+  <div class="ancho">
+    <h2>Pruébalo con tu próximo ejercicio</h2>
+    <p>Escribe un algoritmo, mira su diagrama y haz la prueba de escritorio. Sin cuenta y sin anuncios.</p>
+    <div class="botones">
+      <a class="boton principal" href="https://app.jaguarcode.org/">Abrir la app</a>
+      <a class="boton borde" href="/guias">Ver las guías</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="ancho">
+    <span>Jaguar es un proyecto de Panterino, hecho en México.</span>
+    <a href="/">Inicio</a>
+    <a href="/guias">Guías</a>
+    <a href="/manual">Manual</a>
+    <a href="https://www.facebook.com/jaguareducation">Facebook</a>
+    <a href="https://github.com/panterino/jaguar">GitHub</a>
+    <a href="#" data-analitica-cambiar>Analítica</a>
+  </div>
+</footer>
+
+<script src="/analitica.js" defer></script>
+</body>
+</html>

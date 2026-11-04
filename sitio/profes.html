@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Jaguar Code para profes: algoritmos, diagramas y pseudocódigo en clase</title>
-<meta name="description" content="Guía para profes de Computación Básica I (IPN) y Cultura Digital (SEP): cómo usar Jaguar para enseñar algoritmos, diagramas de flujo, pseudocódigo y prueba de escritorio.">
+<meta name="description" content="Guía para profes: cómo usar Jaguar para enseñar algoritmos, diagramas de flujo, pseudocódigo y prueba de escritorio, cómo ordenar la clase y cómo revisar las entregas.">
 <link rel="canonical" href="https://jaguarcode.org/profes">
 <meta name="robots" content="index, follow">
 <meta name="theme-color" content="#3B2410">
@@ -17,12 +17,14 @@
 <meta property="og:locale" content="es_MX">
 <meta property="og:url" content="https://jaguarcode.org/profes">
 <meta property="og:title" content="Jaguar Code para profes: algoritmos, diagramas y pseudocódigo en clase">
-<meta property="og:description" content="Qué cubre Jaguar de Computación Básica I y Cultura Digital, cómo armar tu clase y cómo revisar las entregas.">
+<meta property="og:description" content="Cómo usar Jaguar en tu clase de algoritmos, cómo armar la clase y cómo revisar las entregas.">
 <meta property="og:image" content="https://jaguarcode.org/compartir.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
 <style>
+@font-face { font-family: "Nunito"; src: url("/fuentes/nunito.woff2") format("woff2"); font-weight: 200 1000; font-style: normal; font-display: swap; }
 :root {
   --cafe: #3B2410; --amarillo: #F4B723; --azul: #00A8F0;
   --fondo: #FFF8F0; --superficie: #FFFFFF; --superficie-2: #FBF1E4;
@@ -41,7 +43,7 @@
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 body {
   margin: 0; background: var(--fondo); color: var(--texto);
-  font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font: 17px/1.6 "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   overflow-x: hidden;
 }
 a { color: var(--enlace); text-underline-offset: 3px; }
@@ -100,6 +102,9 @@ td:first-child { font-weight: 600; }
   background: var(--amarillo); color: var(--cafe); font-weight: 800;
 }
 .pasos p { margin: 0; color: var(--suave); }
+.enlaces-suaves { margin: 14px 0 0; font-size: 15.5px; }
+.enlaces-suaves a { color: inherit; text-underline-offset: 3px; }
+.cierre .enlaces-suaves { text-align: center; }
 
 .dos { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .tarjeta { background: var(--superficie); border: 1px solid var(--borde); border-radius: 14px; padding: 22px; }
@@ -155,36 +160,27 @@ footer span { margin-right: auto; }
     </div>
     <p class="pronto">Guía para profes</p>
     <h1>Jaguar en tu clase de <span>algoritmos</span></h1>
-    <p class="lema">Qué cubre del programa, una forma de ordenar las clases y cómo revisar lo que entregan tus alumnos. Jaguar está en versión anticipada y buscamos profes que lo prueben con su grupo.</p>
+    <p class="lema">Una forma de ordenar las clases, qué ofrece Jaguar para cada paso y cómo revisar lo que entregan tus alumnos. Jaguar ya está abierto y su lanzamiento oficial es el lunes 11 de enero de 2027. Buscamos profes que lo usen con su grupo antes de esa fecha, y te ayudamos a armar la clase.</p>
     <div class="botones">
-      <a class="boton principal" href="/#contacto">Quiero probarlo con mi grupo</a>
-      <a class="boton borde" href="#programa">Qué cubre</a>
+      <a class="boton principal" href="https://app.jaguarcode.org/">Entrar como profe</a>
     </div>
+    <p class="enlaces-suaves"><a href="#empezar">Empezar en 5 minutos</a> · <a href="/#contacto">Prefiero que me acompañen</a></p>
   </div>
 </header>
 
 <main>
-<section id="programa">
+<section id="empezar">
   <div class="ancho">
-    <p class="eti">El programa</p>
-    <h2>Lo que pide el programa y dónde está en Jaguar</h2>
-    <p class="intro">En el IPN, la unidad de Pensamiento computacional de Computación Básica I dura 32 horas y vale el 40 % de la calificación. Esto es lo que pide y cómo lo trabajas en Jaguar:</p>
-    <div class="tabla">
-      <table>
-        <thead><tr><th>Lo que pide el programa</th><th>En Jaguar</th></tr></thead>
-        <tbody>
-          <tr><td>Algoritmo, diagrama de flujo y pseudocódigo</td><td>El mismo programa en dos vistas. Lo que cambias en una aparece en la otra.</td></tr>
-          <tr><td>Análisis del problema: entrada, proceso y salida</td><td>El planteamiento, que se escribe antes del código y queda al inicio del programa.</td></tr>
-          <tr><td>Pruebas piloto (de escritorio) y depuración</td><td>La prueba de escritorio: Jaguar arma la tabla de variables, o el alumno la llena y Jaguar le marca qué acertó. También hay ejecución paso a paso.</td></tr>
-          <tr><td>Variables, constantes, tipos de datos y expresiones</td><td>Sí, con errores en español que dicen la línea y cómo arreglarlo.</td></tr>
-          <tr><td>Operadores aritméticos, relacionales, lógicos y de asignación</td><td>Sí, con la escritura de pseudocódigo en español que se usa en clase.</td></tr>
-          <tr><td>Estructuras secuenciales, condicionales y repetitivas</td><td>Sí, y 12 retos con pistas que las recorren en orden.</td></tr>
-          <tr><td>Implementación en un entorno de programación</td><td>Sí: ejecuta el pseudocódigo y abre y guarda archivos .psc.</td></tr>
-          <tr><td>Criterio: el diagrama y el pseudocódigo son coherentes con el algoritmo</td><td>Siempre lo son, porque son el mismo programa. Tú revisas la lógica.</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="fuente">Fuente: programa de Computación Básica I, Plan 2026, publicado por el CECyT 10 del IPN. En la SEP, Cultura Digital (MCCEMS) trabaja los mismos temas de algoritmos, diagramas de flujo, pseudocódigo y prueba de escritorio.</p>
+    <p class="eti">Empieza hoy</p>
+    <h2>Tu primer ejercicio en 5 minutos, sin escribirnos</h2>
+    <p class="intro">No necesitas cuenta ni que te demos acceso: la app ya está abierta. Esta es la ruta más corta para que tu grupo resuelva un ejercicio tuyo.</p>
+    <ol class="pasos">
+      <li><h3>Abre Jaguar y elige «Soy profesor»</h3><p>Entra a <a href="https://app.jaguarcode.org/">app.jaguarcode.org</a> desde el navegador, o instala la app. En la bienvenida toca «Soy profesor». Si ya habías elegido otra opción, se cambia en Ajustes, en Perfil.</p></li>
+      <li><h3>Crea tu ejercicio</h3><p>En Clases abre Mis ejercicios y toca Nuevo ejercicio. Escribe el enunciado y tu solución, y toca Generar casos con mi solución: Jaguar propone las pruebas. Puedes editarlas y marcar algunas como ocultas.</p></li>
+      <li><h3>Compártelo con un QR o un enlace</h3><p>Toca Proyectar y sale un QR grande para el proyector, que sirve aunque el salón no tenga internet. O copia el enlace y mándalo por WhatsApp o Classroom. Tus alumnos no necesitan cuenta.</p></li>
+      <li><h3>Mira quién lo logró</h3><p>Cuando un alumno pasa todas las pruebas, te muestra una pantalla verde con su nombre y la hora, que se ve bien desde lejos.</p></li>
+    </ol>
+    <p class="intro" style="margin:24px 0 0">¿Prefieres una clase en línea, con un código para tu grupo y una tabla de entregas? Es el paso siguiente: mira <a href="#grupo">cómo trabajar con tu grupo</a>. Y la guía completa también está dentro de la app, en Ayuda, en la pestaña Profe.</p>
   </div>
 </section>
 
@@ -247,22 +243,23 @@ footer span { margin-right: auto; }
   <div class="ancho">
     <p class="eti">Preguntas</p>
     <h2>Preguntas frecuentes de profes</h2>
-    <details><summary>¿Tengo que instalar algo en la sala de cómputo?</summary><p>No. Jaguar corre en el navegador, y en Android también como app. Los programas se guardan como archivos .psc y se pueden abrir y llevar a otros equipos.</p></details>
+    <details><summary>¿Tengo que instalar algo en la sala de cómputo?</summary><p>No. Jaguar corre en el navegador, y también hay app para Android, Windows, Mac y Linux. Los programas se guardan como archivos .psc y se pueden abrir y llevar a otros equipos.</p></details>
     <details><summary>¿Puedo usar mis propios ejercicios?</summary><p>Sí. Escribes el enunciado y tu solución, Jaguar propone las pruebas y tú decides cuáles quedan, incluso pruebas ocultas para que no programen "para el ejemplo".</p></details>
     <details><summary>¿Jaguar califica a mis alumnos?</summary><p>No. Te dice qué pruebas pasó cada programa; la calificación, la rúbrica y la lista de cotejo son tuyas.</p></details>
     <details><summary>¿Qué pasa si un alumno no tiene datos o internet?</summary><p>Puede programar, probar sus ejercicios y hacer los retos sin conexión. Solo las clases en línea necesitan internet para entregar.</p></details>
     <details><summary>¿Cuánto cuesta?</summary><p>Nada, ni para ti ni para tus alumnos. No tiene anuncios.</p></details>
-    <details><summary>¿Cómo lo pruebo con mi grupo?</summary><p>Escríbenos desde el formulario de la página principal. Te mandamos el acceso a la versión anticipada.</p></details>
+    <details><summary>¿Tengo que pedirles acceso o escribirles para usarlo?</summary><p>No. La app ya está abierta: entra a app.jaguarcode.org y elige «Soy profesor». La guía de esta página te lleva paso a paso, y dentro de la app hay otra en Ayuda, en la pestaña Profe. Escríbenos solo si quieres que te ayudemos a armar la clase antes del lanzamiento, el 11 de enero de 2027.</p></details>
   </div>
 </section>
 
 <section class="cierre">
   <div class="ancho">
-    <h2>¿Lo probamos con tu grupo?</h2>
-    <p>Cuéntanos tu escuela, tu materia y cuántos grupos tienes. Lo que nos digas nos ayuda a decidir qué hacer después.</p>
+    <h2>Empieza cuando quieras</h2>
+    <p>No hace falta escribirnos. Si quieres compañía para armar tu clase, o contarnos qué te falta en el salón (escuela, materia, cuántos grupos), con gusto te leemos.</p>
     <div class="botones">
-      <a class="boton principal" href="/#contacto">Escribirnos</a>
+      <a class="boton principal" href="https://app.jaguarcode.org/">Entrar como profe</a>
     </div>
+    <p class="enlaces-suaves"><a href="/#contacto">Escribirnos</a> · <a href="#empezar">Ver los pasos otra vez</a></p>
   </div>
 </section>
 </main>
@@ -274,8 +271,10 @@ footer span { margin-right: auto; }
     <a href="/manual">Manual</a>
     <a href="https://www.facebook.com/jaguareducation">Facebook</a>
     <a href="https://github.com/panterino/jaguar">GitHub</a>
+    <a href="#" data-analitica-cambiar>Analítica</a>
   </div>
 </footer>
 
+<script src="/analitica.js" defer></script>
 </body>
 </html>

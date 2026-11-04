@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pseudocódigo, diagrama de flujo y bloques: diferencias y cuándo usar cada uno</title>
+<meta name="description" content="Las tres formas de escribir un algoritmo: en qué se parecen, en qué se diferencian, cuándo conviene cada una y por qué aprender con las tres a la vez.">
+<link rel="canonical" href="https://jaguarcode.org/guias/pseudocodigo-diagrama-de-flujo-y-bloques">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="apple-touch-icon" href="/icono.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Jaguar Code">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://jaguarcode.org/guias/pseudocodigo-diagrama-de-flujo-y-bloques">
+<meta property="og:title" content="Pseudocódigo, diagrama de flujo y bloques: diferencias y cuándo usar cada uno">
+<meta property="og:description" content="Las tres formas de escribir un algoritmo: en qué se parecen, en qué se diferencian, cuándo conviene cada una y por qué aprender con las tres a la vez.">
+<meta property="og:image" content="https://jaguarcode.org/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Pseudocódigo, diagrama de flujo y bloques: diferencias y cuándo usar cada uno">
+<meta name="twitter:description" content="Las tres formas de escribir un algoritmo: en qué se parecen, en qué se diferencian, cuándo conviene cada una y por qué aprender con las tres a la vez.">
+<meta name="twitter:image" content="https://jaguarcode.org/compartir.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://jaguarcode.org/guias/pseudocodigo-diagrama-de-flujo-y-bloques#articulo",
+      "headline": "Pseudocódigo, diagrama de flujo y bloques: diferencias y cuándo usar cada uno",
+      "description": "Las tres formas de escribir un algoritmo: en qué se parecen, en qué se diferencian, cuándo conviene cada una y por qué aprender con las tres a la vez.",
+      "inLanguage": "es-MX",
+      "datePublished": "2026-11-03",
+      "dateModified": "2026-11-03",
+      "mainEntityOfPage": "https://jaguarcode.org/guias/pseudocodigo-diagrama-de-flujo-y-bloques",
+      "image": "https://jaguarcode.org/compartir.png",
+      "author": { "@type": "Organization", "name": "Panterino", "url": "https://jaguarcode.org/" },
+      "publisher": { "@type": "Organization", "name": "Panterino", "logo": { "@type": "ImageObject", "url": "https://jaguarcode.org/icono.png" } }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "https://jaguarcode.org/" },
+        { "@type": "ListItem", "position": 2, "name": "Guías", "item": "https://jaguarcode.org/guias" },
+        { "@type": "ListItem", "position": 3, "name": "Pseudocódigo, diagramas de flujo y bloques", "item": "https://jaguarcode.org/guias/pseudocodigo-diagrama-de-flujo-y-bloques" }
+      ]
+    },
+    { "@type": "FAQPage", "mainEntity": [{"@type":"Question","name":"¿Qué es mejor, el diagrama de flujo o el pseudocódigo?","acceptedAnswer":{"@type":"Answer","text":"Ninguno es mejor siempre. El diagrama ayuda a entender por dónde va un algoritmo, sobre todo con decisiones y ciclos. El pseudocódigo es más rápido de escribir y corregir, y se parece más a un lenguaje de programación. Lo ideal es saber pasar de uno a otro."}},{"@type":"Question","name":"¿Cuál es la diferencia entre un diagrama de flujo y el pseudocódigo?","acceptedAnswer":{"@type":"Answer","text":"Dicen lo mismo de formas distintas. El pseudocódigo escribe los pasos con palabras, uno por línea. El diagrama de flujo los dibuja con figuras (óvalos, rectángulos, rombos) unidas por flechas que muestran el orden."}},{"@type":"Question","name":"¿Los bloques son solo para niños?","acceptedAnswer":{"@type":"Answer","text":"No. Sirven a cualquiera que esté empezando, porque quitan los errores de escritura y dejan ver la estructura. En un estudio con estudiantes de bachillerato, quienes empezaron con bloques aprendieron más conceptos en las primeras semanas y no tuvieron desventaja al pasar a Java."}},{"@type":"Question","name":"En el examen me piden el diagrama a mano. ¿Me sirve Jaguar?","acceptedAnswer":{"@type":"Answer","text":"Sí. Practica dibujándolo en papel y después escribe el mismo algoritmo en Jaguar para comparar tu dibujo con el diagrama que genera. Si no coinciden, encontraste un error o una forma distinta de resolverlo."}},{"@type":"Question","name":"¿Tengo que aprender los tres?","acceptedAnswer":{"@type":"Answer","text":"Lo que se pide casi siempre es pseudocódigo y diagrama de flujo. Los bloques son opcionales: úsalos si te ayudan a empezar. Lo importante no es el formato, sino entender el algoritmo que está detrás de los tres."}}] }
+  ]
+}
+</script>
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/estilos.css">
+</head>
+<body>
+<header class="sitio-barra">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="/logo.svg" alt="" width="46" height="40">
+      <a class="nombre" href="/">Jaguar Code</a>
+      <a href="/guias">Guías</a>
+      <a href="/retos">Retos</a>
+      <a href="/profes">Para profes</a>
+      <a href="https://github.com/panterino/jaguar">GitHub</a>
+    </div>
+  </div>
+</header>
+<main class="guia">
+  <div class="ancho angosto">
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › <a href="/guias">Guías</a> › Pseudocódigo, diagramas de flujo y bloques</nav>
+    <h1>Pseudocódigo, diagramas de flujo y bloques</h1>
+    <p class="resumen">El pseudocódigo, el diagrama de flujo y los bloques son tres formas de escribir el mismo algoritmo. Cada una deja ver algo distinto, y usarlas juntas hace más fácil entender qué hace un programa y por qué.</p>
+    <nav class="contenido" aria-label="Contenido de la guía"><b>En esta guía</b>
+      <ol>
+        <li><a href="#tres-formas">Un algoritmo, tres formas</a></li>
+        <li><a href="#pseudocodigo">El pseudocódigo: preciso y cerca de programar</a></li>
+        <li><a href="#diagrama">El diagrama de flujo: ver el camino</a></li>
+        <li><a href="#bloques">Los bloques: armar sin errores de escritura</a></li>
+        <li><a href="#comparacion">Comparación rápida</a></li>
+        <li><a href="#juntos">Por qué aprender con los tres a la vez</a></li>
+        <li><a href="#como-usarlos">Cómo usarlos al estudiar o en clase</a></li>
+        <li><a href="#fuentes">Fuentes</a></li>
+        <li><a href="#preguntas">Preguntas frecuentes</a></li>
+      </ol>
+    </nav>
+    <article>
+      <section id="tres-formas">
+        <h2>Un algoritmo, tres formas</h2>
+<p>Este algoritmo pregunta tu edad y te dice si ya puedes votar. Primero, en <b>pseudocódigo</b>: palabras en español, una instrucción por línea.</p>
+<pre class="codigo" data-entradas="15" data-salida="¿Tu edad?&#10;Faltan 3" tabindex="0"><code>Algoritmo puede_votar
+    Escribir "¿Tu edad?"
+    Leer edad
+    Si edad &gt;= 18 Entonces
+        Escribir "Puedes votar"
+    SiNo
+        Escribir "Faltan ", 18 - edad
+    FinSi
+FinAlgoritmo</code></pre>
+<p>El mismo algoritmo como <b>diagrama de flujo</b>. Cada figura es un tipo de paso y las flechas marcan el camino. En el rombo, el camino se divide en dos.</p>
+<figure class="diagrama" style="max-width:624px;overflow-x:auto"><svg style="max-width:584px;min-width:467px" viewBox="0 0 583.2 433.6" width="520" role="img" aria-labelledby="diag-4"><title id="diag-4">Diagrama de flujo de Algoritmo puede_votar</title><g class="linea" stroke-width="1.5" fill="none" stroke-linejoin="round"><path d="M314.4 56L314.4 84"/><path d="M314.4 124L314.4 152"/><path d="M314.4 192L314.4 220"/><path d="M235.1 248L156.2 248L156.2 292.8"/><path d="M393.7 248L449.8 248L449.8 292.8"/><path d="M156.2 332.8L156.2 349.6L314.4 349.6"/><path d="M449.8 332.8L449.8 349.6L314.4 349.6"/><path d="M314.4 349.6L314.4 377.6"/></g><path d="M314.4 84L310.4 76L318.4 76z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M314.4 152L310.4 144L318.4 144z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M314.4 220L310.4 212L318.4 212z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M156.2 292.8L152.2 284.8L160.2 284.8z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M449.8 292.8L445.8 284.8L453.8 284.8z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M314.4 377.6L310.4 369.6L318.4 369.6z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><rect class="ini fig" x="269.4" y="16" width="90" height="40" rx="20"/><text x="314.4" y="40.5" text-anchor="middle">Inicio</text><path class="sal fig" d="M222.4 84 H420.4 L406.4 124 H208.4 z"/><text x="314.4" y="108.5" text-anchor="middle">Escribir "¿Tu edad?"</text><path class="io fig" d="M264.2 152 H378.6 L364.6 192 H250.2 z"/><text x="314.4" y="176.5" text-anchor="middle">Leer edad</text><path class="dec fig" d="M314.4 220 L393.7 248 L314.4 276 L235.1 248 z"/><text x="314.4" y="252.5" text-anchor="middle">edad &gt;= 18</text><path class="sal fig" d="M30 292.8 H296.4 L282.4 332.8 H16 z"/><text x="156.2" y="317.3" text-anchor="middle">Escribir "Faltan ", 18 - edad</text><path class="sal fig" d="M346.4 292.8 H567.2 L553.2 332.8 H332.4 z"/><text x="449.8" y="317.3" text-anchor="middle">Escribir "Puedes votar"</text><rect class="ini fig" x="269.4" y="377.6" width="90" height="40" rx="20"/><text x="314.4" y="402.1" text-anchor="middle">Fin</text><text x="213.1" y="232" font-size="11">No</text><text x="399.7" y="232" font-size="11">Sí</text></svg></figure>
+<p>Y como <b>bloques</b>: piezas de colores que encajan unas dentro de otras. Cada color es un tipo de instrucción, y lo que va dentro del <code>Si</code> queda abrazado por él.</p>
+<figure class="bloques" style="max-width:420px;margin:18px auto"><svg viewBox="0 0 420 312" width="420" role="img" aria-labelledby="bloq-1" style="display:block;width:100%;height:auto"><title id="bloq-1">El algoritmo puede_votar en bloques</title><rect x="6" y="9" width="408" height="40" rx="12" fill="#1B5E20"/><rect x="6" y="6" width="408" height="40" rx="12" fill="#2E7D32"/><text x="20" y="31" fill="#fff" font-weight="800" font-size="13" font-family="Nunito, system-ui, sans-serif">Escribir</text><rect x="90.8" y="14" width="99.6" height="24" rx="7" fill="#fff"/><text x="98.8" y="31" fill="#2E7D32" font-size="13" font-family="ui-monospace, Menlo, Consolas, monospace">&quot;¿Tu edad?&quot;</text><rect x="6" y="57" width="408" height="40" rx="12" fill="#005A8C"/><rect x="6" y="54" width="408" height="40" rx="12" fill="#0077B6"/><text x="20" y="79" fill="#fff" font-weight="800" font-size="13" font-family="Nunito, system-ui, sans-serif">Leer</text><rect x="60.4" y="62" width="46.4" height="24" rx="7" fill="#fff"/><text x="68.4" y="79" fill="#0060A0" font-size="13" font-family="ui-monospace, Menlo, Consolas, monospace">edad</text><rect x="6" y="105" width="408" height="198" rx="12" fill="#633500"/><rect x="6" y="102" width="408" height="198" rx="12" fill="#8A4B00"/><text x="20" y="127" fill="#fff" font-weight="800" font-size="13" font-family="Nunito, system-ui, sans-serif">Si</text><rect x="45.2" y="110" width="92.0" height="24" rx="7" fill="#fff"/><text x="53.2" y="127" fill="#1F1B13" font-size="13" font-family="ui-monospace, Menlo, Consolas, monospace">edad &gt;= 18</text><text x="147.2" y="127" fill="#fff" font-weight="800" font-size="13" font-family="Nunito, system-ui, sans-serif">Entonces</text><rect x="28" y="146" width="386" height="48" rx="8" style="fill:var(--fondo)"/><rect x="28" y="153" width="386" height="40" rx="12" fill="#1B5E20"/><rect x="28" y="150" width="386" height="40" rx="12" fill="#2E7D32"/><text x="42" y="175" fill="#fff" font-weight="800" font-size="13" font-family="Nunito, system-ui, sans-serif">Escribir</text><rect x="112.8" y="158" width="122.4" height="24" rx="7" fill="#fff"/><text x="120.8" y="175" fill="#2E7D32" font-size="13" font-family="ui-monospace, Menlo, Consolas, monospace">&quot;Puedes votar&quot;</text><text x="20" y="219" fill="#fff" font-weight="800" font-size="13" font-family="Nunito, system-ui, sans-serif">SiNo</text><rect x="28" y="232" width="386" height="48" rx="8" style="fill:var(--fondo)"/><rect x="28" y="239" width="386" height="40" rx="12" fill="#1B5E20"/><rect x="28" y="236" width="386" height="40" rx="12" fill="#2E7D32"/><text x="42" y="261" fill="#fff" font-weight="800" font-size="13" font-family="Nunito, system-ui, sans-serif">Escribir</text><rect x="112.8" y="244" width="168.0" height="24" rx="7" fill="#fff"/><text x="120.8" y="261" fill="#2E7D32" font-size="13" font-family="ui-monospace, Menlo, Consolas, monospace">&quot;Faltan &quot;, 18 - edad</text></svg></figure>
+<p>Los tres dicen exactamente lo mismo. No son tres programas: son tres maneras de mirar uno solo. Lo que cambia es <i>qué se ve más fácil</i> en cada una.</p>
+      </section>
+      <section id="pseudocodigo">
+        <h2>El pseudocódigo: preciso y cerca de programar</h2>
+<p>El pseudocódigo es la forma más compacta. Un programa de 30 pasos cabe en una pantalla, se corrige borrando una palabra y se comparte copiando y pegando. Además, se parece mucho a los lenguajes de verdad: <code>Si</code> es <code>if</code>, <code>Mientras</code> es <code>while</code>. Por eso es el formato que más acerca a programar en Python, C o Java.</p>
+<p><b>Lo difícil:</b> hay que escribir bien. Una comilla que falta o un <code>FinSi</code> olvidado detienen todo, y al principio esos errores distraen de lo importante, que es la lógica. También cuesta ver de un vistazo cuántos caminos tiene el programa: un <code>Si</code> dentro de otro <code>Si</code> se nota solo por la sangría.</p>
+<p><b>Conviene cuando:</b> ya entiendes la idea y quieres escribirla completa, cuando el programa es largo o cuando te preparas para pasar a un lenguaje de programación. Si quieres conocerlo a fondo, está la guía <a href="/guias/que-es-el-pseudocodigo">qué es el pseudocódigo</a>.</p>
+      </section>
+      <section id="diagrama">
+        <h2>El diagrama de flujo: ver el camino</h2>
+<p>El diagrama dibuja lo que el pseudocódigo solo dice. Las decisiones se ven como bifurcaciones y los ciclos como flechas que regresan. Con el dedo puedes seguir el camino que tomaría el programa con cierto dato, y eso es justo lo que hace falta para entenderlo.</p>
+<p>Esto tiene respaldo. En un experimento clásico, David Scanlan comparó a estudiantes que leían algoritmos como diagramas de flujo estructurados contra otros que los leían en pseudocódigo. Con los diagramas los entendieron en menos tiempo, se equivocaron menos al responder preguntas sobre ellos y confiaron más en su respuesta. La ventaja creció conforme los algoritmos se hacían más complicados (Scanlan, 1989).</p>
+<p><b>Lo difícil:</b> los diagramas crecen rápido. A mano, un programa con varios ciclos llena una hoja, y corregir un paso en medio obliga a redibujar. Ojo también con lo que mide ese estudio: <i>leer</i> y entender un algoritmo, no escribirlo.</p>
+<p><b>Conviene cuando:</b> estás aprendiendo una estructura nueva (decisiones, ciclos), cuando explicas un algoritmo a alguien o cuando no entiendes por qué tu programa toma el camino que toma. Para aprender a dibujarlos, revisa <a href="/guias/como-hacer-un-diagrama-de-flujo">cómo hacer un diagrama de flujo</a>.</p>
+      </section>
+      <section id="bloques">
+        <h2>Los bloques: armar sin errores de escritura</h2>
+<p>Con bloques no escribes: eliges una pieza y la llenas. No hay comillas que olvidar ni cierres que faltan, porque cada <code>Si</code> ya viene con su forma de C y su <code>SiNo</code>. Además, todas las instrucciones están a la vista: no tienes que recordar cómo se escribe <code>Repetir</code>, la ves en la lista.</p>
+<p>En un estudio de cinco semanas con estudiantes de bachillerato, David Weintrop y Uri Wilensky compararon una versión con bloques y otra con texto del mismo entorno de programación. Quienes usaron bloques aprendieron más conceptos en ese tiempo. Los de texto, en cambio, sentían que lo suyo se parecía más a programar de verdad (Weintrop y Wilensky, 2017). Después, ambos grupos pasaron a Java y, tras 10 semanas, la diferencia desapareció: empezar con bloques no los dejó atrás (Weintrop y Wilensky, 2019).</p>
+<p><b>Lo difícil:</b> armar un programa grande pieza por pieza es más lento que escribirlo, y tarde o temprano hay que pasar a texto. Los bloques son una rampa, no el destino.</p>
+<p><b>Conviene cuando:</b> estás empezando y los errores de escritura te frenan, o cuando quieres concentrarte en el orden de los pasos sin pelear con la sintaxis.</p>
+      </section>
+      <section id="comparacion">
+        <h2>Comparación rápida</h2>
+<div class="tabla"><table><caption>Pseudocódigo, diagrama de flujo y bloques</caption><thead><tr><th scope="col"></th><th scope="col">Pseudocódigo</th><th scope="col">Diagrama de flujo</th><th scope="col">Bloques</th></tr></thead><tbody><tr><td><b>Lo que se ve mejor</b></td><td>Cada paso, completo y en orden</td><td>Los caminos: decisiones y ciclos</td><td>Qué va dentro de qué</td></tr><tr><td><b>Error típico</b></td><td>De escritura: comillas, cierres</td><td>Flechas que no llegan a ningún lado</td><td>Pieza en el lugar equivocado</td></tr><tr><td><b>Programas largos</b></td><td>Bien: es compacto</td><td>Difícil: crece mucho</td><td>Lento de armar</td></tr><tr><td><b>Más útil para</b></td><td>Escribir y pasar a otro lenguaje</td><td>Entender y explicar</td><td>Empezar sin trabarse</td></tr><tr><td><b>En papel</b></td><td>Fácil de escribir</td><td>Tardado de corregir</td><td>No se usa</td></tr></tbody></table></div>
+      </section>
+      <section id="juntos">
+        <h2>Por qué aprender con los tres a la vez</h2>
+<p>La investigación sobre aprender con varias representaciones, como la de Shaaron Ainsworth, explica por qué juntarlas ayuda (Ainsworth, 2006). Cuando ves la misma idea de varias formas, pasan tres cosas:</p>
+<ul>
+  <li><b>Se complementan.</b> Cada formato muestra algo que el otro esconde: el pseudocódigo da el detalle, el diagrama da la forma.</li>
+  <li><b>Se aclaran entre sí.</b> Lo que ya conoces ayuda a leer lo nuevo. Si dudas de qué hace un <code>SiNo</code> escrito, el rombo del diagrama te lo dice.</li>
+  <li><b>Construyen una idea más profunda.</b> Al relacionarlas entiendes lo que tienen en común: el algoritmo, que no es ni el texto ni el dibujo.</li>
+</ul>
+<p>La misma investigación advierte algo: tener varias representaciones no ayuda solo. Lo más difícil para quien empieza es <i>traducir</i> de una a otra, y si nadie lo apoya en eso, más representaciones pueden confundir en vez de ayudar.</p>
+<p>Por eso en Jaguar las tres vistas están conectadas. Cambias una línea de pseudocódigo y el diagrama y los bloques cambian con ella. Tocas una figura del diagrama y ves qué línea es. La traducción que en papel tendrías que hacer tú, aquí la ves hecha y puedes comprobarla. Y cuando ya no la necesitas, usas solo una vista.</p>
+<p>Hay una cuarta forma de mirar el programa: <b>en el tiempo</b>. La <a href="/guias/prueba-de-escritorio">prueba de escritorio</a> muestra qué vale cada variable en cada paso. Así se ve el algoritmo puede_votar cuando escribes 15:</p>
+<div class="tabla"><table><caption>Prueba de escritorio con edad = 15</caption><thead><tr><th scope="col">Paso</th><th scope="col">Línea</th><th scope="col">Instrucción</th><th scope="col">edad</th><th scope="col">Pantalla</th></tr></thead><tbody><tr><td>1</td><td>3</td><td class="instr">Escribir "¿Tu edad?"</td><td></td><td>¿Tu edad?</td></tr><tr><td>2</td><td>4</td><td class="instr">Leer edad</td><td class="cambio">15</td><td></td></tr><tr><td>3</td><td>5</td><td class="instr">Si edad &gt;= 18 Entonces</td><td>15</td><td></td></tr><tr><td>4</td><td>8</td><td class="instr">Escribir "Faltan ", 18 - edad</td><td>15</td><td>Faltan 3</td></tr></tbody></table></div>
+<p>El pseudocódigo dice qué hacer, el diagrama muestra por dónde va, los bloques muestran qué contiene qué, y la prueba de escritorio enseña lo que pasó de verdad.</p>
+      </section>
+      <section id="como-usarlos">
+        <h2>Cómo usarlos al estudiar o en clase</h2>
+<ol>
+  <li><b>Al empezar un tema</b>, mira primero el diagrama: te da la forma general antes de los detalles.</li>
+  <li><b>Si los errores de escritura te frenan</b>, arma el programa en bloques y luego mira cómo queda escrito.</li>
+  <li><b>Para la tarea o el examen</b>, escribe en pseudocódigo: es lo que más se pide y lo más cercano a programar.</li>
+  <li><b>Cuando algo no sale</b>, haz la prueba de escritorio: casi siempre muestra en qué paso se rompe la lógica.</li>
+</ol>
+<p>Si das clase, tres actividades que funcionan bien:</p>
+<ul>
+  <li><b>Del diagrama al código.</b> Muestra un diagrama y pide el pseudocódigo. Luego comparan con la vista de Jaguar.</li>
+  <li><b>Del código al diagrama, a mano.</b> Pide dibujar el diagrama en papel y después revisarlo contra el que genera Jaguar. Las diferencias son la discusión.</li>
+  <li><b>Predecir antes de ejecutar.</b> Con la prueba de escritorio en modo Practicar, cada quien llena la tabla y Jaguar revisa cada celda.</li>
+</ul>
+      </section>
+      <section id="fuentes">
+        <h2>Fuentes</h2>
+<ul class="fuentes">
+  <li>Ainsworth, S. (2006). DeFT: A conceptual framework for considering learning with multiple representations. <i>Learning and Instruction, 16</i>(3), 183–198. <a href="https://doi.org/10.1016/j.learninstruc.2006.03.001">doi.org/10.1016/j.learninstruc.2006.03.001</a></li>
+  <li>Scanlan, D. A. (1989). Structured flowcharts outperform pseudocode: an experimental comparison. <i>IEEE Software, 6</i>(5), 28–36. <a href="https://doi.org/10.1109/52.35587">doi.org/10.1109/52.35587</a></li>
+  <li>Weintrop, D. y Wilensky, U. (2017). Comparing block-based and text-based programming in high school computer science classrooms. <i>ACM Transactions on Computing Education, 18</i>(1), artículo 3. <a href="https://ccl.northwestern.edu/2017/a3_weintrop_wilensky.pdf">PDF</a></li>
+  <li>Weintrop, D. y Wilensky, U. (2019). Transitioning from introductory block-based and text-based environments to professional programming languages in high school computer science classrooms. <i>Computers &amp; Education, 142</i>, 103646. <a href="https://www.terpconnect.umd.edu/~weintrop/papers/Weintrop&amp;Wilensky_2019_C&amp;E.pdf">PDF</a></li>
+</ul>
+      </section>
+      <section id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+        <details><summary>¿Qué es mejor, el diagrama de flujo o el pseudocódigo?</summary><p>Ninguno es mejor siempre. El diagrama ayuda a entender por dónde va un algoritmo, sobre todo con decisiones y ciclos. El pseudocódigo es más rápido de escribir y corregir, y se parece más a un lenguaje de programación. Lo ideal es saber pasar de uno a otro.</p></details>
+        <details><summary>¿Cuál es la diferencia entre un diagrama de flujo y el pseudocódigo?</summary><p>Dicen lo mismo de formas distintas. El pseudocódigo escribe los pasos con palabras, uno por línea. El diagrama de flujo los dibuja con figuras (óvalos, rectángulos, rombos) unidas por flechas que muestran el orden.</p></details>
+        <details><summary>¿Los bloques son solo para niños?</summary><p>No. Sirven a cualquiera que esté empezando, porque quitan los errores de escritura y dejan ver la estructura. En un estudio con estudiantes de bachillerato, quienes empezaron con bloques aprendieron más conceptos en las primeras semanas y no tuvieron desventaja al pasar a Java.</p></details>
+        <details><summary>En el examen me piden el diagrama a mano. ¿Me sirve Jaguar?</summary><p>Sí. Practica dibujándolo en papel y después escribe el mismo algoritmo en Jaguar para comparar tu dibujo con el diagrama que genera. Si no coinciden, encontraste un error o una forma distinta de resolverlo.</p></details>
+        <details><summary>¿Tengo que aprender los tres?</summary><p>Lo que se pide casi siempre es pseudocódigo y diagrama de flujo. Los bloques son opcionales: úsalos si te ayudan a empezar. Lo importante no es el formato, sino entender el algoritmo que está detrás de los tres.</p></details>
+      </section>
+    </article>
+<aside class="cta-guia" aria-labelledby="cta-t">
+  <h2 id="cta-t">Practica esto en Jaguar Code</h2>
+  <p>Escribe pseudocódigo, mira su diagrama y haz la prueba de escritorio desde el celular. Gratis, sin anuncios y sin cuenta.</p>
+  <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir la app</a></div>
+  <p class="aviso-prueba"><b>Acceso abierto antes del lanzamiento.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo. Lanzamiento oficial: 11 de enero de 2027.</p>
+</aside>
+    <h2 style="margin-top:44px">Sigue aprendiendo</h2>
+    <div class="relacionadas">
+      <a href="/guias/que-es-el-pseudocodigo">Qué es el pseudocódigo<small>El pseudocódigo es una forma de escribir un algoritmo con palabras parecidas a las de un lenguaje de programación, pero sin reglas estrictas de sintaxis.</small></a>
+      <a href="/guias/como-hacer-un-diagrama-de-flujo">Cómo hacer un diagrama de flujo<small>Un diagrama de flujo representa un algoritmo con figuras unidas por flechas.</small></a>
+      <a href="/guias/prueba-de-escritorio">La prueba de escritorio<small>La prueba de escritorio es seguir un algoritmo a mano, línea por línea, anotando en una tabla cuánto vale cada variable en cada paso.</small></a>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="ancho">
+    <span class="quien"><img src="/logo.svg" alt="" width="30" height="26">Un proyecto de Panterino · hecho en México</span>
+    <a href="/guias">Guías</a>
+    <a href="/retos">Retos</a>
+    <a href="/descargas">Descargas</a>
+    <a href="/manual">Manual</a>
+    <a href="https://www.facebook.com/jaguareducation">Facebook</a>
+    <a href="https://github.com/panterino/jaguar">Código en GitHub</a>
+    <a href="#" data-analitica-cambiar>Analítica</a>
+  </div>
+</footer>
+<script src="/acceso.js" defer></script>
+<script src="/analitica.js" defer></script>
+</body>
+</html>

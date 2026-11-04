@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arreglos en pseudocódigo: Dimension, recorrer, sumar y buscar (con ejemplos)</title>
+<meta name="description" content="Qué es un arreglo (vector) en pseudocódigo, cómo crearlo con Dimension, llenarlo, recorrerlo con Para, sumar, buscar el mayor y usar matrices. Ejemplos ejecutables.">
+<link rel="canonical" href="https://jaguarcode.org/guias/arreglos-en-pseudocodigo">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="apple-touch-icon" href="/icono.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Jaguar Code">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://jaguarcode.org/guias/arreglos-en-pseudocodigo">
+<meta property="og:title" content="Arreglos en pseudocódigo: Dimension, recorrer, sumar y buscar (con ejemplos)">
+<meta property="og:description" content="Qué es un arreglo (vector) en pseudocódigo, cómo crearlo con Dimension, llenarlo, recorrerlo con Para, sumar, buscar el mayor y usar matrices. Ejemplos ejecutables.">
+<meta property="og:image" content="https://jaguarcode.org/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Arreglos en pseudocódigo: Dimension, recorrer, sumar y buscar (con ejemplos)">
+<meta name="twitter:description" content="Qué es un arreglo (vector) en pseudocódigo, cómo crearlo con Dimension, llenarlo, recorrerlo con Para, sumar, buscar el mayor y usar matrices. Ejemplos ejecutables.">
+<meta name="twitter:image" content="https://jaguarcode.org/compartir.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://jaguarcode.org/guias/arreglos-en-pseudocodigo#articulo",
+      "headline": "Arreglos en pseudocódigo: Dimension, recorrer, sumar y buscar (con ejemplos)",
+      "description": "Qué es un arreglo (vector) en pseudocódigo, cómo crearlo con Dimension, llenarlo, recorrerlo con Para, sumar, buscar el mayor y usar matrices. Ejemplos ejecutables.",
+      "inLanguage": "es-MX",
+      "datePublished": "2026-11-03",
+      "dateModified": "2026-11-03",
+      "mainEntityOfPage": "https://jaguarcode.org/guias/arreglos-en-pseudocodigo",
+      "image": "https://jaguarcode.org/compartir.png",
+      "author": { "@type": "Organization", "name": "Panterino", "url": "https://jaguarcode.org/" },
+      "publisher": { "@type": "Organization", "name": "Panterino", "logo": { "@type": "ImageObject", "url": "https://jaguarcode.org/icono.png" } }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "https://jaguarcode.org/" },
+        { "@type": "ListItem", "position": 2, "name": "Guías", "item": "https://jaguarcode.org/guias" },
+        { "@type": "ListItem", "position": 3, "name": "Arreglos en pseudocódigo", "item": "https://jaguarcode.org/guias/arreglos-en-pseudocodigo" }
+      ]
+    },
+    { "@type": "FAQPage", "mainEntity": [{"@type":"Question","name":"¿Qué es un arreglo en pseudocódigo?","acceptedAnswer":{"@type":"Answer","text":"Es una variable que guarda varios valores del mismo tipo, cada uno en una posición numerada. Por ejemplo, un arreglo de 30 casillas puede guardar las calificaciones de todo un grupo."}},{"@type":"Question","name":"¿Arreglo y vector son lo mismo?","acceptedAnswer":{"@type":"Answer","text":"Sí. Un arreglo de una dimensión también se llama vector. Uno de dos dimensiones, con filas y columnas, se llama matriz."}},{"@type":"Question","name":"¿Los arreglos empiezan en 0 o en 1?","acceptedAnswer":{"@type":"Answer","text":"En PSeInt (perfil flexible) y en Jaguar empiezan en 1. En la mayoría de los lenguajes de programación, como Python, C y Java, empiezan en 0. Al traducir un algoritmo hay que ajustar las posiciones."}},{"@type":"Question","name":"¿Puedo guardar textos en un arreglo?","acceptedAnswer":{"@type":"Answer","text":"Sí. Un arreglo puede guardar números, textos o valores lógicos. Lo normal es que todas las casillas sean del mismo tipo."}}] }
+  ]
+}
+</script>
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/estilos.css">
+</head>
+<body>
+<header class="sitio-barra">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="/logo.svg" alt="" width="46" height="40">
+      <a class="nombre" href="/">Jaguar Code</a>
+      <a href="/guias">Guías</a>
+      <a href="/retos">Retos</a>
+      <a href="/profes">Para profes</a>
+      <a href="https://github.com/panterino/jaguar">GitHub</a>
+    </div>
+  </div>
+</header>
+<main class="guia">
+  <div class="ancho angosto">
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › <a href="/guias">Guías</a> › Arreglos en pseudocódigo</nav>
+    <h1>Arreglos en pseudocódigo</h1>
+    <p class="resumen">Un arreglo es una variable que guarda varios valores del mismo tipo, cada uno en una posición numerada. Se crea con Dimension y se recorre con un ciclo Para.</p>
+    <nav class="contenido" aria-label="Contenido de la guía"><b>En esta guía</b>
+      <ol>
+        <li><a href="#que-es">Qué es un arreglo</a></li>
+        <li><a href="#dimension">Crear un arreglo con Dimension</a></li>
+        <li><a href="#recorrer">Llenar y recorrer con Para</a></li>
+        <li><a href="#mayor">Ejemplo: encontrar el mayor</a></li>
+        <li><a href="#buscar">Ejemplo: buscar un valor</a></li>
+        <li><a href="#matrices">Matrices: arreglos de dos dimensiones</a></li>
+        <li><a href="#errores">Errores comunes</a></li>
+        <li><a href="#preguntas">Preguntas frecuentes</a></li>
+      </ol>
+    </nav>
+    <article>
+      <section id="que-es">
+        <h2>Qué es un arreglo</h2>
+<p>Si un programa necesita las calificaciones de 30 alumnos, crear 30 variables (<code>c1</code>, <code>c2</code>, …, <code>c30</code>) es impráctico. Un <b>arreglo</b> (también llamado vector) es una sola variable con muchas casillas numeradas. Cada casilla guarda un valor y se identifica por su <b>posición</b> o índice.</p>
+<div class="tabla"><table><caption>El arreglo calif con 5 casillas</caption><thead><tr><th scope="col">Posición</th><th scope="col">1</th><th scope="col">2</th><th scope="col">3</th><th scope="col">4</th><th scope="col">5</th></tr></thead><tbody><tr><td><b>Valor</b></td><td>8</td><td>10</td><td>6</td><td>9</td><td>7</td></tr></tbody></table></div>
+<p><code>calif[3]</code> se lee «calif en la posición 3» y vale 6. En PSeInt y en Jaguar las posiciones empiezan en 1. En lenguajes como Python, C o Java empiezan en 0: tenlo en cuenta cuando pases tu algoritmo a uno de ellos.</p>
+      </section>
+      <section id="dimension">
+        <h2>Crear un arreglo con Dimension</h2>
+<p>Antes de usar un arreglo hay que decir cuántas casillas tiene, con <code>Dimension</code>. Después, cada casilla se usa como una variable normal:</p>
+<pre class="codigo" data-salida="El segundo día es martes" tabindex="0"><code>Algoritmo primer_arreglo
+    Dimension dias[3]
+    dias[1] &lt;- "lunes"
+    dias[2] &lt;- "martes"
+    dias[3] &lt;- "miércoles"
+    Escribir "El segundo día es ", dias[2]
+FinAlgoritmo</code></pre>
+<p>Si usas una posición que no existe, como <code>dias[4]</code>, Jaguar se detiene con el mensaje «La posición 4 está fuera del arreglo 'dias'» y te recuerda que las posiciones válidas van de 1 a 3.</p>
+      </section>
+      <section id="recorrer">
+        <h2>Llenar y recorrer con Para</h2>
+<p>Lo que hace útiles a los arreglos es combinarlos con un ciclo <code>Para</code>. La variable del ciclo sirve de posición, así que con tres líneas lees o muestras todas las casillas:</p>
+<pre class="codigo" data-entradas="8|10|6|9|7" data-salida="Calificación 1:&#10;Calificación 2:&#10;Calificación 3:&#10;Calificación 4:&#10;Calificación 5:&#10;Promedio: 8&#10;Arriba del promedio:&#10;10&#10;9" tabindex="0"><code>Algoritmo promedio_grupo
+    Dimension calif[5]
+    suma &lt;- 0
+    Para i &lt;- 1 Hasta 5 Hacer
+        Escribir "Calificación ", i, ":"
+        Leer calif[i]
+        suma &lt;- suma + calif[i]
+    FinPara
+    promedio &lt;- suma / 5
+    Escribir "Promedio: ", promedio
+    Escribir "Arriba del promedio:"
+    Para i &lt;- 1 Hasta 5 Hacer
+        Si calif[i] &gt; promedio Entonces
+            Escribir calif[i]
+        FinSi
+    FinPara
+FinAlgoritmo</code></pre>
+<p>Este ejemplo muestra por qué se necesita el arreglo: para saber qué calificaciones están arriba del promedio, primero hay que conocerlas todas. Sin arreglo, al leer la quinta ya habrías perdido las anteriores.</p>
+<p>Para solo leer los valores, sin necesitar la posición, también existe <code>Para Cada</code>:</p>
+<pre class="codigo" data-salida="Total: 45" tabindex="0"><code>Algoritmo para_cada
+    Dimension precios[3]
+    precios[1] &lt;- 15
+    precios[2] &lt;- 22
+    precios[3] &lt;- 8
+    total &lt;- 0
+    Para Cada p de precios Hacer
+        total &lt;- total + p
+    FinPara
+    Escribir "Total: ", total
+FinAlgoritmo</code></pre>
+      </section>
+      <section id="mayor">
+        <h2>Ejemplo: encontrar el mayor</h2>
+<p>Un ejercicio clásico: encontrar el valor más alto. La idea es suponer que el primero es el mayor y compararlo con cada uno de los demás. Si aparece uno más grande, se vuelve el nuevo mayor:</p>
+<pre class="codigo" data-entradas="24|31|28|35|30" data-salida="La más alta: 35" tabindex="0"><code>Algoritmo mayor_del_arreglo
+    Dimension temp[5]
+    Para i &lt;- 1 Hasta 5 Hacer
+        Leer temp[i]
+    FinPara
+    mayor &lt;- temp[1]
+    Para i &lt;- 2 Hasta 5 Hacer
+        Si temp[i] &gt; mayor Entonces
+            mayor &lt;- temp[i]
+        FinSi
+    FinPara
+    Escribir "La más alta: ", mayor
+FinAlgoritmo</code></pre>
+<p>¿Por qué empezar con <code>temp[1]</code> y no con 0? Porque si todas las temperaturas fueran negativas, 0 sería «el mayor» sin estar en el arreglo. Empezar con un valor del propio arreglo funciona siempre. Para el menor, es igual pero con <code>&lt;</code>.</p>
+      </section>
+      <section id="buscar">
+        <h2>Ejemplo: buscar un valor</h2>
+<p>Para saber si un valor está en el arreglo, se recorre casilla por casilla. Una variable lógica recuerda si ya se encontró:</p>
+<pre class="codigo" data-entradas="Sofía" data-salida="Está en la posición 3" tabindex="0"><code>Algoritmo buscar
+    Dimension nombres[4]
+    nombres[1] &lt;- "Ana"
+    nombres[2] &lt;- "Luis"
+    nombres[3] &lt;- "Sofía"
+    nombres[4] &lt;- "Mateo"
+    Leer buscado
+    encontrado &lt;- Falso
+    Para i &lt;- 1 Hasta 4 Hacer
+        Si nombres[i] = buscado Entonces
+            Escribir "Está en la posición ", i
+            encontrado &lt;- Verdadero
+        FinSi
+    FinPara
+    Si NO encontrado Entonces
+        Escribir "No está en la lista"
+    FinSi
+FinAlgoritmo</code></pre>
+<p>A esto se le llama <b>búsqueda lineal</b> o secuencial. Es la más sencilla y funciona aunque el arreglo no esté ordenado.</p>
+      </section>
+      <section id="matrices">
+        <h2>Matrices: arreglos de dos dimensiones</h2>
+<p>Un arreglo también puede tener filas y columnas, como una tabla. Se crea con dos tamaños, <code>Dimension m[filas, columnas]</code>, y se recorre con un <code>Para</code> dentro de otro:</p>
+<pre class="codigo" data-salida="1 2 3 4&#10;2 4 6 8&#10;3 6 9 12" tabindex="0"><code>Algoritmo tablas_de_multiplicar
+    Dimension m[3, 4]
+    Para f &lt;- 1 Hasta 3 Hacer
+        Para c &lt;- 1 Hasta 4 Hacer
+            m[f, c] &lt;- f * c
+        FinPara
+    FinPara
+    Para f &lt;- 1 Hasta 3 Hacer
+        Escribir m[f, 1], " ", m[f, 2], " ", m[f, 3], " ", m[f, 4]
+    FinPara
+FinAlgoritmo</code></pre>
+<p>El ciclo de afuera recorre las filas y el de adentro las columnas de cada fila. Por cada vuelta del <code>Para</code> externo, el interno da todas las suyas.</p>
+      </section>
+      <section id="errores">
+        <h2>Errores comunes</h2>
+<ul>
+  <li><b>Usar el arreglo sin <code>Dimension</code>.</b> Primero se crea y luego se usa.</li>
+  <li><b>Empezar en 0.</b> En PSeInt flexible y en Jaguar, la primera posición es 1. <code>Para i &lt;- 0 Hasta 5</code> sobre un arreglo de 5 se sale de los límites.</li>
+  <li><b>Dimensionar dos veces</b> el mismo arreglo. Jaguar avisa: «El arreglo 'calif' ya fue dimensionado».</li>
+  <li><b>Escribir el arreglo completo</b> con <code>Escribir calif</code>. Hay que mostrar casilla por casilla, con un ciclo.</li>
+  <li><b>Confundir la posición con el valor.</b> En <code>calif[3]</code>, el 3 es la posición; el valor es lo que hay guardado ahí.</li>
+</ul>
+      </section>
+      <section id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+        <details><summary>¿Qué es un arreglo en pseudocódigo?</summary><p>Es una variable que guarda varios valores del mismo tipo, cada uno en una posición numerada. Por ejemplo, un arreglo de 30 casillas puede guardar las calificaciones de todo un grupo.</p></details>
+        <details><summary>¿Arreglo y vector son lo mismo?</summary><p>Sí. Un arreglo de una dimensión también se llama vector. Uno de dos dimensiones, con filas y columnas, se llama matriz.</p></details>
+        <details><summary>¿Los arreglos empiezan en 0 o en 1?</summary><p>En PSeInt (perfil flexible) y en Jaguar empiezan en 1. En la mayoría de los lenguajes de programación, como Python, C y Java, empiezan en 0. Al traducir un algoritmo hay que ajustar las posiciones.</p></details>
+        <details><summary>¿Puedo guardar textos en un arreglo?</summary><p>Sí. Un arreglo puede guardar números, textos o valores lógicos. Lo normal es que todas las casillas sean del mismo tipo.</p></details>
+      </section>
+    </article>
+<aside class="cta-guia" aria-labelledby="cta-t">
+  <h2 id="cta-t">Practica esto en Jaguar Code</h2>
+  <p>Escribe pseudocódigo, mira su diagrama y haz la prueba de escritorio desde el celular. Gratis, sin anuncios y sin cuenta.</p>
+  <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir la app</a></div>
+  <p class="aviso-prueba"><b>Acceso abierto antes del lanzamiento.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo. Lanzamiento oficial: 11 de enero de 2027.</p>
+</aside>
+    <h2 style="margin-top:44px">Sigue aprendiendo</h2>
+    <div class="relacionadas">
+      <a href="/guias/ciclos-mientras-para-repetir">Ciclos en pseudocódigo: Mientras, Para y Repetir<small>Un ciclo repite un grupo de instrucciones.</small></a>
+      <a href="/guias/variables-y-tipos-de-datos">Variables, tipos de datos y operadores<small>Una variable es un espacio con nombre donde el programa guarda un dato.</small></a>
+      <a href="/guias/de-pseudocodigo-a-python">De pseudocódigo a Python<small>Si ya sabes pseudocódigo, ya sabes la parte difícil de programar: la lógica.</small></a>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="ancho">
+    <span class="quien"><img src="/logo.svg" alt="" width="30" height="26">Un proyecto de Panterino · hecho en México</span>
+    <a href="/guias">Guías</a>
+    <a href="/retos">Retos</a>
+    <a href="/descargas">Descargas</a>
+    <a href="/manual">Manual</a>
+    <a href="https://www.facebook.com/jaguareducation">Facebook</a>
+    <a href="https://github.com/panterino/jaguar">Código en GitHub</a>
+    <a href="#" data-analitica-cambiar>Analítica</a>
+  </div>
+</footer>
+<script src="/acceso.js" defer></script>
+<script src="/analitica.js" defer></script>
+</body>
+</html>

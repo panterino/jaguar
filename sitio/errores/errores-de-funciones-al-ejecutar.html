@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Error «Demasiadas llamadas a funciones» y «terminó sin darle un valor»: cómo arreglarlo</title>
+<meta name="description" content="Qué significan los errores «Demasiadas llamadas a funciones, una dentro de otra» y «La función … terminó sin darle un valor a …» en pseudocódigo, y cómo arreglarlos.">
+<link rel="canonical" href="https://jaguarcode.org/errores/errores-de-funciones-al-ejecutar">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="apple-touch-icon" href="/icono.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Jaguar Code">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://jaguarcode.org/errores/errores-de-funciones-al-ejecutar">
+<meta property="og:title" content="Error «Demasiadas llamadas a funciones» y «terminó sin darle un valor»: cómo arreglarlo">
+<meta property="og:description" content="Qué significan los errores «Demasiadas llamadas a funciones, una dentro de otra» y «La función … terminó sin darle un valor a …» en pseudocódigo, y cómo arreglarlos.">
+<meta property="og:image" content="https://jaguarcode.org/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Error «Demasiadas llamadas a funciones» y «terminó sin darle un valor»: cómo arreglarlo">
+<meta name="twitter:description" content="Qué significan los errores «Demasiadas llamadas a funciones, una dentro de otra» y «La función … terminó sin darle un valor a …» en pseudocódigo, y cómo arreglarlos.">
+<meta name="twitter:image" content="https://jaguarcode.org/compartir.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://jaguarcode.org/errores/errores-de-funciones-al-ejecutar#articulo",
+      "headline": "Error «Demasiadas llamadas a funciones» y «terminó sin darle un valor»: cómo arreglarlo",
+      "description": "Qué significan los errores «Demasiadas llamadas a funciones, una dentro de otra» y «La función … terminó sin darle un valor a …» en pseudocódigo, y cómo arreglarlos.",
+      "inLanguage": "es-MX",
+      "datePublished": "2026-11-05",
+      "dateModified": "2026-11-05",
+      "mainEntityOfPage": "https://jaguarcode.org/errores/errores-de-funciones-al-ejecutar",
+      "image": "https://jaguarcode.org/compartir.png",
+      "author": { "@type": "Organization", "name": "Panterino", "url": "https://jaguarcode.org/" },
+      "publisher": { "@type": "Organization", "name": "Panterino", "logo": { "@type": "ImageObject", "url": "https://jaguarcode.org/icono.png" } }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "https://jaguarcode.org/" },
+        { "@type": "ListItem", "position": 2, "name": "Errores", "item": "https://jaguarcode.org/errores" },
+        { "@type": "ListItem", "position": 3, "name": "Errores de funciones al ejecutar: recursión sin fin y funciones sin valor", "item": "https://jaguarcode.org/errores/errores-de-funciones-al-ejecutar" }
+      ]
+    },
+    { "@type": "FAQPage", "mainEntity": [{"@type":"Question","name":"¿Cuántas llamadas aguanta Jaguar?","acceptedAnswer":{"@type":"Answer","text":"Hasta 200 llamadas, una dentro de otra. Una recursión legítima, como sumar hasta 190, funciona sin problema."}},{"@type":"Question","name":"¿Puedo evitar la recursión?","acceptedAnswer":{"@type":"Answer","text":"Casi siempre sí: un ciclo Para o Mientras hace lo mismo. La recursión es una forma más corta de escribir ciertos problemas, pero no es obligatoria."}}] }
+  ]
+}
+</script>
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/estilos.css">
+</head>
+<body>
+<header class="sitio-barra">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="/logo.svg" alt="" width="46" height="40">
+      <a class="nombre" href="/">Jaguar Code</a>
+      <a href="/guias">Guías</a>
+      <a href="/retos">Retos</a>
+      <a href="/profes">Para profes</a>
+      <a href="https://github.com/panterino/jaguar">GitHub</a>
+    </div>
+  </div>
+</header>
+<main class="guia">
+  <div class="ancho angosto">
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › <a href="/errores">Errores</a> › Errores de funciones al ejecutar: recursión sin fin y funciones sin valor</nav>
+    <h1>Errores de funciones al ejecutar: recursión sin fin y funciones sin valor</h1>
+    <p class="resumen">Estos errores aparecen cuando una función se llama a sí misma sin parar (le falta el caso base) o cuando una función termina sin haberle dado valor a lo que debía devolver.</p>
+    <nav class="contenido" aria-label="Contenido de la página"><b>En esta página</b>
+      <ol>
+        <li><a href="#que-significa">Qué significa</a></li>
+        <li><a href="#ejemplos">Ejemplos y cómo arreglarlos</a></li>
+        <li><a href="#causas">Por qué aparece</a></li>
+        <li><a href="#evitarlo">Cómo evitarlo</a></li>
+        <li><a href="#preguntas">Preguntas frecuentes</a></li>
+      </ol>
+    </nav>
+    <article>
+      <section id="que-significa">
+        <h2>Qué significa</h2>
+<p class="aviso-error" role="note"><b>Error al ejecutar en la línea 2</b><br>Demasiadas llamadas a funciones, una dentro de otra. ¿Una función recursiva que nunca llega a su caso base?</p>
+<p>Una función puede llamarse a sí misma; a eso se le llama <b>recursión</b>. Para que funcione, necesita un <b>caso base</b>: una situación en la que ya no se llama más y responde directo. Sin caso base, las llamadas se apilan una dentro de otra sin fin, y Jaguar se detiene al llegar a un límite.</p>
+<p>El otro error es más sencillo: una función con valor de retorno (<code>Funcion r &lt;- doble(n)</code>) tiene que darle un valor a <code>r</code> antes de terminar.</p>
+      </section>
+      <section id="ejemplos">
+        <h2>Ejemplos y cómo arreglarlos</h2>
+<h3>Recursión sin caso base</h3>
+<pre class="codigo" data-error="Demasiadas llamadas a funciones, una dentro de otra." tabindex="0"><code>Funcion r &lt;- f(n)
+    r &lt;- f(n + 1)
+FinFuncion
+
+Algoritmo a
+    Escribir f(1)
+FinAlgoritmo</code></pre>
+<p>Esta función siempre se llama a sí misma. Agrega el caso base, el momento en que responde sin llamar de nuevo:</p>
+<pre class="codigo" data-salida="10" tabindex="0"><code>Funcion r &lt;- suma(n)
+    Si n = 0 Entonces
+        r &lt;- 0
+    SiNo
+        r &lt;- n + suma(n - 1)
+    FinSi
+FinFuncion
+
+Algoritmo a
+    Escribir suma(4)
+FinAlgoritmo</code></pre>
+<h3>Una función que no devuelve nada</h3>
+<pre class="codigo" data-error="La función 'doble' terminó sin darle un valor a 'r'." tabindex="0"><code>Funcion r &lt;- doble(n)
+    n &lt;- n * 2
+FinFuncion
+
+Algoritmo a
+    Escribir doble(4)
+FinAlgoritmo</code></pre>
+<p class="aviso-error" role="note"><b>Error al ejecutar en la línea 5</b><br>La función 'doble' terminó sin darle un valor a 'r'.</p>
+<p>El resultado hay que guardarlo en <code>r</code>, el nombre que va después de <code>Funcion</code>:</p>
+<pre class="codigo" data-salida="8" tabindex="0"><code>Funcion r &lt;- doble(n)
+    r &lt;- n * 2
+FinFuncion
+
+Algoritmo a
+    Escribir doble(4)
+FinAlgoritmo</code></pre>
+
+      </section>
+      <section id="causas">
+        <h2>Por qué aparece</h2>
+<ul>
+  <li>La recursión no tiene caso base, o el caso base nunca se alcanza porque el valor se aleja en vez de acercarse.</li>
+  <li>Se llama a la función con el mismo dato una y otra vez.</li>
+  <li>Se escribió el resultado en otra variable y no en la que nombra la función.</li>
+  <li>El valor se asigna dentro de un <code>Si</code> que no siempre se cumple.</li>
+</ul>
+      </section>
+      <section id="evitarlo">
+        <h2>Cómo evitarlo</h2>
+<p>Escribe primero el caso base y después el caso que se llama a sí mismo, y comprueba que cada llamada se acerca un paso al caso base: <code>n - 1</code> se acerca a 0, <code>n + 1</code> se aleja. Para las funciones normales, que el nombre del resultado siempre reciba un valor, con un <code>SiNo</code> si hace falta.</p>
+      </section>
+      <section id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+        <details><summary>¿Cuántas llamadas aguanta Jaguar?</summary><p>Hasta 200 llamadas, una dentro de otra. Una recursión legítima, como sumar hasta 190, funciona sin problema.</p></details>
+        <details><summary>¿Puedo evitar la recursión?</summary><p>Casi siempre sí: un ciclo Para o Mientras hace lo mismo. La recursión es una forma más corta de escribir ciertos problemas, pero no es obligatoria.</p></details>
+      </section>
+    </article>
+<aside class="cta-guia" aria-labelledby="cta-t">
+  <h2 id="cta-t">Practica esto en Jaguar Code</h2>
+  <p>Escribe pseudocódigo, mira su diagrama y haz la prueba de escritorio desde el celular. Gratis, sin anuncios y sin cuenta.</p>
+  <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir la app</a></div>
+  <p class="aviso-prueba"><b>Acceso abierto antes del lanzamiento.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo. Lanzamiento oficial: 11 de enero de 2027.</p>
+</aside>
+    <h2 style="margin-top:44px">Sigue aprendiendo</h2>
+    <div class="relacionadas">
+      <a href="/errores/errores-al-usar-funciones">Errores al usar funciones y subprocesos<small>Al usar una función hay que llamarla con su nombre exacto y con el número de valores que espera.</small></a>
+      <a href="/guias/funciones-y-subprocesos-en-pseudocodigo">Funciones y subprocesos en pseudocódigo<small>Una función es un pedazo de programa con nombre que puedes usar muchas veces.</small></a>
+      <a href="/errores/demasiados-pasos-ciclo-infinito">«El programa se detuvo porque llevaba demasiados pasos»<small>Este error aparece cuando un ciclo nunca termina, casi siempre porque dentro del ciclo no cambia nada que haga falsa la condición.</small></a>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="ancho">
+    <span class="quien"><img src="/logo.svg" alt="" width="30" height="26">Un proyecto de Panterino · hecho en México</span>
+    <a href="/guias">Guías</a>
+    <a href="/retos">Retos</a>
+    <a href="/descargas">Descargas</a>
+    <a href="/manual">Manual</a>
+    <a href="https://www.facebook.com/jaguareducation">Facebook</a>
+    <a href="https://github.com/panterino/jaguar">Código en GitHub</a>
+    <a href="#" data-analitica-cambiar>Analítica</a>
+  </div>
+</footer>
+<script src="/acceso.js" defer></script>
+<script src="/analitica.js" defer></script>
+</body>
+</html>

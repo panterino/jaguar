@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Error «No reconozco el carácter» en pseudocódigo: qué significa y cómo arreglarlo</title>
+<meta name="description" content="Qué significa el error «No reconozco el carácter …» en pseudocódigo, qué símbolos sí se pueden usar fuera de los textos y cómo arreglarlo.">
+<link rel="canonical" href="https://jaguarcode.org/errores/no-reconozco-el-caracter">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="apple-touch-icon" href="/icono.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Jaguar Code">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://jaguarcode.org/errores/no-reconozco-el-caracter">
+<meta property="og:title" content="Error «No reconozco el carácter» en pseudocódigo: qué significa y cómo arreglarlo">
+<meta property="og:description" content="Qué significa el error «No reconozco el carácter …» en pseudocódigo, qué símbolos sí se pueden usar fuera de los textos y cómo arreglarlo.">
+<meta property="og:image" content="https://jaguarcode.org/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Error «No reconozco el carácter» en pseudocódigo: qué significa y cómo arreglarlo">
+<meta name="twitter:description" content="Qué significa el error «No reconozco el carácter …» en pseudocódigo, qué símbolos sí se pueden usar fuera de los textos y cómo arreglarlo.">
+<meta name="twitter:image" content="https://jaguarcode.org/compartir.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://jaguarcode.org/errores/no-reconozco-el-caracter#articulo",
+      "headline": "Error «No reconozco el carácter» en pseudocódigo: qué significa y cómo arreglarlo",
+      "description": "Qué significa el error «No reconozco el carácter …» en pseudocódigo, qué símbolos sí se pueden usar fuera de los textos y cómo arreglarlo.",
+      "inLanguage": "es-MX",
+      "datePublished": "2026-11-03",
+      "dateModified": "2026-11-03",
+      "mainEntityOfPage": "https://jaguarcode.org/errores/no-reconozco-el-caracter",
+      "image": "https://jaguarcode.org/compartir.png",
+      "author": { "@type": "Organization", "name": "Panterino", "url": "https://jaguarcode.org/" },
+      "publisher": { "@type": "Organization", "name": "Panterino", "logo": { "@type": "ImageObject", "url": "https://jaguarcode.org/icono.png" } }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "https://jaguarcode.org/" },
+        { "@type": "ListItem", "position": 2, "name": "Errores", "item": "https://jaguarcode.org/errores" },
+        { "@type": "ListItem", "position": 3, "name": "No reconozco el carácter", "item": "https://jaguarcode.org/errores/no-reconozco-el-caracter" }
+      ]
+    },
+    { "@type": "FAQPage", "mainEntity": [{"@type":"Question","name":"¿Puedo usar acentos y la ñ en los nombres de variables?","acceptedAnswer":{"@type":"Answer","text":"Sí. Jaguar acepta nombres como año o número. Eso sí, año y ano son dos variables distintas: escribe el nombre siempre igual."}},{"@type":"Question","name":"¿Qué símbolo uso para el porcentaje?","acceptedAnswer":{"@type":"Answer","text":"En pseudocódigo, % es el residuo de una división (igual que MOD), no el porcentaje. Para calcular un 16 % multiplica por 0.16."}}] }
+  ]
+}
+</script>
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/estilos.css">
+</head>
+<body>
+<header class="sitio-barra">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="/logo.svg" alt="" width="46" height="40">
+      <a class="nombre" href="/">Jaguar Code</a>
+      <a href="/guias">Guías</a>
+      <a href="/retos">Retos</a>
+      <a href="/profes">Para profes</a>
+      <a href="https://github.com/panterino/jaguar">GitHub</a>
+    </div>
+  </div>
+</header>
+<main class="guia">
+  <div class="ancho angosto">
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › <a href="/errores">Errores</a> › No reconozco el carácter</nav>
+    <h1>No reconozco el carácter</h1>
+    <p class="resumen">Fuera de los textos entre comillas, un programa solo puede tener letras, números y ciertos símbolos. Este error aparece cuando hay un símbolo que el pseudocódigo no usa.</p>
+    <nav class="contenido" aria-label="Contenido de la página"><b>En esta página</b>
+      <ol>
+        <li><a href="#que-significa">Qué significa</a></li>
+        <li><a href="#ejemplos">Ejemplos y cómo arreglarlos</a></li>
+        <li><a href="#causas">Por qué aparece</a></li>
+        <li><a href="#evitarlo">Cómo evitarlo</a></li>
+        <li><a href="#preguntas">Preguntas frecuentes</a></li>
+      </ol>
+    </nav>
+    <article>
+      <section id="que-significa">
+        <h2>Qué significa</h2>
+<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>No reconozco el carácter '€'.</p>
+<p>Dentro de un texto entre comillas puedes escribir lo que quieras: acentos, signos de interrogación, emojis. Pero <b>fuera de las comillas</b>, el programa solo puede tener nombres, números y los símbolos que el pseudocódigo conoce: operadores (<code>+ - * / ^ %</code>), comparaciones (<code>= &lt;&gt; &lt; &gt; &lt;= &gt;=</code>), la flecha <code>&lt;-</code>, paréntesis, corchetes, comas, punto y coma, dos puntos, y <code>&amp;</code> o <code>|</code> como «y» y «o».</p>
+<p>Si aparece otro símbolo, Jaguar no sabe qué significa y te dice exactamente cuál es. Lo más común es un símbolo de moneda, un signo de apertura (<code>¿</code> o <code>¡</code>) fuera de las comillas o un carácter que se coló al copiar de un documento.</p>
+      </section>
+      <section id="ejemplos">
+        <h2>Ejemplos y cómo arreglarlos</h2>
+<h3>Un símbolo de moneda</h3>
+<pre class="codigo" data-error="No reconozco el carácter '€'." tabindex="0"><code>Algoritmo precio
+    total &lt;- 100 * 1.16 €
+    Escribir total
+FinAlgoritmo</code></pre><p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>No reconozco el carácter '€'.</p>
+<p>Los números van solos. Si quieres que se vea el símbolo, ponlo en el texto que muestras:</p>
+<pre class="codigo" data-salida="$116 pesos" tabindex="0"><code>Algoritmo precio
+    total &lt;- 100 * 1.16
+    Escribir "$", total, " pesos"
+FinAlgoritmo</code></pre>
+<h3>Un signo de interrogación afuera de las comillas</h3>
+<pre class="codigo" data-error="No reconozco el carácter '¿'." tabindex="0"><code>Algoritmo pregunta
+    Escribir ¿"Cómo te llamas?"
+    Leer nombre
+FinAlgoritmo</code></pre><p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>No reconozco el carácter '¿'.</p>
+<p>Así queda arreglado:</p>
+<pre class="codigo" data-entradas="Luis" data-salida="¿Cómo te llamas?&#10;Hola, Luis" tabindex="0"><code>Algoritmo pregunta
+    Escribir "¿Cómo te llamas?"
+    Leer nombre
+    Escribir "Hola, ", nombre
+FinAlgoritmo</code></pre>
+
+      </section>
+      <section id="causas">
+        <h2>Por qué aparece</h2>
+<ul>
+  <li>Un símbolo de moneda, porcentaje con letra u otro signo pegado a un número.</li>
+  <li>Un signo de apertura (<code>¿</code>, <code>¡</code>) fuera de las comillas.</li>
+  <li>Caracteres que se copiaron de un PDF o de un procesador de textos, como guiones largos (—) en lugar del signo menos.</li>
+</ul>
+      </section>
+      <section id="evitarlo">
+        <h2>Cómo evitarlo</h2>
+<p>Si copiaste el código de un documento y aparece este error, borra el carácter que te señala Jaguar y escríbelo de nuevo con el teclado. En las operaciones usa el guion normal (<code>-</code>) para restar.</p>
+      </section>
+      <section id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+        <details><summary>¿Puedo usar acentos y la ñ en los nombres de variables?</summary><p>Sí. Jaguar acepta nombres como año o número. Eso sí, año y ano son dos variables distintas: escribe el nombre siempre igual.</p></details>
+        <details><summary>¿Qué símbolo uso para el porcentaje?</summary><p>En pseudocódigo, % es el residuo de una división (igual que MOD), no el porcentaje. Para calcular un 16 % multiplica por 0.16.</p></details>
+      </section>
+    </article>
+<aside class="cta-guia" aria-labelledby="cta-t">
+  <h2 id="cta-t">Practica esto en Jaguar Code</h2>
+  <p>Escribe pseudocódigo, mira su diagrama y haz la prueba de escritorio desde el celular. Gratis, sin anuncios y sin cuenta.</p>
+  <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir la app</a></div>
+  <p class="aviso-prueba"><b>Acceso abierto antes del lanzamiento.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo. Lanzamiento oficial: 11 de enero de 2027.</p>
+</aside>
+    <h2 style="margin-top:44px">Sigue aprendiendo</h2>
+    <div class="relacionadas">
+      <a href="/errores/falta-la-comilla-que-cierra-este-texto">Falta la comilla que cierra este texto<small>Un texto empieza con comillas y debe terminar con comillas en la misma línea.</small></a>
+      <a href="/errores/sobra-al-final-de-la-instruccion">Sobra algo al final de la instrucción<small>Jaguar terminó de leer una instrucción completa y todavía quedaba algo en la línea.</small></a>
+      <a href="/guias/variables-y-tipos-de-datos">Variables, tipos de datos y operadores<small>Una variable es un espacio con nombre donde el programa guarda un dato.</small></a>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="ancho">
+    <span class="quien"><img src="/logo.svg" alt="" width="30" height="26">Un proyecto de Panterino · hecho en México</span>
+    <a href="/guias">Guías</a>
+    <a href="/retos">Retos</a>
+    <a href="/descargas">Descargas</a>
+    <a href="/manual">Manual</a>
+    <a href="https://www.facebook.com/jaguareducation">Facebook</a>
+    <a href="https://github.com/panterino/jaguar">Código en GitHub</a>
+    <a href="#" data-analitica-cambiar>Analítica</a>
+  </div>
+</footer>
+<script src="/acceso.js" defer></script>
+<script src="/analitica.js" defer></script>
+</body>
+</html>

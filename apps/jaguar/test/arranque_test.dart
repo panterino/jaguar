@@ -184,21 +184,21 @@ void main() {
       expect(find.text('Primeros pasos'), findsOneWidget);
     });
 
-    testWidgets('Inicio avisa que es una versión de prueba, una sola vez por versión', (tester) async {
+    testWidgets('Inicio avisa que el acceso es previo al lanzamiento, una sola vez por versión', (tester) async {
       await _pumpPhone(tester, values: {'jaguar.view.mode': 'basic', 'jaguar.view.tourStep': 3}, openEditor: false);
-      expect(find.textContaining('Versión de prueba'), findsOneWidget);
+      expect(find.textContaining('antes del lanzamiento'), findsOneWidget);
       await tester.tap(find.text('Entendido'));
       await tester.pumpAndSettle();
-      expect(find.textContaining('Versión de prueba'), findsNothing);
+      expect(find.textContaining('antes del lanzamiento'), findsNothing);
     });
 
-    testWidgets('el aviso de versión de prueba no sale si ya se leyó en esta versión', (tester) async {
+    testWidgets('el aviso previo al lanzamiento no sale si ya se leyó en esta versión', (tester) async {
       await _pumpPhone(
         tester,
         values: {'jaguar.view.mode': 'basic', 'jaguar.view.tourStep': 3, 'jaguar.view.betaNotice': jaguarVersion},
         openEditor: false,
       );
-      expect(find.textContaining('Versión de prueba'), findsNothing);
+      expect(find.textContaining('antes del lanzamiento'), findsNothing);
     });
 
     testWidgets('la Ruta avisa que nada está bloqueado', (tester) async {

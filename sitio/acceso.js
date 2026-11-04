@@ -35,10 +35,12 @@
   var llave = 'AIzaSyD771Ak8TGNvnW1B_vRhMb6AG0IxPssrcE';
   var forma = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
-  function huella(texto) {
-    return crypto.subtle.digest('SHA-256', new TextEncoder().encode(texto)).then(function (b) {
-      return Array.from(new Uint8Array(b)).map(function (x) { return x.toString(16).padStart(2, '0'); }).join('').slice(0, 32);
-    });
+  // Un id al azar: así no se puede averiguar si un correo ya está en la lista
+  // intentando agregarlo. Un correo repetido es solo otra entrada.
+  function idAleatorio() {
+    var letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var bytes = crypto.getRandomValues(new Uint8Array(20));
+    return Array.prototype.map.call(bytes, function (b) { return letras[b % letras.length]; }).join('');
   }
 
   function adentro(caja, celebra) {
@@ -72,7 +74,7 @@
       var boton = form.querySelector('[type=submit]');
       boton.disabled = true;
       estado.textContent = 'Un momento…';
-      huella(correo).then(function (id) {
+      Promise.resolve(idAleatorio()).then(function (id) {
         return fetch(api + ':commit?key=' + llave, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -86,8 +88,7 @@
           }] })
         });
       }).then(function (r) {
-        // 409: ese correo ya estaba en la lista; para quien lo escribe es lo mismo.
-        if (!r.ok && r.status !== 409) throw new Error(r.status);
+        if (!r.ok) throw new Error(r.status);
         recuerda();
         form.reset();
         estado.textContent = '';

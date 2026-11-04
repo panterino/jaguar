@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Variables, tipos de datos y operadores en pseudocódigo (con ejemplos)</title>
+<meta name="description" content="Qué es una variable, cómo se asigna un valor, los tipos de datos (entero, real, texto y lógico) y los operadores en pseudocódigo, con ejemplos que puedes ejecutar.">
+<link rel="canonical" href="https://jaguarcode.org/guias/variables-y-tipos-de-datos">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="apple-touch-icon" href="/icono.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Jaguar Code">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://jaguarcode.org/guias/variables-y-tipos-de-datos">
+<meta property="og:title" content="Variables, tipos de datos y operadores en pseudocódigo (con ejemplos)">
+<meta property="og:description" content="Qué es una variable, cómo se asigna un valor, los tipos de datos (entero, real, texto y lógico) y los operadores en pseudocódigo, con ejemplos que puedes ejecutar.">
+<meta property="og:image" content="https://jaguarcode.org/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Variables, tipos de datos y operadores en pseudocódigo (con ejemplos)">
+<meta name="twitter:description" content="Qué es una variable, cómo se asigna un valor, los tipos de datos (entero, real, texto y lógico) y los operadores en pseudocódigo, con ejemplos que puedes ejecutar.">
+<meta name="twitter:image" content="https://jaguarcode.org/compartir.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://jaguarcode.org/guias/variables-y-tipos-de-datos#articulo",
+      "headline": "Variables, tipos de datos y operadores en pseudocódigo (con ejemplos)",
+      "description": "Qué es una variable, cómo se asigna un valor, los tipos de datos (entero, real, texto y lógico) y los operadores en pseudocódigo, con ejemplos que puedes ejecutar.",
+      "inLanguage": "es-MX",
+      "datePublished": "2026-11-03",
+      "dateModified": "2026-11-03",
+      "mainEntityOfPage": "https://jaguarcode.org/guias/variables-y-tipos-de-datos",
+      "image": "https://jaguarcode.org/compartir.png",
+      "author": { "@type": "Organization", "name": "Panterino", "url": "https://jaguarcode.org/" },
+      "publisher": { "@type": "Organization", "name": "Panterino", "logo": { "@type": "ImageObject", "url": "https://jaguarcode.org/icono.png" } }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "https://jaguarcode.org/" },
+        { "@type": "ListItem", "position": 2, "name": "Guías", "item": "https://jaguarcode.org/guias" },
+        { "@type": "ListItem", "position": 3, "name": "Variables, tipos de datos y operadores", "item": "https://jaguarcode.org/guias/variables-y-tipos-de-datos" }
+      ]
+    },
+    { "@type": "FAQPage", "mainEntity": [{"@type":"Question","name":"¿Qué es una variable en pseudocódigo?","acceptedAnswer":{"@type":"Answer","text":"Es un espacio con nombre donde el programa guarda un dato, como un número o un texto. Su valor puede cambiar mientras el programa se ejecuta, por eso se llama variable."}},{"@type":"Question","name":"¿Qué diferencia hay entre una variable y una constante?","acceptedAnswer":{"@type":"Answer","text":"Una variable puede cambiar de valor durante el programa. Una constante es un valor que no cambia, como PI o el porcentaje del IVA. En pseudocódigo, una constante suele ser una variable a la que le das valor una sola vez al inicio."}},{"@type":"Question","name":"¿Es obligatorio usar Definir?","acceptedAnswer":{"@type":"Answer","text":"En el pseudocódigo flexible de PSeInt, que es el que usan la mayoría de las escuelas, no. Pero si tu profe pide el perfil estricto, sí hay que definir cada variable. Definirla siempre es una buena costumbre."}},{"@type":"Question","name":"¿Para qué sirve MOD?","acceptedAnswer":{"@type":"Answer","text":"Da el residuo de una división entera. Por ejemplo, 17 MOD 5 es 2, porque 17 entre 5 es 3 y sobran 2. Se usa para saber si un número es par, si es múltiplo de otro o para separar dígitos."}}] }
+  ]
+}
+</script>
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/estilos.css">
+</head>
+<body>
+<header class="sitio-barra">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="/logo.svg" alt="" width="46" height="40">
+      <a class="nombre" href="/">Jaguar Code</a>
+      <a href="/guias">Guías</a>
+      <a href="/retos">Retos</a>
+      <a href="/profes">Para profes</a>
+      <a href="https://github.com/panterino/jaguar">GitHub</a>
+    </div>
+  </div>
+</header>
+<main class="guia">
+  <div class="ancho angosto">
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › <a href="/guias">Guías</a> › Variables, tipos de datos y operadores</nav>
+    <h1>Variables, tipos de datos y operadores</h1>
+    <p class="resumen">Una variable es un espacio con nombre donde el programa guarda un dato. Cada dato tiene un tipo, como entero, real, texto o lógico, y los operadores sirven para calcular y comparar con esos datos.</p>
+    <nav class="contenido" aria-label="Contenido de la guía"><b>En esta guía</b>
+      <ol>
+        <li><a href="#variable">Qué es una variable</a></li>
+        <li><a href="#asignar-y-leer">Dar valor a una variable: asignar y leer</a></li>
+        <li><a href="#tipos">Tipos de datos</a></li>
+        <li><a href="#aritmeticos">Operadores aritméticos</a></li>
+        <li><a href="#comparacion-y-logicos">Operadores de comparación y lógicos</a></li>
+        <li><a href="#funciones">Funciones útiles</a></li>
+        <li><a href="#intercambiar">Ejemplo: intercambiar dos variables</a></li>
+        <li><a href="#errores">Errores comunes</a></li>
+        <li><a href="#preguntas">Preguntas frecuentes</a></li>
+      </ol>
+    </nav>
+    <article>
+      <section id="variable">
+        <h2>Qué es una variable</h2>
+<p>Imagina una caja con una etiqueta. La etiqueta es el <b>nombre</b> de la variable y lo que hay dentro es su <b>valor</b>. El programa puede ver qué hay en la caja, cambiarlo o usarlo para calcular otra cosa.</p>
+<pre class="codigo" data-salida="El área es 15" tabindex="0"><code>Algoritmo area
+    base &lt;- 5
+    altura &lt;- 3
+    area &lt;- base * altura
+    Escribir "El área es ", area
+FinAlgoritmo</code></pre>
+<p>Aquí hay tres variables: <code>base</code>, <code>altura</code> y <code>area</code>. La flecha <code>&lt;-</code> se lee «guarda»: «guarda 5 en base». Una variable guarda un solo valor a la vez. Si le asignas otro, el anterior se pierde.</p>
+<p>Los nombres pueden llevar letras, números y guion bajo, pero deben empezar con una letra y no llevar espacios: <code>precio_total</code> sí, <code>precio total</code> no. Conviene que digan qué guardan: <code>edad</code> se entiende mejor que <code>x</code>.</p>
+      </section>
+      <section id="asignar-y-leer">
+        <h2>Dar valor a una variable: asignar y leer</h2>
+<p>Una variable recibe valor de dos formas. Con <code>&lt;-</code>, el programa lo calcula o lo pone. Con <code>Leer</code>, se lo pide a quien usa el programa.</p>
+<pre class="codigo" data-entradas="21" data-salida="Escribe un número:&#10;El doble es 42" tabindex="0"><code>Algoritmo doble
+    Escribir "Escribe un número:"
+    Leer n
+    doble &lt;- n * 2
+    Escribir "El doble es ", doble
+FinAlgoritmo</code></pre>
+<p>Una asignación también puede usar el valor viejo de la misma variable. <code>contador &lt;- contador + 1</code> significa: toma lo que vale <code>contador</code>, súmale 1 y guarda el resultado otra vez en <code>contador</code>. En matemáticas eso no tiene sentido, pero en programación es de lo más común.</p>
+      </section>
+      <section id="tipos">
+        <h2>Tipos de datos</h2>
+<div class="tabla"><table><caption>Los tipos de datos del pseudocódigo</caption><thead><tr><th scope="col">Tipo</th><th scope="col">Qué guarda</th><th scope="col">Ejemplos</th></tr></thead><tbody><tr><td><b>Entero</b></td><td>Números sin decimales</td><td><code>7</code>, <code>-3</code>, <code>2026</code></td></tr><tr><td><b>Real</b></td><td>Números con decimales</td><td><code>3.5</code>, <code>0.16</code>, <code>-2.75</code></td></tr><tr><td><b>Caracter</b> (o Texto)</td><td>Letras, palabras, frases</td><td><code>"Ana"</code>, <code>"A"</code>, <code>"5 de mayo"</code></td></tr><tr><td><b>Lógico</b></td><td>Verdadero o falso</td><td><code>Verdadero</code>, <code>Falso</code></td></tr></tbody></table></div>
+<p>Con <code>Definir</code> dices de qué tipo será una variable antes de usarla. En el pseudocódigo flexible que usan la mayoría de las escuelas no es obligatorio, pero ayuda: si defines una variable como <code>Entero</code> e intentas guardar un número con decimales, Jaguar te avisa.</p>
+<pre class="codigo" data-salida="Luis tiene 16 años y mide 1.72" tabindex="0"><code>Algoritmo con_tipos
+    Definir nombre Como Caracter
+    Definir edad Como Entero
+    Definir estatura Como Real
+    nombre &lt;- "Luis"
+    edad &lt;- 16
+    estatura &lt;- 1.72
+    Escribir nombre, " tiene ", edad, " años y mide ", estatura
+FinAlgoritmo</code></pre>
+<p>Los textos siempre van entre comillas. <code>"7"</code> es un texto (el carácter siete) y <code>7</code> es un número. La diferencia importa: <code>"7" + "3"</code> da <code>"73"</code>, y <code>7 + 3</code> da <code>10</code>.</p>
+      </section>
+      <section id="aritmeticos">
+        <h2>Operadores aritméticos</h2>
+<div class="tabla"><table><caption>Operadores para calcular</caption><thead><tr><th scope="col">Operador</th><th scope="col">Qué hace</th><th scope="col">Ejemplo</th><th scope="col">Resultado</th></tr></thead><tbody><tr><td><code>+</code></td><td>Suma</td><td><code>7 + 3</code></td><td>10</td></tr><tr><td><code>-</code></td><td>Resta</td><td><code>7 - 3</code></td><td>4</td></tr><tr><td><code>*</code></td><td>Multiplicación</td><td><code>7 * 3</code></td><td>21</td></tr><tr><td><code>/</code></td><td>División</td><td><code>10 / 4</code></td><td>2.5</td></tr><tr><td><code>MOD</code></td><td>Residuo de la división</td><td><code>10 MOD 4</code></td><td>2</td></tr><tr><td><code>^</code></td><td>Potencia</td><td><code>2 ^ 10</code></td><td>1024</td></tr></tbody></table></div>
+<p><code>MOD</code> merece atención porque aparece en muchos ejercicios. Da lo que sobra de una división: 10 entre 4 es 2 y sobran 2. Sirve para saber si un número es par (<code>n MOD 2 = 0</code>), si es múltiplo de otro o para separar los dígitos de un número.</p>
+<p>Como en matemáticas, primero se calculan las potencias, luego multiplicaciones y divisiones, y al final sumas y restas. Los paréntesis cambian ese orden:</p>
+<pre class="codigo" data-salida="14&#10;20&#10;Promedio: 9" tabindex="0"><code>Algoritmo prioridad
+    Escribir 2 + 3 * 4
+    Escribir (2 + 3) * 4
+    promedio &lt;- (8 + 9 + 10) / 3
+    Escribir "Promedio: ", promedio
+FinAlgoritmo</code></pre>
+<p>Un error clásico es escribir <code>8 + 9 + 10 / 3</code> para un promedio: sin paréntesis solo se divide el 10.</p>
+      </section>
+      <section id="comparacion-y-logicos">
+        <h2>Operadores de comparación y lógicos</h2>
+<p>Comparar dos valores da un resultado lógico: verdadero o falso. Es lo que usan las decisiones (<code>Si</code>) y los ciclos (<code>Mientras</code>).</p>
+<div class="tabla"><table><caption>Comparación</caption><thead><tr><th scope="col">Operador</th><th scope="col">Significa</th><th scope="col">Ejemplo verdadero</th></tr></thead><tbody><tr><td><code>=</code></td><td>Igual a</td><td><code>5 = 5</code></td></tr><tr><td><code>&lt;&gt;</code></td><td>Distinto de</td><td><code>5 &lt;&gt; 3</code></td></tr><tr><td><code>&lt;</code> / <code>&gt;</code></td><td>Menor que / mayor que</td><td><code>3 &lt; 5</code></td></tr><tr><td><code>&lt;=</code> / <code>&gt;=</code></td><td>Menor o igual / mayor o igual</td><td><code>5 &gt;= 5</code></td></tr></tbody></table></div>
+<p>Para combinar comparaciones están <code>Y</code>, <code>O</code> y <code>NO</code>. Con <code>Y</code>, las dos partes deben cumplirse. Con <code>O</code>, basta una. <code>NO</code> invierte el resultado.</p>
+<pre class="codigo" data-entradas="12" data-salida="¿Es válida? FALSO" tabindex="0"><code>Algoritmo rango
+    Leer calificacion
+    valida &lt;- calificacion &gt;= 0 Y calificacion &lt;= 10
+    Escribir "¿Es válida? ", valida
+FinAlgoritmo</code></pre>
+<p>Las decisiones con estos operadores están explicadas a fondo en la guía de <a href="/guias/condicionales-si-y-segun">condicionales</a>.</p>
+      </section>
+      <section id="funciones">
+        <h2>Funciones útiles</h2>
+<p>El pseudocódigo trae funciones listas para cálculos comunes. Se escribe el nombre y, entre paréntesis, el dato:</p>
+<div class="tabla"><table><caption>Funciones de uso frecuente</caption><thead><tr><th scope="col">Función</th><th scope="col">Qué hace</th><th scope="col">Ejemplo</th><th scope="col">Resultado</th></tr></thead><tbody><tr><td><code>Raiz(x)</code></td><td>Raíz cuadrada</td><td><code>Raiz(81)</code></td><td>9</td></tr><tr><td><code>Abs(x)</code></td><td>Valor absoluto</td><td><code>Abs(-4)</code></td><td>4</td></tr><tr><td><code>Redon(x)</code></td><td>Redondea al entero más cercano</td><td><code>Redon(3.6)</code></td><td>4</td></tr><tr><td><code>Trunc(x)</code></td><td>Quita los decimales</td><td><code>Trunc(3.6)</code></td><td>3</td></tr><tr><td><code>Azar(n)</code></td><td>Número al azar de 0 a n-1</td><td><code>Azar(6) + 1</code></td><td>Un dado: de 1 a 6</td></tr><tr><td><code>Longitud(t)</code></td><td>Cuántos caracteres tiene un texto</td><td><code>Longitud("jaguar")</code></td><td>6</td></tr><tr><td><code>Mayusculas(t)</code></td><td>Pasa un texto a mayúsculas</td><td><code>Mayusculas("hola")</code></td><td>HOLA</td></tr><tr><td><code>Subcadena(t, i, f)</code></td><td>Parte de un texto, de la posición i a la f</td><td><code>Subcadena("jaguar", 1, 3)</code></td><td>jag</td></tr></tbody></table></div><pre class="codigo" data-entradas="3|4" data-salida="La hipotenusa mide 5" tabindex="0"><code>Algoritmo hipotenusa
+    Leer a, b
+    c &lt;- Raiz(a ^ 2 + b ^ 2)
+    Escribir "La hipotenusa mide ", c
+FinAlgoritmo</code></pre>
+      </section>
+      <section id="intercambiar">
+        <h2>Ejemplo: intercambiar dos variables</h2>
+<p>Un ejercicio que aparece en casi todos los cursos: intercambiar los valores de <code>a</code> y <code>b</code>. Si escribes <code>a &lt;- b</code> y luego <code>b &lt;- a</code>, pierdes el valor original de <code>a</code>. La solución es una variable auxiliar que lo guarde mientras tanto:</p>
+<pre class="codigo" data-salida="a = 8, b = 3" tabindex="0"><code>Algoritmo intercambiar
+    a &lt;- 3
+    b &lt;- 8
+    aux &lt;- a
+    a &lt;- b
+    b &lt;- aux
+    Escribir "a = ", a, ", b = ", b
+FinAlgoritmo</code></pre>
+<p>En la prueba de escritorio se ve cómo <code>aux</code> rescata el 3 antes de que se pierda. Las celdas resaltadas son las que acaban de cambiar:</p>
+<div class="tabla"><table><caption>Prueba de escritorio de intercambiar</caption><thead><tr><th scope="col">Paso</th><th scope="col">Línea</th><th scope="col">Instrucción</th><th scope="col">a</th><th scope="col">b</th><th scope="col">aux</th><th scope="col">Pantalla</th></tr></thead><tbody><tr><td>1</td><td>3</td><td class="instr">a &lt;- 3</td><td class="cambio">3</td><td></td><td></td><td></td></tr><tr><td>2</td><td>4</td><td class="instr">b &lt;- 8</td><td>3</td><td class="cambio">8</td><td></td><td></td></tr><tr><td>3</td><td>5</td><td class="instr">aux &lt;- a</td><td>3</td><td>8</td><td class="cambio">3</td><td></td></tr><tr><td>4</td><td>6</td><td class="instr">a &lt;- b</td><td class="cambio">8</td><td>8</td><td>3</td><td></td></tr><tr><td>5</td><td>7</td><td class="instr">b &lt;- aux</td><td>8</td><td class="cambio">3</td><td>3</td><td></td></tr><tr><td>6</td><td>8</td><td class="instr">Escribir "a = ", a, ", b = ", b</td><td>8</td><td>3</td><td>3</td><td>a = 8, b = 3</td></tr></tbody></table></div>
+      </section>
+      <section id="errores">
+        <h2>Errores comunes</h2>
+<p>Estos son los errores con variables que más se repiten, con el mensaje que da Jaguar en cada caso:</p>
+<ul>
+  <li><b>Usar una variable que no tiene valor.</b> Si escribes <code>p &lt;- (a + b) / 2</code> y nunca leíste <code>b</code>, Jaguar dice: «No encuentro la variable 'b'». Si hay una parecida, sugiere: «¿Quisiste decir 'a'?».</li>
+  <li><b>Guardar decimales en un Entero.</b> Con <code>Definir e Como Entero</code> y luego <code>e &lt;- 5 / 2</code>, el mensaje es: «No se puede guardar el número 2.5 en 'e' porque es de tipo Entero», con la sugerencia de usar <code>Trunc()</code> o <code>Redon()</code>.</li>
+  <li><b>Confundir <code>=</code> con <code>&lt;-</code>.</b> La flecha guarda; el igual compara. Algunas escuelas aceptan <code>=</code> para asignar, pero usar la flecha evita confusiones.</li>
+  <li><b>Olvidar las comillas.</b> <code>Escribir Hola</code> busca una variable llamada Hola. Lo que quieres es <code>Escribir "Hola"</code>.</li>
+  <li><b>Escribir el nombre de dos formas.</b> <code>Promedio</code> y <code>promedio</code> son la misma variable en PSeInt y en Jaguar, pero <code>promedio</code> y <code>promedo</code> no.</li>
+</ul>
+<p>Si Jaguar te muestra un mensaje que no entiendes, búscalo en <a href="/errores">la lista de errores explicados</a>. Por ejemplo, <a href="/errores/es-una-palabra-reservada">por qué no puedes llamar <code>y</code> a una variable</a>.</p>
+      </section>
+      <section id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+        <details><summary>¿Qué es una variable en pseudocódigo?</summary><p>Es un espacio con nombre donde el programa guarda un dato, como un número o un texto. Su valor puede cambiar mientras el programa se ejecuta, por eso se llama variable.</p></details>
+        <details><summary>¿Qué diferencia hay entre una variable y una constante?</summary><p>Una variable puede cambiar de valor durante el programa. Una constante es un valor que no cambia, como PI o el porcentaje del IVA. En pseudocódigo, una constante suele ser una variable a la que le das valor una sola vez al inicio.</p></details>
+        <details><summary>¿Es obligatorio usar Definir?</summary><p>En el pseudocódigo flexible de PSeInt, que es el que usan la mayoría de las escuelas, no. Pero si tu profe pide el perfil estricto, sí hay que definir cada variable. Definirla siempre es una buena costumbre.</p></details>
+        <details><summary>¿Para qué sirve MOD?</summary><p>Da el residuo de una división entera. Por ejemplo, 17 MOD 5 es 2, porque 17 entre 5 es 3 y sobran 2. Se usa para saber si un número es par, si es múltiplo de otro o para separar dígitos.</p></details>
+      </section>
+    </article>
+<aside class="cta-guia" aria-labelledby="cta-t">
+  <h2 id="cta-t">Practica esto en Jaguar Code</h2>
+  <p>Escribe pseudocódigo, mira su diagrama y haz la prueba de escritorio desde el celular. Gratis, sin anuncios y sin cuenta.</p>
+  <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir la app</a></div>
+  <p class="aviso-prueba"><b>Acceso abierto antes del lanzamiento.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo. Lanzamiento oficial: 11 de enero de 2027.</p>
+</aside>
+    <h2 style="margin-top:44px">Sigue aprendiendo</h2>
+    <div class="relacionadas">
+      <a href="/guias/que-es-el-pseudocodigo">Qué es el pseudocódigo<small>El pseudocódigo es una forma de escribir un algoritmo con palabras parecidas a las de un lenguaje de programación, pero sin reglas estrictas de sintaxis.</small></a>
+      <a href="/guias/condicionales-si-y-segun">Condicionales en pseudocódigo: Si y Segun<small>Una condicional hace que el programa elija qué hacer según un dato.</small></a>
+      <a href="/guias/prueba-de-escritorio">La prueba de escritorio<small>La prueba de escritorio es seguir un algoritmo a mano, línea por línea, anotando en una tabla cuánto vale cada variable en cada paso.</small></a>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="ancho">
+    <span class="quien"><img src="/logo.svg" alt="" width="30" height="26">Un proyecto de Panterino · hecho en México</span>
+    <a href="/guias">Guías</a>
+    <a href="/retos">Retos</a>
+    <a href="/descargas">Descargas</a>
+    <a href="/manual">Manual</a>
+    <a href="https://www.facebook.com/jaguareducation">Facebook</a>
+    <a href="https://github.com/panterino/jaguar">Código en GitHub</a>
+    <a href="#" data-analitica-cambiar>Analítica</a>
+  </div>
+</footer>
+<script src="/acceso.js" defer></script>
+<script src="/analitica.js" defer></script>
+</body>
+</html>

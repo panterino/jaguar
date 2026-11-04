@@ -3,14 +3,61 @@ import 'package:jaguar_core/jaguar_core.dart';
 
 import '../theme.dart';
 
-/// Shows which test cases passed. When all pass, [onShowTeacher] opens the
-/// verified screen.
+/// Shows which test cases passed. When all pass and [onShowTeacher] is not
+/// null, a button opens the verified screen (the teacher checking their own
+/// solution has no one to show it to).
+///
+/// A bottom sheet on a phone, a dialog on a computer.
 Future<void> showCheckResults(
   BuildContext context, {
   required CheckResult result,
-  required VoidCallback onShowTeacher,
+  VoidCallback? onShowTeacher,
   ValueChanged<int>? onGoToLine,
 }) {
+  if (MediaQuery.sizeOf(context).width >= 900) {
+    return showDialog<void>(
+      context: context,
+      builder: (context) => Dialog(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 680, maxHeight: MediaQuery.sizeOf(context).height * 0.85),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Align(
+                alignment: Alignment.centerRight,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 8, 8, 0),
+                  child: IconButton(
+                    tooltip: 'Cerrar',
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ),
+              ),
+              Flexible(
+                child: _ResultsList(
+                  result: result,
+                  onShowTeacher: onShowTeacher == null
+                      ? null
+                      : () {
+                          Navigator.pop(context);
+                          onShowTeacher();
+                        },
+                  onGoToLine: onGoToLine == null
+                      ? null
+                      : (line) {
+                          Navigator.pop(context);
+                          onGoToLine(line);
+                        },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
@@ -23,10 +70,12 @@ Future<void> showCheckResults(
       builder: (context, scrollController) => _ResultsList(
         result: result,
         scrollController: scrollController,
-        onShowTeacher: () {
-          Navigator.pop(context);
-          onShowTeacher();
-        },
+        onShowTeacher: onShowTeacher == null
+            ? null
+            : () {
+                Navigator.pop(context);
+                onShowTeacher();
+              },
         onGoToLine: onGoToLine == null
             ? null
             : (line) {
@@ -41,14 +90,14 @@ Future<void> showCheckResults(
 class _ResultsList extends StatelessWidget {
   const _ResultsList({
     required this.result,
-    required this.scrollController,
+    this.scrollController,
     required this.onShowTeacher,
     required this.onGoToLine,
   });
 
   final CheckResult result;
-  final ScrollController scrollController;
-  final VoidCallback onShowTeacher;
+  final ScrollController? scrollController;
+  final VoidCallback? onShowTeacher;
   final ValueChanged<int>? onGoToLine;
 
   @override
@@ -83,7 +132,7 @@ class _ResultsList extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-        if (result.passed)
+        if (result.passed && onShowTeacher != null)
           FilledButton.icon(
             onPressed: onShowTeacher,
             icon: const Icon(Icons.school_outlined),

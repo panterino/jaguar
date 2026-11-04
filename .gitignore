@@ -16,7 +16,8 @@ coverage/
 .flutter-plugins
 .flutter-plugins-dependencies
 # El paquete no fija versiones; la app sí (su pubspec.lock se sube).
-packages/**/pubspec.lock
+# Para desarrollar jaguar_core junto con la app (ver CONTRIBUTING.md).
+pubspec_overrides.yaml
 
 # Firebase y Node
 .firebase/

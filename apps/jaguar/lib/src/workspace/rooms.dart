@@ -584,7 +584,7 @@ class _BetaNotice extends StatelessWidget {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        'Versión de prueba: puede tener errores y cambiar. Tus programas se guardan solo en este dispositivo.',
+                        'Acceso abierto antes del lanzamiento, el 11 de enero de 2027. Puede tener errores. Tus programas se guardan solo en este dispositivo.',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(color: scheme.onTertiaryContainer),
                       ),
                     ),

@@ -1,4 +1,4 @@
-# Compila Jaguar Code para Linux y Windows (no se puede desde un Mac) y lo adjunta a la
+# Compila Jaguar Code para Linux (tar.gz y snap) y Windows (no se puede desde un Mac) y lo adjunta a la
 # publicación (release) de GitHub. También se puede lanzar a mano desde la
 # pestaña Actions para probar el paquete.
 name: Escritorio
@@ -88,3 +88,37 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release upload "${{ github.event.release.tag_name || inputs.etiqueta }}" apps/jaguar/JaguarCode-windows-x64.zip --clobber
+
+  snap:
+    runs-on: ubuntu-22.04
+    env:
+      # Credencial del Snap Store (docs/tiendas-linux.md). Sin ella solo se compila.
+      SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Versión del snap
+        run: |
+          etiqueta="${{ github.event.release.tag_name || inputs.etiqueta }}"
+          if [ -n "$etiqueta" ]; then
+            sed -i "s/^version: .*/version: '${etiqueta#v}'/" snap/snapcraft.yaml
+          fi
+          grep '^version:' snap/snapcraft.yaml
+      - uses: snapcore/action-build@v1
+        id: snap
+      - uses: actions/upload-artifact@v4
+        with:
+          name: JaguarCode-snap
+          path: ${{ steps.snap.outputs.snap }}
+      - name: Adjuntar a la publicación
+        if: github.event_name == 'release' || inputs.etiqueta != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp "${{ steps.snap.outputs.snap }}" JaguarCode-linux-x64.snap
+          gh release upload "${{ github.event.release.tag_name || inputs.etiqueta }}" JaguarCode-linux-x64.snap --clobber
+      - name: Publicar en el Snap Store (canal beta)
+        if: ${{ env.SNAPCRAFT_STORE_CREDENTIALS != '' && (github.event_name == 'release' || inputs.etiqueta != '') }}
+        uses: snapcore/action-publish@v1
+        with:
+          snap: ${{ steps.snap.outputs.snap }}
+          release: beta

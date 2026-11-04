@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Error «La posición … está fuera del arreglo»: qué significa y cómo arreglarlo</title>
+<meta name="description" content="Qué significa el error «La posición 4 está fuera del arreglo», «Esa posición todavía no tiene valor» y «no es un arreglo» en pseudocódigo, y cómo arreglarlo con ejemplos.">
+<link rel="canonical" href="https://jaguarcode.org/errores/posicion-fuera-del-arreglo">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="apple-touch-icon" href="/icono.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Jaguar Code">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://jaguarcode.org/errores/posicion-fuera-del-arreglo">
+<meta property="og:title" content="Error «La posición … está fuera del arreglo»: qué significa y cómo arreglarlo">
+<meta property="og:description" content="Qué significa el error «La posición 4 está fuera del arreglo», «Esa posición todavía no tiene valor» y «no es un arreglo» en pseudocódigo, y cómo arreglarlo con ejemplos.">
+<meta property="og:image" content="https://jaguarcode.org/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Error «La posición … está fuera del arreglo»: qué significa y cómo arreglarlo">
+<meta name="twitter:description" content="Qué significa el error «La posición 4 está fuera del arreglo», «Esa posición todavía no tiene valor» y «no es un arreglo» en pseudocódigo, y cómo arreglarlo con ejemplos.">
+<meta name="twitter:image" content="https://jaguarcode.org/compartir.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://jaguarcode.org/errores/posicion-fuera-del-arreglo#articulo",
+      "headline": "Error «La posición … está fuera del arreglo»: qué significa y cómo arreglarlo",
+      "description": "Qué significa el error «La posición 4 está fuera del arreglo», «Esa posición todavía no tiene valor» y «no es un arreglo» en pseudocódigo, y cómo arreglarlo con ejemplos.",
+      "inLanguage": "es-MX",
+      "datePublished": "2026-11-05",
+      "dateModified": "2026-11-05",
+      "mainEntityOfPage": "https://jaguarcode.org/errores/posicion-fuera-del-arreglo",
+      "image": "https://jaguarcode.org/compartir.png",
+      "author": { "@type": "Organization", "name": "Panterino", "url": "https://jaguarcode.org/" },
+      "publisher": { "@type": "Organization", "name": "Panterino", "logo": { "@type": "ImageObject", "url": "https://jaguarcode.org/icono.png" } }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "https://jaguarcode.org/" },
+        { "@type": "ListItem", "position": 2, "name": "Errores", "item": "https://jaguarcode.org/errores" },
+        { "@type": "ListItem", "position": 3, "name": "«La posición … está fuera del arreglo»", "item": "https://jaguarcode.org/errores/posicion-fuera-del-arreglo" }
+      ]
+    },
+    { "@type": "FAQPage", "mainEntity": [{"@type":"Question","name":"¿Por qué las posiciones empiezan en 1 y no en 0?","acceptedAnswer":{"@type":"Answer","text":"Porque así lo hace el pseudocódigo de PSeInt, que Jaguar sigue. En muchos lenguajes de programación (Python, Java, C) empiezan en 0; la guía de pseudocódigo a Python explica cómo cambian los números."}},{"@type":"Question","name":"¿Puedo agrandar un arreglo después de crearlo?","acceptedAnswer":{"@type":"Answer","text":"No. Un arreglo tiene un tamaño fijo desde Dimension. Si necesitas más casillas, créalo más grande desde el principio, y Jaguar avisa si intentas dimensionar el mismo arreglo dos veces."}},{"@type":"Question","name":"¿Y si el tamaño lo escribe la persona?","acceptedAnswer":{"@type":"Answer","text":"Puedes leerlo con Leer y usarlo en Dimension: Leer n, Dimension notas[n]. Jaguar exige que sea al menos 1."}}] }
+  ]
+}
+</script>
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/estilos.css">
+</head>
+<body>
+<header class="sitio-barra">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="/logo.svg" alt="" width="46" height="40">
+      <a class="nombre" href="/">Jaguar Code</a>
+      <a href="/guias">Guías</a>
+      <a href="/retos">Retos</a>
+      <a href="/profes">Para profes</a>
+      <a href="https://github.com/panterino/jaguar">GitHub</a>
+    </div>
+  </div>
+</header>
+<main class="guia">
+  <div class="ancho angosto">
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › <a href="/errores">Errores</a> › «La posición … está fuera del arreglo»</nav>
+    <h1>«La posición … está fuera del arreglo»</h1>
+    <p class="resumen">Este error aparece cuando el programa usa una posición que el arreglo no tiene. En Jaguar las posiciones empiezan en 1 y terminan en el tamaño con el que creaste el arreglo.</p>
+    <nav class="contenido" aria-label="Contenido de la página"><b>En esta página</b>
+      <ol>
+        <li><a href="#que-significa">Qué significa</a></li>
+        <li><a href="#ejemplos">Ejemplos y cómo arreglarlos</a></li>
+        <li><a href="#causas">Por qué aparece</a></li>
+        <li><a href="#evitarlo">Cómo evitarlo</a></li>
+        <li><a href="#preguntas">Preguntas frecuentes</a></li>
+      </ol>
+    </nav>
+    <article>
+      <section id="que-significa">
+        <h2>Qué significa</h2>
+<p class="aviso-error" role="note"><b>Error al ejecutar en la línea 3</b><br>La posición 4 está fuera del arreglo 'notas'. Las posiciones válidas van de 1 a 3.</p>
+<p>Un arreglo es una fila de casillas numeradas. Si lo creas con <code>Dimension notas[3]</code>, tiene tres casillas: la 1, la 2 y la 3. Pedir la 4 es como buscar un asiento que no existe, y Jaguar se detiene para avisarte.</p>
+<p>En Jaguar las posiciones empiezan en <b>1</b>, no en 0. El mensaje siempre te dice cuáles son las válidas.</p>
+      </section>
+      <section id="ejemplos">
+        <h2>Ejemplos y cómo arreglarlos</h2>
+<h3>Una posición de más</h3>
+<pre class="codigo" data-error="La posición 4 está fuera del arreglo 'notas'." tabindex="0"><code>Algoritmo lista
+    Dimension notas[3]
+    notas[4] &lt;- 10
+FinAlgoritmo</code></pre>
+<p class="aviso-error" role="note"><b>Error al ejecutar en la línea 3</b><br>La posición 4 está fuera del arreglo 'notas'. Las posiciones válidas van de 1 a 3.</p>
+<p>Usa una posición que exista, o crea el arreglo con más casillas:</p>
+<pre class="codigo" data-salida="10" tabindex="0"><code>Algoritmo lista
+    Dimension notas[4]
+    notas[4] &lt;- 10
+    Escribir notas[4]
+FinAlgoritmo</code></pre>
+<h3>Empezar en 0</h3>
+<p>Si vienes de otro lenguaje, es normal empezar en 0. En Jaguar la primera casilla es la 1:</p>
+<pre class="codigo" data-error="La posición 0 está fuera del arreglo 'notas'." tabindex="0"><code>Algoritmo lista
+    Dimension notas[3]
+    notas[0] &lt;- 10
+FinAlgoritmo</code></pre>
+<p>Con un ciclo, que vaya de 1 al tamaño:</p>
+<pre class="codigo" data-salida="10 30" tabindex="0"><code>Algoritmo lista
+    Dimension notas[3]
+    Para i &lt;- 1 Hasta 3 Hacer
+        notas[i] &lt;- i * 10
+    FinPara
+    Escribir notas[1], " ", notas[3]
+FinAlgoritmo</code></pre>
+<h3>Una posición que nunca se llenó</h3>
+<pre class="codigo" data-error="Esa posición del arreglo 'notas' todavía no tiene valor." tabindex="0"><code>Algoritmo lista
+    Dimension notas[3]
+    notas[1] &lt;- 8
+    Escribir notas[2]
+FinAlgoritmo</code></pre>
+<p>La posición existe, pero está vacía. Llénala antes de leerla:</p>
+<pre class="codigo" data-salida="17" tabindex="0"><code>Algoritmo lista
+    Dimension notas[3]
+    notas[1] &lt;- 8
+    notas[2] &lt;- 9
+    Escribir notas[1] + notas[2]
+FinAlgoritmo</code></pre>
+<h3>Usar como arreglo algo que no lo es</h3>
+<pre class="codigo" data-error="'n' no es un arreglo." tabindex="0"><code>Algoritmo lista
+    n &lt;- 5
+    n[1] &lt;- 3
+FinAlgoritmo</code></pre>
+<p>Para que una variable sea arreglo hay que crearla con <code>Dimension</code> antes: <code>Dimension n[5]</code>. Más sobre esto en la guía de <a href="/guias/arreglos-en-pseudocodigo">arreglos</a>.</p>
+
+      </section>
+      <section id="causas">
+        <h2>Por qué aparece</h2>
+<ul>
+  <li>El ciclo llega más lejos que el arreglo: <code>Para i &lt;- 1 Hasta 4</code> con un arreglo de tres casillas.</li>
+  <li>Se empieza en 0, como en otros lenguajes, o se calcula una posición que se sale por uno.</li>
+  <li>El tamaño se escribió mal en <code>Dimension</code>, o cambió el dato que lo define.</li>
+  <li>Se lee una casilla antes de llenarla.</li>
+</ul>
+      </section>
+      <section id="evitarlo">
+        <h2>Cómo evitarlo</h2>
+<p>Que el ciclo y el arreglo usen el mismo número: guarda el tamaño en una variable (<code>n &lt;- 3</code>), crea el arreglo con <code>Dimension notas[n]</code> y recorre con <code>Para i &lt;- 1 Hasta n</code>. Así, si cambias el tamaño, cambia todo junto. Y en la prueba de escritorio, mira qué valor tiene <code>i</code> en la última fila.</p>
+      </section>
+      <section id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+        <details><summary>¿Por qué las posiciones empiezan en 1 y no en 0?</summary><p>Porque así lo hace el pseudocódigo de PSeInt, que Jaguar sigue. En muchos lenguajes de programación (Python, Java, C) empiezan en 0; la guía de pseudocódigo a Python explica cómo cambian los números.</p></details>
+        <details><summary>¿Puedo agrandar un arreglo después de crearlo?</summary><p>No. Un arreglo tiene un tamaño fijo desde Dimension. Si necesitas más casillas, créalo más grande desde el principio, y Jaguar avisa si intentas dimensionar el mismo arreglo dos veces.</p></details>
+        <details><summary>¿Y si el tamaño lo escribe la persona?</summary><p>Puedes leerlo con Leer y usarlo en Dimension: Leer n, Dimension notas[n]. Jaguar exige que sea al menos 1.</p></details>
+      </section>
+    </article>
+<aside class="cta-guia" aria-labelledby="cta-t">
+  <h2 id="cta-t">Practica esto en Jaguar Code</h2>
+  <p>Escribe pseudocódigo, mira su diagrama y haz la prueba de escritorio desde el celular. Gratis, sin anuncios y sin cuenta.</p>
+  <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir la app</a></div>
+  <p class="aviso-prueba"><b>Acceso abierto antes del lanzamiento.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo. Lanzamiento oficial: 11 de enero de 2027.</p>
+</aside>
+    <h2 style="margin-top:44px">Sigue aprendiendo</h2>
+    <div class="relacionadas">
+      <a href="/guias/arreglos-en-pseudocodigo">Arreglos en pseudocódigo<small>Un arreglo es una variable que guarda varios valores del mismo tipo, cada uno en una posición numerada.</small></a>
+      <a href="/guias/de-pseudocodigo-a-python">De pseudocódigo a Python<small>Si ya sabes pseudocódigo, ya sabes la parte difícil de programar: la lógica.</small></a>
+      <a href="/guias/ciclos-mientras-para-repetir">Ciclos en pseudocódigo: Mientras, Para y Repetir<small>Un ciclo repite un grupo de instrucciones.</small></a>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="ancho">
+    <span class="quien"><img src="/logo.svg" alt="" width="30" height="26">Un proyecto de Panterino · hecho en México</span>
+    <a href="/guias">Guías</a>
+    <a href="/retos">Retos</a>
+    <a href="/descargas">Descargas</a>
+    <a href="/manual">Manual</a>
+    <a href="https://www.facebook.com/jaguareducation">Facebook</a>
+    <a href="https://github.com/panterino/jaguar">Código en GitHub</a>
+    <a href="#" data-analitica-cambiar>Analítica</a>
+  </div>
+</footer>
+<script src="/acceso.js" defer></script>
+<script src="/analitica.js" defer></script>
+</body>
+</html>

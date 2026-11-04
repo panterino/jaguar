@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Error «necesita números, pero recibió el texto» y «No se puede comparar el texto con el número»</title>
+<meta name="description" content="Qué significan los errores «La resta necesita números, pero recibió el texto…» y «No se puede comparar el texto … con el número …» en pseudocódigo, y cómo arreglarlos.">
+<link rel="canonical" href="https://jaguarcode.org/errores/operacion-con-texto-y-numero">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="apple-touch-icon" href="/icono.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Jaguar Code">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://jaguarcode.org/errores/operacion-con-texto-y-numero">
+<meta property="og:title" content="Error «necesita números, pero recibió el texto» y «No se puede comparar el texto con el número»">
+<meta property="og:description" content="Qué significan los errores «La resta necesita números, pero recibió el texto…» y «No se puede comparar el texto … con el número …» en pseudocódigo, y cómo arreglarlos.">
+<meta property="og:image" content="https://jaguarcode.org/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Error «necesita números, pero recibió el texto» y «No se puede comparar el texto con el número»">
+<meta name="twitter:description" content="Qué significan los errores «La resta necesita números, pero recibió el texto…» y «No se puede comparar el texto … con el número …» en pseudocódigo, y cómo arreglarlos.">
+<meta name="twitter:image" content="https://jaguarcode.org/compartir.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://jaguarcode.org/errores/operacion-con-texto-y-numero#articulo",
+      "headline": "Error «necesita números, pero recibió el texto» y «No se puede comparar el texto con el número»",
+      "description": "Qué significan los errores «La resta necesita números, pero recibió el texto…» y «No se puede comparar el texto … con el número …» en pseudocódigo, y cómo arreglarlos.",
+      "inLanguage": "es-MX",
+      "datePublished": "2026-11-05",
+      "dateModified": "2026-11-05",
+      "mainEntityOfPage": "https://jaguarcode.org/errores/operacion-con-texto-y-numero",
+      "image": "https://jaguarcode.org/compartir.png",
+      "author": { "@type": "Organization", "name": "Panterino", "url": "https://jaguarcode.org/" },
+      "publisher": { "@type": "Organization", "name": "Panterino", "logo": { "@type": "ImageObject", "url": "https://jaguarcode.org/icono.png" } }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "https://jaguarcode.org/" },
+        { "@type": "ListItem", "position": 2, "name": "Errores", "item": "https://jaguarcode.org/errores" },
+        { "@type": "ListItem", "position": 3, "name": "Una operación mezcla texto y números", "item": "https://jaguarcode.org/errores/operacion-con-texto-y-numero" }
+      ]
+    },
+    { "@type": "FAQPage", "mainEntity": [{"@type":"Question","name":"¿Por qué \"5\" no es lo mismo que 5?","acceptedAnswer":{"@type":"Answer","text":"Entre comillas es un texto: una palabra que se parece a un número. Sin comillas es un número y se puede usar en cuentas. ConvertirANumero pasa de uno al otro."}},{"@type":"Question","name":"¿Puedo comparar dos textos con < o >?","acceptedAnswer":{"@type":"Answer","text":"Sí, se comparan por orden alfabético. Lo que no se puede es comparar un texto con un número."}}] }
+  ]
+}
+</script>
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/estilos.css">
+</head>
+<body>
+<header class="sitio-barra">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="/logo.svg" alt="" width="46" height="40">
+      <a class="nombre" href="/">Jaguar Code</a>
+      <a href="/guias">Guías</a>
+      <a href="/retos">Retos</a>
+      <a href="/profes">Para profes</a>
+      <a href="https://github.com/panterino/jaguar">GitHub</a>
+    </div>
+  </div>
+</header>
+<main class="guia">
+  <div class="ancho angosto">
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › <a href="/errores">Errores</a> › Una operación mezcla texto y números</nav>
+    <h1>Una operación mezcla texto y números</h1>
+    <p class="resumen">Estos errores aparecen cuando una cuenta o una comparación mezcla un texto con un número. Se arreglan convirtiendo el texto a número, o comparando cosas del mismo tipo.</p>
+    <nav class="contenido" aria-label="Contenido de la página"><b>En esta página</b>
+      <ol>
+        <li><a href="#que-significa">Qué significa</a></li>
+        <li><a href="#ejemplos">Ejemplos y cómo arreglarlos</a></li>
+        <li><a href="#causas">Por qué aparece</a></li>
+        <li><a href="#evitarlo">Cómo evitarlo</a></li>
+        <li><a href="#preguntas">Preguntas frecuentes</a></li>
+      </ol>
+    </nav>
+    <article>
+      <section id="que-significa">
+        <h2>Qué significa</h2>
+<p class="aviso-error" role="note"><b>Error al ejecutar en la línea 3</b><br>La resta '-' necesita números, pero recibió el texto "Ana".</p>
+<p>Las cuentas (<code>-</code>, <code>*</code>, <code>/</code>) solo se hacen con números, y las comparaciones de orden (<code>&lt;</code>, <code>&gt;</code>) solo entre cosas del mismo tipo: números con números, textos con textos. Si en una de ellas aparece un texto donde va un número, Jaguar se detiene y dice cuál fue.</p>
+<p>Ojo con el <code>+</code>: con números suma y con textos los une. Por eso <code>"Ana" + 1</code> no es una cuenta, y las cuentas con <code>-</code> no tienen versión para textos.</p>
+      </section>
+      <section id="ejemplos">
+        <h2>Ejemplos y cómo arreglarlos</h2>
+<h3>Restar un texto</h3>
+<pre class="codigo" data-error="La resta '-' necesita números, pero recibió el texto &quot;Ana&quot;." tabindex="0"><code>Algoritmo a
+    nombre &lt;- "Ana"
+    Escribir nombre - 1
+FinAlgoritmo</code></pre>
+<p>Si lo que tienes es un texto con un número adentro, conviértelo con <code>ConvertirANumero</code>:</p>
+<pre class="codigo" data-salida="4" tabindex="0"><code>Algoritmo a
+    texto &lt;- "5"
+    Escribir ConvertirANumero(texto) - 1
+FinAlgoritmo</code></pre>
+<h3>Comparar un texto con un número</h3>
+<pre class="codigo" data-error="No se puede comparar el texto &quot;abc&quot; con el número 3." tabindex="0"><code>Algoritmo a
+    texto &lt;- "abc"
+    Si texto &gt; 3 Entonces
+        Escribir "largo"
+    FinSi
+FinAlgoritmo</code></pre>
+<p>Casi siempre lo que querías era comparar el <i>largo</i> del texto, que sí es un número:</p>
+<pre class="codigo" data-salida="largo" tabindex="0"><code>Algoritmo a
+    texto &lt;- "abcd"
+    Si Longitud(texto) &gt; 3 Entonces
+        Escribir "largo"
+    FinSi
+FinAlgoritmo</code></pre>
+
+      </section>
+      <section id="causas">
+        <h2>Por qué aparece</h2>
+<ul>
+  <li>Una variable de texto, como un nombre, se usa en una cuenta.</li>
+  <li>Se lee con <code>Leer</code> una palabra y se la compara con un número.</li>
+  <li>Se confunde el texto <code>"5"</code>, entre comillas, con el número <code>5</code>.</li>
+</ul>
+      </section>
+      <section id="evitarlo">
+        <h2>Cómo evitarlo</h2>
+<p>Pregúntate qué tipo tiene cada cosa que usas: lo que va entre comillas es texto, aunque parezca un número. Usa <code>ConvertirANumero</code> y <code>ConvertirATexto</code> para pasar de uno a otro, y <code>Longitud</code> para convertir un texto en un número que se pueda comparar. La guía de <a href="/guias/variables-y-tipos-de-datos">variables y tipos de datos</a> lo explica con ejemplos.</p>
+      </section>
+      <section id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+        <details><summary>¿Por qué "5" no es lo mismo que 5?</summary><p>Entre comillas es un texto: una palabra que se parece a un número. Sin comillas es un número y se puede usar en cuentas. ConvertirANumero pasa de uno al otro.</p></details>
+        <details><summary>¿Puedo comparar dos textos con &lt; o &gt;?</summary><p>Sí, se comparan por orden alfabético. Lo que no se puede es comparar un texto con un número.</p></details>
+      </section>
+    </article>
+<aside class="cta-guia" aria-labelledby="cta-t">
+  <h2 id="cta-t">Practica esto en Jaguar Code</h2>
+  <p>Escribe pseudocódigo, mira su diagrama y haz la prueba de escritorio desde el celular. Gratis, sin anuncios y sin cuenta.</p>
+  <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir la app</a></div>
+  <p class="aviso-prueba"><b>Acceso abierto antes del lanzamiento.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo. Lanzamiento oficial: 11 de enero de 2027.</p>
+</aside>
+    <h2 style="margin-top:44px">Sigue aprendiendo</h2>
+    <div class="relacionadas">
+      <a href="/guias/variables-y-tipos-de-datos">Variables, tipos de datos y operadores<small>Una variable es un espacio con nombre donde el programa guarda un dato.</small></a>
+      <a href="/errores/valor-que-no-corresponde-al-tipo">Un valor que no corresponde al tipo de la variable<small>Estos errores aparecen cuando una variable con tipo (Entero, Real, Texto o Lógico) recibe un valor de otro tipo: un decimal en un Entero, un número en un Texto o letras donde se esperaba un número..</small></a>
+      <a href="/errores/la-condicion-debe-ser-verdadero-o-falso">«La condición debe ser Verdadero o Falso»<small>Este error aparece cuando después de Si, Mientras o Hasta Que va un valor que no es una comparación, por ejemplo solo un número o un texto.</small></a>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="ancho">
+    <span class="quien"><img src="/logo.svg" alt="" width="30" height="26">Un proyecto de Panterino · hecho en México</span>
+    <a href="/guias">Guías</a>
+    <a href="/retos">Retos</a>
+    <a href="/descargas">Descargas</a>
+    <a href="/manual">Manual</a>
+    <a href="https://www.facebook.com/jaguareducation">Facebook</a>
+    <a href="https://github.com/panterino/jaguar">Código en GitHub</a>
+    <a href="#" data-analitica-cambiar>Analítica</a>
+  </div>
+</footer>
+<script src="/acceso.js" defer></script>
+<script src="/analitica.js" defer></script>
+</body>
+</html>

@@ -4,7 +4,7 @@
 // Python. Correr desde apps/jaguar:
 //   dart run tool/retos_html.dart
 // Los ejemplos llevan data-entradas y data-salida: una prueba
-// (packages/jaguar_core/test/guias_test.dart) los ejecuta con el intérprete.
+// (apps/jaguar/test/sitio_test.dart) los ejecuta con el intérprete.
 import 'dart:convert';
 import 'dart:io';
 
@@ -161,7 +161,7 @@ String _pagina(String id) {
       <h2 id="cta-t">Pruébalo paso a paso en tu celular</h2>
       <p>En Jaguar Code escribes este algoritmo, lo ejecutas, ves su diagrama y haces la prueba de escritorio. El reto trae pistas y pruebas que te dicen si está bien. Gratis, sin anuncios y sin cuenta.</p>
       <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir Jaguar Code</a></div>
-      <p class="aviso-prueba"><b>Versión de prueba.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo.</p>
+      <p class="aviso-prueba"><b>Acceso abierto antes del lanzamiento.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo. Lanzamiento oficial: 11 de enero de 2027.</p>
     </aside>
     <h2 style="margin-top:44px">Sigue con otro reto</h2>
     <div class="relacionadas">
@@ -395,9 +395,9 @@ Future<String> _herramienta() async {
     </article>
     <aside class="cta-guia" aria-labelledby="cta-t">
       <h2 id="cta-t">En el celular, con diagrama y retos</h2>
-      <p>Jaguar Code hace esta misma prueba de escritorio en la app, la deja llenar a mano para practicar y la combina con el diagrama de flujo, los bloques y doce retos con pistas. Gratis, sin anuncios y sin cuenta.</p>
+      <p>Jaguar Code hace esta misma prueba de escritorio en la app, la deja llenar a mano para practicar y la combina con el diagrama de flujo, los bloques y 36 retos con pistas. Gratis, sin anuncios y sin cuenta.</p>
       <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir Jaguar Code</a></div>
-      <p class="aviso-prueba"><b>Versión de prueba.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo.</p>
+      <p class="aviso-prueba"><b>Acceso abierto antes del lanzamiento.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo. Lanzamiento oficial: 11 de enero de 2027.</p>
     </aside>
     <h2 style="margin-top:44px">Sigue aprendiendo</h2>
     <div class="relacionadas">
@@ -587,9 +587,9 @@ Future<String> _diagramaWeb() async {
     </article>
     <aside class="cta-guia" aria-labelledby="cta-t">
       <h2 id="cta-t">Arma el diagrama con figuras en tu celular</h2>
-      <p>En Jaguar Code dibujas el diagrama tocando figuras y el pseudocódigo se escribe solo, y al revés. Trae también bloques, la prueba de escritorio y doce retos con pistas. Gratis, sin anuncios y sin cuenta.</p>
+      <p>En Jaguar Code dibujas el diagrama tocando figuras y el pseudocódigo se escribe solo, y al revés. Trae también bloques, la prueba de escritorio y 36 retos con pistas. Gratis, sin anuncios y sin cuenta.</p>
       <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir Jaguar Code</a></div>
-      <p class="aviso-prueba"><b>Versión de prueba.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo.</p>
+      <p class="aviso-prueba"><b>Acceso abierto antes del lanzamiento.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo. Lanzamiento oficial: 11 de enero de 2027.</p>
     </aside>
     <h2 style="margin-top:44px">Sigue aprendiendo</h2>
     <div class="relacionadas">
@@ -633,7 +633,7 @@ String _descargas() {
     ),
     (
       '¿Qué cambia entre la descarga y la versión web?',
-      'Es la misma app. En Windows y Linux faltan las clases y la comunidad, que dependen de un servicio que todavía no está configurado para esos sistemas; todo lo demás funciona sin internet.',
+      'Es la misma app, con las clases y la comunidad también. La diferencia es cómo se instala y se actualiza: la web siempre está al día y las descargas las actualizas tú. Todo lo demás funciona sin internet.',
     ),
   ];
   final faq = preguntas
@@ -674,7 +674,7 @@ String _descargas() {
     <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › Descargas</nav>
     <h1>Descargar Jaguar Code</h1>
     <p class="resumen">Instálalo en tu celular o tu computadora, o ábrelo sin instalar nada en el navegador. Es gratis, sin anuncios y sin cuenta, y el código es abierto.</p>
-    <p class="aviso-prueba"><b>Versión de prueba.</b> Jaguar Code está en desarrollo: puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo.</p>
+    <p class="aviso-prueba"><b>Acceso abierto antes del lanzamiento.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo. Lanzamiento oficial: lunes 11 de enero de 2027.</p>
 
     <div class="relacionadas descargas">
       <a href="https://app.jaguarcode.org/">Navegador<small>Sin instalar. Funciona en Windows, Mac, Linux, Android, iPhone y iPad.</small></a>
@@ -682,6 +682,7 @@ String _descargas() {
       <a href="$_bajar/JaguarCode-windows-x64.zip">Windows (ZIP)<small>Para Windows 10 y 11 de 64 bits. Se descomprime y se abre, sin instalador.</small></a>
       <a href="$_bajar/JaguarCode-macos.dmg">Mac (DMG)<small>Para Mac con chip de Apple o Intel.</small></a>
       <a href="$_bajar/JaguarCode-linux-x64.tar.gz">Linux (tar.gz)<small>Para Linux de 64 bits con escritorio GTK.</small></a>
+      <a href="https://snapcraft.io/jaguar-code">Linux (Snap)<small>Desde el Snap Store, en el canal beta. Se actualiza solo.</small></a>
     </div>
     <p class="nota-tabla">Todas las versiones y sus sumas de verificación están en <a href="https://github.com/panterino/jaguar/releases">la página de versiones</a>.</p>
 
@@ -701,7 +702,7 @@ String _descargas() {
           <li>Abre la carpeta y haz doble clic en <code>jaguar.exe</code>.</li>
           <li>Si Windows muestra «Windows protegió tu PC», toca Más información y luego Ejecutar de todas formas.</li>
         </ol>
-        <p>En Windows no están las clases ni la comunidad; el resto funciona sin conexión.</p>
+        <p>Las clases y la comunidad necesitan conexión; el resto funciona sin ella.</p>
       </section>
       <section id="mac">
         <h2>Cómo instalarlo en Mac</h2>
@@ -712,12 +713,13 @@ String _descargas() {
       </section>
       <section id="linux">
         <h2>Cómo usarlo en Linux</h2>
+        <p>Con Snap, en una terminal: <code>sudo snap install jaguar-code --beta</code>. Se actualiza solo. Si prefieres el archivo, sigue estos pasos:</p>
         <ol>
           <li>Descomprime el archivo: <code>tar -xzf JaguarCode-linux-x64.tar.gz</code>.</li>
           <li>Entra a la carpeta y ejecuta <code>./jaguar</code>.</li>
           <li>Para tenerlo en el menú de aplicaciones, ejecuta <code>./instalar.sh</code> y no muevas la carpeta de lugar.</li>
         </ol>
-        <p>En Linux no están las clases ni la comunidad; el resto funciona sin conexión.</p>
+        <p>Las clases y la comunidad necesitan conexión; el resto funciona sin ella.</p>
       </section>
       <section id="preguntas">
         <h2>Preguntas frecuentes</h2>
@@ -740,12 +742,14 @@ String _descargas() {
 // Mapa del sitio ---------------------------------------------------------
 
 String _mapa() {
-  String url(String ruta, String frecuencia, String prioridad) =>
-      '  <url><loc>${g.sitio}$ruta</loc><lastmod>${g.fecha}</lastmod><changefreq>$frecuencia</changefreq><priority>$prioridad</priority></url>';
+  String url(String ruta, String frecuencia, String prioridad, [String? cambio]) =>
+      '  <url><loc>${g.sitio}$ruta</loc><lastmod>${cambio ?? g.fecha}</lastmod><changefreq>$frecuencia</changefreq><priority>$prioridad</priority></url>';
   final lineas = [
     url('/', 'weekly', '1.0'),
     url('/guias', 'monthly', '0.8'),
-    for (final guia in g.guias) url('/guias/${guia.slug}', 'monthly', '0.8'),
+    for (final guia in g.guias) url('/guias/${guia.slug}', 'monthly', '0.8', guia.publicada),
+    url('/errores', 'monthly', '0.7', '2026-11-03'),
+    for (final error in g.errores) url('/errores/${error.slug}', 'monthly', '0.6', error.publicada),
     url('/descargas', 'monthly', '0.8'),
     url('/herramientas/prueba-de-escritorio', 'monthly', '0.9'),
     url('/herramientas/diagrama-de-flujo-online', 'monthly', '0.9'),
@@ -753,6 +757,7 @@ String _mapa() {
     for (final id in _orden) url(_ruta(id), 'monthly', '0.8'),
     url('/profes', 'monthly', '0.7'),
     url('/manual', 'monthly', '0.6'),
+    url('/por-que-jaguar', 'monthly', '0.7', '2026-11-03'),
   ];
   return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${lineas.join('\n')}\n</urlset>\n';
 }
