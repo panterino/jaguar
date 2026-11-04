@@ -64,7 +64,7 @@ class ViewSettings extends ChangeNotifier {
   int get tourStep => _prefs.getInt('jaguar.view.tourStep') ?? 3;
   set tourStep(int value) => _set(() => _prefs.setInt('jaguar.view.tourStep', value));
 
-  /// The version for which the person already read "versión de prueba": the
+  /// The version for which the person already read the notice about the open access before the launch: the
   /// notice shows again with each new version.
   String? get betaNoticeVersion => _prefs.getString('jaguar.view.betaNotice');
   set betaNoticeVersion(String? value) => _set(() {
