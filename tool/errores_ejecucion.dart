@@ -880,7 +880,7 @@ FinAlgoritmo
         'Casi siempre sí: un ciclo Para o Mientras hace lo mismo. La recursión es una forma más corta de escribir ciertos problemas, pero no es obligatoria.',
       ),
     ],
-    relacionadas: ['errores-al-usar-funciones', 'ciclos-mientras-para-repetir', 'demasiados-pasos-ciclo-infinito'],
+    relacionadas: ['errores-al-usar-funciones', 'funciones-y-subprocesos-en-pseudocodigo', 'demasiados-pasos-ciclo-infinito'],
   ),
   Guia(
     carpeta: 'errores',
