@@ -246,6 +246,59 @@ void main() {
     await tester.pumpAndSettle();
     expect(opened?.title, 'Par o impar');
   });
+
+  testWidgets('la clase muestra al alumno cuántas pruebas ocultas hay y el profesor la cierra', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    final backend = MemoryBackend();
+    final cloud = Cloud(backend, prefs);
+    final teacher = await cloud.registerTeacher(email: 'p@x.mx', password: 'secreto', alias: 'Profe');
+    final room = await cloud.createClass('1° A');
+    await backend.assign(
+      room.id,
+      const Exercise(
+        id: 'doble',
+        title: 'Doble',
+        cases: [
+          TestCase(inputs: ['2'], expected: '4'),
+          TestCase(inputs: ['0'], expected: '0', hidden: true),
+          TestCase(inputs: ['-3'], expected: '-6', hidden: true),
+        ],
+      ),
+    );
+    Future<void> open(ClassRoom r) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ClassScreen(
+            cloud: cloud,
+            room: r,
+            exercises: ExerciseStore(prefs),
+            onOpenAssignment: (_) {},
+            onOpenSource: (_) {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    // The teacher closes the class with the switch.
+    await open(room);
+    expect(find.text('Recibe alumnos nuevos'), findsOneWidget);
+    await tester.tap(find.byType(Switch));
+    await tester.pumpAndSettle();
+    expect(find.text('Cerrada a alumnos nuevos'), findsOneWidget);
+    expect((await backend.myClasses()).single.open, isFalse);
+
+    // A student who is already in sees how many hidden tests the teacher reviews.
+    backend.actAs(null);
+    await cloud.signInAnonymously(alias: 'Ana', role: CloudRole.alumno);
+    backend.actAs(teacher);
+    await backend.setClassOpen(room.id, open: true);
+    await cloud.signInAnonymously(alias: 'Ana', role: CloudRole.alumno);
+    await cloud.joinClass(code: room.code, name: 'Ana');
+    await open(room);
+    expect(find.textContaining('Tu profe revisa 2 pruebas más que no se ven'), findsOneWidget);
+  });
 }
 
 const minSend = Cloud.minSendGap;

@@ -8,6 +8,7 @@ import '../exercises/exercise_store.dart';
 import '../theme.dart';
 import 'account_dialog.dart';
 import 'cloud.dart';
+import 'regrade.dart';
 
 /// Same breakpoint as the rooms: from here the classes use the width.
 const _wideWidth = 900.0;
@@ -237,6 +238,15 @@ class _ClassScreenState extends State<ClassScreen> {
   Map<String, Map<String, Submission>> _submissions = const {};
   String? _error;
   Timer? _refresh;
+  late bool _open = widget.room.open;
+
+  /// What each student claimed, for the entries the teacher's check changed:
+  /// `assignmentId/uid` → "3 de 3". The numbers on screen are the checked ones.
+  Map<String, String> _claimed = const {};
+
+  /// Checked results, kept while the program stays the same, so the 20-second
+  /// refresh does not run every program again.
+  final Map<String, ({String source, int passed, int total, int? stamp})> _checked = {};
 
   CloudBackend get _backend => widget.cloud.backend;
   bool get _isTeacher => widget.room.ownerId == widget.cloud.user?.uid;
@@ -260,9 +270,10 @@ class _ClassScreenState extends State<ClassScreen> {
       final assignments = await _backend.assignments(widget.room.id);
       final members = _isTeacher ? await _backend.members(widget.room.id) : const <Member>[];
       final submissions = <String, Map<String, Submission>>{};
+      final claimed = <String, String>{};
       for (final a in assignments) {
         if (_isTeacher) {
-          submissions[a.id] = await _backend.submissions(widget.room.id, a.id);
+          submissions[a.id] = await _regradeAll(a, await _backend.submissions(widget.room.id, a.id), claimed);
         } else {
           final mine = await _backend.mySubmission(widget.room.id, a.id);
           submissions[a.id] = {if (mine case final Submission s) s.uid: s};
@@ -273,10 +284,55 @@ class _ClassScreenState extends State<ClassScreen> {
         _assignments = assignments;
         _members = members;
         _submissions = submissions;
+        _claimed = claimed;
         _error = null;
       });
     } on CloudException catch (e) {
       if (mounted) setState(() => _error = e.message);
+    }
+  }
+
+  /// A student writes the number of tests they passed, so it is not believed:
+  /// the program runs again here against every test, hidden ones included.
+  Future<Map<String, Submission>> _regradeAll(
+    Assignment assignment,
+    Map<String, Submission> sent,
+    Map<String, String> claimed,
+  ) async {
+    final result = <String, Submission>{};
+    for (final entry in sent.entries) {
+      final s = entry.value;
+      final key = '${assignment.id}/${entry.key}';
+      final stamp = s.updatedAt?.millisecondsSinceEpoch;
+      var known = _checked[key];
+      if (known == null || known.source != s.source || known.stamp != stamp) {
+        final graded = await regrade(assignment, s);
+        known = (source: s.source, passed: graded.passed, total: graded.total, stamp: stamp);
+        _checked[key] = known;
+      }
+      if (known.passed != s.passed || known.total != s.total) claimed[key] = '${s.passed} de ${s.total}';
+      result[entry.key] = Submission(
+        uid: s.uid,
+        name: s.name,
+        source: s.source,
+        passed: known.passed,
+        total: known.total,
+        updatedAt: s.updatedAt,
+        pastedLines: s.pastedLines,
+      );
+    }
+    return result;
+  }
+
+  Future<void> _setOpen(bool open) async {
+    final before = _open;
+    setState(() => _open = open);
+    try {
+      await _backend.setClassOpen(widget.room.id, open: open);
+    } on CloudException catch (e) {
+      if (!mounted) return;
+      setState(() => _open = before);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
     }
   }
 
@@ -358,6 +414,13 @@ class _ClassScreenState extends State<ClassScreen> {
                 '${submission.passed} de ${submission.total} pruebas'
                 '${submission.updatedAt == null ? '' : ' · ${_time(submission.updatedAt!)}'}',
               ),
+              if (_claimed['${assignment.id}/${submission.uid}'] case final String said) ...[
+                const SizedBox(height: 8),
+                Text(
+                  'El alumno dijo $said; al revisar su programa contra todas las pruebas salió esto.',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
               if (submission.pastedLines > 0) ...[
                 const SizedBox(height: 8),
                 _PastedNote(lines: submission.pastedLines),
@@ -431,7 +494,8 @@ class _ClassScreenState extends State<ClassScreen> {
     final list = ListView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
       children: [
-        if (_isTeacher) _CodeCard(code: widget.room.code, students: _members.length),
+        if (_isTeacher)
+          _CodeCard(code: widget.room.code, students: _members.length, open: _open, onOpenChanged: _setOpen),
         const SizedBox(height: 16),
         Text('Tareas', style: theme.textTheme.titleMedium),
         const SizedBox(height: 8),
@@ -456,11 +520,18 @@ class _ClassScreenState extends State<ClassScreen> {
               child: ListTile(
                 leading: _StatusIcon(submission: _submissions[a.id]?.values.firstOrNull),
                 title: Text(a.title),
-                subtitle: Text(switch (_submissions[a.id]?.values.firstOrNull) {
-                  null => 'Sin entregar',
-                  final s when s.complete => 'Completa: ${s.passed} de ${s.total} pruebas',
-                  final s => '${s.passed} de ${s.total} pruebas',
-                }),
+                subtitle: Text(
+                  '${switch (_submissions[a.id]?.values.firstOrNull) {
+                    null => 'Sin entregar',
+                    final s when s.complete => 'Completa: ${s.passed} de ${s.total} pruebas',
+                    final s => '${s.passed} de ${s.total} pruebas',
+                  }}'
+                  '${a.hiddenCount == 0
+                      ? ''
+                      : a.hiddenCount == 1
+                      ? '. Tu profe revisa 1 prueba más que no se ve.'
+                      : '. Tu profe revisa ${a.hiddenCount} pruebas más que no se ven.'}',
+                ),
                 trailing: FilledButton.tonal(onPressed: () => _openAssignment(a), child: const Text('Resolver')),
               ),
             ),
@@ -517,7 +588,7 @@ class _ClassScreenState extends State<ClassScreen> {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
               children: [
-                _CodeCard(code: widget.room.code, students: _members.length),
+                _CodeCard(code: widget.room.code, students: _members.length, open: _open, onOpenChanged: _setOpen),
                 const SizedBox(height: 12),
                 Tooltip(
                   message: 'Elige uno de tus ejercicios o uno del banco',
@@ -568,10 +639,12 @@ String _time(DateTime time) {
 }
 
 class _CodeCard extends StatelessWidget {
-  const _CodeCard({required this.code, required this.students});
+  const _CodeCard({required this.code, required this.students, required this.open, required this.onOpenChanged});
 
   final String code;
   final int students;
+  final bool open;
+  final ValueChanged<bool> onOpenChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -592,6 +665,19 @@ class _CodeCard extends StatelessWidget {
                     style: monoStyle.copyWith(fontSize: 36, fontWeight: FontWeight.w700, letterSpacing: 2),
                   ),
                   Text(students == 1 ? '1 alumno' : '$students alumnos', style: theme.textTheme.bodySmall),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Switch(value: open, onChanged: onOpenChanged),
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: Text(
+                          open ? 'Recibe alumnos nuevos' : 'Cerrada a alumnos nuevos',
+                          style: theme.textTheme.bodySmall,
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
