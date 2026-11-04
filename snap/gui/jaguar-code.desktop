@@ -1,7 +1,8 @@
 [Desktop Entry]
 Type=Application
 Name=Jaguar Code
-Comment=Aprende lógica de programación con pseudocódigo, diagramas de flujo y retos
+Comment=Learn programming logic with pseudocode, flowcharts and challenges
+Comment[es]=Aprende lógica de programación con pseudocódigo, diagramas de flujo y retos
 Exec=jaguar-code
 Icon=${SNAP}/meta/gui/jaguar-code.png
 Terminal=false

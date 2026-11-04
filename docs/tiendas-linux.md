@@ -16,6 +16,8 @@ Una sola vez, en una terminal con `snapcraft` instalado (en Linux, o `brew insta
 
 Desde entonces, cada publicación (release) de GitHub compila el snap, lo adjunta como `JaguarCode-linux-x64.snap` y lo sube al canal `beta`. Mientras sea versión de prueba, se queda en `beta`; para pasarlo a estable: `snapcraft release jaguar-code <revisión> stable`.
 
+La ficha del snap (resumen y descripción) está en inglés, como la del resto de la tienda, y sale de `snap/snapcraft.yaml` con cada revisión. Las capturas no: el Snap Store solo las acepta desde su panel, en snapcraft.io, Listing, Screenshots (hasta cinco). Las de `snap/capturas/` (1600x900, de la app real) son para subirlas ahí a mano.
+
 Para probar sin publicar: Actions, Escritorio, Run workflow (deja la etiqueta vacía); el snap queda como artefacto.
 
 Lo que no se ha probado: el primer build del snap. Si falla, se corrige con el registro de Actions.
