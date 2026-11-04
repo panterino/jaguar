@@ -125,6 +125,32 @@ como "compartir".
    dijiste, no lo pide. Si aparece, es la única parte que cambiaría.
 5. Enviar a revisión. Las primeras revisiones tardan varios días.
 
+## Estado de la consola (4 de noviembre de 2026)
+
+La app está en la cuenta de desarrollador **JF Dev MX** (cuenta personal), como el borrador
+«Jaguar: Aprende a programar», sin paquete subido todavía. En la misma cuenta hay otra, «Jaguar:
+Aprende Facilmente» (`com.panterino.jaguar`, de 2021), que **Google eliminó** y tiene un problema de
+políticas; no es esta y conviene saber por qué fue, porque cuenta en el historial de la cuenta.
+
+Hecho en el borrador:
+
+- Ficha principal: nombre, descripciones, ícono, gráfico de funciones y las 7 capturas.
+- Política de privacidad, anuncios (no), ID de publicidad (no), apps gubernamentales (no),
+  funciones financieras (ninguna) y apps de salud (ninguna).
+- Seguridad de los datos: todo respondido y guardado como borrador, falta enviarlo.
+
+Falta, y no lo puede hacer un asistente:
+
+1. **Detalles de acceso:** pide un correo y una contraseña de profesor de prueba (hay que crear la
+   cuenta en la app). Hasta que esté, la consola no deja llenar «Público objetivo y contenido», ni
+   enviar la seguridad de los datos.
+2. **Público objetivo y contenido:** 13 a 15, 16 a 17 y 18 o más.
+3. **Clasificación del contenido:** el cuestionario IARC implica aceptar sus condiciones de servicio.
+4. **Correo de contacto** de la ficha (obligatorio, y es público) y, si quieres, el sitio web
+   https://jaguarcode.org.
+5. **El `.aab`:** crear la versión en Pruebas internas y subirlo.
+6. Declarar el estado de comerciante antes de febrero de 2027 (solo el dueño de la cuenta).
+
 ## Pendiente
 
 - Capturas de tableta y, si se quiere, un video.
