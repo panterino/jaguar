@@ -39,7 +39,11 @@ Future<(Cloud, ClassRoom, ExerciseStore)> _classWith({int tasks = 2, int student
           classId: room.id,
           assignmentId: a.id,
           name: name,
-          source: '// Entrega de $name\nAlgoritmo x\nFinAlgoritmo\n',
+          // The first student's program really passes; the teacher's check
+          // runs it again, so the number he sends is not what counts.
+          source: s == 1
+              ? '// Entrega de $name\nAlgoritmo x\n    Leer n\n    Escribir n\nFinAlgoritmo\n'
+              : '// Entrega de $name\nAlgoritmo x\nFinAlgoritmo\n',
           passed: s == 1 ? 1 : 0,
           total: 1,
           pastedLines: s == 2 ? 12 : 0,
