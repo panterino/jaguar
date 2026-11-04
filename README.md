@@ -19,8 +19,7 @@ escuelas y hacer que funcione en cualquier equipo.
 ## Qué hay aquí
 
 ```
-packages/jaguar_core   el intérprete, en Dart puro (sin Flutter)
-apps/jaguar            la app en Flutter
+apps/jaguar            la app en Flutter (usa el paquete jaguar_core, que vive aparte)
 firestore.rules        reglas de la base de datos (clases y comunidad)
 firebase-tests/        pruebas de esas reglas contra el emulador
 sitio/                 la página de presentación
@@ -63,10 +62,13 @@ compilar. Se publica con `tool/publicar_sitio.sh`.
 
 ## El intérprete solo
 
+El intérprete es el paquete [`jaguar_core`](https://github.com/panterino/jaguar_core), en Dart puro y en su propio repositorio, para poder publicarlo y usarlo sin la app. Aquí se usa como dependencia de `apps/jaguar`.
+
 ```sh
-cd packages/jaguar_core
+git clone https://github.com/panterino/jaguar_core
+cd jaguar_core
 dart test
-dart run bin/jaguar.dart example/hola.psc
+dart run jaguar_core:jaguar example/hola.psc
 ```
 
 ```dart

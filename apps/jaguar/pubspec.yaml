@@ -17,7 +17,9 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   jaguar_core:
-    path: ../../packages/jaguar_core
+    git:
+      url: https://github.com/panterino/jaguar_core.git
+      ref: v0.1.0
   mobile_scanner: ^7.4.2
   qr_flutter: ^4.1.0
   share_plus: ^12.0.2

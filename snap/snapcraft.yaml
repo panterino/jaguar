@@ -1,5 +1,5 @@
 # Jaguar Code como snap. Se compila desde la raíz del repositorio (la app usa
-# packages/jaguar_core) y lo arma .github/workflows/escritorio.yml.
+# jaguar_core, que se baja de su repositorio) y lo arma .github/workflows/escritorio.yml.
 name: jaguar-code
 title: Jaguar Code
 base: core22

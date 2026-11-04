@@ -296,9 +296,11 @@ packages:
   jaguar_core:
     dependency: "direct main"
     description:
-      path: "../../packages/jaguar_core"
-      relative: true
-    source: path
+      path: "."
+      ref: "v0.1.0"
+      resolved-ref: "288dd6017adcf9669cae9d29bb2c9c589a742109"
+      url: "https://github.com/panterino/jaguar_core.git"
+    source: git
     version: "0.1.0"
   json_annotation:
     dependency: transitive

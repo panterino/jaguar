@@ -4,7 +4,7 @@
 // Python. Correr desde apps/jaguar:
 //   dart run tool/retos_html.dart
 // Los ejemplos llevan data-entradas y data-salida: una prueba
-// (packages/jaguar_core/test/guias_test.dart) los ejecuta con el intérprete.
+// (apps/jaguar/test/sitio_test.dart) los ejecuta con el intérprete.
 import 'dart:convert';
 import 'dart:io';
 
