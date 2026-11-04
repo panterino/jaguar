@@ -292,6 +292,7 @@ void main() {
             textScale: scale,
           );
           expect(find.text('Crear mi primer ejercicio'), findsOneWidget);
+          expect(find.byType(FloatingActionButton), findsNothing);
         });
       }
     }

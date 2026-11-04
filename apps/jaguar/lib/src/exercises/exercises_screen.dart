@@ -105,8 +105,9 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
         final current = _current(exercises);
         return Scaffold(
           appBar: AppBar(title: const Text('Mis ejercicios')),
-          // On a computer the button lives in the list, next to the count.
-          floatingActionButton: wide
+          // On a computer the button lives in the list; with nothing yet, the
+          // empty state already offers it.
+          floatingActionButton: wide || exercises.isEmpty
               ? null
               : FloatingActionButton.extended(
                   onPressed: _edit,

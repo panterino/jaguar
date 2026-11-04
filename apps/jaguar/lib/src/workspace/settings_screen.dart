@@ -366,9 +366,10 @@ class _CodePreviewState extends State<_CodePreview> {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: scheme.outlineVariant),
         ),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Text.rich(_code.buildTextSpan(context: context, style: style, withComposing: false), softWrap: false),
+        child: Text.rich(
+          _code.buildTextSpan(context: context, style: style, withComposing: false),
+          softWrap: false,
+          overflow: TextOverflow.clip,
         ),
       ),
     );
