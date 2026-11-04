@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme.dart';
 import 'privacy.dart';
 import '../widgets/mascota.dart';
+import '../widgets/page_width.dart';
 
 const jaguarVersion = '0.9.1';
 
@@ -18,7 +19,7 @@ class AboutScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Acerca de Jaguar Code')),
       body: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 760),
+          constraints: const BoxConstraints(maxWidth: readingWidth),
           child: ListView(
             padding: const EdgeInsets.all(24),
             children: [

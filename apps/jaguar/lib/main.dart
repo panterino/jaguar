@@ -69,42 +69,12 @@ class JaguarApp extends StatelessWidget {
         theme: buildTheme(Brightness.light),
         darkTheme: buildTheme(Brightness.dark),
         themeMode: settings.themeMode,
-        builder: (context, child) => MaxWidth(child: child!),
         home: WorkspaceScreen(
           store: store,
           exercises: exercises,
           settings: settings,
           cloud: cloud,
           startInEditor: openEditor,
-        ),
-      ),
-    );
-  }
-}
-
-/// The widest the app gets. On an ultrawide monitor (21:9) everything
-/// stretched across the whole screen; past this the app stays centered.
-const maxAppWidth = 1600.0;
-
-class MaxWidth extends StatelessWidget {
-  const MaxWidth({super.key, required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final media = MediaQuery.of(context);
-    if (media.size.width <= maxAppWidth) return child;
-    return ColoredBox(
-      color: Theme.of(context).scaffoldBackgroundColor,
-      child: Center(
-        child: SizedBox(
-          width: maxAppWidth,
-          // Inside, the screens see the width they really have.
-          child: MediaQuery(
-            data: media.copyWith(size: Size(maxAppWidth, media.size.height)),
-            child: child,
-          ),
         ),
       ),
     );

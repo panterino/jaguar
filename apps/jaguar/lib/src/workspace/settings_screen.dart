@@ -6,6 +6,7 @@ import '../exercises/exercise_store.dart';
 import '../settings.dart';
 import '../theme.dart';
 import 'mode_widgets.dart';
+import '../widgets/page_width.dart';
 
 /// Same breakpoint as the rooms: from here the settings use two columns.
 const _wideWidth = 900.0;
@@ -87,7 +88,7 @@ class SettingsScreen extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.topCenter,
                   child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 1000),
+                    constraints: const BoxConstraints(maxWidth: pageWidth),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

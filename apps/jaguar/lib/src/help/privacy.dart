@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'privacy_text.dart';
+import '../widgets/page_width.dart';
 
 export 'privacy_text.dart';
 
@@ -14,7 +15,7 @@ class PrivacyScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Aviso de privacidad')),
       body: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 720),
+          constraints: const BoxConstraints(maxWidth: readingWidth),
           child: ListView(
             padding: const EdgeInsets.all(20),
             children: [
