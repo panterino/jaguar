@@ -31,7 +31,7 @@ class _WelcomeDialog extends StatelessWidget {
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Activar modo profesor')),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Activar')),
         ],
       ),
     );

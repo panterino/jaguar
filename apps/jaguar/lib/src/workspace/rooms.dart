@@ -15,6 +15,7 @@ import '../programs/examples.dart';
 import '../programs/program_store.dart';
 import '../settings.dart';
 import '../theme.dart';
+import '../cloud/account_dialog.dart';
 import 'classes_room.dart';
 import 'programs_drawer.dart' show timeAgo;
 import '../widgets/page_width.dart';
@@ -189,6 +190,9 @@ class RoomsScaffold extends StatelessWidget {
   /// Students join with a code; teachers create the class.
   Widget _classesAction(BuildContext context, Cloud cloud) {
     final teacher = cloud.user?.isTeacher ?? false;
+    // Someone in teacher mode who has not signed in yet is shown the way in,
+    // not the student's "join with a code".
+    final teacherToSignIn = !cloud.signedIn && actions.onOpenTeacher != null;
     return Padding(
       padding: const EdgeInsets.only(right: 8),
       child: teacher
@@ -196,6 +200,12 @@ class RoomsScaffold extends StatelessWidget {
               onPressed: () => createClassFlow(context, cloud),
               icon: const Icon(Icons.add),
               label: const Text('Crear clase'),
+            )
+          : teacherToSignIn
+          ? FilledButton.icon(
+              onPressed: () => showAccountDialog(context, cloud),
+              icon: const Icon(Icons.login),
+              label: const Text('Entrar'),
             )
           : OutlinedButton.icon(
               onPressed: () => joinClassFlow(context, cloud, exercises),
@@ -1784,10 +1794,15 @@ class _ClassesRoom extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final received = exercises.received.reversed.toList();
+    // A teacher comes here to run classes; the lines about "your teacher" are
+    // for students.
+    final teacher = (cloud?.user?.isTeacher ?? false) || (cloud?.signedIn != true && actions.onOpenTeacher != null);
     return _Page(
       children: [
-        const _Phrase(
-          'Lo que te comparte tu profe: clases en línea y ejercicios. Si no tienes profe, no necesitas esta sala.',
+        _Phrase(
+          teacher
+              ? 'Crea clases, asigna ejercicios con pruebas y revisa lo que entrega tu grupo.'
+              : 'Lo que te comparte tu profe: clases en línea y ejercicios. Si no tienes profe, no necesitas esta sala.',
         ),
         if (actions.onOpenTeacher case final openTeacher?) ...[
           _RoomCard(
@@ -1805,64 +1820,67 @@ class _ClassesRoom extends StatelessWidget {
         if (cloud case final cloud?)
           ClassesList(
             cloud: cloud,
+            forTeacher: teacher,
             onOpenAssignment: (assignment) => actions.onOpenAssignment?.call(assignment),
             onOpenClass: (room) => actions.onOpenClass?.call(room),
           )
         else
           const _Phrase('Las clases en línea necesitan internet. Lo demás de esta sala funciona sin conexión.'),
-        const SizedBox(height: 20),
-        const _Label('Ejercicios del profe'),
-        if (received.isEmpty)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
-            child: Text(
-              'Cuando tu profe te comparta un ejercicio con un QR o un enlace, aparece aquí.',
-              style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
-            ),
-          )
-        else
-          for (final exercise in received)
-            _RoomCard(
-              margin: const EdgeInsets.only(bottom: 6),
-              child: ListTile(
-                minVerticalPadding: 12,
-                title: Text(exercise.title),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => actions.onOpenExercise(exercise),
+        if (!teacher || received.isNotEmpty) ...[
+          const SizedBox(height: 20),
+          const _Label('Ejercicios del profe'),
+          if (received.isEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+              child: Text(
+                'Cuando tu profe te comparta un ejercicio con un QR o un enlace, aparece aquí.',
+                style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
               ),
-            ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            if (actions.onScan case final scan?)
+            )
+          else
+            for (final exercise in received)
+              _RoomCard(
+                margin: const EdgeInsets.only(bottom: 6),
+                child: ListTile(
+                  minVerticalPadding: 12,
+                  title: Text(exercise.title),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => actions.onOpenExercise(exercise),
+                ),
+              ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              if (actions.onScan case final scan?)
+                OutlinedButton.icon(
+                  onPressed: scan,
+                  icon: const Icon(Icons.qr_code_scanner),
+                  label: const Text('Escanear QR'),
+                ),
               OutlinedButton.icon(
-                onPressed: scan,
-                icon: const Icon(Icons.qr_code_scanner),
-                label: const Text('Escanear QR'),
+                onPressed: actions.onOpenLink,
+                icon: const Icon(Icons.link),
+                label: const Text('Abrir enlace'),
               ),
-            OutlinedButton.icon(
-              onPressed: actions.onOpenLink,
-              icon: const Icon(Icons.link),
-              label: const Text('Abrir enlace'),
-            ),
-          ],
-        ),
-        const SizedBox(height: 20),
-        DecoratedBox(
-          decoration: BoxDecoration(
-            border: Border.all(color: scheme.outlineVariant),
-            borderRadius: BorderRadius.circular(12),
+            ],
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Text(
-              'Lo que haces aquí es para tu clase. Tu avance en la Ruta va por separado y nadie más lo ve.',
-              style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+          const SizedBox(height: 20),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              border: Border.all(color: scheme.outlineVariant),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Text(
+                'Lo que haces aquí es para tu clase. Tu avance en la Ruta va por separado y nadie más lo ve.',
+                style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+              ),
             ),
           ),
-        ),
+        ],
       ],
     );
   }
