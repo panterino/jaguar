@@ -6,6 +6,7 @@ import 'package:jaguar_core/jaguar_core.dart';
 
 import '../exercises/exercise_store.dart';
 import '../theme.dart';
+import '../widgets/pro_widgets.dart';
 import 'account_dialog.dart';
 import 'cloud.dart';
 import 'regrade.dart';
@@ -22,7 +23,76 @@ Future<(String, String)?> askJoinCode(BuildContext context) =>
 
 /// Asks for the name of a new class; null if cancelled.
 Future<String?> askNewClassName(BuildContext context) =>
-    _askText(context, title: 'Nueva clase', label: 'Nombre de la clase', hint: '1° A · Lógica');
+    showDialog<String>(context: context, builder: (_) => const _NewClassDialog());
+
+/// Fields with an outline inside a dialog: here people fill in a form, so they
+/// should look like one.
+Widget _formTheme(BuildContext context, Widget child) => Theme(
+  data: Theme.of(
+    context,
+  ).copyWith(inputDecorationTheme: const InputDecorationTheme(border: OutlineInputBorder(), isDense: false)),
+  child: child,
+);
+
+class _NewClassDialog extends StatefulWidget {
+  const _NewClassDialog();
+
+  @override
+  State<_NewClassDialog> createState() => _NewClassDialogState();
+}
+
+class _NewClassDialogState extends State<_NewClassDialog> {
+  final _name = TextEditingController();
+
+  @override
+  void dispose() {
+    _name.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final name = _name.text.trim();
+    if (name.isNotEmpty) Navigator.pop(context, name);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return _formTheme(
+      context,
+      AlertDialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        title: const Text('Crear una clase'),
+        content: SizedBox(
+          width: 400,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Tus alumnos la verán con este nombre. Al crearla recibes un código para que se unan.',
+                style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _name,
+                autofocus: true,
+                textInputAction: TextInputAction.done,
+                textCapitalization: TextCapitalization.sentences,
+                decoration: const InputDecoration(labelText: 'Nombre de la clase', hintText: '1° A · Lógica'),
+                onSubmitted: (_) => _submit(),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+          FilledButton(onPressed: _submit, child: const Text('Crear clase')),
+        ],
+      ),
+    );
+  }
+}
 
 /// My classes: the teacher creates them; students join with a code.
 class ClassesScreen extends StatefulWidget {
@@ -158,7 +228,7 @@ class _ClassesScreenState extends State<ClassesScreen> {
                     title: user.isTeacher ? 'Aún no tienes clases' : 'Aún no estás en ninguna clase',
                     text: user.isTeacher
                         ? 'Crea una clase y comparte su código con tu grupo.'
-                        : 'Pídele a tu profesor el código de la clase (como JAG-4K7Q).',
+                        : 'Pídele a tu profesor el código de la clase (como JAG-K7Q4M2XP).',
                     action: wide
                         ? FilledButton.icon(onPressed: action, icon: Icon(actionIcon), label: Text(actionLabel!))
                         : null,
@@ -401,59 +471,148 @@ class _ClassScreenState extends State<ClassScreen> {
   }
 
   Future<void> _showSubmission(Submission submission, Assignment assignment) async {
+    final said = _claimed['${assignment.id}/${submission.uid}'];
     await showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('${submission.name} · ${assignment.title}'),
-        content: SizedBox(
-          width: 560,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+      builder: (context) {
+        final theme = Theme.of(context);
+        final scheme = theme.colorScheme;
+        return AlertDialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+          titlePadding: const EdgeInsets.fromLTRB(24, 22, 24, 0),
+          title: Row(
             children: [
-              Text(
-                '${submission.passed} de ${submission.total} pruebas'
-                '${submission.updatedAt == null ? '' : ' · ${_time(submission.updatedAt!)}'}',
-              ),
-              if (_claimed['${assignment.id}/${submission.uid}'] case final String said) ...[
-                const SizedBox(height: 8),
-                Text(
-                  'El alumno dijo $said; al revisar su programa contra todas las pruebas salió esto.',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ],
-              if (submission.pastedLines > 0) ...[
-                const SizedBox(height: 8),
-                _PastedNote(lines: submission.pastedLines),
-              ],
-              const SizedBox(height: 8),
-              Flexible(
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: SingleChildScrollView(
-                    child: SelectableText(submission.source, style: monoStyle.copyWith(fontSize: 13, letterSpacing: 0)),
-                  ),
+              InitialsAvatar(name: submission.name, size: 44),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      submission.name,
+                      style: theme.textTheme.titleLarge,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      assignment.title,
+                      style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.popUntil(context, (route) => route.isFirst);
-              widget.onOpenSource('// Entrega de ${submission.name}: ${assignment.title}\n${submission.source}');
-            },
-            child: const Text('Abrir una copia'),
+          content: SizedBox(
+            width: 600,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 14),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    StatusPill(
+                      label: '${submission.passed} de ${submission.total} pruebas',
+                      tone: submission.complete ? PillTone.good : PillTone.warn,
+                      icon: submission.complete ? Icons.check_circle : Icons.timelapse,
+                    ),
+                    if (submission.updatedAt != null)
+                      StatusPill(label: _time(submission.updatedAt!), icon: Icons.schedule),
+                  ],
+                ),
+                if (submission.pastedLines > 0) ...[
+                  const SizedBox(height: 12),
+                  NoticeBox(
+                    tone: PillTone.info,
+                    icon: Icons.content_paste,
+                    text:
+                        'Pegó ${submission.pastedLines} líneas de una vez mientras lo escribía. Puede ser código suyo '
+                        'de otro lado, o de alguien más: pídele que te explique el programa.',
+                  ),
+                ],
+                if (said != null) ...[
+                  const SizedBox(height: 12),
+                  NoticeBox(
+                    tone: PillTone.warn,
+                    icon: Icons.rule,
+                    text:
+                        'El alumno dijo $said. Jaguar corrió su programa contra todas las pruebas, '
+                        'las ocultas incluidas, y salió lo que ves arriba.',
+                  ),
+                ],
+                const SizedBox(height: 14),
+                Flexible(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: scheme.surfaceContainerLowest,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: scheme.outlineVariant),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Container(
+                          color: scheme.surfaceContainerHigh,
+                          padding: const EdgeInsets.fromLTRB(14, 2, 4, 2),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  'Programa del alumno',
+                                  style: theme.textTheme.labelMedium?.copyWith(color: scheme.onSurfaceVariant),
+                                ),
+                              ),
+                              IconButton(
+                                tooltip: 'Copiar programa',
+                                visualDensity: VisualDensity.compact,
+                                icon: const Icon(Icons.copy_rounded, size: 18),
+                                onPressed: () {
+                                  Clipboard.setData(ClipboardData(text: submission.source));
+                                  ScaffoldMessenger.of(context)
+                                    ..hideCurrentSnackBar()
+                                    ..showSnackBar(const SnackBar(content: Text('Programa copiado')));
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        Flexible(
+                          child: SingleChildScrollView(
+                            padding: const EdgeInsets.all(14),
+                            child: SelectableText(
+                              submission.source,
+                              style: monoStyle.copyWith(fontSize: 13, height: 1.45, letterSpacing: 0),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-          FilledButton(onPressed: () => Navigator.pop(context), child: const Text('Cerrar')),
-        ],
-      ),
+          actionsPadding: const EdgeInsets.fromLTRB(24, 12, 24, 20),
+          actions: [
+            TextButton.icon(
+              onPressed: () {
+                Navigator.popUntil(context, (route) => route.isFirst);
+                widget.onOpenSource('// Entrega de ${submission.name}: ${assignment.title}\n${submission.source}');
+              },
+              icon: const Icon(Icons.open_in_new, size: 18),
+              label: const Text('Abrir una copia'),
+            ),
+            FilledButton(onPressed: () => Navigator.pop(context), child: const Text('Cerrar')),
+          ],
+        );
+      },
     );
   }
 
@@ -554,6 +713,67 @@ class _ClassScreenState extends State<ClassScreen> {
       if (_submissions[assignment.id]?[m.uid]?.complete ?? false) m,
   ].length;
 
+  /// The class in three figures: people, tasks, and how much of what was asked
+  /// is done.
+  Widget _stats(List<Assignment> assignments) {
+    final total = _members.length * assignments.length;
+    final done = [for (final a in assignments) _completed(a)].fold(0, (a, b) => a + b);
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: StatTile(icon: Icons.groups_outlined, value: '${_members.length}', label: 'Alumnos'),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: StatTile(icon: Icons.assignment_outlined, value: '${assignments.length}', label: 'Tareas'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        StatTile(
+          icon: Icons.task_alt,
+          value: total == 0 ? '—' : '${(done * 100 / total).round()} %',
+          label: 'Entregas completas',
+          progress: total == 0 ? null : done / total,
+        ),
+      ],
+    );
+  }
+
+  /// The table as text with tabs, which a spreadsheet takes as columns. The
+  /// numbers are the ones Jaguar checked, not what each student reported.
+  String _gradesTsv(List<Assignment> assignments) {
+    String cell(String text) => text.replaceAll(RegExp(r'[\t\r\n]+'), ' ');
+    final rows = <List<String>>[
+      ['Alumno', for (final a in assignments) a.title, 'Tareas completas'],
+    ];
+    for (final m in _members) {
+      var done = 0;
+      final cells = <String>[];
+      for (final a in assignments) {
+        final s = _submissions[a.id]?[m.uid];
+        if (s == null) {
+          cells.add('');
+        } else {
+          cells.add('${s.passed}/${s.total}');
+          if (s.complete) done++;
+        }
+      }
+      rows.add([m.name, ...cells, '$done/${assignments.length}']);
+    }
+    return rows.map((r) => r.map(cell).join('\t')).join('\n');
+  }
+
+  Future<void> _copyGrades(List<Assignment> assignments) async {
+    await Clipboard.setData(ClipboardData(text: _gradesTsv(assignments)));
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(const SnackBar(content: Text('Calificaciones copiadas. Pégalas en una hoja de cálculo.')));
+  }
+
   /// The teacher on a computer: the class and its tasks on the left, and
   /// the deliveries table taking the rest of the width and height.
   Widget _teacherWide(List<Assignment> assignments) {
@@ -581,6 +801,7 @@ class _ClassScreenState extends State<ClassScreen> {
             members: _members,
             submissions: _submissions,
             completed: _completed,
+            claimed: _claimed,
             onTap: _showSubmission,
           );
     return Row(
@@ -594,6 +815,8 @@ class _ClassScreenState extends State<ClassScreen> {
               children: [
                 _CodeCard(code: widget.room.code, students: _members.length, open: _open, onOpenChanged: _setOpen),
                 const SizedBox(height: 12),
+                _stats(assignments),
+                const SizedBox(height: 14),
                 Tooltip(
                   message: 'Elige uno de tus ejercicios o uno del banco',
                   child: FilledButton.icon(
@@ -602,26 +825,31 @@ class _ClassScreenState extends State<ClassScreen> {
                     label: const Text('Asignar ejercicio'),
                   ),
                 ),
-                const SizedBox(height: 20),
-                Text('Tareas', style: theme.textTheme.titleMedium),
-                const SizedBox(height: 4),
+                const SizedBox(height: 24),
+                const BlockHeading('Tareas'),
                 if (assignments.isEmpty)
                   Text(
                     'Todavía no hay tareas en esta clase.',
                     style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
                   ),
                 for (final a in assignments)
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.assignment_outlined),
-                    title: Text(a.title, maxLines: 2, overflow: TextOverflow.ellipsis),
-                    subtitle: Text('${_completed(a)} de ${_members.length} completas'),
-                    trailing: IconButton(
-                      tooltip: 'Quitar tarea',
-                      icon: const Icon(Icons.delete_outline),
-                      onPressed: () => _removeAssignment(a),
+                  _TaskTile(
+                    assignment: a,
+                    completed: _completed(a),
+                    students: _members.length,
+                    onRemove: () => _removeAssignment(a),
+                  ),
+                if (assignments.isNotEmpty && _members.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Tooltip(
+                    message: 'Copia la tabla para pegarla en una hoja de cálculo',
+                    child: OutlinedButton.icon(
+                      onPressed: () => _copyGrades(assignments),
+                      icon: const Icon(Icons.table_view_outlined),
+                      label: const Text('Copiar calificaciones'),
                     ),
                   ),
+                ],
               ],
             ),
           ),
@@ -653,54 +881,132 @@ class _CodeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Card(
-      color: theme.colorScheme.primaryContainer,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Código para unirse', style: theme.textTheme.labelLarge),
-                  SelectableText(
-                    code,
-                    style: monoStyle.copyWith(fontSize: 36, fontWeight: FontWeight.w700, letterSpacing: 2),
-                  ),
-                  Text(students == 1 ? '1 alumno' : '$students alumnos', style: theme.textTheme.bodySmall),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Switch(value: open, onChanged: onOpenChanged),
-                      const SizedBox(width: 4),
-                      Flexible(
-                        child: Text(
-                          open ? 'Recibe alumnos nuevos' : 'Cerrada a alumnos nuevos',
-                          style: theme.textTheme.bodySmall,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+    final scheme = theme.colorScheme;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: scheme.primaryContainer.withValues(alpha: 0.55),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: scheme.primary.withValues(alpha: 0.35)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const BlockHeading('Código de la clase'),
+          CodeBadge(code: code),
+          const SizedBox(height: 10),
+          Text(
+            students == 1
+                ? '1 alumno dentro. Tu grupo lo escribe en Unirme con código.'
+                : '$students alumnos dentro. Tu grupo lo escribe en Unirme con código.',
+            style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+          ),
+          const SizedBox(height: 8),
+          Divider(height: 16, color: scheme.primary.withValues(alpha: 0.2)),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      open ? 'Recibe alumnos nuevos' : 'Cerrada a alumnos nuevos',
+                      style: theme.textTheme.labelLarge,
+                    ),
+                    Text(
+                      open ? 'Cualquiera con el código puede unirse.' : 'Quien ya está dentro se queda.',
+                      style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            IconButton(
-              tooltip: 'Copiar código',
-              icon: const Icon(Icons.copy),
-              onPressed: () {
-                Clipboard.setData(ClipboardData(text: code));
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Código copiado')));
-              },
-            ),
-          ],
-        ),
+              Switch(value: open, onChanged: onOpenChanged),
+            ],
+          ),
+        ],
       ),
     );
   }
 }
 
-/// Students × assignments: ✓, 2/3 or — in each cell.
+/// A task in the side panel: its name, how many finished it, and a bar.
+class _TaskTile extends StatelessWidget {
+  const _TaskTile({required this.assignment, required this.completed, required this.students, required this.onRemove});
+
+  final Assignment assignment;
+  final int completed;
+  final int students;
+  final VoidCallback onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.fromLTRB(12, 10, 4, 12),
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: scheme.outlineVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.assignment_outlined, size: 20, color: scheme.primary),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  assignment.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleSmall,
+                ),
+              ),
+              IconButton(
+                tooltip: 'Quitar tarea',
+                visualDensity: VisualDensity.compact,
+                icon: const Icon(Icons.delete_outline, size: 20),
+                onPressed: onRemove,
+              ),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '$completed de $students completas',
+                  style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                ),
+                const SizedBox(height: 6),
+                LinearProgressIndicator(
+                  value: students == 0 ? 0 : completed / students,
+                  minHeight: 5,
+                  borderRadius: BorderRadius.circular(3),
+                  backgroundColor: scheme.surfaceContainerHighest,
+                ),
+                if (assignment.hiddenCount > 0) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    assignment.hiddenCount == 1
+                        ? 'Incluye 1 prueba oculta'
+                        : 'Incluye ${assignment.hiddenCount} pruebas ocultas',
+                    style: theme.textTheme.labelSmall?.copyWith(color: scheme.onSurfaceVariant),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _ProgressTable extends StatelessWidget {
   const _ProgressTable({
     required this.assignments,
@@ -795,6 +1101,7 @@ class _ProgressGrid extends StatelessWidget {
     required this.members,
     required this.submissions,
     required this.completed,
+    required this.claimed,
     required this.onTap,
   });
 
@@ -802,27 +1109,33 @@ class _ProgressGrid extends StatelessWidget {
   final List<Member> members;
   final Map<String, Map<String, Submission>> submissions;
   final int Function(Assignment) completed;
+
+  /// `assignmentId/uid` → what the student said, where Jaguar's check found
+  /// something else.
+  final Map<String, String> claimed;
   final void Function(Submission, Assignment) onTap;
 
-  static const _nameWidth = 220.0;
+  static const _nameWidth = 240.0;
   static const _taskWidth = 190.0;
+  static const _totalWidth = 150.0;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
+        color: scheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: scheme.outlineVariant, width: 1.5),
+        border: Border.all(color: scheme.outlineVariant),
       ),
       clipBehavior: Clip.antiAlias,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final natural = _nameWidth + assignments.length * _taskWidth;
+          final natural = _nameWidth + assignments.length * _taskWidth + _totalWidth;
           final width = natural > constraints.maxWidth ? natural : constraints.maxWidth;
-          // The task columns share what the name column leaves, so a few
-          // tasks do not leave an empty strip on the right.
-          final taskWidth = (width - _nameWidth) / assignments.length;
+          // The task columns share what the other two leave, so a few tasks
+          // do not leave an empty strip on the right.
+          final taskWidth = (width - _nameWidth - _totalWidth) / assignments.length;
           final grid = SizedBox(
             width: width,
             child: Column(
@@ -836,17 +1149,27 @@ class _ProgressGrid extends StatelessWidget {
                       Tooltip(
                         message: a.title,
                         child: Column(
+                          mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(a.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: _head(context)),
+                            const SizedBox(height: 2),
                             Text(
                               '${completed(a)} de ${members.length} completas',
                               style: Theme.of(context).textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                            ),
+                            const SizedBox(height: 5),
+                            LinearProgressIndicator(
+                              value: members.isEmpty ? 0 : completed(a) / members.length,
+                              minHeight: 4,
+                              borderRadius: BorderRadius.circular(2),
+                              backgroundColor: scheme.surfaceContainerHighest,
                             ),
                           ],
                         ),
                       ),
                   ],
+                  total: Text('Avance', style: _head(context)),
                   taskWidth: taskWidth,
                 ),
                 Expanded(
@@ -854,11 +1177,22 @@ class _ProgressGrid extends StatelessWidget {
                     itemCount: members.length,
                     itemBuilder: (context, i) {
                       final m = members[i];
+                      final done = [
+                        for (final a in assignments)
+                          if (submissions[a.id]?[m.uid]?.complete ?? false) a,
+                      ].length;
                       return _row(
                         context,
                         shaded: i.isOdd,
-                        name: Text(m.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+                        name: Row(
+                          children: [
+                            InitialsAvatar(name: m.name),
+                            const SizedBox(width: 12),
+                            Expanded(child: Text(m.name, maxLines: 1, overflow: TextOverflow.ellipsis)),
+                          ],
+                        ),
                         cells: [for (final a in assignments) _cell(context, m, a)],
+                        total: _total(context, done),
                         taskWidth: taskWidth,
                       );
                     },
@@ -875,12 +1209,36 @@ class _ProgressGrid extends StatelessWidget {
     );
   }
 
-  TextStyle? _head(BuildContext context) => Theme.of(context).textTheme.labelLarge;
+  TextStyle? _head(BuildContext context) =>
+      Theme.of(context).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700);
+
+  /// How many tasks this student finished, as a short bar and a fraction.
+  Widget _total(BuildContext context, int done) {
+    final scheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        children: [
+          Expanded(
+            child: LinearProgressIndicator(
+              value: assignments.isEmpty ? 0 : done / assignments.length,
+              minHeight: 6,
+              borderRadius: BorderRadius.circular(3),
+              backgroundColor: scheme.surfaceContainerHighest,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Text('$done/${assignments.length}', style: Theme.of(context).textTheme.labelLarge),
+        ],
+      ),
+    );
+  }
 
   Widget _row(
     BuildContext context, {
     required Widget name,
     required List<Widget> cells,
+    required Widget total,
     required double taskWidth,
     bool header = false,
     bool shaded = false,
@@ -891,16 +1249,18 @@ class _ProgressGrid extends StatelessWidget {
         color: header
             ? scheme.surfaceContainerHigh
             : shaded
-            ? scheme.surfaceContainerLow
+            ? scheme.surfaceContainerLow.withValues(alpha: 0.6)
             : null,
-        border: Border(bottom: BorderSide(color: scheme.outlineVariant)),
+        border: Border(
+          bottom: BorderSide(color: scheme.outlineVariant.withValues(alpha: header ? 1 : 0.6)),
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
             width: _nameWidth,
-            constraints: const BoxConstraints(minHeight: 52),
+            constraints: BoxConstraints(minHeight: header ? 64 : 56),
             alignment: Alignment.centerLeft,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: name,
@@ -908,11 +1268,18 @@ class _ProgressGrid extends StatelessWidget {
           for (final cell in cells)
             Container(
               width: taskWidth,
-              constraints: const BoxConstraints(minHeight: 52),
+              constraints: BoxConstraints(minHeight: header ? 64 : 56),
               alignment: Alignment.centerLeft,
               padding: header ? const EdgeInsets.symmetric(horizontal: 12, vertical: 8) : EdgeInsets.zero,
               child: cell,
             ),
+          Container(
+            width: _totalWidth,
+            constraints: BoxConstraints(minHeight: header ? 64 : 56),
+            alignment: Alignment.centerLeft,
+            padding: header ? const EdgeInsets.symmetric(horizontal: 16, vertical: 8) : EdgeInsets.zero,
+            child: total,
+          ),
         ],
       ),
     );
@@ -926,27 +1293,41 @@ class _ProgressGrid extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12),
         child: Semantics(
           label: '${member.name}, ${assignment.title}: sin entregar',
-          child: Text('Sin entregar', style: TextStyle(color: scheme.onSurfaceVariant)),
+          child: Text('Sin entregar', style: TextStyle(color: scheme.onSurfaceVariant.withValues(alpha: 0.8))),
         ),
       );
     }
+    final said = claimed['${assignment.id}/${member.uid}'];
     return Semantics(
       button: true,
-      label: '${member.name}, ${assignment.title}: ${s.passed} de ${s.total} pruebas. Abre la entrega.',
+      label:
+          '${member.name}, ${assignment.title}: ${s.passed} de ${s.total} pruebas.'
+          '${said == null ? '' : ' El alumno dijo $said.'} Abre la entrega.',
       excludeSemantics: true,
       child: Tooltip(
         message: 'Ver la entrega de ${member.name}',
         child: InkWell(
           onTap: () => onTap(s, assignment),
           child: Container(
-            constraints: const BoxConstraints(minHeight: 52),
+            constraints: const BoxConstraints(minHeight: 56),
             alignment: Alignment.centerLeft,
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Row(
               children: [
-                _StatusIcon(submission: s),
-                const SizedBox(width: 8),
-                Flexible(child: Text('${s.passed} de ${s.total}', maxLines: 1, overflow: TextOverflow.ellipsis)),
+                Flexible(
+                  child: StatusPill(
+                    label: '${s.passed} de ${s.total}',
+                    tone: s.complete ? PillTone.good : PillTone.warn,
+                    icon: s.complete ? Icons.check_circle : Icons.timelapse,
+                  ),
+                ),
+                if (said != null) ...[
+                  const SizedBox(width: 8),
+                  Tooltip(
+                    message: 'El alumno dijo $said; Jaguar revisó su programa y salió esto.',
+                    child: Icon(Icons.rule, size: 18, color: scheme.error),
+                  ),
+                ],
                 if (s.pastedLines > 0) ...[
                   const SizedBox(width: 8),
                   Tooltip(
@@ -998,14 +1379,15 @@ class _ExercisePickerState extends State<_ExercisePicker> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     return SafeArea(
       child: ListView(
         shrinkWrap: widget.inDialog,
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
         children: [
           if (widget.inDialog)
             Padding(
-              padding: const EdgeInsets.only(top: 12, bottom: 8),
+              padding: const EdgeInsets.only(top: 16, bottom: 4),
               child: Row(
                 children: [
                   Expanded(child: Text('Asignar ejercicio', style: theme.textTheme.titleLarge)),
@@ -1013,36 +1395,40 @@ class _ExercisePickerState extends State<_ExercisePicker> {
                 ],
               ),
             ),
-          Text('Mis ejercicios', style: theme.textTheme.titleMedium),
+          Text(
+            'Elige el ejercicio que tu grupo va a resolver. Se revisa solo.',
+            style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+          ),
+          const SizedBox(height: 16),
+          const BlockHeading('Mis ejercicios'),
           if (widget.exercises.isEmpty)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 8),
-              child: Text('Aún no tienes. Crea uno con "Crear ejercicio con este programa" en el menú Profesor.'),
+            const NoticeBox(
+              text: 'Aún no tienes. Crea uno con "Crear ejercicio con este programa" en el menú Profesor.',
             ),
           for (final e in widget.exercises)
-            ListTile(
-              leading: const Icon(Icons.assignment_outlined),
-              title: Text(e.title),
-              subtitle: Text('${e.cases.length} pruebas'),
+            _PickRow(
+              icon: Icons.assignment_outlined,
+              title: e.title,
+              detail: e.cases.length == 1 ? '1 prueba' : '${e.cases.length} pruebas',
               onTap: () => Navigator.pop(context, e),
             ),
-          const Divider(),
-          Text('Del banco de la comunidad', style: theme.textTheme.titleMedium),
+          const SizedBox(height: 16),
+          const BlockHeading('Del banco de la comunidad'),
           FutureBuilder(
             future: _bank,
             builder: (context, snapshot) {
               final bank = snapshot.data;
-              if (snapshot.hasError) return const Text('No se pudo cargar el banco.');
+              if (snapshot.hasError) return const NoticeBox(tone: PillTone.bad, text: 'No se pudo cargar el banco.');
               if (bank == null) return const LinearProgressIndicator();
-              if (bank.isEmpty) return const Text('Todavía no hay ejercicios compartidos.');
+              if (bank.isEmpty) return const NoticeBox(text: 'Todavía no hay ejercicios compartidos.');
               return Column(
                 children: [
                   for (final p in bank)
                     if (p.exercise case final exercise?)
-                      ListTile(
-                        leading: const Icon(Icons.public),
-                        title: Text(p.title),
-                        subtitle: Text('${p.topic} · de ${p.authorAlias}'),
+                      _PickRow(
+                        icon: Icons.public,
+                        title: p.title,
+                        detail: '${p.topic} · de ${p.authorAlias}',
                         onTap: () => Navigator.pop(context, exercise),
                       ),
                 ],
@@ -1050,6 +1436,61 @@ class _ExercisePickerState extends State<_ExercisePicker> {
             },
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// One exercise to choose: a card with its name and a line of detail.
+class _PickRow extends StatelessWidget {
+  const _PickRow({required this.icon, required this.title, required this.detail, required this.onTap});
+
+  final IconData icon;
+  final String title;
+  final String detail;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: scheme.outlineVariant),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          child: Row(
+            children: [
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: scheme.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, size: 20, color: scheme.primary),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: theme.textTheme.titleSmall, maxLines: 2, overflow: TextOverflow.ellipsis),
+                    Text(detail, style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right, color: scheme.onSurfaceVariant),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -1080,34 +1521,50 @@ class _JoinDialogState extends State<_JoinDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Unirme a una clase'),
-      content: SizedBox(
-        width: 360,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _code,
-              autofocus: true,
-              textCapitalization: TextCapitalization.characters,
-              decoration: const InputDecoration(labelText: 'Código de la clase', hintText: 'JAG-4K7Q'),
-            ),
-            TextField(
-              controller: _name,
-              decoration: const InputDecoration(
-                labelText: 'Tu nombre',
-                helperText: 'Solo lo ve tu profesor, para saber de quién es cada entrega.',
+    final theme = Theme.of(context);
+    return _formTheme(
+      context,
+      AlertDialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        title: const Text('Unirme a una clase'),
+        content: SizedBox(
+          width: 400,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Pídele el código a tu profesor. No hace falta correo ni teléfono.',
+                style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
               ),
-              onSubmitted: (_) => _submit(),
-            ),
-          ],
+              const SizedBox(height: 16),
+              TextField(
+                controller: _code,
+                autofocus: true,
+                textInputAction: TextInputAction.next,
+                textCapitalization: TextCapitalization.characters,
+                style: monoStyle.copyWith(fontSize: 16, letterSpacing: 1),
+                decoration: const InputDecoration(labelText: 'Código de la clase', hintText: 'JAG-K7Q4M2XP'),
+              ),
+              const SizedBox(height: 14),
+              TextField(
+                controller: _name,
+                textInputAction: TextInputAction.done,
+                decoration: const InputDecoration(
+                  labelText: 'Tu nombre',
+                  helperText: 'Solo lo ve tu profesor, para saber de quién es cada entrega.',
+                  helperMaxLines: 2,
+                ),
+                onSubmitted: (_) => _submit(),
+              ),
+            ],
+          ),
         ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+          FilledButton(onPressed: _submit, child: const Text('Unirme')),
+        ],
       ),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
-        FilledButton(onPressed: _submit, child: const Text('Unirme')),
-      ],
     );
   }
 }
@@ -1163,37 +1620,6 @@ class _Empty extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-/// What the teacher sees when a lot of code arrived at once. A reason to
-/// ask the student to explain it, not proof of anything.
-class _PastedNote extends StatelessWidget {
-  const _PastedNote({required this.lines});
-
-  final int lines;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(color: scheme.tertiaryContainer, borderRadius: BorderRadius.circular(8)),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.content_paste, size: 20, color: scheme.onTertiaryContainer),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              'Pegó $lines líneas de una vez mientras lo escribía. Puede ser código suyo de otro lado, '
-              'o de alguien más: pídele que te explique el programa.',
-              style: TextStyle(color: scheme.onTertiaryContainer),
-            ),
-          ),
-        ],
       ),
     );
   }

@@ -4,6 +4,7 @@ import '../cloud/account_dialog.dart';
 import '../cloud/classes_screen.dart';
 import '../cloud/cloud.dart';
 import '../exercises/exercise_store.dart';
+import '../widgets/pro_widgets.dart';
 
 /// Joins a class with its code: signs in first if needed. Used by the room
 /// and by its app bar button.
@@ -60,9 +61,14 @@ class ClassesList extends StatefulWidget {
     required this.cloud,
     required this.onOpenAssignment,
     required this.onOpenClass,
+    this.forTeacher = false,
   });
 
   final Cloud cloud;
+
+  /// The person is in teacher mode: what they see before signing in talks
+  /// about creating classes, not about joining one.
+  final bool forTeacher;
   final void Function(Assignment assignment) onOpenAssignment;
   final void Function(ClassRoom room) onOpenClass;
 
@@ -121,11 +127,13 @@ class _ClassesListState extends State<ClassesList> {
     final cloud = widget.cloud;
     if (!cloud.signedIn) {
       return _Note(
-        icon: Icons.cloud_outlined,
-        title: 'Tus clases en línea',
-        text:
-            'Tu profe crea una clase y te da un código. Aquí ves sus tareas y cuánto llevas, sin dar correo ni '
-            'teléfono.',
+        icon: widget.forTeacher ? Icons.school_outlined : Icons.cloud_outlined,
+        title: widget.forTeacher ? 'Entra para crear tus clases' : 'Tus clases en línea',
+        text: widget.forTeacher
+            ? 'Con tu correo, tus clases y ejercicios te siguen a cualquier equipo. Tus alumnos entran con un '
+                  'código, sin dar correo ni teléfono.'
+            : 'Tu profe crea una clase y te da un código. Aquí ves sus tareas y cuánto llevas, sin dar correo ni '
+                  'teléfono.',
         action: FilledButton(onPressed: () => showAccountDialog(context, cloud), child: const Text('Entrar')),
       );
     }
@@ -143,7 +151,10 @@ class _ClassesListState extends State<ClassesList> {
         }
         final classes = snapshot.data;
         if (classes == null) {
-          return const Padding(padding: EdgeInsets.all(24), child: Center(child: CircularProgressIndicator()));
+          return const Padding(
+            padding: EdgeInsets.all(24),
+            child: Center(child: CircularProgressIndicator()),
+          );
         }
         if (classes.isEmpty) {
           return _Note(
@@ -170,35 +181,38 @@ class _ClassesListState extends State<ClassesList> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    InkWell(
-                      onTap: () => widget.onOpenClass(view.room),
-                      child: Container(
-                        color: scheme.primaryContainer,
-                        padding: const EdgeInsets.fromLTRB(16, 14, 8, 14),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    view.room.name,
-                                    style: theme.textTheme.titleMedium?.copyWith(color: scheme.onPrimaryContainer),
-                                  ),
-                                  Text(
-                                    view.owned
-                                        ? 'Tu clase · código ${view.room.code}'
-                                        : 'Prof. ${view.room.ownerAlias}',
-                                    style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onPrimaryContainer),
-                                  ),
-                                ],
+                    if (view.owned)
+                      _OwnedHeader(view: view, onTap: () => widget.onOpenClass(view.room))
+                    else
+                      InkWell(
+                        onTap: () => widget.onOpenClass(view.room),
+                        child: Container(
+                          color: scheme.primaryContainer,
+                          padding: const EdgeInsets.fromLTRB(16, 14, 8, 14),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      view.room.name,
+                                      style: theme.textTheme.titleMedium?.copyWith(color: scheme.onPrimaryContainer),
+                                    ),
+                                    Text(
+                                      view.owned
+                                          ? 'Tu clase · código ${view.room.code}'
+                                          : 'Prof. ${view.room.ownerAlias}',
+                                      style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onPrimaryContainer),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            Icon(Icons.chevron_right, color: scheme.onPrimaryContainer),
-                          ],
+                              Icon(Icons.chevron_right, color: scheme.onPrimaryContainer),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
                     if (view.entries.isEmpty)
                       Padding(
                         padding: const EdgeInsets.all(16),
@@ -212,7 +226,8 @@ class _ClassesListState extends State<ClassesList> {
                         _AssignmentRow(
                           entry: entry,
                           owned: view.owned,
-                          onTap: () => view.owned ? widget.onOpenClass(view.room) : widget.onOpenAssignment(entry.assignment),
+                          onTap: () =>
+                              view.owned ? widget.onOpenClass(view.room) : widget.onOpenAssignment(entry.assignment),
                         ),
                     const SizedBox(height: 4),
                   ],
@@ -240,7 +255,10 @@ class _AssignmentRow extends StatelessWidget {
     final (Widget marker, String status) = owned
         ? (Icon(Icons.assignment_outlined, size: 20, color: scheme.onSurfaceVariant), 'Ver entregas')
         : mine == null
-        ? (Icon(Icons.radio_button_unchecked, size: 20, color: scheme.outline, semanticLabel: 'sin empezar'), 'Sin empezar')
+        ? (
+            Icon(Icons.radio_button_unchecked, size: 20, color: scheme.outline, semanticLabel: 'sin empezar'),
+            'Sin empezar',
+          )
         : mine.complete
         ? (
             Icon(Icons.check, size: 20, color: Colors.green.shade700, semanticLabel: 'entregada'),
@@ -264,7 +282,10 @@ class _AssignmentRow extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(entry.assignment.title, style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500)),
+                    Text(
+                      entry.assignment.title,
+                      style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
+                    ),
                     Text(status, style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
                   ],
                 ),
@@ -308,6 +329,73 @@ class _Note extends StatelessWidget {
             style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
           ),
           if (action != null) ...[const SizedBox(height: 12), action!],
+        ],
+      ),
+    );
+  }
+}
+
+/// The top of a teacher's class: name, state, how many tasks, and the code
+/// ready to read out or copy.
+class _OwnedHeader extends StatelessWidget {
+  const _OwnedHeader({required this.view, required this.onTap});
+
+  final _ClassView view;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final tasks = view.entries.length;
+    return Container(
+      color: scheme.primaryContainer.withValues(alpha: 0.55),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          InkWell(
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 8, 8),
+              child: Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: scheme.primary.withValues(alpha: 0.14),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(Icons.groups_2_outlined, color: scheme.primary),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(view.room.name, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+                        const SizedBox(height: 2),
+                        Text(
+                          tasks == 0 ? 'Sin tareas todavía' : (tasks == 1 ? '1 tarea' : '$tasks tareas'),
+                          style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                        ),
+                      ],
+                    ),
+                  ),
+                  StatusPill(
+                    label: view.room.open ? 'Abierta' : 'Cerrada',
+                    tone: view.room.open ? PillTone.good : PillTone.neutral,
+                    icon: view.room.open ? Icons.lock_open_outlined : Icons.lock_outline,
+                  ),
+                  Icon(Icons.chevron_right, color: scheme.onSurfaceVariant),
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 14),
+            child: CodeBadge(code: view.room.code, large: false),
+          ),
         ],
       ),
     );
