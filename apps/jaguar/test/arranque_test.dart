@@ -360,7 +360,7 @@ void main() {
 
       await tester.tap(find.text('Soy profesor'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Activar modo profesor'));
+      await tester.tap(find.text('Activar'));
       await tester.pumpAndSettle();
       expect(ViewSettings(_prefs).teacher, isTrue);
       await irASala(tester, 'Clases');

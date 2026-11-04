@@ -188,7 +188,9 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('1 clase'), findsOneWidget);
       await irASala(tester, 'Clases');
-      expect(find.textContaining('Tu clase · código JAG-'), findsOneWidget);
+      // The code has its own badge, and the class says if it takes new students.
+      expect(find.textContaining('JAG-'), findsOneWidget);
+      expect(find.text('Abierta'), findsOneWidget);
       expect(find.text('Ver entregas'), findsOneWidget);
       expect(find.text('Crear clase'), findsOneWidget);
       expect(find.text('Unirme con código'), findsNothing);

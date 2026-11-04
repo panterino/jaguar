@@ -408,7 +408,7 @@ class GuideScreen extends StatelessWidget {
       icon: Icons.groups_outlined,
       title: 'Tu clase',
       summary: 'Únete con el código de tu profe y entrega',
-      intro: 'Las clases en línea necesitan internet. Tu profe te da un código como JAG-4K7Q.',
+      intro: 'Las clases en línea necesitan internet. Tu profe te da un código como JAG-K7Q4M2XP.',
       steps: [
         desktop ? 'Haz clic en Clases en la barra de la izquierda.' : 'Abre la sala Clases y toca Mis clases en línea.',
         'Toca Entrar, elige Alumno y escribe un alias. No uses tu nombre completo ni datos personales. No '
@@ -512,9 +512,9 @@ class GuideScreen extends StatelessWidget {
       summary: 'Un código para tu grupo',
       steps: [
         'Entra en línea como Profesor con tu correo, para no perder tus clases si cambias de equipo. La primera '
-            'vez toca ¿Primera vez? Crear cuenta de profesor. Si olvidas la contraseña, hay un enlace por correo.',
+            'vez elige Crear cuenta arriba de los campos. Si olvidas la contraseña, hay un enlace por correo.',
         'En Mis clases toca Crear clase y ponle un nombre, como «1° A · Lógica». Jaguar te da un código como '
-            'JAG-4K7Q: cópialo a tu grupo de WhatsApp o escríbelo en el pizarrón.',
+            'JAG-K7Q4M2XP: cópialo a tu grupo de WhatsApp o escríbelo en el pizarrón.',
         'Tus alumnos entran con el código y un nombre; no necesitan correo.',
         'Dentro de la clase, Asignar ejercicio elige uno de Mis ejercicios o del banco de la comunidad.',
       ],
