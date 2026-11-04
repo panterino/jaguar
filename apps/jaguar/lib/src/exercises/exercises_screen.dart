@@ -5,16 +5,20 @@ import '../cloud/account_dialog.dart';
 import '../cloud/cloud.dart';
 import '../cloud/community_screen.dart';
 
+import '../settings.dart';
 import 'exercise_editor_screen.dart';
 import 'exercise_store.dart';
 import 'project_screen.dart';
 
 /// The teacher's exercise bank, reusable across groups and semesters.
 class ExercisesScreen extends StatelessWidget {
-  const ExercisesScreen({super.key, required this.store, required this.onTryAsStudent, this.cloud});
+  const ExercisesScreen({super.key, required this.store, required this.onTryAsStudent, this.cloud, this.settings});
 
   final ExerciseStore store;
   final ValueChanged<Exercise> onTryAsStudent;
+
+  /// For the code editor of the solution; null uses the defaults.
+  final ViewSettings? settings;
 
   /// To share exercises with other teachers; null offline.
   final Cloud? cloud;
@@ -40,7 +44,7 @@ class ExercisesScreen extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute<void>(
-        builder: (_) => ExerciseEditorScreen(store: store, exercise: exercise),
+        builder: (_) => ExerciseEditorScreen(store: store, exercise: exercise, settings: settings),
       ),
     );
   }

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:jaguar_core/jaguar_core.dart';
 
-import '../editor/auto_indent.dart';
+import '../editor/code_editor.dart';
+import '../editor/completions.dart';
+import '../editor/keyword_bar.dart';
 import '../editor/syntax_controller.dart';
+import '../settings.dart';
 import '../theme.dart';
 import 'check_results_sheet.dart';
 import 'exercise_store.dart';
@@ -37,9 +40,13 @@ class _CaseFields {
 /// Jaguar proposes the test cases from it (see `suggestTests`), and the
 /// teacher only reviews them.
 class ExerciseEditorScreen extends StatefulWidget {
-  const ExerciseEditorScreen({super.key, required this.store, this.exercise, this.fromProgram});
+  const ExerciseEditorScreen({super.key, required this.store, this.exercise, this.fromProgram, this.settings});
 
   final ExerciseStore store;
+
+  /// Font size and keyword bar of the code editor, the same as in the
+  /// workspace. Null uses the defaults.
+  final ViewSettings? settings;
 
   /// Null for a new exercise.
   final Exercise? exercise;
@@ -68,6 +75,11 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
   late final List<_CaseFields> _cases = [
     for (final testCase in widget.exercise?.cases ?? const <TestCase>[]) _CaseFields(testCase),
   ];
+  // The solution is written in the same editor as any program: completions,
+  // auto indent, find and replace, and errors while typing.
+  final _solutionFocus = FocusNode();
+  final _undo = UndoHistoryController();
+  late final _diagnostics = Diagnostics(_solution);
   bool _busy = false;
 
   @override
@@ -124,7 +136,10 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
   void dispose() {
     _title.dispose();
     _statement.dispose();
+    _diagnostics.dispose();
     _solution.dispose();
+    _solutionFocus.dispose();
+    _undo.dispose();
     for (final c in _cases) {
       c.dispose();
     }
@@ -217,6 +232,40 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
+  /// The code editor of the app, in a frame. [height] null fills the space.
+  Widget _solutionEditor({double? height}) {
+    final settings = widget.settings;
+    final desktop = useDesktopLayout(context);
+    final scheme = Theme.of(context).colorScheme;
+    final editor = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Expanded(
+          child: CodeEditor(
+            diagnostics: _diagnostics,
+            controller: _solution,
+            focusNode: _solutionFocus,
+            undoController: _undo,
+            fontSize: settings?.fontSize ?? 14,
+            highlightCurrentLine: desktop,
+          ),
+        ),
+        if (!desktop || (settings?.keywordBar ?? false)) KeywordBar(controller: _solution, focusNode: _solutionFocus),
+      ],
+    );
+    final framed = Semantics(
+      label: 'Editor de la solución',
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          border: Border.all(color: scheme.outlineVariant, width: 1.5),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: ClipRRect(borderRadius: BorderRadius.circular(10.5), child: editor),
+      ),
+    );
+    return height == null ? framed : SizedBox(height: height, child: framed);
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -272,23 +321,7 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
                 title: 'Tu solución',
                 subtitle: 'Escríbela como si fueras el alumno. De ella salen los casos de prueba; nunca se comparte.',
               ),
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: theme.colorScheme.outlineVariant),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                child: TextField(
-                  controller: _solution,
-                  minLines: 6,
-                  maxLines: null,
-                  style: monoStyle.copyWith(fontSize: 14, height: 1.5),
-                  autocorrect: false,
-                  enableSuggestions: false,
-                  inputFormatters: [AutoIndentFormatter()],
-                  decoration: const InputDecoration.collapsed(hintText: 'Algoritmo solucion ...'),
-                ),
-              ),
+              _solutionEditor(height: 340),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
