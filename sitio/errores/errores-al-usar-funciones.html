@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Errores de funciones en pseudocódigo: «recibe 1 valor, pero se le dieron 2» y otros</title>
+<meta name="description" content="Qué significan los errores «… recibe 1 valor, pero se le dieron 2», «No existe ninguna función llamada …», «… no devuelve ningún valor» y «La función … ya fue definida», con ejemplos.">
+<link rel="canonical" href="https://jaguarcode.org/errores/errores-al-usar-funciones">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="apple-touch-icon" href="/icono.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Jaguar Code">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://jaguarcode.org/errores/errores-al-usar-funciones">
+<meta property="og:title" content="Errores de funciones en pseudocódigo: «recibe 1 valor, pero se le dieron 2» y otros">
+<meta property="og:description" content="Qué significan los errores «… recibe 1 valor, pero se le dieron 2», «No existe ninguna función llamada …», «… no devuelve ningún valor» y «La función … ya fue definida», con ejemplos.">
+<meta property="og:image" content="https://jaguarcode.org/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Errores de funciones en pseudocódigo: «recibe 1 valor, pero se le dieron 2» y otros">
+<meta name="twitter:description" content="Qué significan los errores «… recibe 1 valor, pero se le dieron 2», «No existe ninguna función llamada …», «… no devuelve ningún valor» y «La función … ya fue definida», con ejemplos.">
+<meta name="twitter:image" content="https://jaguarcode.org/compartir.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://jaguarcode.org/errores/errores-al-usar-funciones#articulo",
+      "headline": "Errores de funciones en pseudocódigo: «recibe 1 valor, pero se le dieron 2» y otros",
+      "description": "Qué significan los errores «… recibe 1 valor, pero se le dieron 2», «No existe ninguna función llamada …», «… no devuelve ningún valor» y «La función … ya fue definida», con ejemplos.",
+      "inLanguage": "es-MX",
+      "datePublished": "2026-11-03",
+      "dateModified": "2026-11-03",
+      "mainEntityOfPage": "https://jaguarcode.org/errores/errores-al-usar-funciones",
+      "image": "https://jaguarcode.org/compartir.png",
+      "author": { "@type": "Organization", "name": "Panterino", "url": "https://jaguarcode.org/" },
+      "publisher": { "@type": "Organization", "name": "Panterino", "logo": { "@type": "ImageObject", "url": "https://jaguarcode.org/icono.png" } }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "https://jaguarcode.org/" },
+        { "@type": "ListItem", "position": 2, "name": "Errores", "item": "https://jaguarcode.org/errores" },
+        { "@type": "ListItem", "position": 3, "name": "Errores al usar funciones y subprocesos", "item": "https://jaguarcode.org/errores/errores-al-usar-funciones" }
+      ]
+    },
+    { "@type": "FAQPage", "mainEntity": [{"@type":"Question","name":"¿Qué diferencia hay entre Funcion y SubProceso?","acceptedAnswer":{"@type":"Answer","text":"En Jaguar, como en PSeInt, una función que devuelve un valor se escribe Funcion resultado <- Nombre(parámetros), y se puede usar dentro de operaciones. Una sin resultado solo ejecuta pasos y se llama en su propia línea."}},{"@type":"Question","name":"¿Qué funciones trae Jaguar?","acceptedAnswer":{"@type":"Answer","text":"Raiz, Abs, Redon, Trunc, Azar, Aleatorio, Longitud, Mayusculas, Minusculas, Subcadena, Concatenar, ConvertirANumero, ConvertirATexto, las trigonométricas (Sen, Cos, Tan…), Ln, Exp y la constante PI."}}] }
+  ]
+}
+</script>
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/estilos.css">
+</head>
+<body>
+<header class="sitio-barra">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="/logo.svg" alt="" width="46" height="40">
+      <a class="nombre" href="/">Jaguar Code</a>
+      <a href="/guias">Guías</a>
+      <a href="/retos">Retos</a>
+      <a href="/profes">Para profes</a>
+      <a href="https://github.com/panterino/jaguar">GitHub</a>
+    </div>
+  </div>
+</header>
+<main class="guia">
+  <div class="ancho angosto">
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › <a href="/errores">Errores</a> › Errores al usar funciones y subprocesos</nav>
+    <h1>Errores al usar funciones y subprocesos</h1>
+    <p class="resumen">Al usar una función hay que llamarla con su nombre exacto y con el número de valores que espera. Y solo las funciones que devuelven un resultado pueden usarse dentro de una operación.</p>
+    <nav class="contenido" aria-label="Contenido de la página"><b>En esta página</b>
+      <ol>
+        <li><a href="#que-significa">Qué significa</a></li>
+        <li><a href="#ejemplos">Ejemplos y cómo arreglarlos</a></li>
+        <li><a href="#causas">Por qué aparece</a></li>
+        <li><a href="#preguntas">Preguntas frecuentes</a></li>
+      </ol>
+    </nav>
+    <article>
+      <section id="que-significa">
+        <h2>Qué significa</h2>
+<p class="aviso-error" role="note"><b>Error de escritura en la línea 6</b><br>'Doble' recibe 1 valor, pero se le dieron 2.</p>
+<p>Una función es un pedazo de programa con nombre que recibe valores (los <b>parámetros</b>) y puede devolver un resultado. Pueden ser de Jaguar, como <code>Raiz(x)</code> o <code>Longitud(texto)</code>, o tuyas, definidas con <code>Funcion</code> o <code>SubProceso</code>.</p>
+<p>Antes de ejecutar, Jaguar revisa todas las llamadas del programa y avisa si algo no cuadra:</p>
+<ul>
+  <li><b>«… recibe 1 valor, pero se le dieron 2»</b>: la llamada tiene más (o menos) valores que los parámetros de la función.</li>
+  <li><b>«No existe ninguna función llamada …»</b>: el nombre no coincide con ninguna función de Jaguar ni tuya. Si hay una parecida, te sugiere cuál.</li>
+  <li><b>«… no devuelve ningún valor, así que no puede usarse dentro de una expresión»</b>: usaste un subproceso (que solo hace cosas) como si diera un resultado.</li>
+  <li><b>«La función … ya fue definida en la línea …»</b>: hay dos funciones con el mismo nombre.</li>
+  <li><b>«Después de 'Por' se esperaba 'Referencia' o 'Valor'»</b>: en los parámetros, <code>Por</code> solo puede ir seguido de una de esas dos palabras.</li>
+</ul>
+      </section>
+      <section id="ejemplos">
+        <h2>Ejemplos y cómo arreglarlos</h2>
+<h3>Más valores de los que recibe</h3>
+<pre class="codigo" data-error="'Doble' recibe 1 valor, pero se le dieron 2." tabindex="0"><code>Funcion resultado &lt;- Doble(x)
+    resultado &lt;- x * 2
+FinFuncion
+
+Algoritmo usar_doble
+    Escribir Doble(4, 5)
+FinAlgoritmo</code></pre><p class="aviso-error" role="note"><b>Error de escritura en la línea 6</b><br>'Doble' recibe 1 valor, pero se le dieron 2.</p>
+<p><code>Doble</code> tiene un solo parámetro, así que se llama con un solo valor:</p>
+<pre class="codigo" data-salida="8" tabindex="0"><code>Funcion resultado &lt;- Doble(x)
+    resultado &lt;- x * 2
+FinFuncion
+
+Algoritmo usar_doble
+    Escribir Doble(4)
+FinAlgoritmo</code></pre>
+<h3>Una función que no existe</h3>
+<pre class="codigo" data-error="No existe ninguna función llamada 'Raices'." tabindex="0"><code>Algoritmo raiz
+    Escribir Raices(49)
+FinAlgoritmo</code></pre><p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>No existe ninguna función llamada 'Raices'.</p>
+<p>La función de Jaguar para la raíz cuadrada es <code>Raiz</code> (también <code>RC</code>):</p>
+<pre class="codigo" data-salida="7" tabindex="0"><code>Algoritmo raiz
+    Escribir Raiz(49)
+FinAlgoritmo</code></pre>
+<h3>Un subproceso usado como función</h3>
+<pre class="codigo" data-error="'Saludar' no devuelve ningún valor, así que no puede usarse dentro de una expresión." tabindex="0"><code>SubProceso Saludar(nombre)
+    Escribir "Hola, ", nombre
+FinSubProceso
+
+Algoritmo saludo
+    mensaje &lt;- Saludar("Ana")
+FinAlgoritmo</code></pre><p class="aviso-error" role="note"><b>Error de escritura en la línea 6</b><br>'Saludar' no devuelve ningún valor, así que no puede usarse dentro de una expresión. Para que devuelva un valor defínela como 'Funcion resultado &lt;- Saludar(...)'.</p>
+<p>Un subproceso se llama solo, en su propia línea. Si necesitas un resultado para guardarlo, define una función con <code>Funcion resultado &lt;- Nombre(...)</code>:</p>
+<pre class="codigo" data-salida="Hola, Ana" tabindex="0"><code>SubProceso Saludar(nombre)
+    Escribir "Hola, ", nombre
+FinSubProceso
+
+Algoritmo saludo
+    Saludar("Ana")
+FinAlgoritmo</code></pre>
+<h3>Dos funciones con el mismo nombre</h3>
+<pre class="codigo" data-error="La función 'Area' ya fue definida en la línea 1." tabindex="0"><code>Funcion r &lt;- Area(b, h)
+    r &lt;- b * h
+FinFuncion
+
+Funcion r &lt;- Area(lado)
+    r &lt;- lado * lado
+FinFuncion
+
+Algoritmo areas
+    Escribir Area(3, 4)
+FinAlgoritmo</code></pre><p class="aviso-error" role="note"><b>Error de escritura en la línea 5</b><br>La función 'Area' ya fue definida en la línea 1.</p>
+<p>Cada función necesita un nombre distinto:</p>
+<pre class="codigo" data-salida="12&#10;25" tabindex="0"><code>Funcion r &lt;- AreaRectangulo(b, h)
+    r &lt;- b * h
+FinFuncion
+
+Funcion r &lt;- AreaCuadrado(lado)
+    r &lt;- lado * lado
+FinFuncion
+
+Algoritmo areas
+    Escribir AreaRectangulo(3, 4)
+    Escribir AreaCuadrado(5)
+FinAlgoritmo</code></pre>
+
+      </section>
+      <section id="causas">
+        <h2>Por qué aparece</h2>
+<ul>
+  <li>Pasar más o menos valores de los que la función espera, a veces por una coma de más.</li>
+  <li>Escribir mal el nombre de la función, o usar el nombre que tiene en otro lenguaje (<code>sqrt</code> funciona, pero <code>Raices</code> no).</li>
+  <li>Confundir un <code>SubProceso</code>, que solo hace cosas, con una <code>Funcion</code> que devuelve un valor.</li>
+  <li>Copiar una función dos veces en el mismo archivo.</li>
+</ul>
+      </section>
+      <section id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+        <details><summary>¿Qué diferencia hay entre Funcion y SubProceso?</summary><p>En Jaguar, como en PSeInt, una función que devuelve un valor se escribe Funcion resultado &lt;- Nombre(parámetros), y se puede usar dentro de operaciones. Una sin resultado solo ejecuta pasos y se llama en su propia línea.</p></details>
+        <details><summary>¿Qué funciones trae Jaguar?</summary><p>Raiz, Abs, Redon, Trunc, Azar, Aleatorio, Longitud, Mayusculas, Minusculas, Subcadena, Concatenar, ConvertirANumero, ConvertirATexto, las trigonométricas (Sen, Cos, Tan…), Ln, Exp y la constante PI.</p></details>
+      </section>
+    </article>
+<aside class="cta-guia" aria-labelledby="cta-t">
+  <h2 id="cta-t">Practica esto en Jaguar Code</h2>
+  <p>Escribe pseudocódigo, mira su diagrama y haz la prueba de escritorio desde el celular. Gratis, sin anuncios y sin cuenta.</p>
+  <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir la app</a></div>
+  <p class="aviso-prueba"><b>Versión de prueba.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo.</p>
+</aside>
+    <h2 style="margin-top:44px">Sigue aprendiendo</h2>
+    <div class="relacionadas">
+      <a href="/errores/no-entiendo-la-instruccion">No entiendo la instrucción<small>Cada línea de un programa debe empezar con una instrucción que Jaguar conozca, como Escribir, Leer, Si o una asignación.</small></a>
+      <a href="/errores/se-esperaba-cerrar-parentesis">Se esperaba ')' para cerrar el paréntesis<small>Abriste un paréntesis o un corchete y la línea se terminó, o apareció otra cosa, antes de cerrarlo..</small></a>
+      <a href="/guias/variables-y-tipos-de-datos">Variables, tipos de datos y operadores<small>Una variable es un espacio con nombre donde el programa guarda un dato.</small></a>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="ancho">
+    <span class="quien"><img src="/logo.svg" alt="" width="30" height="26">Un proyecto de Panterino · hecho en México</span>
+    <a href="/guias">Guías</a>
+    <a href="/retos">Retos</a>
+    <a href="/descargas">Descargas</a>
+    <a href="/manual">Manual</a>
+    <a href="https://www.facebook.com/jaguareducation">Facebook</a>
+    <a href="https://github.com/panterino/jaguar">Código en GitHub</a>
+    <a href="#" data-analitica-cambiar>Analítica</a>
+  </div>
+</footer>
+<script src="/acceso.js" defer></script>
+<script src="/analitica.js" defer></script>
+</body>
+</html>

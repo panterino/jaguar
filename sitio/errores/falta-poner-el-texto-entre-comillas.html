@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Error «Falta poner el texto entre comillas»: qué significa y cómo arreglarlo</title>
+<meta name="description" content="Qué significa el error «Falta poner el texto entre comillas» al usar Escribir en pseudocódigo, y cómo distinguir un texto de una variable.">
+<link rel="canonical" href="https://jaguarcode.org/errores/falta-poner-el-texto-entre-comillas">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="apple-touch-icon" href="/icono.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Jaguar Code">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://jaguarcode.org/errores/falta-poner-el-texto-entre-comillas">
+<meta property="og:title" content="Error «Falta poner el texto entre comillas»: qué significa y cómo arreglarlo">
+<meta property="og:description" content="Qué significa el error «Falta poner el texto entre comillas» al usar Escribir en pseudocódigo, y cómo distinguir un texto de una variable.">
+<meta property="og:image" content="https://jaguarcode.org/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Error «Falta poner el texto entre comillas»: qué significa y cómo arreglarlo">
+<meta name="twitter:description" content="Qué significa el error «Falta poner el texto entre comillas» al usar Escribir en pseudocódigo, y cómo distinguir un texto de una variable.">
+<meta name="twitter:image" content="https://jaguarcode.org/compartir.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://jaguarcode.org/errores/falta-poner-el-texto-entre-comillas#articulo",
+      "headline": "Error «Falta poner el texto entre comillas»: qué significa y cómo arreglarlo",
+      "description": "Qué significa el error «Falta poner el texto entre comillas» al usar Escribir en pseudocódigo, y cómo distinguir un texto de una variable.",
+      "inLanguage": "es-MX",
+      "datePublished": "2026-11-03",
+      "dateModified": "2026-11-03",
+      "mainEntityOfPage": "https://jaguarcode.org/errores/falta-poner-el-texto-entre-comillas",
+      "image": "https://jaguarcode.org/compartir.png",
+      "author": { "@type": "Organization", "name": "Panterino", "url": "https://jaguarcode.org/" },
+      "publisher": { "@type": "Organization", "name": "Panterino", "logo": { "@type": "ImageObject", "url": "https://jaguarcode.org/icono.png" } }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "https://jaguarcode.org/" },
+        { "@type": "ListItem", "position": 2, "name": "Errores", "item": "https://jaguarcode.org/errores" },
+        { "@type": "ListItem", "position": 3, "name": "Falta poner el texto entre comillas", "item": "https://jaguarcode.org/errores/falta-poner-el-texto-entre-comillas" }
+      ]
+    },
+    { "@type": "FAQPage", "mainEntity": [{"@type":"Question","name":"¿Qué diferencia hay entre Escribir nombre y Escribir \"nombre\"?","acceptedAnswer":{"@type":"Answer","text":"Sin comillas, Jaguar muestra lo que hay guardado en la variable nombre (por ejemplo, Ana). Con comillas, muestra la palabra «nombre» tal cual."}},{"@type":"Question","name":"¿Y si solo es una palabra, como Escribir Hola?","acceptedAnswer":{"@type":"Answer","text":"Entonces Jaguar busca una variable llamada Hola. Si no existe, el error será «No encuentro la variable». Con una sola palabra también hacen falta las comillas: Escribir \"Hola\"."}}] }
+  ]
+}
+</script>
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/estilos.css">
+</head>
+<body>
+<header class="sitio-barra">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="/logo.svg" alt="" width="46" height="40">
+      <a class="nombre" href="/">Jaguar Code</a>
+      <a href="/guias">Guías</a>
+      <a href="/retos">Retos</a>
+      <a href="/profes">Para profes</a>
+      <a href="https://github.com/panterino/jaguar">GitHub</a>
+    </div>
+  </div>
+</header>
+<main class="guia">
+  <div class="ancho angosto">
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › <a href="/errores">Errores</a> › Falta poner el texto entre comillas</nav>
+    <h1>Falta poner el texto entre comillas</h1>
+    <p class="resumen">Jaguar encontró varias palabras sueltas después de Escribir. Seguramente querías mostrar un texto, y los textos van entre comillas.</p>
+    <nav class="contenido" aria-label="Contenido de la página"><b>En esta página</b>
+      <ol>
+        <li><a href="#que-significa">Qué significa</a></li>
+        <li><a href="#ejemplos">Ejemplo y cómo arreglarlo</a></li>
+        <li><a href="#causas">Por qué aparece</a></li>
+        <li><a href="#evitarlo">Cómo evitarlo</a></li>
+        <li><a href="#preguntas">Preguntas frecuentes</a></li>
+      </ol>
+    </nav>
+    <article>
+      <section id="que-significa">
+        <h2>Qué significa</h2>
+<p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>Falta poner el texto entre comillas. Los textos van entre comillas: Escribir "Hola mundo"</p>
+<p>Para Jaguar, una palabra sin comillas es el <b>nombre de una variable</b>. Si escribes <code>Escribir Hola mundo</code>, entiende que quieres mostrar el valor de una variable llamada <code>Hola</code> y otra llamada <code>mundo</code>, una pegada a la otra, y eso no tiene sentido. Como lo más probable es que quisieras mostrar el texto «Hola mundo», te lo dice y en la sugerencia te escribe cómo queda.</p>
+<p>La regla es sencilla: lo que quieres que aparezca <i>tal cual</i> en la pantalla va entre comillas; lo que quieres que se reemplace por su valor va sin comillas.</p>
+      </section>
+      <section id="ejemplos">
+        <h2>Ejemplo y cómo arreglarlo</h2>
+<pre class="codigo" data-error="Falta poner el texto entre comillas." tabindex="0"><code>Algoritmo saludo
+    Escribir Hola mundo
+FinAlgoritmo</code></pre><p class="aviso-error" role="note"><b>Error de escritura en la línea 2</b><br>Falta poner el texto entre comillas. Los textos van entre comillas: Escribir "Hola mundo"</p>
+<p>Así queda arreglado:</p>
+<pre class="codigo" data-salida="Hola mundo" tabindex="0"><code>Algoritmo saludo
+    Escribir "Hola mundo"
+FinAlgoritmo</code></pre>
+
+      </section>
+      <section id="causas">
+        <h2>Por qué aparece</h2>
+<ul>
+  <li>Escribiste el texto sin comillas.</li>
+  <li>Querías mostrar un texto y una variable, pero faltaron las comillas del texto y la coma que los separa: <code>Escribir "Tu edad es ", edad</code>.</li>
+</ul>
+      </section>
+      <section id="evitarlo">
+        <h2>Cómo evitarlo</h2>
+<p>Antes de escribir algo después de <code>Escribir</code>, pregúntate: ¿quiero que salga esta palabra o el valor guardado en ella? Si es la palabra, comillas. Si es el valor, sin comillas. Si son las dos cosas, sepáralas con comas.</p>
+      </section>
+      <section id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+        <details><summary>¿Qué diferencia hay entre Escribir nombre y Escribir "nombre"?</summary><p>Sin comillas, Jaguar muestra lo que hay guardado en la variable nombre (por ejemplo, Ana). Con comillas, muestra la palabra «nombre» tal cual.</p></details>
+        <details><summary>¿Y si solo es una palabra, como Escribir Hola?</summary><p>Entonces Jaguar busca una variable llamada Hola. Si no existe, el error será «No encuentro la variable». Con una sola palabra también hacen falta las comillas: Escribir "Hola".</p></details>
+      </section>
+    </article>
+<aside class="cta-guia" aria-labelledby="cta-t">
+  <h2 id="cta-t">Practica esto en Jaguar Code</h2>
+  <p>Escribe pseudocódigo, mira su diagrama y haz la prueba de escritorio desde el celular. Gratis, sin anuncios y sin cuenta.</p>
+  <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir la app</a></div>
+  <p class="aviso-prueba"><b>Versión de prueba.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo.</p>
+</aside>
+    <h2 style="margin-top:44px">Sigue aprendiendo</h2>
+    <div class="relacionadas">
+      <a href="/errores/falta-la-comilla-que-cierra-este-texto">Falta la comilla que cierra este texto<small>Un texto empieza con comillas y debe terminar con comillas en la misma línea.</small></a>
+      <a href="/errores/sobra-al-final-de-la-instruccion">Sobra algo al final de la instrucción<small>Jaguar terminó de leer una instrucción completa y todavía quedaba algo en la línea.</small></a>
+      <a href="/guias/que-es-el-pseudocodigo">Qué es el pseudocódigo<small>El pseudocódigo es una forma de escribir un algoritmo con palabras parecidas a las de un lenguaje de programación, pero sin reglas estrictas de sintaxis.</small></a>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="ancho">
+    <span class="quien"><img src="/logo.svg" alt="" width="30" height="26">Un proyecto de Panterino · hecho en México</span>
+    <a href="/guias">Guías</a>
+    <a href="/retos">Retos</a>
+    <a href="/descargas">Descargas</a>
+    <a href="/manual">Manual</a>
+    <a href="https://www.facebook.com/jaguareducation">Facebook</a>
+    <a href="https://github.com/panterino/jaguar">Código en GitHub</a>
+    <a href="#" data-analitica-cambiar>Analítica</a>
+  </div>
+</footer>
+<script src="/acceso.js" defer></script>
+<script src="/analitica.js" defer></script>
+</body>
+</html>

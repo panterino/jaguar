@@ -395,7 +395,7 @@ Future<String> _herramienta() async {
     </article>
     <aside class="cta-guia" aria-labelledby="cta-t">
       <h2 id="cta-t">En el celular, con diagrama y retos</h2>
-      <p>Jaguar Code hace esta misma prueba de escritorio en la app, la deja llenar a mano para practicar y la combina con el diagrama de flujo, los bloques y doce retos con pistas. Gratis, sin anuncios y sin cuenta.</p>
+      <p>Jaguar Code hace esta misma prueba de escritorio en la app, la deja llenar a mano para practicar y la combina con el diagrama de flujo, los bloques y 36 retos con pistas. Gratis, sin anuncios y sin cuenta.</p>
       <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir Jaguar Code</a></div>
       <p class="aviso-prueba"><b>Versión de prueba.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo.</p>
     </aside>
@@ -587,7 +587,7 @@ Future<String> _diagramaWeb() async {
     </article>
     <aside class="cta-guia" aria-labelledby="cta-t">
       <h2 id="cta-t">Arma el diagrama con figuras en tu celular</h2>
-      <p>En Jaguar Code dibujas el diagrama tocando figuras y el pseudocódigo se escribe solo, y al revés. Trae también bloques, la prueba de escritorio y doce retos con pistas. Gratis, sin anuncios y sin cuenta.</p>
+      <p>En Jaguar Code dibujas el diagrama tocando figuras y el pseudocódigo se escribe solo, y al revés. Trae también bloques, la prueba de escritorio y 36 retos con pistas. Gratis, sin anuncios y sin cuenta.</p>
       <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir Jaguar Code</a></div>
       <p class="aviso-prueba"><b>Versión de prueba.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo.</p>
     </aside>
@@ -742,12 +742,14 @@ String _descargas() {
 // Mapa del sitio ---------------------------------------------------------
 
 String _mapa() {
-  String url(String ruta, String frecuencia, String prioridad) =>
-      '  <url><loc>${g.sitio}$ruta</loc><lastmod>${g.fecha}</lastmod><changefreq>$frecuencia</changefreq><priority>$prioridad</priority></url>';
+  String url(String ruta, String frecuencia, String prioridad, [String? cambio]) =>
+      '  <url><loc>${g.sitio}$ruta</loc><lastmod>${cambio ?? g.fecha}</lastmod><changefreq>$frecuencia</changefreq><priority>$prioridad</priority></url>';
   final lineas = [
     url('/', 'weekly', '1.0'),
     url('/guias', 'monthly', '0.8'),
-    for (final guia in g.guias) url('/guias/${guia.slug}', 'monthly', '0.8'),
+    for (final guia in g.guias) url('/guias/${guia.slug}', 'monthly', '0.8', guia.publicada),
+    url('/errores', 'monthly', '0.7', '2026-11-03'),
+    for (final error in g.errores) url('/errores/${error.slug}', 'monthly', '0.6', error.publicada),
     url('/descargas', 'monthly', '0.8'),
     url('/herramientas/prueba-de-escritorio', 'monthly', '0.9'),
     url('/herramientas/diagrama-de-flujo-online', 'monthly', '0.9'),
@@ -755,6 +757,7 @@ String _mapa() {
     for (final id in _orden) url(_ruta(id), 'monthly', '0.8'),
     url('/profes', 'monthly', '0.7'),
     url('/manual', 'monthly', '0.6'),
+    url('/por-que-jaguar', 'monthly', '0.7', '2026-11-03'),
   ];
   return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${lineas.join('\n')}\n</urlset>\n';
 }

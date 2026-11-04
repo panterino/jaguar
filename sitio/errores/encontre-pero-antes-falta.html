@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Error «Encontré FinAlgoritmo, pero antes falta FinSi»: qué significa y cómo arreglarlo</title>
+<meta name="description" content="Qué significa el error «Encontré FinAlgoritmo, pero antes falta FinSi» (o FinPara, FinMientras, Hasta Que) en pseudocódigo, por qué aparece y cómo arreglarlo, con ejemplos.">
+<link rel="canonical" href="https://jaguarcode.org/errores/encontre-pero-antes-falta">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="apple-touch-icon" href="/icono.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Jaguar Code">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://jaguarcode.org/errores/encontre-pero-antes-falta">
+<meta property="og:title" content="Error «Encontré FinAlgoritmo, pero antes falta FinSi»: qué significa y cómo arreglarlo">
+<meta property="og:description" content="Qué significa el error «Encontré FinAlgoritmo, pero antes falta FinSi» (o FinPara, FinMientras, Hasta Que) en pseudocódigo, por qué aparece y cómo arreglarlo, con ejemplos.">
+<meta property="og:image" content="https://jaguarcode.org/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Error «Encontré FinAlgoritmo, pero antes falta FinSi»: qué significa y cómo arreglarlo">
+<meta name="twitter:description" content="Qué significa el error «Encontré FinAlgoritmo, pero antes falta FinSi» (o FinPara, FinMientras, Hasta Que) en pseudocódigo, por qué aparece y cómo arreglarlo, con ejemplos.">
+<meta name="twitter:image" content="https://jaguarcode.org/compartir.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://jaguarcode.org/errores/encontre-pero-antes-falta#articulo",
+      "headline": "Error «Encontré FinAlgoritmo, pero antes falta FinSi»: qué significa y cómo arreglarlo",
+      "description": "Qué significa el error «Encontré FinAlgoritmo, pero antes falta FinSi» (o FinPara, FinMientras, Hasta Que) en pseudocódigo, por qué aparece y cómo arreglarlo, con ejemplos.",
+      "inLanguage": "es-MX",
+      "datePublished": "2026-11-03",
+      "dateModified": "2026-11-03",
+      "mainEntityOfPage": "https://jaguarcode.org/errores/encontre-pero-antes-falta",
+      "image": "https://jaguarcode.org/compartir.png",
+      "author": { "@type": "Organization", "name": "Panterino", "url": "https://jaguarcode.org/" },
+      "publisher": { "@type": "Organization", "name": "Panterino", "logo": { "@type": "ImageObject", "url": "https://jaguarcode.org/icono.png" } }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "https://jaguarcode.org/" },
+        { "@type": "ListItem", "position": 2, "name": "Errores", "item": "https://jaguarcode.org/errores" },
+        { "@type": "ListItem", "position": 3, "name": "«Encontré …, pero antes falta …»: un bloque sin cerrar", "item": "https://jaguarcode.org/errores/encontre-pero-antes-falta" }
+      ]
+    },
+    { "@type": "FAQPage", "mainEntity": [{"@type":"Question","name":"¿Por qué dice que falta FinSi si el error está en la línea del FinAlgoritmo?","acceptedAnswer":{"@type":"Answer","text":"Porque ahí es donde Jaguar se da cuenta. Al llegar a FinAlgoritmo, el Si todavía estaba abierto. El mensaje te dice en qué línea empezó el Si, para que sepas cuál quedó sin cerrar."}},{"@type":"Question","name":"¿Se puede escribir Fin Si con espacio?","acceptedAnswer":{"@type":"Answer","text":"Sí. Jaguar acepta FinSi y Fin Si, igual que FinPara y Fin Para. Lo que no puede faltar es el cierre."}},{"@type":"Question","name":"¿Este error sale también en PSeInt?","acceptedAnswer":{"@type":"Answer","text":"PSeInt avisa de este problema con otro mensaje, pero la causa es la misma: un bloque sin cerrar. El código arreglado de esta página funciona igual en PSeInt."}}] }
+  ]
+}
+</script>
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/estilos.css">
+</head>
+<body>
+<header class="sitio-barra">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="/logo.svg" alt="" width="46" height="40">
+      <a class="nombre" href="/">Jaguar Code</a>
+      <a href="/guias">Guías</a>
+      <a href="/retos">Retos</a>
+      <a href="/profes">Para profes</a>
+      <a href="https://github.com/panterino/jaguar">GitHub</a>
+    </div>
+  </div>
+</header>
+<main class="guia">
+  <div class="ancho angosto">
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › <a href="/errores">Errores</a> › «Encontré …, pero antes falta …»: un bloque sin cerrar</nav>
+    <h1>«Encontré …, pero antes falta …»: un bloque sin cerrar</h1>
+    <p class="resumen">Este error aparece cuando un bloque, como un Si, un Para o un Mientras, no se cerró antes de que llegara el cierre de otro bloque. Casi siempre falta un FinSi, un FinPara o un FinMientras.</p>
+    <nav class="contenido" aria-label="Contenido de la página"><b>En esta página</b>
+      <ol>
+        <li><a href="#que-significa">Qué significa</a></li>
+        <li><a href="#ejemplos">Ejemplos y cómo arreglarlos</a></li>
+        <li><a href="#causas">Por qué aparece</a></li>
+        <li><a href="#evitarlo">Cómo evitarlo</a></li>
+        <li><a href="#preguntas">Preguntas frecuentes</a></li>
+      </ol>
+    </nav>
+    <article>
+      <section id="que-significa">
+        <h2>Qué significa</h2>
+<p class="aviso-error" role="note"><b>Error de escritura en la línea 5</b><br>Encontré 'FinAlgoritmo', pero antes falta 'FinSi' para cerrar el 'Si' de la línea 3. Cierra primero el 'Si' con 'FinSi'. Después va 'FinAlgoritmo'.</p>
+<p>Los bloques del pseudocódigo se abren y se cierran en orden, como cajas una dentro de otra: la última que abres es la primera que cierras. Si abres un <code>Si</code> dentro del <code>Algoritmo</code>, primero va el <code>FinSi</code> y después el <code>FinAlgoritmo</code>.</p>
+<p>Jaguar lee tu programa de arriba hacia abajo. Cuando encuentra un cierre (por ejemplo <code>FinAlgoritmo</code>) mientras todavía hay un bloque abierto adentro (el <code>Si</code>), te avisa: encontré esto, pero antes falta aquello. El mensaje te dice tres cosas: qué cierre encontró, qué cierre falta y en qué línea se abrió el bloque que quedó abierto.</p>
+      </section>
+      <section id="ejemplos">
+        <h2>Ejemplos y cómo arreglarlos</h2>
+<h3>Falta el FinSi</h3>
+<p>El caso más común: un <code>Si</code> que nunca se cerró.</p>
+<pre class="codigo" data-error="Encontré 'FinAlgoritmo', pero antes falta 'FinSi' para cerrar el 'Si' de la línea 3." tabindex="0"><code>Algoritmo positivo
+    Leer n
+    Si n &gt; 0 Entonces
+        Escribir "Es positivo"
+FinAlgoritmo</code></pre><p class="aviso-error" role="note"><b>Error de escritura en la línea 5</b><br>Encontré 'FinAlgoritmo', pero antes falta 'FinSi' para cerrar el 'Si' de la línea 3. Cierra primero el 'Si' con 'FinSi'. Después va 'FinAlgoritmo'.</p>
+<p>Se arregla agregando el <code>FinSi</code> donde termina lo que va dentro del <code>Si</code>, antes del <code>FinAlgoritmo</code>:</p>
+<pre class="codigo" data-entradas="4" data-salida="Es positivo" tabindex="0"><code>Algoritmo positivo
+    Leer n
+    Si n &gt; 0 Entonces
+        Escribir "Es positivo"
+    FinSi
+FinAlgoritmo</code></pre>
+<h3>Un Si dentro de un Para</h3>
+<p>Con bloques anidados, el error dice qué cierre llegó antes de tiempo. Aquí el <code>FinPara</code> llegó cuando el <code>Si</code> de adentro seguía abierto:</p>
+<pre class="codigo" data-error="Encontré 'FinPara', pero antes falta 'FinSi' para cerrar el 'Si' de la línea 3." tabindex="0"><code>Algoritmo pares
+    Para i &lt;- 1 Hasta 6 Hacer
+        Si i MOD 2 = 0 Entonces
+            Escribir i
+    FinPara
+FinAlgoritmo</code></pre><p class="aviso-error" role="note"><b>Error de escritura en la línea 5</b><br>Encontré 'FinPara', pero antes falta 'FinSi' para cerrar el 'Si' de la línea 3. Cierra primero el 'Si' con 'FinSi'. Después va 'FinPara'.</p>
+<p>El <code>FinSi</code> va antes del <code>FinPara</code>, porque el <code>Si</code> se abrió después:</p>
+<pre class="codigo" data-salida="2&#10;4&#10;6" tabindex="0"><code>Algoritmo pares
+    Para i &lt;- 1 Hasta 6 Hacer
+        Si i MOD 2 = 0 Entonces
+            Escribir i
+        FinSi
+    FinPara
+FinAlgoritmo</code></pre>
+<h3>Repetir sin Hasta Que</h3>
+<p>El <code>Repetir</code> no se cierra con una palabra «Fin», sino con <code>Hasta Que</code> y una condición:</p>
+<pre class="codigo" data-error="Encontré 'FinAlgoritmo', pero antes falta 'Hasta Que' para cerrar el 'Repetir' de la línea 2." tabindex="0"><code>Algoritmo contrasena
+    Repetir
+        Leer clave
+FinAlgoritmo</code></pre><p class="aviso-error" role="note"><b>Error de escritura en la línea 4</b><br>Encontré 'FinAlgoritmo', pero antes falta 'Hasta Que' para cerrar el 'Repetir' de la línea 2. Cierra primero el 'Repetir' con 'Hasta Que'. Después va 'FinAlgoritmo'.</p>
+<p>Así queda arreglado:</p>
+<pre class="codigo" data-entradas="jaguar" data-salida="Correcta" tabindex="0"><code>Algoritmo contrasena
+    Repetir
+        Leer clave
+    Hasta Que clave = "jaguar"
+    Escribir "Correcta"
+FinAlgoritmo</code></pre>
+
+      </section>
+      <section id="causas">
+        <h2>Por qué aparece</h2>
+<ul>
+  <li>Olvidaste escribir el cierre (<code>FinSi</code>, <code>FinPara</code>, <code>FinMientras</code>, <code>FinSegun</code> o <code>Hasta Que</code>).</li>
+  <li>Escribiste los cierres en el orden equivocado: cerraste primero el bloque de afuera.</li>
+  <li>Borraste una línea y con ella se fue un cierre.</li>
+  <li>Copiaste un fragmento de otro programa sin su cierre.</li>
+</ul>
+      </section>
+      <section id="evitarlo">
+        <h2>Cómo evitarlo</h2>
+<p>Escribe el cierre en cuanto abras el bloque, y luego rellena lo de adentro: primero <code>Si … Entonces</code> y <code>FinSi</code>, después lo que va en medio. Y cuida la sangría: si cada cierre queda a la misma altura que su apertura, un cierre que falta se nota a simple vista.</p>
+<p>En Jaguar, la vista de diagrama o de bloques también ayuda: mientras falta un cierre, no se puede dibujar el programa, y en cuanto lo pones aparece completo.</p>
+      </section>
+      <section id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+        <details><summary>¿Por qué dice que falta FinSi si el error está en la línea del FinAlgoritmo?</summary><p>Porque ahí es donde Jaguar se da cuenta. Al llegar a FinAlgoritmo, el Si todavía estaba abierto. El mensaje te dice en qué línea empezó el Si, para que sepas cuál quedó sin cerrar.</p></details>
+        <details><summary>¿Se puede escribir Fin Si con espacio?</summary><p>Sí. Jaguar acepta FinSi y Fin Si, igual que FinPara y Fin Para. Lo que no puede faltar es el cierre.</p></details>
+        <details><summary>¿Este error sale también en PSeInt?</summary><p>PSeInt avisa de este problema con otro mensaje, pero la causa es la misma: un bloque sin cerrar. El código arreglado de esta página funciona igual en PSeInt.</p></details>
+      </section>
+    </article>
+<aside class="cta-guia" aria-labelledby="cta-t">
+  <h2 id="cta-t">Practica esto en Jaguar Code</h2>
+  <p>Escribe pseudocódigo, mira su diagrama y haz la prueba de escritorio desde el celular. Gratis, sin anuncios y sin cuenta.</p>
+  <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir la app</a></div>
+  <p class="aviso-prueba"><b>Versión de prueba.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo.</p>
+</aside>
+    <h2 style="margin-top:44px">Sigue aprendiendo</h2>
+    <div class="relacionadas">
+      <a href="/errores/falta-fin-para-cerrar">Falta FinAlgoritmo, FinSi o FinPara para cerrar un bloque<small>Jaguar llegó al final de tu programa y un bloque seguía abierto.</small></a>
+      <a href="/guias/condicionales-si-y-segun">Condicionales en pseudocódigo: Si y Segun<small>Una condicional hace que el programa elija qué hacer según un dato.</small></a>
+      <a href="/guias/ciclos-mientras-para-repetir">Ciclos en pseudocódigo: Mientras, Para y Repetir<small>Un ciclo repite un grupo de instrucciones.</small></a>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="ancho">
+    <span class="quien"><img src="/logo.svg" alt="" width="30" height="26">Un proyecto de Panterino · hecho en México</span>
+    <a href="/guias">Guías</a>
+    <a href="/retos">Retos</a>
+    <a href="/descargas">Descargas</a>
+    <a href="/manual">Manual</a>
+    <a href="https://www.facebook.com/jaguareducation">Facebook</a>
+    <a href="https://github.com/panterino/jaguar">Código en GitHub</a>
+    <a href="#" data-analitica-cambiar>Analítica</a>
+  </div>
+</footer>
+<script src="/acceso.js" defer></script>
+<script src="/analitica.js" defer></script>
+</body>
+</html>

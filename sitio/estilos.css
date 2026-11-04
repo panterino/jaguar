@@ -533,6 +533,11 @@ footer .quien { margin-right: auto; display: flex; align-items: center; gap: 10p
 .guia pre.codigo { margin: 16px 0; padding: 16px 18px; border-radius: 14px; background: var(--codigo); border: 1px solid var(--borde); overflow-x: auto; font: 15px/1.7 ui-monospace, "SF Mono", Menlo, Consolas, "Roboto Mono", monospace; }
 .guia figure { margin: 18px 0; }
 .guia figcaption { font-size: 14.5px; color: var(--suave); margin-top: 6px; }
+/* En las guías, las tablas no parpadean (la animación es para la demo de la portada)
+   y en una prueba de escritorio se resalta lo que acaba de cambiar. */
+.guia tbody tr { animation: none; }
+.guia td.cambio { background: var(--marca); font-weight: 700; }
+.guia td.instr { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 14px; }
 .guia .contenido { border: 2px solid var(--borde); border-radius: 16px; padding: 14px 20px; margin: 0 0 8px; background: var(--superficie); }
 .guia .contenido b { font-size: 15px; }
 .guia .contenido ol { margin: 6px 0 0; padding-left: 22px; columns: 2; column-gap: 28px; }

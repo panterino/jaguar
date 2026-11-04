@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ciclos en pseudocódigo: Mientras, Para y Repetir (diferencias y ejemplos)</title>
+<meta name="description" content="Cómo repetir pasos en pseudocódigo con Para, Mientras y Repetir: diferencias, cuándo usar cada uno, contadores, acumuladores y cómo evitar un ciclo infinito.">
+<link rel="canonical" href="https://jaguarcode.org/guias/ciclos-mientras-para-repetir">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="apple-touch-icon" href="/icono.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Jaguar Code">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://jaguarcode.org/guias/ciclos-mientras-para-repetir">
+<meta property="og:title" content="Ciclos en pseudocódigo: Mientras, Para y Repetir (diferencias y ejemplos)">
+<meta property="og:description" content="Cómo repetir pasos en pseudocódigo con Para, Mientras y Repetir: diferencias, cuándo usar cada uno, contadores, acumuladores y cómo evitar un ciclo infinito.">
+<meta property="og:image" content="https://jaguarcode.org/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Ciclos en pseudocódigo: Mientras, Para y Repetir (diferencias y ejemplos)">
+<meta name="twitter:description" content="Cómo repetir pasos en pseudocódigo con Para, Mientras y Repetir: diferencias, cuándo usar cada uno, contadores, acumuladores y cómo evitar un ciclo infinito.">
+<meta name="twitter:image" content="https://jaguarcode.org/compartir.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://jaguarcode.org/guias/ciclos-mientras-para-repetir#articulo",
+      "headline": "Ciclos en pseudocódigo: Mientras, Para y Repetir (diferencias y ejemplos)",
+      "description": "Cómo repetir pasos en pseudocódigo con Para, Mientras y Repetir: diferencias, cuándo usar cada uno, contadores, acumuladores y cómo evitar un ciclo infinito.",
+      "inLanguage": "es-MX",
+      "datePublished": "2026-11-03",
+      "dateModified": "2026-11-03",
+      "mainEntityOfPage": "https://jaguarcode.org/guias/ciclos-mientras-para-repetir",
+      "image": "https://jaguarcode.org/compartir.png",
+      "author": { "@type": "Organization", "name": "Panterino", "url": "https://jaguarcode.org/" },
+      "publisher": { "@type": "Organization", "name": "Panterino", "logo": { "@type": "ImageObject", "url": "https://jaguarcode.org/icono.png" } }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "https://jaguarcode.org/" },
+        { "@type": "ListItem", "position": 2, "name": "Guías", "item": "https://jaguarcode.org/guias" },
+        { "@type": "ListItem", "position": 3, "name": "Ciclos en pseudocódigo: Mientras, Para y Repetir", "item": "https://jaguarcode.org/guias/ciclos-mientras-para-repetir" }
+      ]
+    },
+    { "@type": "FAQPage", "mainEntity": [{"@type":"Question","name":"¿Cuál es la diferencia entre Mientras y Repetir?","acceptedAnswer":{"@type":"Answer","text":"Mientras revisa la condición antes de cada vuelta, así que puede no ejecutarse ninguna vez. Repetir la revisa al final, así que siempre se ejecuta al menos una vez. Además, Mientras sigue mientras la condición sea verdadera y Repetir sigue hasta que lo sea."}},{"@type":"Question","name":"¿Cuándo uso Para y cuándo Mientras?","acceptedAnswer":{"@type":"Answer","text":"Usa Para cuando sabes cuántas veces se repite, aunque ese número venga en una variable. Usa Mientras cuando la repetición depende de algo que no sabes de antemano, como que el usuario escriba 0."}},{"@type":"Question","name":"¿Qué es un ciclo infinito?","acceptedAnswer":{"@type":"Answer","text":"Es un ciclo cuya condición nunca deja de cumplirse, normalmente porque olvidaste cambiar la variable que se revisa. El programa se repite sin terminar. Jaguar lo detiene y te avisa."}},{"@type":"Question","name":"¿Qué es un acumulador?","acceptedAnswer":{"@type":"Answer","text":"Es una variable que va sumando valores en cada vuelta de un ciclo, como el total de una compra o la suma de calificaciones. Debe empezar en 0 antes del ciclo."}}] }
+  ]
+}
+</script>
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/estilos.css">
+</head>
+<body>
+<header class="sitio-barra">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="/logo.svg" alt="" width="46" height="40">
+      <a class="nombre" href="/">Jaguar Code</a>
+      <a href="/guias">Guías</a>
+      <a href="/retos">Retos</a>
+      <a href="/profes">Para profes</a>
+      <a href="https://github.com/panterino/jaguar">GitHub</a>
+    </div>
+  </div>
+</header>
+<main class="guia">
+  <div class="ancho angosto">
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › <a href="/guias">Guías</a> › Ciclos en pseudocódigo: Mientras, Para y Repetir</nav>
+    <h1>Ciclos en pseudocódigo: Mientras, Para y Repetir</h1>
+    <p class="resumen">Un ciclo repite un grupo de instrucciones. Para se usa cuando sabes cuántas veces repetir, Mientras cuando repites mientras algo sea cierto, y Repetir cuando los pasos deben hacerse al menos una vez.</p>
+    <nav class="contenido" aria-label="Contenido de la guía"><b>En esta guía</b>
+      <ol>
+        <li><a href="#que-es">Qué es un ciclo</a></li>
+        <li><a href="#para">Para: cuando sabes cuántas veces</a></li>
+        <li><a href="#mientras">Mientras: repetir mientras algo sea cierto</a></li>
+        <li><a href="#repetir">Repetir: al menos una vez</a></li>
+        <li><a href="#comparacion">Diferencias entre Para, Mientras y Repetir</a></li>
+        <li><a href="#contador-acumulador">Contadores y acumuladores</a></li>
+        <li><a href="#prueba">Un ciclo en la prueba de escritorio</a></li>
+        <li><a href="#infinito">El ciclo infinito</a></li>
+        <li><a href="#errores">Errores comunes</a></li>
+        <li><a href="#preguntas">Preguntas frecuentes</a></li>
+      </ol>
+    </nav>
+    <article>
+      <section id="que-es">
+        <h2>Qué es un ciclo</h2>
+<p>Mostrar la tabla del 7 escribiendo diez veces <code>Escribir</code> funciona, pero ¿y si fuera la tabla hasta el 100? Un <b>ciclo</b> (también llamado bucle o estructura repetitiva) escribe los pasos una vez y los repite las veces que haga falta.</p>
+<p>Cada repetición se llama <b>vuelta</b> o iteración. Todo ciclo tiene una condición que decide si se da otra vuelta o si ya se termina. Hay tres formas de escribirlo, y la diferencia está en cuándo y cómo se revisa esa condición.</p>
+      </section>
+      <section id="para">
+        <h2>Para: cuando sabes cuántas veces</h2>
+<p><code>Para</code> usa una variable que cuenta sola. Empieza en un valor, avanza de uno en uno y se detiene al llegar al final:</p>
+<pre class="codigo" data-salida="7 x 1 = 7&#10;7 x 2 = 14&#10;7 x 3 = 21&#10;7 x 4 = 28&#10;7 x 5 = 35&#10;7 x 6 = 42&#10;7 x 7 = 49&#10;7 x 8 = 56&#10;7 x 9 = 63&#10;7 x 10 = 70" tabindex="0"><code>Algoritmo tabla_del_7
+    Para i &lt;- 1 Hasta 10 Hacer
+        Escribir "7 x ", i, " = ", 7 * i
+    FinPara
+FinAlgoritmo</code></pre>
+<p>Con <code>Con Paso</code> cambias cuánto avanza en cada vuelta. Un paso negativo cuenta hacia atrás:</p>
+<pre class="codigo" data-salida="10&#10;8&#10;6&#10;4&#10;2&#10;0&#10;¡Despegue!" tabindex="0"><code>Algoritmo cuenta_regresiva
+    Para i &lt;- 10 Hasta 0 Con Paso -2 Hacer
+        Escribir i
+    FinPara
+    Escribir "¡Despegue!"
+FinAlgoritmo</code></pre>
+<p>El final también puede ser una variable. Este programa calcula el factorial de un número (5! = 1 × 2 × 3 × 4 × 5):</p>
+<pre class="codigo" data-entradas="5" data-salida="5! = 120" tabindex="0"><code>Algoritmo factorial
+    Leer n
+    resultado &lt;- 1
+    Para i &lt;- 1 Hasta n Hacer
+        resultado &lt;- resultado * i
+    FinPara
+    Escribir n, "! = ", resultado
+FinAlgoritmo</code></pre>
+<p>No cambies el valor de <code>i</code> dentro de un <code>Para</code>: el ciclo lo maneja solo, y modificarlo a mano lleva a resultados confusos.</p>
+      </section>
+      <section id="mientras">
+        <h2>Mientras: repetir mientras algo sea cierto</h2>
+<p><code>Mientras</code> revisa la condición <b>antes</b> de cada vuelta. Si es verdadera, ejecuta los pasos y vuelve a revisar. Si es falsa, sale del ciclo. Sirve cuando no sabes de antemano cuántas vueltas habrá. Por ejemplo, sumar números hasta que el usuario escriba 0:</p>
+<pre class="codigo" data-entradas="5|3|2|0" data-salida="Total: 10" tabindex="0"><code>Algoritmo suma_hasta_cero
+    suma &lt;- 0
+    Leer n
+    Mientras n &lt;&gt; 0 Hacer
+        suma &lt;- suma + n
+        Leer n
+    FinMientras
+    Escribir "Total: ", suma
+FinAlgoritmo</code></pre>
+<p>Hay un <code>Leer n</code> antes del ciclo y otro al final de cada vuelta. El primero da el valor que se revisa la primera vez; el segundo da el siguiente. Si el primer número es 0, el ciclo no da ni una vuelta: <code>Mientras</code> puede repetirse cero veces.</p>
+<p>En el diagrama de flujo, un ciclo es una flecha que regresa a la condición:</p>
+<figure class="diagrama" style="max-width:315px;overflow-x:auto"><svg style="max-width:275px;min-width:220px" viewBox="0 0 274.4 608.8" width="274.4" role="img" aria-labelledby="diag-3"><title id="diag-3">Diagrama de flujo de Algoritmo suma_hasta_cero</title><g class="linea" stroke-width="1.5" fill="none" stroke-linejoin="round"><path d="M137.2 56L137.2 84"/><path d="M137.2 124L137.2 152"/><path d="M137.2 192L137.2 220"/><path d="M137.2 220L137.2 234"/><path d="M137.2 290L137.2 318"/><path d="M137.2 358L137.2 386"/><path d="M137.2 426L137.2 440L42.4 440L42.4 227L137.2 227"/><path d="M196 262L232 262L232 456.8L137.2 456.8"/><path d="M137.2 456.8L137.2 484.8"/><path d="M137.2 524.8L137.2 552.8"/></g><path d="M137.2 84L133.2 76L141.2 76z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M137.2 152L133.2 144L141.2 144z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M137.2 220L133.2 212L141.2 212z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M137.2 234L133.2 226L141.2 226z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M137.2 318L133.2 310L141.2 310z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M137.2 386L133.2 378L141.2 378z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M137.2 227L129.2 231L129.2 223z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M137.2 484.8L133.2 476.8L141.2 476.8z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><path d="M137.2 552.8L133.2 544.8L141.2 544.8z" style="fill:var(--fig-linea);stroke:none" stroke="none"/><rect class="ini fig" x="92.2" y="16" width="90" height="40" rx="20"/><text x="137.2" y="40.5" text-anchor="middle">Inicio</text><rect class="proc fig" x="87" y="84" width="100.4" height="40" rx="3"/><text x="137.2" y="108.5" text-anchor="middle">suma &lt;- 0</text><path class="io fig" d="M98.4 152 H190 L176 192 H84.4 z"/><text x="137.2" y="176.5" text-anchor="middle">Leer n</text><path class="dec fig" d="M137.2 234 L196 262 L137.2 290 L78.4 262 z"/><text x="137.2" y="266.5" text-anchor="middle">n &lt;&gt; 0</text><rect class="proc fig" x="60.4" y="318" width="153.6" height="40" rx="3"/><text x="137.2" y="342.5" text-anchor="middle">suma &lt;- suma + n</text><path class="io fig" d="M98.4 386 H190 L176 426 H84.4 z"/><text x="137.2" y="410.5" text-anchor="middle">Leer n</text><path class="sal fig" d="M30 484.8 H258.4 L244.4 524.8 H16 z"/><text x="137.2" y="509.3" text-anchor="middle">Escribir "Total: ", suma</text><rect class="ini fig" x="92.2" y="552.8" width="90" height="40" rx="20"/><text x="137.2" y="577.3" text-anchor="middle">Fin</text><text x="143.2" y="292" font-size="11">Sí</text><text x="202" y="246" font-size="11">No</text></svg></figure>
+      </section>
+      <section id="repetir">
+        <h2>Repetir: al menos una vez</h2>
+<p><code>Repetir … Hasta Que</code> revisa la condición <b>después</b> de cada vuelta, así que los pasos siempre se hacen por lo menos una vez. Es ideal para pedir un dato hasta que sea correcto:</p>
+<pre class="codigo" data-entradas="gato|tigre|jaguar" data-salida="Contraseña:&#10;Contraseña:&#10;Contraseña:&#10;Bienvenido" tabindex="0"><code>Algoritmo contrasena
+    Repetir
+        Escribir "Contraseña:"
+        Leer clave
+    Hasta Que clave = "jaguar"
+    Escribir "Bienvenido"
+FinAlgoritmo</code></pre>
+<p>Ojo con la lógica de la condición: <code>Mientras</code> sigue <i>mientras</i> sea verdadera, y <code>Repetir … Hasta Que</code> sigue <i>hasta que</i> sea verdadera. Son opuestas. Puedes practicar esta estructura en el reto de <a href="/retos/algoritmo-de-contrasena-con-repetir">contraseña con Repetir</a>.</p>
+      </section>
+      <section id="comparacion">
+        <h2>Diferencias entre Para, Mientras y Repetir</h2>
+<div class="tabla"><table><caption>Los tres ciclos</caption><thead><tr><th scope="col"></th><th scope="col">Para</th><th scope="col">Mientras</th><th scope="col">Repetir</th></tr></thead><tbody><tr><td><b>Úsalo cuando</b></td><td>Sabes cuántas vueltas</td><td>Repites mientras algo sea cierto</td><td>Debe hacerse al menos una vez</td></tr><tr><td><b>Revisa la condición</b></td><td>Antes de cada vuelta</td><td>Antes de cada vuelta</td><td>Después de cada vuelta</td></tr><tr><td><b>Vueltas mínimas</b></td><td>0</td><td>0</td><td>1</td></tr><tr><td><b>Termina cuando</b></td><td>El contador pasa del final</td><td>La condición es falsa</td><td>La condición es verdadera</td></tr><tr><td><b>Ejemplo típico</b></td><td>Tabla de multiplicar</td><td>Sumar hasta que escriban 0</td><td>Pedir una contraseña</td></tr></tbody></table></div>
+<p>Cualquier ciclo se puede escribir con <code>Mientras</code>, pero usar el adecuado hace el programa más corto y más claro.</p>
+      </section>
+      <section id="contador-acumulador">
+        <h2>Contadores y acumuladores</h2>
+<p>Casi todos los ejercicios de ciclos usan estas dos variables:</p>
+<ul>
+  <li>Un <b>contador</b> suma 1 en cada vuelta en la que pasa algo: <code>aprobados &lt;- aprobados + 1</code>. Sirve para contar cuántos.</li>
+  <li>Un <b>acumulador</b> suma un valor que cambia: <code>suma &lt;- suma + calificacion</code>. Sirve para totales y promedios.</li>
+</ul>
+<p>Los dos deben empezar en 0 <b>antes</b> del ciclo. Este programa lee 4 calificaciones, cuenta las aprobadas y calcula el promedio:</p>
+<pre class="codigo" data-entradas="8|5|10|9" data-salida="Promedio: 8&#10;Aprobados: 3" tabindex="0"><code>Algoritmo calificaciones
+    aprobados &lt;- 0
+    suma &lt;- 0
+    Para i &lt;- 1 Hasta 4 Hacer
+        Leer calificacion
+        suma &lt;- suma + calificacion
+        Si calificacion &gt;= 6 Entonces
+            aprobados &lt;- aprobados + 1
+        FinSi
+    FinPara
+    Escribir "Promedio: ", suma / 4
+    Escribir "Aprobados: ", aprobados
+FinAlgoritmo</code></pre>
+      </section>
+      <section id="prueba">
+        <h2>Un ciclo en la prueba de escritorio</h2>
+<p>La prueba de escritorio es la mejor forma de entender un ciclo, porque «desenrolla» las vueltas: la misma línea aparece una vez por cada repetición. Así se ve el factorial de 4:</p>
+<div class="tabla"><table><caption>Prueba de escritorio de factorial con n = 4</caption><thead><tr><th scope="col">Paso</th><th scope="col">Línea</th><th scope="col">Instrucción</th><th scope="col">n</th><th scope="col">resultado</th><th scope="col">i</th><th scope="col">Pantalla</th></tr></thead><tbody><tr><td>1</td><td>3</td><td class="instr">Leer n</td><td class="cambio">4</td><td></td><td></td><td></td></tr><tr><td>2</td><td>4</td><td class="instr">resultado &lt;- 1</td><td>4</td><td class="cambio">1</td><td></td><td></td></tr><tr><td>3</td><td>5</td><td class="instr">Para i &lt;- 1 Hasta n Hacer</td><td>4</td><td>1</td><td class="cambio">1</td><td></td></tr><tr><td>4</td><td>6</td><td class="instr">resultado &lt;- resultado * i</td><td>4</td><td>1</td><td>1</td><td></td></tr><tr><td>5</td><td>5</td><td class="instr">Para i &lt;- 1 Hasta n Hacer</td><td>4</td><td>1</td><td class="cambio">2</td><td></td></tr><tr><td>6</td><td>6</td><td class="instr">resultado &lt;- resultado * i</td><td>4</td><td class="cambio">2</td><td>2</td><td></td></tr><tr><td>7</td><td>5</td><td class="instr">Para i &lt;- 1 Hasta n Hacer</td><td>4</td><td>2</td><td class="cambio">3</td><td></td></tr><tr><td>8</td><td>6</td><td class="instr">resultado &lt;- resultado * i</td><td>4</td><td class="cambio">6</td><td>3</td><td></td></tr><tr><td>9</td><td>5</td><td class="instr">Para i &lt;- 1 Hasta n Hacer</td><td>4</td><td>6</td><td class="cambio">4</td><td></td></tr><tr><td>10</td><td>6</td><td class="instr">resultado &lt;- resultado * i</td><td>4</td><td class="cambio">24</td><td>4</td><td></td></tr><tr><td>11</td><td>5</td><td class="instr">Para i &lt;- 1 Hasta n Hacer</td><td>4</td><td>24</td><td>4</td><td></td></tr><tr><td>12</td><td>8</td><td class="instr">Escribir n, "! = ", resultado</td><td>4</td><td>24</td><td>4</td><td>4! = 24</td></tr></tbody></table></div>
+<p>Las celdas resaltadas muestran cómo <code>i</code> avanza y <code>resultado</code> crece en cada vuelta: 1, 2, 6, 24. Más sobre esta técnica en la guía de <a href="/guias/prueba-de-escritorio">prueba de escritorio</a>.</p>
+      </section>
+      <section id="infinito">
+        <h2>El ciclo infinito</h2>
+<p>Si nada dentro del ciclo cambia la condición, el ciclo nunca termina. Es el error más común con <code>Mientras</code>:</p>
+<pre class="codigo" tabindex="0"><code>Algoritmo nunca_termina
+    i &lt;- 1
+    Mientras i &lt;= 3 Hacer
+        Escribir i
+    FinMientras
+FinAlgoritmo</code></pre>
+<p>Aquí <code>i</code> vale 1 para siempre, porque falta <code>i &lt;- i + 1</code> dentro del ciclo. En papel no te das cuenta hasta que haces la prueba de escritorio. Jaguar detiene el programa cuando lleva demasiados pasos y te avisa, en vez de congelarse.</p>
+<p>Antes de escribir un <code>Mientras</code>, pregúntate: ¿qué cambia en cada vuelta para que algún día la condición sea falsa?</p>
+      </section>
+      <section id="errores">
+        <h2>Errores comunes</h2>
+<ul>
+  <li><b>No inicializar</b> el contador o el acumulador antes del ciclo, o inicializarlo <i>dentro</i> (se reinicia en cada vuelta).</li>
+  <li><b>Olvidar actualizar</b> la variable de la condición en un <code>Mientras</code>: ciclo infinito.</li>
+  <li><b>Dar una vuelta de más o de menos.</b> <code>Para i &lt;- 1 Hasta 10</code> da 10 vueltas; <code>Para i &lt;- 0 Hasta 10</code> da 11.</li>
+  <li><b>Invertir la condición del Repetir.</b> «Repetir hasta que la clave sea correcta» se escribe <code>Hasta Que clave = "jaguar"</code>, no con <code>&lt;&gt;</code>.</li>
+  <li><b>Poner el <code>Escribir</code> del resultado dentro del ciclo</b>, cuando solo debía mostrarse una vez al final.</li>
+</ul>
+<p>Los mensajes que da Jaguar cuando un ciclo está mal escrito, con su explicación: <a href="/errores/se-esperaba-hasta-en-el-ciclo-para">errores al escribir un Para</a> y <a href="/errores/encontre-pero-antes-falta">bloques sin cerrar</a>.</p>
+      </section>
+      <section id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+        <details><summary>¿Cuál es la diferencia entre Mientras y Repetir?</summary><p>Mientras revisa la condición antes de cada vuelta, así que puede no ejecutarse ninguna vez. Repetir la revisa al final, así que siempre se ejecuta al menos una vez. Además, Mientras sigue mientras la condición sea verdadera y Repetir sigue hasta que lo sea.</p></details>
+        <details><summary>¿Cuándo uso Para y cuándo Mientras?</summary><p>Usa Para cuando sabes cuántas veces se repite, aunque ese número venga en una variable. Usa Mientras cuando la repetición depende de algo que no sabes de antemano, como que el usuario escriba 0.</p></details>
+        <details><summary>¿Qué es un ciclo infinito?</summary><p>Es un ciclo cuya condición nunca deja de cumplirse, normalmente porque olvidaste cambiar la variable que se revisa. El programa se repite sin terminar. Jaguar lo detiene y te avisa.</p></details>
+        <details><summary>¿Qué es un acumulador?</summary><p>Es una variable que va sumando valores en cada vuelta de un ciclo, como el total de una compra o la suma de calificaciones. Debe empezar en 0 antes del ciclo.</p></details>
+      </section>
+    </article>
+<aside class="cta-guia" aria-labelledby="cta-t">
+  <h2 id="cta-t">Practica esto en Jaguar Code</h2>
+  <p>Escribe pseudocódigo, mira su diagrama y haz la prueba de escritorio desde el celular. Gratis, sin anuncios y sin cuenta.</p>
+  <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir la app</a></div>
+  <p class="aviso-prueba"><b>Versión de prueba.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo.</p>
+</aside>
+    <h2 style="margin-top:44px">Sigue aprendiendo</h2>
+    <div class="relacionadas">
+      <a href="/guias/condicionales-si-y-segun">Condicionales en pseudocódigo: Si y Segun<small>Una condicional hace que el programa elija qué hacer según un dato.</small></a>
+      <a href="/guias/arreglos-en-pseudocodigo">Arreglos en pseudocódigo<small>Un arreglo es una variable que guarda varios valores del mismo tipo, cada uno en una posición numerada.</small></a>
+      <a href="/guias/prueba-de-escritorio">La prueba de escritorio<small>La prueba de escritorio es seguir un algoritmo a mano, línea por línea, anotando en una tabla cuánto vale cada variable en cada paso.</small></a>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="ancho">
+    <span class="quien"><img src="/logo.svg" alt="" width="30" height="26">Un proyecto de Panterino · hecho en México</span>
+    <a href="/guias">Guías</a>
+    <a href="/retos">Retos</a>
+    <a href="/descargas">Descargas</a>
+    <a href="/manual">Manual</a>
+    <a href="https://www.facebook.com/jaguareducation">Facebook</a>
+    <a href="https://github.com/panterino/jaguar">Código en GitHub</a>
+    <a href="#" data-analitica-cambiar>Analítica</a>
+  </div>
+</footer>
+<script src="/acceso.js" defer></script>
+<script src="/analitica.js" defer></script>
+</body>
+</html>

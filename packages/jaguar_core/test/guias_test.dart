@@ -5,7 +5,9 @@ import 'package:jaguar_core/jaguar_core.dart';
 import 'package:test/test.dart';
 
 /// Los ejemplos de las guías de la página (sitio/guias) se ejecutan de verdad:
-/// una guía con un ejemplo que falla confundiría a quien la sigue.
+/// una guía con un ejemplo que falla confundiría a quien la sigue. En las
+/// páginas de errores (sitio/errores), los ejemplos con data-error están mal a
+/// propósito: deben dar exactamente ese mensaje.
 String _desescapa(String s) => s
     .replaceAll('&lt;', '<')
     .replaceAll('&gt;', '>')
@@ -14,10 +16,10 @@ String _desescapa(String s) => s
     .replaceAll('&amp;', '&');
 
 void main() {
-  final carpetas = [Directory('../../sitio/guias'), Directory('../../sitio/retos')];
+  final carpetas = [Directory('../../sitio/guias'), Directory('../../sitio/errores'), Directory('../../sitio/retos')];
   final carpeta = carpetas.first;
   final ejemplo = RegExp(r'<pre class="codigo" ([^>]*)><code>(.*?)</code></pre>', dotAll: true);
-  final atributo = RegExp(r'data-(entradas|salida)="([^"]*)"');
+  final atributo = RegExp(r'data-(entradas|salida|error)="([^"]*)"');
 
   test('las guías existen', () {
     expect(carpeta.existsSync(), isTrue);
@@ -50,6 +52,19 @@ void main() {
     expect(File('../../apps/jaguar/web/privacidad.html').readAsStringSync(), contains('analitica.js'));
   });
 
+  test('cada error que enlazan las herramientas tiene su página', () {
+    final errores = Directory('../../sitio/errores');
+    expect(errores.existsSync(), isTrue);
+    for (final js in ['herramienta.js', 'diagrama.js']) {
+      final fuente = File('../../sitio/herramientas/$js').readAsStringSync();
+      final paginas = RegExp(r"'([a-z-]+)'\],").allMatches(fuente).map((m) => m.group(1)!).toList();
+      expect(paginas, isNotEmpty, reason: js);
+      for (final p in paginas) {
+        expect(File('${errores.path}/$p.html').existsSync(), isTrue, reason: '$js enlaza /errores/$p');
+      }
+    }
+  });
+
   test('el generador de diagramas tiene su página y su núcleo compilado', () {
     final html = File('../../sitio/herramientas/diagrama-de-flujo-online.html').readAsStringSync();
     expect(html, contains('id="bajar-svg"'));
@@ -79,6 +94,15 @@ void main() {
     final html = archivo.readAsStringSync();
     for (final (i, m) in ejemplo.allMatches(html).indexed) {
       final atributos = {for (final a in atributo.allMatches(m.group(1)!)) a.group(1)!: _desescapa(a.group(2)!)};
+      if (atributos.containsKey('error')) {
+        test('$nombre, ejemplo ${i + 1} (con error)', () async {
+          final fuente = _desescapa(m.group(2)!);
+          final entradas = (atributos['entradas'] ?? '').isEmpty ? <String>[] : atributos['entradas']!.split('|');
+          final resultado = await runProgram(fuente, inputs: entradas);
+          expect(resultado.error?.message, atributos['error']);
+        });
+        continue;
+      }
       // Sin data-salida es un ejemplo de otro lenguaje o un fragmento.
       if (!atributos.containsKey('salida')) continue;
       test('$nombre, ejemplo ${i + 1}', () async {
