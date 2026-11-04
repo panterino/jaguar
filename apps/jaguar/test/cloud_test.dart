@@ -129,6 +129,41 @@ void main() {
     expect(() => backend.submissions(room.id, assignment.id), throwsA(isA<CloudException>()));
   });
 
+  test('Probar no gasta una escritura cada vez que se aprieta', () async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    final backend = _CountingBackend();
+    var clock = DateTime(2026, 11, 4, 10);
+    final cloud = Cloud(backend, prefs, now: () => clock);
+    await cloud.registerTeacher(email: 'profe@prepa.mx', password: 'secreto', alias: 'Profa');
+    final room = await cloud.createClass('1° A');
+    final assignment = await backend.assign(room.id, parImpar);
+    await cloud.signInAnonymously(alias: 'Ana', role: CloudRole.alumno);
+    await cloud.joinClass(code: room.code, name: 'Ana');
+    cloud.linkAssignment(parImpar, assignment);
+
+    const right = 'Algoritmo p\n    Leer n\n    Escribir n, " es par"\nFinAlgoritmo\n';
+    final result = await checkSolution(right, parImpar);
+    Future<void> press(String source, CheckResult r) =>
+        cloud.submitIfAssigned(exercise: parImpar, studentName: 'Ana', source: source, result: r);
+
+    await press(right, result);
+    await press(right, result); // identical: nothing is sent
+    expect(backend.submits, 1);
+
+    clock = clock.add(const Duration(seconds: 5));
+    await press('$right\n', result); // same result, text changed a moment ago
+    expect(backend.submits, 1);
+
+    clock = clock.add(minSend);
+    await press('$right\n', result); // enough time has passed
+    expect(backend.submits, 2);
+
+    final worse = await checkSolution('Algoritmo p\nFinAlgoritmo\n', parImpar);
+    await press('Algoritmo p\nFinAlgoritmo\n', worse); // another result: at once
+    expect(backend.submits, 3);
+  });
+
   test('olvidé mi contraseña y borrar la cuenta', () async {
     final backend = MemoryBackend();
     final teacher = await backend.registerTeacher(email: 'profe@escuela.mx', password: 'secreta', alias: 'Profa');
@@ -211,4 +246,32 @@ void main() {
     await tester.pumpAndSettle();
     expect(opened?.title, 'Par o impar');
   });
+}
+
+const minSend = Cloud.minSendGap;
+
+class _CountingBackend extends MemoryBackend {
+  int submits = 0;
+
+  @override
+  Future<void> submit({
+    required String classId,
+    required String assignmentId,
+    required String name,
+    required String source,
+    required int passed,
+    required int total,
+    int pastedLines = 0,
+  }) {
+    submits++;
+    return super.submit(
+      classId: classId,
+      assignmentId: assignmentId,
+      name: name,
+      source: source,
+      passed: passed,
+      total: total,
+      pastedLines: pastedLines,
+    );
+  }
 }
