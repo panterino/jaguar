@@ -10,6 +10,7 @@ import '../theme.dart';
 import 'exercise_editor_screen.dart';
 import 'exercise_store.dart';
 import 'project_screen.dart';
+import '../widgets/page_width.dart';
 
 /// Same breakpoint as the rooms: from here the list and the detail go side
 /// by side.
@@ -131,7 +132,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
               child: exercises.isEmpty
                   ? _EmptyState(onCreate: _edit)
                   : wide
-                  ? _wideBody(exercises, current!)
+                  ? PageWidth(width: workWidth, child: _wideBody(exercises, current!))
                   : _narrowBody(exercises),
             ),
           ),

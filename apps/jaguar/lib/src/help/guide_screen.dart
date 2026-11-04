@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../settings.dart';
 import '../share/scan_screen.dart';
 import '../theme.dart';
+import '../widgets/page_width.dart';
 
 /// Jaguar's guide, inside the app so it works without internet. One tab for
 /// students and one for teachers; it opens on the tab of the chosen
@@ -633,7 +634,7 @@ class _Page extends StatelessWidget {
     final scheme = theme.colorScheme;
     return Center(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 760),
+        constraints: const BoxConstraints(maxWidth: readingWidth),
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
           children: [
