@@ -6,9 +6,12 @@ import 'package:jaguar/src/editor/keyword_bar.dart';
 import 'package:jaguar/src/exercises/exercise_editor_screen.dart';
 import 'package:jaguar/src/exercises/exercise_store.dart';
 import 'package:jaguar/src/exercises/exercises_screen.dart';
+import 'package:jaguar/src/exercises/project_screen.dart';
+import 'package:jaguar/src/exercises/verified_screen.dart';
 import 'package:jaguar/src/settings.dart';
 import 'package:jaguar/src/workspace/settings_screen.dart';
 import 'package:jaguar_core/jaguar_core.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const _par = Exercise(
@@ -33,7 +36,7 @@ Future<ExerciseStore> _store() async {
   return store;
 }
 
-Future<void> _pump(WidgetTester tester, Widget screen, Size size, {double textScale = 1}) async {
+Future<void> _pump(WidgetTester tester, Widget screen, Size size, {double textScale = 1, bool settle = true}) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
@@ -46,7 +49,12 @@ Future<void> _pump(WidgetTester tester, Widget screen, Size size, {double textSc
       home: screen,
     ),
   );
-  await tester.pumpAndSettle();
+  // Some screens animate forever (the clock of the verified screen).
+  if (settle) {
+    await tester.pumpAndSettle();
+  } else {
+    await tester.pump(const Duration(milliseconds: 500));
+  }
 }
 
 const _sizes = {'escritorio': Size(1366, 768), 'tableta': Size(900, 700), 'celular': Size(400, 800)};
@@ -332,6 +340,100 @@ void main() {
       expect(find.byTooltip('Opciones'), findsNWidgets(2));
       expect(find.text('Nuevo ejercicio'), findsOneWidget); // the floating button
       expect(find.text('Comparación flexible'), findsNothing);
+    });
+  });
+
+  group('proyectar, verificada y resultados', () {
+    for (final MapEntry(key: name, value: size) in _sizes.entries) {
+      for (final scale in [1.0, 1.3]) {
+        testWidgets('proyectar no desborda en $name con letra x$scale', (tester) async {
+          await _pump(tester, const ProjectScreen(exercise: _par), size, textScale: scale);
+          expect(find.text('Par o impar'), findsWidgets);
+          expect(find.text('Copiar enlace'), findsOneWidget);
+        });
+
+        testWidgets('la pantalla verificada no desborda en $name con letra x$scale', (tester) async {
+          await _pump(
+            tester,
+            VerifiedScreen(
+              exerciseTitle: 'Par o impar',
+              studentName: 'Ana María de los Ángeles Pérez Hernández',
+              passedCases: 3,
+              verifiedAt: DateTime(2026, 11, 3, 10, 30),
+              source: _solucion,
+              pastedLines: 12,
+            ),
+            size,
+            textScale: scale,
+            settle: false,
+          );
+          expect(find.text('Ejercicio verificado'), findsOneWidget);
+          await tester.pumpWidget(const SizedBox()); // stops the clock timer
+        });
+      }
+    }
+
+    testWidgets('proyectar en escritorio pone el QR al lado del texto y llena la altura', (tester) async {
+      await _pump(tester, const ProjectScreen(exercise: _par), _sizes['escritorio']!);
+      final qr = tester.getRect(find.byType(QrImageView));
+      final text = tester.getTopLeft(find.textContaining('Escanéalo'));
+      expect(text.dx, greaterThan(qr.right));
+      expect(qr.height, greaterThan(560)); // readable from the back row
+      expect(qr.bottom, lessThanOrEqualTo(768));
+    });
+
+    testWidgets('la pantalla verificada se centra y su título se lee sobre el verde', (tester) async {
+      await _pump(
+        tester,
+        VerifiedScreen(
+          exerciseTitle: 'Par o impar',
+          studentName: 'Ana Pérez',
+          passedCases: 3,
+          verifiedAt: DateTime(2026, 11, 3, 10, 30),
+          source: _solucion,
+        ),
+        _sizes['escritorio']!,
+        settle: false,
+      );
+      final name = tester.getCenter(find.text('Ana Pérez'));
+      expect(name.dx, closeTo(683, 2));
+      final title = tester.widget<Text>(find.text('Ejercicio verificado'));
+      expect(title.style?.color, Colors.white);
+      await tester.pumpWidget(const SizedBox());
+    });
+
+    testWidgets('comprobar mi solución: diálogo en escritorio, hoja en celular, sin botón para el profesor', (
+      tester,
+    ) async {
+      final store = await _store();
+      await _pump(tester, ExerciseEditorScreen(store: store, exercise: _par), _sizes['escritorio']!);
+      await tester.tap(find.text('Comprobar mi solución'));
+      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 500)));
+      await tester.pumpAndSettle();
+      expect(find.byType(Dialog), findsOneWidget);
+      expect(find.byType(BottomSheet), findsNothing);
+      expect(find.text('¡Todos los casos son correctos!'), findsOneWidget);
+      expect(find.text('Mostrar al profesor'), findsNothing);
+      await tester.tap(find.byTooltip('Cerrar'));
+      await tester.pumpAndSettle();
+      expect(find.byType(Dialog), findsNothing);
+    });
+
+    testWidgets('comprobar mi solución en celular usa una hoja inferior', (tester) async {
+      final store = await _store();
+      await _pump(tester, ExerciseEditorScreen(store: store, exercise: _par), _sizes['celular']!);
+      await tester.scrollUntilVisible(
+        find.text('Comprobar mi solución'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(find.text('Comprobar mi solución'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Comprobar mi solución'));
+      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 500)));
+      await tester.pumpAndSettle();
+      expect(find.byType(BottomSheet), findsOneWidget);
+      expect(find.text('¡Todos los casos son correctos!'), findsOneWidget);
     });
   });
 }

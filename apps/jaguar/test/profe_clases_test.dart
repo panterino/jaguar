@@ -20,7 +20,7 @@ Exercise _exercise(int n) => Exercise(
 
 /// A class with [tasks] assignments and [students] students, the first of
 /// them with everything done and the second with a pasted program.
-Future<(Cloud, ClassRoom, ExerciseStore)> _classWith({int tasks = 2, int students = 3, bool asTeacher = true}) async {
+Future<(Cloud, ClassRoom, ExerciseStore)> _classWith({int tasks = 2, int students = 3}) async {
   SharedPreferences.setMockInitialValues({});
   final prefs = await SharedPreferences.getInstance();
   final backend = MemoryBackend();

@@ -220,7 +220,7 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
     final result = await checkSolution(_solution.text, _exercise);
     setState(() => _busy = false);
     if (!mounted) return;
-    await showCheckResults(context, result: result, onShowTeacher: () {});
+    await showCheckResults(context, result: result);
   }
 
   void _project() {
