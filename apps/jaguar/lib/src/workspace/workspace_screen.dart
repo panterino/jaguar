@@ -1188,11 +1188,11 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
           // Shortcuts work as soon as the window opens, before any click.
           child: Focus(autofocus: true, child: _content(desktop, shownMenus)),
         );
-        // The browser tab and the task switcher show the program's name.
+        // The browser tab and the task switcher show where you are.
+        final room = _room;
         screen = ListenableBuilder(
           listenable: _code,
-          builder: (context, child) =>
-              Title(title: '${programName(_code.text)} — Jaguar Code', color: jaguarYellow, child: child!),
+          builder: (context, child) => Title(title: windowTitle(room, _code.text), color: jaguarYellow, child: child!),
           child: screen,
         );
         if (desktop && usePlatformMenus) {
@@ -2448,3 +2448,13 @@ class _MoreMenu extends StatelessWidget {
     );
   }
 }
+
+/// The name of the browser tab and the task switcher: the program's name only
+/// in the Taller. In the other rooms the program last opened has nothing to do
+/// with what is on screen.
+String windowTitle(Room room, String source) => switch (room) {
+  Room.home => 'Jaguar Code',
+  Room.route => 'Ruta — Jaguar Code',
+  Room.classes => 'Clases — Jaguar Code',
+  Room.workshop => '${programName(source)} — Jaguar Code',
+};
