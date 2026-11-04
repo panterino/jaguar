@@ -31,7 +31,7 @@ class AboutScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('Jaguar Code', style: theme.textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w800)),
-                        Text('Un proyecto de Panterino · versión $jaguarVersion (de prueba)', style: theme.textTheme.bodyMedium),
+                        Text('Un proyecto de Panterino · versión $jaguarVersion (antes del lanzamiento)', style: theme.textTheme.bodyMedium),
                       ],
                     ),
                   ),

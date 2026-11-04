@@ -22,7 +22,9 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
 <style>
+@font-face { font-family: "Nunito"; src: url("/fuentes/nunito.woff2") format("woff2"); font-weight: 200 1000; font-style: normal; font-display: swap; }
 :root {
   --cafe: #3B2410; --amarillo: #F4B723; --azul: #00A8F0;
   --fondo: #FFF8F0; --superficie: #FFFFFF; --superficie-2: #FBF1E4;
@@ -41,7 +43,7 @@
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 body {
   margin: 0; background: var(--fondo); color: var(--texto);
-  font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font: 17px/1.6 "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   overflow-x: hidden;
 }
 a { color: var(--enlace); text-underline-offset: 3px; }
@@ -155,9 +157,9 @@ footer span { margin-right: auto; }
     </div>
     <p class="pronto">Guía para profes</p>
     <h1>Jaguar en tu clase de <span>algoritmos</span></h1>
-    <p class="lema">Una forma de ordenar las clases, qué ofrece Jaguar para cada paso y cómo revisar lo que entregan tus alumnos. Jaguar está en versión de prueba y buscamos profes que lo prueben con su grupo antes del lanzamiento previsto para el 11 de enero de 2027.</p>
+    <p class="lema">Una forma de ordenar las clases, qué ofrece Jaguar para cada paso y cómo revisar lo que entregan tus alumnos. Jaguar ya está abierto y su lanzamiento oficial es el lunes 11 de enero de 2027. Buscamos profes que lo usen con su grupo antes de esa fecha, y te ayudamos a armar la clase.</p>
     <div class="botones">
-      <a class="boton principal" href="/#contacto">Quiero probarlo con mi grupo</a>
+      <a class="boton principal" href="/#contacto">Quiero usarlo con mi grupo</a>
       <a class="boton borde" href="#secuencia">Cómo ordenar la clase</a>
     </div>
   </div>
@@ -223,12 +225,12 @@ footer span { margin-right: auto; }
   <div class="ancho">
     <p class="eti">Preguntas</p>
     <h2>Preguntas frecuentes de profes</h2>
-    <details><summary>¿Tengo que instalar algo en la sala de cómputo?</summary><p>No. Jaguar corre en el navegador, y en Android también como app. Los programas se guardan como archivos .psc y se pueden abrir y llevar a otros equipos.</p></details>
+    <details><summary>¿Tengo que instalar algo en la sala de cómputo?</summary><p>No. Jaguar corre en el navegador, y también hay app para Android, Windows, Mac y Linux. Los programas se guardan como archivos .psc y se pueden abrir y llevar a otros equipos.</p></details>
     <details><summary>¿Puedo usar mis propios ejercicios?</summary><p>Sí. Escribes el enunciado y tu solución, Jaguar propone las pruebas y tú decides cuáles quedan, incluso pruebas ocultas para que no programen "para el ejemplo".</p></details>
     <details><summary>¿Jaguar califica a mis alumnos?</summary><p>No. Te dice qué pruebas pasó cada programa; la calificación, la rúbrica y la lista de cotejo son tuyas.</p></details>
     <details><summary>¿Qué pasa si un alumno no tiene datos o internet?</summary><p>Puede programar, probar sus ejercicios y hacer los retos sin conexión. Solo las clases en línea necesitan internet para entregar.</p></details>
     <details><summary>¿Cuánto cuesta?</summary><p>Nada, ni para ti ni para tus alumnos. No tiene anuncios.</p></details>
-    <details><summary>¿Cómo lo pruebo con mi grupo?</summary><p>Escríbenos desde el formulario de la página principal. Te mandamos el acceso a la versión anticipada.</p></details>
+    <details><summary>¿Cómo lo uso con mi grupo?</summary><p>La app ya está abierta: entra a app.jaguarcode.org, sin cuenta para practicar. Si quieres que te ayudemos a armar la clase antes del lanzamiento, el 11 de enero de 2027, escríbenos desde el formulario de la página principal.</p></details>
   </div>
 </section>
 
