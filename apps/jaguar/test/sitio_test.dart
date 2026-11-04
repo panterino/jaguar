@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:jaguar_core/jaguar_core.dart';
-import 'package:test/test.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 /// Los ejemplos de las guías de la página (sitio/guias) se ejecutan de verdad:
 /// una guía con un ejemplo que falla confundiría a quien la sigue. En las
@@ -34,7 +34,7 @@ void main() {
   test('la analítica es la misma en la landing y en la app, y cada página la carga', () {
     final landing = File('../../sitio/analitica.js').readAsStringSync();
     expect(
-      File('../../apps/jaguar/web/analitica.js').readAsStringSync(),
+      File('web/analitica.js').readAsStringSync(),
       landing,
       reason: 'Copia sitio/analitica.js a apps/jaguar/web/',
     );
@@ -48,8 +48,8 @@ void main() {
     for (final f in paginas) {
       expect(f.readAsStringSync(), contains('analitica.js'), reason: f.path);
     }
-    expect(File('../../apps/jaguar/web/index.html').readAsStringSync(), contains('analitica.js'));
-    expect(File('../../apps/jaguar/web/privacidad.html').readAsStringSync(), contains('analitica.js'));
+    expect(File('web/index.html').readAsStringSync(), contains('analitica.js'));
+    expect(File('web/privacidad.html').readAsStringSync(), contains('analitica.js'));
   });
 
   test('cada error que enlazan las herramientas tiene su página', () {

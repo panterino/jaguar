@@ -2,7 +2,7 @@
 // datos estructurados y cierre. Correr desde la raíz:
 //   dart run tool/guias_html.dart
 // Los ejemplos de código llevan data-entradas y data-salida: una prueba
-// (apps/jaguar/test/guias_test.dart) los ejecuta con el intérprete de Jaguar.
+// (apps/jaguar/test/sitio_test.dart) los ejecuta con el intérprete de Jaguar.
 import 'dart:io';
 
 const sitio = 'https://jaguarcode.org';
@@ -1799,7 +1799,7 @@ const indiceErrores = (
 );
 
 /// Una página por cada error de escritura que muestra Jaguar
-/// (packages/jaguar_core/lib/src/lexer.dart y parser.dart).
+/// (lib/src/lexer.dart y parser.dart del paquete jaguar_core).
 final errores = <Guia>[
   Guia(
     carpeta: 'errores',

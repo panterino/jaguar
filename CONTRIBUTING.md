@@ -16,7 +16,7 @@ Usamos gitflow:
 Antes de abrir un pull request:
 
 ```sh
-cd packages/jaguar_core && dart analyze && dart test
+# Si cambiaste el intérprete, corre sus pruebas en el repositorio jaguar_core.
 cd apps/jaguar && flutter analyze && flutter test
 cd firebase-tests && npm test        # si cambiaste firestore.rules
 ```
@@ -24,3 +24,15 @@ cd firebase-tests && npm test        # si cambiaste firestore.rules
 Los commits llevan un mensaje corto, de una línea y sin descripción:
 "Agregado icono de app", "Se agregó panel de pruebas", "Corregido error al
 guardar".
+
+## Desarrollar el intérprete junto con la app
+
+`jaguar_core` vive en [su propio repositorio](https://github.com/panterino/jaguar_core) y la app lo toma por git, con una etiqueta (`ref` en `apps/jaguar/pubspec.yaml`). Para cambiar los dos a la vez, clona `jaguar_core` junto a este repositorio y crea `apps/jaguar/pubspec_overrides.yaml` (no se versiona):
+
+```yaml
+dependency_overrides:
+  jaguar_core:
+    path: ../../../jaguar_core
+```
+
+Cuando el cambio del intérprete esté listo, se publica una versión nueva con su etiqueta y se actualiza el `ref` de la app.
