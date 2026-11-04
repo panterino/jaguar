@@ -1,0 +1,22 @@
+Jaguar Code te enseña lógica de programación paso a paso, en español y sin necesidad de internet.
+
+Escribe pseudocódigo, mira cómo se dibuja su diagrama de flujo y ejecútalo en tu celular. Si algo falla, Jaguar te dice en qué línea y qué probar.
+
+QUÉ PUEDES HACER
+• Aprender en la Ruta: lecciones cortas y retos con pruebas que se revisan solas, con pistas.
+• Escribir pseudocódigo en un editor hecho para el celular, con barra de símbolos y autocompletado.
+• Ver y editar diagramas de flujo: el diagrama se dibuja a partir del código, y también puedes armarlo tocando y se vuelve código.
+• Armar programas con bloques que encajan.
+• Hacer la prueba de escritorio: Jaguar llena la tabla de variables paso a paso, o la llenas tú y te dice en qué acertaste.
+• Ejecutar tus programas y ver su salida en la consola, pidiendo datos con Leer.
+• Abrir y guardar archivos .psc, compartir por QR o enlace, o mandarlos por WhatsApp o correo.
+• Unirte a la clase de tu profesor con un código y entregar los ejercicios. Es opcional.
+• Abrir los programas y ejemplos que comparte la comunidad.
+
+PENSADO PARA APRENDER
+Funciona sin internet y sin cuenta. Tus programas se guardan en tu dispositivo. Entrar en línea, para las clases y la comunidad, es opcional: los alumnos entran solo con un alias, sin correo ni teléfono. No tiene anuncios ni compras dentro de la app.
+
+PARA PROFESORES
+Crea una clase con un código, asigna ejercicios con pruebas (también pruebas ocultas), proyecta un QR para que tus alumnos lo abran y revisa quién va completando cada tarea y cómo la resolvió.
+
+Jaguar Code es software libre (AGPL-3.0) y lo hace Panterino, un proyecto educativo de México. Código fuente: github.com/panterino/jaguar. Dudas y sugerencias: jaguarcode.org
