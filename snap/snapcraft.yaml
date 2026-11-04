@@ -4,14 +4,16 @@ name: jaguar-code
 title: Jaguar Code
 base: core22
 version: '0.8.1'
-summary: Aprende lógica de programación con pseudocódigo y diagramas de flujo
+summary: Learn programming logic with pseudocode and flowcharts
 description: |
-  Jaguar Code es una app gratuita para aprender lógica de programación, paso a
-  paso y en español: lecciones cortas, retos con pruebas, pseudocódigo,
-  diagramas de flujo, bloques y prueba de escritorio automática. Funciona sin
-  internet, sin anuncios y sin cuenta.
+  Jaguar Code is a free app to learn programming logic step by step: short
+  lessons, challenges with tests, pseudocode, flowcharts, blocks and an
+  automatic desk check. It works offline, with no ads and no account.
 
-  Es una versión de prueba: puede tener errores y cambiar.
+  The app and its lessons are in Spanish.
+
+  This is a test version: it may have bugs and change. Classes and community
+  need an internet connection.
 license: AGPL-3.0-only
 website: https://jaguarcode.org
 source-code: https://github.com/panterino/jaguar
