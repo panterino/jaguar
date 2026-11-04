@@ -395,7 +395,7 @@ Future<String> _herramienta() async {
     </article>
     <aside class="cta-guia" aria-labelledby="cta-t">
       <h2 id="cta-t">En el celular, con diagrama y retos</h2>
-      <p>Jaguar Code hace esta misma prueba de escritorio en la app, la deja llenar a mano para practicar y la combina con el diagrama de flujo, los bloques y doce retos con pistas. Gratis, sin anuncios y sin cuenta.</p>
+      <p>Jaguar Code hace esta misma prueba de escritorio en la app, la deja llenar a mano para practicar y la combina con el diagrama de flujo, los bloques y 36 retos con pistas. Gratis, sin anuncios y sin cuenta.</p>
       <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir Jaguar Code</a></div>
       <p class="aviso-prueba"><b>Versión de prueba.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo.</p>
     </aside>
@@ -587,7 +587,7 @@ Future<String> _diagramaWeb() async {
     </article>
     <aside class="cta-guia" aria-labelledby="cta-t">
       <h2 id="cta-t">Arma el diagrama con figuras en tu celular</h2>
-      <p>En Jaguar Code dibujas el diagrama tocando figuras y el pseudocódigo se escribe solo, y al revés. Trae también bloques, la prueba de escritorio y doce retos con pistas. Gratis, sin anuncios y sin cuenta.</p>
+      <p>En Jaguar Code dibujas el diagrama tocando figuras y el pseudocódigo se escribe solo, y al revés. Trae también bloques, la prueba de escritorio y 36 retos con pistas. Gratis, sin anuncios y sin cuenta.</p>
       <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir Jaguar Code</a></div>
       <p class="aviso-prueba"><b>Versión de prueba.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo.</p>
     </aside>

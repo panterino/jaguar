@@ -1671,7 +1671,7 @@ ${tabla('Lista para comparar cualquier opción', ['Qué revisar', 'Por qué impo
         'Jaguar Code como opción para el celular',
         '''
 <p>Jaguar Code es una app gratuita para aprender lógica de programación que cumple esa lista: escribes pseudocódigo en español, lo ejecutas y ves la consola; abre y guarda archivos <code>.psc</code>; funciona sin internet, no pide cuenta ni muestra anuncios, y es software libre con licencia AGPL. Se instala en Android o se abre en el navegador, y también corre en la computadora.</p>
-<p>Además del código, trae el diagrama de flujo de tu programa, una vista de bloques, la prueba de escritorio hecha sola, doce retos con pistas y lecciones cortas. Los errores salen en español, con la línea y una sugerencia.</p>
+<p>Además del código, trae el diagrama de flujo de tu programa, una vista de bloques, la prueba de escritorio hecha sola, 36 retos con pistas y lecciones cortas. Los errores salen en español, con la línea y una sugerencia.</p>
 <p>Este es un ejemplo sencillo, como los que se hacen en clase:</p>
 ${codigo('''
 Algoritmo promedio
