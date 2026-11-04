@@ -4,6 +4,7 @@ import '../programs/examples.dart';
 import '../theme.dart';
 import 'account_dialog.dart';
 import 'cloud.dart';
+import '../widgets/page_width.dart';
 
 /// What the community shares: programs to try and remix, and exercises for
 /// the shared bank. Without a connection it shows Jaguar's own examples.
@@ -89,7 +90,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
           : null,
       body: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 900),
+          constraints: const BoxConstraints(maxWidth: pageWidth),
           child: ListView(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
             children: [

@@ -9,6 +9,7 @@ import '../theme.dart';
 import 'account_dialog.dart';
 import 'cloud.dart';
 import 'regrade.dart';
+import '../widgets/page_width.dart';
 
 /// Same breakpoint as the rooms: from here the classes use the width.
 const _wideWidth = 900.0;
@@ -166,7 +167,7 @@ class _ClassesScreenState extends State<ClassesScreen> {
                 return Align(
                   alignment: Alignment.topCenter,
                   child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 760),
+                    constraints: const BoxConstraints(maxWidth: pageWidth),
                     child: ListView(
                       padding: EdgeInsets.fromLTRB(12, wide ? 8 : 12, 12, 96),
                       children: [
@@ -481,7 +482,7 @@ class _ClassScreenState extends State<ClassScreen> {
               : assignments == null
               ? const Center(child: CircularProgressIndicator())
               : _isTeacher && wide
-              ? _teacherWide(assignments)
+              ? PageWidth(width: workWidth, child: _teacherWide(assignments))
               : _list(assignments, wide),
         ),
       ),
@@ -540,7 +541,10 @@ class _ClassScreenState extends State<ClassScreen> {
     if (!wide) return list;
     return Align(
       alignment: Alignment.topCenter,
-      child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 720), child: list),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: pageWidth),
+        child: list,
+      ),
     );
   }
 

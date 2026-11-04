@@ -11,6 +11,7 @@ import '../theme.dart';
 import 'check_results_sheet.dart';
 import 'exercise_store.dart';
 import 'project_screen.dart';
+import '../widgets/page_width.dart';
 
 class _CaseFields {
   _CaseFields([TestCase? testCase])
@@ -526,7 +527,7 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
             (LogicalKeyboardKey.enter, _checkSolution),
           ]) ...{SingleActivator(key, control: true): action, SingleActivator(key, meta: true): action},
         },
-        child: wide ? _wideBody() : _narrowBody(),
+        child: wide ? PageWidth(width: workWidth, child: _wideBody()) : _narrowBody(),
       ),
     );
   }

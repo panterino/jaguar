@@ -17,6 +17,7 @@ import '../settings.dart';
 import '../theme.dart';
 import 'classes_room.dart';
 import 'programs_drawer.dart' show timeAgo;
+import '../widgets/page_width.dart';
 
 /// The four places of the phone app. Each one answers a question: what is
 /// next (Inicio), what do I learn (Ruta), what does my teacher ask (Clases)
@@ -311,7 +312,7 @@ class _Page extends StatelessWidget {
   Widget build(BuildContext context) => Align(
     alignment: Alignment.topCenter,
     child: ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: _isWide(context) ? 920 : 640),
+      constraints: const BoxConstraints(maxWidth: pageWidth),
       child: ListView(padding: EdgeInsets.fromLTRB(16, _isWide(context) ? 28 : 16, 16, 24), children: children),
     ),
   );
@@ -539,7 +540,7 @@ class _HomeRoomState extends State<_HomeRoom> {
         final padded = Align(
           alignment: Alignment.topCenter,
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 640),
+            constraints: const BoxConstraints(maxWidth: pageWidth),
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: tier == 2 ? 20 : 16),
               child: needsScroll
@@ -568,7 +569,7 @@ class _BetaNotice extends StatelessWidget {
     return Align(
       alignment: Alignment.topCenter,
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 640),
+        constraints: const BoxConstraints(maxWidth: pageWidth),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
           child: MediaQuery.withClampedTextScaling(
@@ -1235,7 +1236,7 @@ class _RouteRoomState extends State<_RouteRoom> {
         Align(
           alignment: Alignment.topCenter,
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 640),
+            constraints: const BoxConstraints(maxWidth: pageWidth),
             child: ListView(
               controller: _scroll,
               padding: EdgeInsets.fromLTRB(16, _isWide(context) ? 12 : 0, 16, 96),
