@@ -5,6 +5,8 @@
 // (apps/jaguar/test/sitio_test.dart) los ejecuta con el intérprete de Jaguar.
 import 'dart:io';
 
+import 'errores_ejecucion.dart';
+
 const sitio = 'https://jaguarcode.org';
 const fecha = '2026-10-27';
 
@@ -1790,17 +1792,17 @@ FinAlgoritmo
 
 /// El índice de /errores.
 const indiceErrores = (
-  titulo: 'Errores de escritura en pseudocódigo: qué significan y cómo arreglarlos',
+  titulo: 'Errores en pseudocódigo: de escritura y al ejecutar, qué significan y cómo arreglarlos',
   desc:
-      'Cada error de escritura que muestra Jaguar, explicado: qué significa, por qué aparece, un ejemplo con el error y cómo arreglarlo. Las causas son las mismas en PSeInt.',
-  h1: 'Errores de escritura en pseudocódigo',
+      'Cada error que muestra Jaguar, explicado: los de escritura (el programa no se puede leer) y los de ejecución (algo falla mientras corre). Qué significa, por qué aparece, un ejemplo y cómo arreglarlo.',
+  h1: 'Errores en pseudocódigo',
   resumen:
-      'Cuando Jaguar encuentra algo que no puede leer en tu programa, te dice en qué línea está y qué falta. Aquí está cada uno de esos mensajes explicado con calma, con un ejemplo del error y cómo se arregla.',
+      'Jaguar puede detenerse en dos momentos. Un error de escritura aparece cuando no puede leer el programa; uno al ejecutar, cuando el programa se entiende pero algo falla mientras corre. Aquí está cada mensaje explicado con calma, con un ejemplo del error y cómo se arregla.',
 );
 
 /// Una página por cada error de escritura que muestra Jaguar
 /// (lib/src/lexer.dart y parser.dart del paquete jaguar_core).
-final errores = <Guia>[
+final erroresEscritura = <Guia>[
   Guia(
     carpeta: 'errores',
     slug: 'encontre-pero-antes-falta',
@@ -2306,10 +2308,7 @@ FinAlgoritmo
         '¿Puedo poner dos instrucciones en una línea?',
         'Sí, separadas con punto y coma: a <- 1; b <- 2. Pero un programa se lee mejor con una instrucción por línea.',
       ),
-      (
-        '¿Los nombres de variables pueden tener espacios?',
-        'No. Usa guion bajo (precio_total) o junta las palabras (precioTotal).',
-      ),
+      ('¿Los nombres de variables pueden tener espacios?', 'No. Usa guion bajo (precio_total) o junta las palabras (precioTotal).'),
     ],
     relacionadas: ['falta-poner-el-texto-entre-comillas', 'se-esperaba-un-valor', 'variables-y-tipos-de-datos'],
   ),
@@ -2406,10 +2405,7 @@ FinAlgoritmo
         '¿Qué cuenta como un valor?',
         'Un número, un texto entre comillas, Verdadero o Falso, una variable, una operación entre valores o una función como Raiz(16).',
       ),
-      (
-        '¿Cómo se escribe una potencia?',
-        'Con ^. Por ejemplo, 2 ^ 3 es 8. El ** de Python no funciona en pseudocódigo.',
-      ),
+      ('¿Cómo se escribe una potencia?', 'Con ^. Por ejemplo, 2 ^ 3 es 8. El ** de Python no funciona en pseudocódigo.'),
     ],
     relacionadas: ['sobra-al-final-de-la-instruccion', 'se-esperaba-cerrar-parentesis', 'condicionales-si-y-segun'],
   ),
@@ -2420,8 +2416,7 @@ FinAlgoritmo
     h1: 'Se esperaba \')\' para cerrar el paréntesis',
     descripcion:
         'Qué significa el error «Se esperaba \')\' para cerrar el paréntesis» (o la llamada a una función, o \']\' para cerrar el índice) y cómo arreglarlo.',
-    resumen:
-        'Abriste un paréntesis o un corchete y la línea se terminó, o apareció otra cosa, antes de cerrarlo.',
+    resumen: 'Abriste un paréntesis o un corchete y la línea se terminó, o apareció otra cosa, antes de cerrarlo.',
     publicada: '2026-11-03',
     secciones: [
       (
@@ -2869,10 +2864,7 @@ FinAlgoritmo
         '¿Qué tipos de datos hay en pseudocódigo?',
         'Entero (números sin decimales), Real (con decimales), Logico (Verdadero o Falso) y Caracter o Texto (letras y palabras). Jaguar también acepta Numero como sinónimo de Real y Cadena como sinónimo de Texto.',
       ),
-      (
-        '¿Puedo definir varias variables en una línea?',
-        'Sí, si son del mismo tipo: Definir a, b, c Como Entero.',
-      ),
+      ('¿Puedo definir varias variables en una línea?', 'Sí, si son del mismo tipo: Definir a, b, c Como Entero.'),
     ],
     relacionadas: ['es-una-palabra-reservada', 'variables-y-tipos-de-datos', 'se-esperaba-corchete-en-dimension'],
   ),
@@ -2883,8 +2875,7 @@ FinAlgoritmo
     h1: 'Se esperaba \'[\' con el tamaño del arreglo',
     descripcion:
         'Qué significa el error «Se esperaba \'[\' con el tamaño del arreglo, por ejemplo: Dimension v[10]» en pseudocódigo y cómo crear un arreglo correctamente.',
-    resumen:
-        'Para crear un arreglo con Dimension hay que decir cuántas casillas tiene, entre corchetes, justo después del nombre.',
+    resumen: 'Para crear un arreglo con Dimension hay que decir cuántas casillas tiene, entre corchetes, justo después del nombre.',
     publicada: '2026-11-03',
     secciones: [
       (
@@ -3012,10 +3003,7 @@ FinAlgoritmo
         '¿Puedo poner un rango en una opción de Segun?',
         'No. Segun compara contra valores exactos. Para «de 6 a 8» usa Si con una condición como calificacion >= 6 Y calificacion <= 8.',
       ),
-      (
-        '¿Las opciones pueden ser textos?',
-        'Sí: "a": Escribir "Opción A". El texto de la opción va entre comillas.',
-      ),
+      ('¿Las opciones pueden ser textos?', 'Sí: "a": Escribir "Opción A". El texto de la opción va entre comillas.'),
     ],
     relacionadas: ['condicionales-si-y-segun', 'encontre-pero-antes-falta', 'se-esperaba-un-valor'],
   ),
@@ -3389,10 +3377,7 @@ FinAlgoritmo
       ),
     ],
     preguntas: [
-      (
-        '¿Se puede escribir Esperar 1 Segundo, en singular?',
-        'Sí. Jaguar acepta Segundo y Segundos, Milisegundo y Milisegundos.',
-      ),
+      ('¿Se puede escribir Esperar 1 Segundo, en singular?', 'Sí. Jaguar acepta Segundo y Segundos, Milisegundo y Milisegundos.'),
       (
         '¿Esperar cambia el resultado de la prueba de escritorio?',
         'No. Esperar solo pausa el programa; no cambia ninguna variable ni lo que se muestra en pantalla.',
@@ -3603,6 +3588,9 @@ String indice({
   b.write(pie);
   return b.toString();
 }
+
+/// Todas las páginas de /errores: las de escritura y las de ejecución.
+final errores = <Guia>[...erroresEscritura, ...erroresEjecucion];
 
 void main() {
   final inicio = File('sitio/index.html').readAsStringSync();

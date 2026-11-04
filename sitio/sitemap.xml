@@ -33,6 +33,16 @@
   <url><loc>https://jaguarcode.org/errores/el-codigo-debe-ir-dentro-de-algoritmo</loc><lastmod>2026-11-03</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://jaguarcode.org/errores/no-reconozco-el-caracter</loc><lastmod>2026-11-03</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://jaguarcode.org/errores/se-esperaba-segundos-o-milisegundos</loc><lastmod>2026-11-03</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://jaguarcode.org/errores/variable-sin-valor</loc><lastmod>2026-11-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://jaguarcode.org/errores/posicion-fuera-del-arreglo</loc><lastmod>2026-11-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://jaguarcode.org/errores/valor-que-no-corresponde-al-tipo</loc><lastmod>2026-11-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://jaguarcode.org/errores/no-hay-mas-datos-para-leer</loc><lastmod>2026-11-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://jaguarcode.org/errores/demasiados-pasos-ciclo-infinito</loc><lastmod>2026-11-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://jaguarcode.org/errores/division-entre-cero</loc><lastmod>2026-11-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://jaguarcode.org/errores/la-condicion-debe-ser-verdadero-o-falso</loc><lastmod>2026-11-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://jaguarcode.org/errores/operacion-con-texto-y-numero</loc><lastmod>2026-11-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://jaguarcode.org/errores/errores-de-funciones-al-ejecutar</loc><lastmod>2026-11-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://jaguarcode.org/errores/valor-no-valido-en-una-funcion-o-un-ciclo</loc><lastmod>2026-11-05</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://jaguarcode.org/descargas</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://jaguarcode.org/herramientas/prueba-de-escritorio</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
   <url><loc>https://jaguarcode.org/herramientas/diagrama-de-flujo-online</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
