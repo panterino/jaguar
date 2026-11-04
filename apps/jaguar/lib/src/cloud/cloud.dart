@@ -1,15 +1,12 @@
 import 'dart:convert';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:jaguar_core/jaguar_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../firebase_options.dart';
 import 'cloud_backend.dart';
-import 'firebase_backend.dart';
+import 'firebase_rest.dart';
+import 'rest_backend.dart';
 
 export 'cloud_backend.dart';
 
@@ -102,21 +99,24 @@ class Cloud extends ChangeNotifier {
   }
 }
 
-/// Connects to Firebase. Returns null where it can't (no configuration for
-/// this platform, no network on first start): Jaguar then works offline.
-Future<Cloud?> connectCloud(SharedPreferences prefs) async {
-  try {
-    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-    // `--dart-define=JAGUAR_EMULATORS=true` uses the local emulators.
-    if (const bool.fromEnvironment('JAGUAR_EMULATORS')) {
-      FirebaseFirestore.instance.useFirestoreEmulator('127.0.0.1', 8080);
-      await FirebaseAuth.instance.useAuthEmulator('127.0.0.1', 9099);
-    }
-    final cloud = Cloud(FirebaseBackend(), prefs);
-    await cloud.restore();
-    return cloud;
-  } on Object catch (error) {
-    debugPrint('Jaguar sin nube: $error');
-    return null;
-  }
+/// The Firebase project of Jaguar. The key is public (it identifies the
+/// project, like the one in the landing page): what protects the data is
+/// `firestore.rules`.
+const _apiKey = 'AIzaSyD771Ak8TGNvnW1B_vRhMb6AG0IxPssrcE';
+const _projectId = 'jaguarapp-50a15';
+
+/// Connects the online side. There is nothing to install or start: the calls
+/// go through Firebase's REST APIs (see [FirebaseRest]), so it is the same on
+/// every platform. Without a connection the calls fail with a message and
+/// Jaguar keeps working offline.
+Future<Cloud> connectCloud(SharedPreferences prefs, {FirebaseRest? rest}) async {
+  // `--dart-define=JAGUAR_EMULATORS=true` uses the local emulators.
+  final firebase =
+      rest ??
+      (const bool.fromEnvironment('JAGUAR_EMULATORS')
+          ? FirebaseRest.emulator(projectId: _projectId)
+          : FirebaseRest(apiKey: _apiKey, projectId: _projectId));
+  final cloud = Cloud(RestBackend(firebase, prefs), prefs);
+  await cloud.restore();
+  return cloud;
 }
