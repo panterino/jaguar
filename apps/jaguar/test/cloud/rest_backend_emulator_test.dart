@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jaguar/src/cloud/cloud_backend.dart';
 import 'package:jaguar/src/cloud/firebase_rest.dart';
+import 'package:jaguar/src/cloud/regrade.dart';
 import 'package:jaguar/src/cloud/rest_backend.dart';
 import 'package:jaguar_core/jaguar_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -161,7 +162,9 @@ void main() {
       final assignment = await teacherDevice.backend.assign(room.id, _exercise);
       final seen = await studentDevice.backend.assignments(room.id);
       expect(seen.single.exercise.title, 'Doble de un número');
-      expect(seen.single.exercise.cases, hasLength(2));
+      // The hidden test stays with the teacher: the student gets the visible one and a number.
+      expect(seen.single.exercise.cases, hasLength(1));
+      expect(seen.single.hiddenCount, 1);
 
       await studentDevice.backend.submit(
         classId: room.id,
@@ -232,6 +235,134 @@ void main() {
     });
   });
 
+  group('seguridad de las clases', () {
+    const withHidden = Exercise(
+      id: 'doble',
+      title: 'Doble',
+      cases: [
+        TestCase(inputs: ['2'], expected: '4'),
+        TestCase(inputs: ['-3'], expected: '-6', hidden: true),
+        TestCase(inputs: ['0'], expected: '0', hidden: true),
+      ],
+    );
+
+    Future<(_Person, _Person, ClassRoom)> classWithStudent() async {
+      final teacher = await _Person.device();
+      await teacher.backend.registerTeacher(email: _email(), password: 'secreto1', alias: 'Profe Ana');
+      final room = await teacher.backend.createClass('Lógica');
+      final student = await _Person.device();
+      await student.backend.signInAnonymously(alias: 'Luis', role: CloudRole.alumno);
+      await student.backend.joinClass(code: room.code, name: 'Luis');
+      return (teacher, student, room);
+    }
+
+    online('los casos ocultos no llegan al alumno ni leyendo directo del servidor', () async {
+      final (teacher, student, room) = await classWithStudent();
+      expect(room.code, matches(RegExp(r'^JAG-[A-HJ-NP-Z2-9]{8}$')));
+      final assignment = await teacher.backend.assign(room.id, withHidden);
+      expect(assignment.hiddenCount, 2);
+
+      // The teacher sees all three tests, with the data of the hidden ones.
+      final forTeacher = (await teacher.backend.assignments(room.id)).single;
+      expect(forTeacher.exercise.cases, hasLength(3));
+      expect(forTeacher.exercise.cases.where((c) => c.hidden).map((c) => c.expected), containsAll(['-6', '0']));
+
+      // The student gets one test and a number.
+      final forStudent = (await student.backend.assignments(room.id)).single;
+      expect(forStudent.exercise.cases, hasLength(1));
+      expect(forStudent.hiddenCount, 2);
+
+      // And reading the server directly, as a student could, finds nothing hidden.
+      final raw = await student.rest.get('classes/${room.id}/assignments/${assignment.id}');
+      expect(raw!.data.toString(), isNot(contains('-6')));
+      await expectLater(
+        student.rest.get('classes/${room.id}/hiddenCases/${assignment.id}'),
+        throwsA(isA<FirebaseRestError>().having((e) => e.code, 'code', 'PERMISSION_DENIED')),
+      );
+      await expectLater(
+        student.rest.query('hiddenCases', parent: 'classes/${room.id}'),
+        throwsA(isA<FirebaseRestError>().having((e) => e.code, 'code', 'PERMISSION_DENIED')),
+      );
+    });
+
+    online('una tarea hecha antes, con lo oculto a la vista, se corrige al abrirla el profesor', () async {
+      final (teacher, student, room) = await classWithStudent();
+      // As the first version of the app wrote it: every test inside, in the open.
+      await teacher.rest.set('classes/${room.id}/assignments/vieja', {
+        'title': 'Doble',
+        'exercise': withHidden.toJson(),
+        'createdAt': ServerValue.timestamp,
+      });
+      var before = await student.rest.get('classes/${room.id}/assignments/vieja');
+      expect(before!.data.toString(), contains('-6'), reason: 'así estaba expuesto');
+
+      final forTeacher = (await teacher.backend.assignments(room.id)).single;
+      expect(forTeacher.exercise.cases, hasLength(3));
+      expect(forTeacher.hiddenCount, 2);
+
+      before = await student.rest.get('classes/${room.id}/assignments/vieja');
+      expect(before!.data.toString(), isNot(contains('-6')));
+      expect((await student.backend.assignments(room.id)).single.exercise.cases, hasLength(1));
+      // A second look changes nothing.
+      expect((await teacher.backend.assignments(room.id)).single.exercise.cases, hasLength(3));
+    });
+
+    online('borrar una tarea borra también sus casos ocultos', () async {
+      final (teacher, _, room) = await classWithStudent();
+      final assignment = await teacher.backend.assign(room.id, withHidden);
+      expect(await teacher.rest.get('classes/${room.id}/hiddenCases/${assignment.id}'), isNotNull);
+      await teacher.backend.removeAssignment(room.id, assignment.id);
+      expect(await teacher.rest.get('classes/${room.id}/hiddenCases/${assignment.id}'), isNull);
+    });
+
+    online('cerrar la clase: nadie nuevo entra, quien ya estaba sigue, y al abrirla entran', () async {
+      final (teacher, student, room) = await classWithStudent();
+      await teacher.backend.setClassOpen(room.id, open: false);
+      expect((await teacher.backend.myClasses()).single.open, isFalse);
+
+      final late = await _Person.device();
+      await late.backend.signInAnonymously(alias: 'Tarde', role: CloudRole.alumno);
+      expect(
+        (await failure(() => late.backend.joinClass(code: room.code, name: 'Tarde'))).message,
+        contains('no está recibiendo alumnos nuevos'),
+      );
+      // Luis is still in.
+      expect((await student.backend.myClasses()).single.id, room.id);
+      // And a student cannot reopen it.
+      expect(
+        (await failure(() => student.backend.setClassOpen(room.id, open: true))).message,
+        'No tienes permiso para hacer eso.',
+      );
+
+      await teacher.backend.setClassOpen(room.id, open: true);
+      await late.backend.joinClass(code: room.code, name: 'Tarde');
+      expect(await teacher.backend.members(room.id), hasLength(2));
+    });
+
+    online('lo que dice el alumno en su entrega queda como dicho: el profesor la revisa de nuevo', () async {
+      final (teacher, student, room) = await classWithStudent();
+      final assignment = await teacher.backend.assign(room.id, withHidden);
+      // A program written for the visible example, claiming a full score.
+      const forTheExample = 'Algoritmo d\n    Leer n\n    Escribir 4\nFinAlgoritmo\n';
+      await student.backend.submit(
+        classId: room.id,
+        assignmentId: assignment.id,
+        name: 'Luis',
+        source: forTheExample,
+        passed: 3,
+        total: 3,
+      );
+      final claimed = (await teacher.backend.submissions(room.id, assignment.id)).values.single;
+      expect(claimed.passed, 3, reason: 'esto es lo que dijo el alumno');
+
+      final full = (await teacher.backend.assignments(room.id)).single;
+      final graded = await regrade(full, claimed);
+      expect(graded.passed, 1, reason: 'lo revisado: solo pasa el caso visible');
+      expect(graded.total, 3);
+      expect(graded.overstated, isTrue);
+    });
+  });
+
   group('comunidad', () {
     online('publicar, dar «me sirvió», reportar y retirar', () async {
       final author = await _Person.device();
@@ -273,6 +404,23 @@ void main() {
       );
       await author.backend.unpublish(publication.id);
       expect((await reader.backend.publications()).map((p) => p.id), isNot(contains(publication.id)));
+    });
+
+    online('la comunidad se puede mirar sin cuenta', () async {
+      final author = await _Person.device();
+      await author.backend.signInAnonymously(alias: 'Ana', role: CloudRole.autodidacta);
+      final publication = await author.backend.publish(
+        kind: PublicationKind.tutorial,
+        title: 'Para todos',
+        description: '',
+        topic: '',
+        content: {'source': 's'},
+      );
+      final visitor = await _Person.device();
+      expect(visitor.backend.currentUser, isNull);
+      expect((await visitor.backend.publications()).map((p) => p.id), contains(publication.id));
+      // But what is private stays private: a visitor cannot read other people's profiles.
+      expect((await failure(() => visitor.backend.myClasses())).message, 'Primero entra a tu cuenta.');
     });
   });
 

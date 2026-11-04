@@ -18,9 +18,75 @@ const parImpar = Exercise(
 
 void main() {
   test('códigos de clase fáciles de dictar y de escribir', () {
-    expect(newClassCode(), matches(RegExp(r'^JAG-[A-HJ-NP-Z2-9]{4}$')));
+    // Eight characters: too many to find by trying them one by one.
+    expect(newClassCode(), matches(RegExp(r'^JAG-[A-HJ-NP-Z2-9]{8}$')));
+    expect({for (var i = 0; i < 500; i++) newClassCode()}, hasLength(500));
+    // The first classes had four, and their codes still work when typed.
     expect(normalizeClassCode('jag 4k7q'), 'JAG-4K7Q');
     expect(normalizeClassCode('4k7q'), 'JAG-4K7Q');
+    expect(normalizeClassCode('jag k7q4 m2xp'), 'JAG-K7Q4M2XP');
+  });
+
+  test('los casos ocultos se quedan con el profesor y el alumno solo ve cuántos hay', () async {
+    final backend = MemoryBackend();
+    await backend.registerTeacher(email: 'profe@prepa.mx', password: 'secreto', alias: 'Profa');
+    final room = await backend.createClass('1° A');
+    const withHidden = Exercise(
+      id: 'doble',
+      title: 'Doble',
+      cases: [
+        TestCase(inputs: ['2'], expected: '4'),
+        TestCase(inputs: ['0'], expected: '0', hidden: true),
+        TestCase(inputs: ['-3'], expected: '-6', hidden: true),
+      ],
+    );
+    final assignment = await backend.assign(room.id, withHidden);
+    expect(assignment.hiddenCount, 2);
+
+    // The teacher sees every test.
+    final forTeacher = (await backend.assignments(room.id)).single;
+    expect(forTeacher.exercise.cases, hasLength(3));
+    expect(forTeacher.hiddenCount, 2);
+
+    // A student gets the visible one and a number.
+    final teacher = backend.currentUser!;
+    await backend.signInAnonymously(alias: 'Ana', role: CloudRole.alumno);
+    await backend.joinClass(code: room.code, name: 'Ana');
+    final forStudent = (await backend.assignments(room.id)).single;
+    expect(forStudent.exercise.cases, hasLength(1));
+    expect(forStudent.exercise.cases.single.hidden, isFalse);
+    expect(forStudent.hiddenCount, 2);
+    expect(forStudent.exercise.toJson().toString(), isNot(contains('-6')));
+    backend.actAs(teacher);
+  });
+
+  test('el profesor cierra la clase: nadie nuevo entra, quien ya estaba sigue', () async {
+    final backend = MemoryBackend();
+    final teacher = await backend.registerTeacher(email: 'profe@prepa.mx', password: 'secreto', alias: 'Profa');
+    final room = await backend.createClass('1° A');
+    expect(room.open, isTrue);
+
+    await backend.signInAnonymously(alias: 'Ana', role: CloudRole.alumno);
+    await backend.joinClass(code: room.code, name: 'Ana');
+
+    backend.actAs(teacher);
+    await backend.setClassOpen(room.id, open: false);
+    expect((await backend.myClasses()).single.open, isFalse);
+
+    await backend.signInAnonymously(alias: 'Beto', role: CloudRole.alumno);
+    expect(
+      () => backend.joinClass(code: room.code, name: 'Beto'),
+      throwsA(isA<CloudException>().having((e) => e.message, 'message', contains('no está recibiendo alumnos nuevos'))),
+    );
+    // A student cannot open it again.
+    expect(() => backend.setClassOpen(room.id, open: true), throwsA(isA<CloudException>()));
+
+    backend.actAs(teacher);
+    await backend.setClassOpen(room.id, open: true);
+    await backend.signInAnonymously(alias: 'Beto', role: CloudRole.alumno);
+    await backend.joinClass(code: room.code, name: 'Beto');
+    backend.actAs(teacher);
+    expect(await backend.members(room.id), hasLength(2));
   });
 
   test('la suite completa: el profesor asigna, el alumno prueba y el resultado llega', () async {

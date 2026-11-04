@@ -149,11 +149,15 @@ class FirebaseRest {
   // Firestore ---------------------------------------------------------------------
 
   String get _documents => 'projects/$projectId/databases/(default)/documents';
-  Uri _firestore(String path) => Uri.parse('$firestoreHost/v1/$path');
+
+  /// The key goes along always: without a session it is all that identifies the
+  /// project, and the rules then see an anonymous visitor (they let anyone read
+  /// the published programs of the community).
+  Uri _firestore(String path) => Uri.parse('$firestoreHost/v1/$path?key=$apiKey');
 
   Future<Map<String, String>> _headers() async => {
     'Content-Type': 'application/json',
-    'Authorization': 'Bearer ${await _token()}',
+    if (signedIn) 'Authorization': 'Bearer ${await _token()}',
   };
 
   /// The document at [path], or null if it does not exist.

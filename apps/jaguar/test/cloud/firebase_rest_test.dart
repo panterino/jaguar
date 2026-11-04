@@ -391,6 +391,19 @@ void main() {
       );
     });
 
+    test('sin sesión se lee con la clave del proyecto y sin token', () async {
+      late http.Request sent;
+      final rest = _rest((request) {
+        sent = request;
+        return _json([
+          {'readTime': 'x'},
+        ]);
+      });
+      expect(await rest.query('publications', where: {'status': 'publicado'}), isEmpty);
+      expect(sent.headers.containsKey('Authorization'), isFalse);
+      expect(sent.url.queryParameters['key'], 'clave');
+    });
+
     test('los ids nuevos tienen 20 letras y números y no se repiten', () {
       final ids = {for (var i = 0; i < 200; i++) newDocumentId()};
       expect(ids, hasLength(200));

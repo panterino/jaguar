@@ -56,16 +56,25 @@ service cloud.firestore {
       function isMember() {
         return signedIn() && exists(/databases/$(database)/documents/classes/$(classId)/members/$(request.auth.uid));
       }
+      function isOpen() {
+        return get(/databases/$(database)/documents/classes/$(classId)).data.get('open', true) == true;
+      }
 
       allow get: if isOwner() || isMember();
       allow list: if signedIn() && resource.data.ownerId == request.auth.uid;
+      // "open" lets the teacher close the class to new students; a class
+      // without the field is open.
       allow create: if signedIn()
-        && onlyFields(['name', 'ownerId', 'ownerAlias', 'code', 'createdAt'])
+        && onlyFields(['name', 'ownerId', 'ownerAlias', 'code', 'createdAt', 'open'])
         && request.resource.data.ownerId == request.auth.uid
-        && shortText('name', 60);
+        && shortText('name', 60)
+        && (!('open' in request.resource.data) || request.resource.data.open is bool);
       allow update: if isOwner()
+        && onlyFields(['name', 'ownerId', 'ownerAlias', 'code', 'createdAt', 'open'])
         && request.resource.data.ownerId == resource.data.ownerId
-        && request.resource.data.code == resource.data.code;
+        && request.resource.data.code == resource.data.code
+        && shortText('name', 60)
+        && (!('open' in request.resource.data) || request.resource.data.open is bool);
       allow delete: if isOwner();
 
       // Joining needs the class code; a student sees only themselves, the
@@ -77,6 +86,7 @@ service cloud.firestore {
           && onlyFields(['name', 'role', 'code', 'joinedAt'])
           && request.resource.data.role == 'alumno'
           && request.resource.data.code == get(/databases/$(database)/documents/classes/$(classId)).data.code
+          && isOpen()
           && shortText('name', 60);
         allow update: if isMe(uid)
           && onlyFields(['name', 'role', 'code', 'joinedAt'])
@@ -86,25 +96,46 @@ service cloud.firestore {
         allow delete: if isMe(uid) || isOwner();
       }
 
+      // The hidden tests of each assignment (same id), for the teacher only.
+      match /hiddenCases/{assignmentId} {
+        allow read, delete: if isOwner();
+        allow create, update: if isOwner()
+          && onlyFields(['cases'])
+          && request.resource.data.cases is list
+          && request.resource.data.cases.size() <= 50;
+      }
+
       // Exercises assigned by the teacher. The teacher's solution never
-      // comes here: it stays on the teacher's device.
+      // comes here: it stays on the teacher's device. Students read the visible
+      // tests only: the hidden ones live in hiddenCases, which only the teacher
+      // reads, and "hiddenCount" tells the students how many there are.
       match /assignments/{assignmentId} {
         allow read: if isOwner() || isMember();
         allow create, update: if isOwner()
-          && onlyFields(['title', 'exercise', 'createdAt', 'dueAt'])
+          && onlyFields(['title', 'exercise', 'createdAt', 'dueAt', 'hiddenCount'])
           && shortText('title', 120)
-          && request.resource.data.exercise is map;
+          && request.resource.data.exercise is map
+          && (!('hiddenCount' in request.resource.data)
+              || (request.resource.data.hiddenCount is int
+                  && request.resource.data.hiddenCount >= 0
+                  && request.resource.data.hiddenCount <= 50));
         allow delete: if isOwner();
 
         // One submission per student, rewritten on every Probar.
         match /submissions/{uid} {
           allow read: if isMe(uid) || isOwner();
+          // "passed" and "total" are what the student says: the teacher's app
+          // runs the program again against every test, hidden ones included,
+          // and shows that result. The rules only keep them sane.
           allow create, update: if isMe(uid) && isMember()
             && onlyFields(['name', 'source', 'passed', 'total', 'pasted', 'updatedAt'])
             && request.resource.data.source is string
             && request.resource.data.source.size() <= 50000
             && request.resource.data.passed is int
             && request.resource.data.total is int
+            && request.resource.data.passed >= 0
+            && request.resource.data.passed <= request.resource.data.total
+            && request.resource.data.total <= 500
             // Most lines pasted at once, for the teacher. Optional.
             && (!('pasted' in request.resource.data)
                 || (request.resource.data.pasted is int && request.resource.data.pasted > 0
@@ -129,12 +160,24 @@ service cloud.firestore {
         && request.resource.data.description is string
         && request.resource.data.description.size() <= 2000
         && request.resource.data.content is map;
+      // The author can hide and show their own, and fix it. A publication a
+      // moderator marked "moderado" (in the console) is out of their hands.
       allow update: if signedIn() && resource.data.authorId == request.auth.uid
+        && resource.data.status in ['publicado', 'oculto']
+        && request.resource.data.status in ['publicado', 'oculto']
+        && onlyFields(['kind', 'title', 'description', 'topic', 'authorId', 'authorAlias', 'content',
+                       'remixOf', 'status', 'createdAt'])
         && request.resource.data.authorId == resource.data.authorId
-        && request.resource.data.status in ['publicado', 'oculto'];
+        && request.resource.data.kind == resource.data.kind
+        && request.resource.data.createdAt == resource.data.createdAt
+        && shortText('title', 120)
+        && request.resource.data.description is string
+        && request.resource.data.description.size() <= 2000
+        && request.resource.data.content is map;
       allow delete: if signedIn() && resource.data.authorId == request.auth.uid;
 
-      // "Me sirvió": one per person, readable to count them.
+      // "Me sirvió": one per person. Anyone can count them, so the ids are
+      // readable: they are random ones from Firebase, never a name or an alias.
       match /useful/{uid} {
         allow read: if true;
         allow create: if isMe(uid) && request.resource.data.keys().size() == 0;
@@ -167,10 +210,11 @@ service cloud.firestore {
         && request.resource.data.creado == request.time;
     }
 
-    // Early access list from the landing page: a person leaves an email to be
-    // told when Jaguar opens. The id is a fingerprint of the email, so the
-    // same address twice keeps one entry (the second create is refused, as an
-    // update is). Only Panterino reads them, in the console.
+    // List from the landing page: a person leaves an email to be told when
+    // Jaguar launches. The id is random, so nobody can find out whether an
+    // address is on the list by trying to add it (a repeated address is just
+    // a second entry, which Panterino sees in the console). Only Panterino
+    // reads them.
     match /accesoAnticipado/{id} {
       allow create: if onlyFields(['correo', 'origen', 'creado'])
         && request.resource.data.correo is string

@@ -115,6 +115,9 @@ class RestBackend implements CloudBackend {
       for (final member in await _rest.query('members', parent: base)) {
         writes.add(Write.delete(member.path));
       }
+      for (final hidden in await _rest.query('hiddenCases', parent: base)) {
+        writes.add(Write.delete(hidden.path));
+      }
       final code = room.data['code'];
       if (code is String && code.isNotEmpty) writes.add(Write.delete('classCodes/$code'));
       writes.add(Write.delete(base));
@@ -167,6 +170,7 @@ class RestBackend implements CloudBackend {
       'ownerId': user.uid,
       'ownerAlias': user.alias,
       'code': code,
+      'open': true,
       'createdAt': ServerValue.timestamp,
     });
     // After the class, so the rules can check who owns it.
@@ -179,12 +183,20 @@ class RestBackend implements CloudBackend {
     final normalized = normalizeClassCode(code);
     final classId = (await _rest.get('classCodes/$normalized'))?.data['classId'] as String?;
     if (classId == null) throw CloudException('No existe ninguna clase con el código $normalized.');
-    await _rest.set('classes/$classId/members/$_uid', {
-      'name': name,
-      'role': 'alumno',
-      'code': normalized,
-      'joinedAt': ServerValue.timestamp,
-    });
+    try {
+      await _rest.set('classes/$classId/members/$_uid', {
+        'name': name,
+        'role': 'alumno',
+        'code': normalized,
+        'joinedAt': ServerValue.timestamp,
+      });
+    } on FirebaseRestError catch (e) {
+      // The code exists, so what the rules refuse is a closed class.
+      if (e.code == 'PERMISSION_DENIED') {
+        throw const CloudException('Esa clase no está recibiendo alumnos nuevos. Pídele a tu profe que la abra.');
+      }
+      rethrow;
+    }
     await _rest.set('users/$_uid', {
       'classes': ArrayUnion([classId]),
     }, merge: true);
@@ -198,7 +210,12 @@ class RestBackend implements CloudBackend {
     code: doc.data['code'] as String? ?? '',
     ownerId: doc.data['ownerId'] as String? ?? '',
     ownerAlias: doc.data['ownerAlias'] as String? ?? '',
+    open: doc.data['open'] != false,
   );
+
+  @override
+  Future<void> setClassOpen(String classId, {required bool open}) =>
+      _guard(() => _rest.set('classes/$classId', {'open': open}, merge: true));
 
   @override
   Future<List<ClassRoom>> myClasses() => _guard(() async {
@@ -224,31 +241,91 @@ class RestBackend implements CloudBackend {
   @override
   Future<List<Assignment>> assignments(String classId) => _guard(() async {
     final docs = await _rest.query('assignments', parent: 'classes/$classId', orderBy: 'createdAt');
-    return [
-      for (final doc in docs)
+    final teacher = _user?.isTeacher ?? false;
+    // Only the teacher can read the hidden tests: students get a number.
+    final hidden = teacher && docs.any((d) => ((d.data['hiddenCount'] as num?) ?? 0) > 0)
+        ? await _hiddenCases(classId)
+        : const <String, List<TestCase>>{};
+    final result = <Assignment>[];
+    for (final doc in docs) {
+      var exercise = Exercise.fromJson((doc.data['exercise']! as Map).cast<String, Object?>());
+      var count = (doc.data['hiddenCount'] as num?)?.toInt() ?? 0;
+      if (teacher && exercise.cases.any((c) => c.hidden)) {
+        // An assignment made before the hidden tests were kept apart: its hidden
+        // tests are in the open, in the part every student reads. Move them.
+        await _storeAssignment(classId, doc.id, exercise, createdAt: doc.data['createdAt'] as DateTime?);
+        count = exercise.cases.where((c) => c.hidden).length;
+      } else if (hidden.containsKey(doc.id)) {
+        exercise = withHiddenCases(exercise, hidden[doc.id]!);
+      }
+      result.add(
         Assignment(
           id: doc.id,
           classId: classId,
-          exercise: Exercise.fromJson((doc.data['exercise']! as Map).cast<String, Object?>()),
+          exercise: exercise,
           createdAt: doc.data['createdAt'] as DateTime?,
+          hiddenCount: count,
         ),
-    ];
+      );
+    }
+    return result;
   });
+
+  Future<Map<String, List<TestCase>>> _hiddenCases(String classId) async {
+    try {
+      final docs = await _rest.query('hiddenCases', parent: 'classes/$classId');
+      return {
+        for (final doc in docs)
+          doc.id: [
+            for (final c in (doc.data['cases'] as List?) ?? const [])
+              TestCase.fromJson((c as Map).cast<String, Object?>()),
+          ],
+      };
+    } on FirebaseRestError catch (e) {
+      if (e.code == 'PERMISSION_DENIED') return const {};
+      rethrow;
+    }
+  }
+
+  /// Writes the assignment with the visible tests, and the hidden ones apart.
+  Future<void> _storeAssignment(String classId, String id, Exercise exercise, {DateTime? createdAt}) async {
+    final parts = splitHiddenCases(exercise);
+    await _rest.commit([
+      Write.set('classes/$classId/assignments/$id', {
+        'title': exercise.title,
+        'exercise': parts.visible.toJson(),
+        'hiddenCount': parts.hidden.length,
+        'createdAt': createdAt ?? ServerValue.timestamp,
+      }),
+      if (parts.hidden.isNotEmpty)
+        Write.set('classes/$classId/hiddenCases/$id', {
+          'cases': [for (final c in parts.hidden) c.toJson()],
+        })
+      else
+        Write.delete('classes/$classId/hiddenCases/$id'),
+    ]);
+  }
 
   @override
   Future<Assignment> assign(String classId, Exercise exercise) => _guard(() async {
     final id = newDocumentId();
-    await _rest.set('classes/$classId/assignments/$id', {
-      'title': exercise.title,
-      'exercise': exercise.toJson(),
-      'createdAt': ServerValue.timestamp,
-    });
-    return Assignment(id: id, classId: classId, exercise: exercise, createdAt: DateTime.now());
+    await _storeAssignment(classId, id, exercise);
+    return Assignment(
+      id: id,
+      classId: classId,
+      exercise: exercise,
+      createdAt: DateTime.now(),
+      hiddenCount: exercise.cases.where((c) => c.hidden).length,
+    );
   });
 
   @override
-  Future<void> removeAssignment(String classId, String assignmentId) =>
-      _guard(() => _rest.delete('classes/$classId/assignments/$assignmentId'));
+  Future<void> removeAssignment(String classId, String assignmentId) => _guard(
+    () => _rest.commit([
+      Write.delete('classes/$classId/assignments/$assignmentId'),
+      Write.delete('classes/$classId/hiddenCases/$assignmentId'),
+    ]),
+  );
 
   @override
   Future<void> submit({
