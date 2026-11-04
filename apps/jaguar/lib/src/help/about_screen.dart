@@ -5,7 +5,7 @@ import 'privacy.dart';
 import '../widgets/mascota.dart';
 import '../widgets/page_width.dart';
 
-const jaguarVersion = '0.9.1';
+const jaguarVersion = '0.9.2';
 
 /// Acerca de: what Jaguar is, where it comes from and what it stands for.
 class AboutScreen extends StatelessWidget {
