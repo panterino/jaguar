@@ -9,6 +9,11 @@ import '../theme.dart';
 import 'account_dialog.dart';
 import 'cloud.dart';
 
+/// Same breakpoint as the rooms: from here the classes use the width.
+const _wideWidth = 900.0;
+
+bool _isWide(BuildContext context) => MediaQuery.sizeOf(context).width >= _wideWidth;
+
 /// Asks for the class code and the student's name; null if cancelled.
 Future<(String, String)?> askJoinCode(BuildContext context) =>
     showDialog<(String, String)>(context: context, builder: (_) => const _JoinDialog());
@@ -111,24 +116,23 @@ class _ClassesScreenState extends State<ClassesScreen> {
   Widget build(BuildContext context) {
     final user = _cloud.user;
     final theme = Theme.of(context);
+    final wide = _isWide(context);
+    final actionLabel = user == null
+        ? null
+        : user.isTeacher
+        ? 'Crear clase'
+        : 'Unirme con un código';
+    final actionIcon = user?.isTeacher ?? false ? Icons.add : Icons.group_add_outlined;
+    final action = user?.isTeacher ?? false ? _create : _join;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mis clases'),
         actions: [IconButton(tooltip: 'Actualizar', icon: const Icon(Icons.refresh), onPressed: _reload)],
       ),
-      floatingActionButton: user == null
+      // On a computer the button sits at the top of the list, near the eyes.
+      floatingActionButton: user == null || wide
           ? null
-          : user.isTeacher
-          ? FloatingActionButton.extended(
-              onPressed: _create,
-              icon: const Icon(Icons.add),
-              label: const Text('Crear clase'),
-            )
-          : FloatingActionButton.extended(
-              onPressed: _join,
-              icon: const Icon(Icons.group_add_outlined),
-              label: const Text('Unirme con un código'),
-            ),
+          : FloatingActionButton.extended(onPressed: action, icon: Icon(actionIcon), label: Text(actionLabel!)),
       body: user == null
           ? _Empty(
               icon: Icons.cloud_outlined,
@@ -153,22 +157,50 @@ class _ClassesScreenState extends State<ClassesScreen> {
                     text: user.isTeacher
                         ? 'Crea una clase y comparte su código con tu grupo.'
                         : 'Pídele a tu profesor el código de la clase (como JAG-4K7Q).',
+                    action: wide
+                        ? FilledButton.icon(onPressed: action, icon: Icon(actionIcon), label: Text(actionLabel!))
+                        : null,
                   );
                 }
-                return ListView(
-                  padding: const EdgeInsets.all(12),
-                  children: [
-                    for (final room in classes)
-                      Card(
-                        child: ListTile(
-                          leading: Icon(room.ownerId == user.uid ? Icons.school_outlined : Icons.backpack_outlined),
-                          title: Text(room.name, style: theme.textTheme.titleMedium),
-                          subtitle: Text(room.ownerId == user.uid ? 'Código ${room.code}' : 'Con ${room.ownerAlias}'),
-                          trailing: const Icon(Icons.chevron_right),
-                          onTap: () => _open(room),
-                        ),
-                      ),
-                  ],
+                return Align(
+                  alignment: Alignment.topCenter,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 760),
+                    child: ListView(
+                      padding: EdgeInsets.fromLTRB(12, wide ? 8 : 12, 12, 96),
+                      children: [
+                        if (wide)
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(4, 0, 4, 12),
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: FilledButton.icon(
+                                onPressed: action,
+                                icon: Icon(actionIcon),
+                                label: Text(actionLabel!),
+                              ),
+                            ),
+                          ),
+                        for (final room in classes)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Card(
+                              child: ListTile(
+                                leading: Icon(
+                                  room.ownerId == user.uid ? Icons.school_outlined : Icons.backpack_outlined,
+                                ),
+                                title: Text(room.name, style: theme.textTheme.titleMedium),
+                                subtitle: Text(
+                                  room.ownerId == user.uid ? 'Código ${room.code}' : 'Con ${room.ownerAlias}',
+                                ),
+                                trailing: const Icon(Icons.chevron_right),
+                                onTap: () => _open(room),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
                 );
               },
             ),
@@ -248,15 +280,53 @@ class _ClassScreenState extends State<ClassScreen> {
     }
   }
 
-  Future<void> _assign() async {
-    final exercise = await showModalBottomSheet<Exercise>(
+  /// A dialog on a computer, a bottom sheet on a phone.
+  Future<Exercise?> _pickExercise() {
+    if (_isWide(context)) {
+      return showDialog<Exercise>(
+        context: context,
+        builder: (context) => Dialog(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 560, maxHeight: 640),
+            child: _ExercisePicker(exercises: widget.exercises.authored, cloud: widget.cloud, inDialog: true),
+          ),
+        ),
+      );
+    }
+    return showModalBottomSheet<Exercise>(
       context: context,
       showDragHandle: true,
       builder: (context) => _ExercisePicker(exercises: widget.exercises.authored, cloud: widget.cloud),
     );
+  }
+
+  Future<void> _assign() async {
+    final exercise = await _pickExercise();
     if (exercise == null) return;
     try {
       await _backend.assign(widget.room.id, exercise);
+      await _load();
+    } on CloudException catch (e) {
+      _toast(e.message);
+    }
+  }
+
+  /// Removing a task also removes what the students delivered, so it asks.
+  Future<void> _removeAssignment(Assignment assignment) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('¿Quitar "${assignment.title}"?'),
+        content: const Text('Tus alumnos dejarán de verla y se pierden sus entregas de esta tarea.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Quitar')),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    try {
+      await _backend.removeAssignment(widget.room.id, assignment.id);
       await _load();
     } on CloudException catch (e) {
       _toast(e.message);
@@ -325,68 +395,169 @@ class _ClassScreenState extends State<ClassScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final assignments = _assignments;
+    final wide = _isWide(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.room.name),
         actions: [IconButton(tooltip: 'Actualizar', icon: const Icon(Icons.refresh), onPressed: _load)],
       ),
-      floatingActionButton: _isTeacher
+      floatingActionButton: _isTeacher && !wide
           ? FloatingActionButton.extended(
               onPressed: _assign,
               icon: const Icon(Icons.assignment_add),
               label: const Text('Asignar ejercicio'),
             )
           : null,
-      body: _error != null
-          ? _Empty(icon: Icons.cloud_off, title: 'No se pudo cargar', text: _error!)
-          : assignments == null
-          ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
+      body: CallbackShortcuts(
+        bindings: {const SingleActivator(LogicalKeyboardKey.escape): () => Navigator.maybePop(context)},
+        child: Focus(
+          autofocus: true,
+          child: _error != null
+              ? _Empty(icon: Icons.cloud_off, title: 'No se pudo cargar', text: _error!)
+              : assignments == null
+              ? const Center(child: CircularProgressIndicator())
+              : _isTeacher && wide
+              ? _teacherWide(assignments)
+              : _list(assignments, wide),
+        ),
+      ),
+    );
+  }
+
+  /// The phone layout, and the student's on any screen: one column.
+  Widget _list(List<Assignment> assignments, bool wide) {
+    final theme = Theme.of(context);
+    final list = ListView(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
+      children: [
+        if (_isTeacher) _CodeCard(code: widget.room.code, students: _members.length),
+        const SizedBox(height: 16),
+        Text('Tareas', style: theme.textTheme.titleMedium),
+        const SizedBox(height: 8),
+        if (assignments.isEmpty)
+          Text(
+            _isTeacher
+                ? 'Asigna un ejercicio: tus alumnos lo verán aquí y sus resultados te llegarán solos.'
+                : 'Tu profesor aún no asigna tareas.',
+            style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+          ),
+        if (_isTeacher && assignments.isNotEmpty)
+          _ProgressTable(
+            assignments: assignments,
+            members: _members,
+            submissions: _submissions,
+            onTap: _showSubmission,
+            onRemove: _removeAssignment,
+          ),
+        if (!_isTeacher)
+          for (final a in assignments)
+            Card(
+              child: ListTile(
+                leading: _StatusIcon(submission: _submissions[a.id]?.values.firstOrNull),
+                title: Text(a.title),
+                subtitle: Text(switch (_submissions[a.id]?.values.firstOrNull) {
+                  null => 'Sin entregar',
+                  final s when s.complete => 'Completa: ${s.passed} de ${s.total} pruebas',
+                  final s => '${s.passed} de ${s.total} pruebas',
+                }),
+                trailing: FilledButton.tonal(onPressed: () => _openAssignment(a), child: const Text('Resolver')),
+              ),
+            ),
+      ],
+    );
+    if (!wide) return list;
+    return Align(
+      alignment: Alignment.topCenter,
+      child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 720), child: list),
+    );
+  }
+
+  /// How many students finished [assignment] (every test passed).
+  int _completed(Assignment assignment) => [
+    for (final m in _members)
+      if (_submissions[assignment.id]?[m.uid]?.complete ?? false) m,
+  ].length;
+
+  /// The teacher on a computer: the class and its tasks on the left, and
+  /// the deliveries table taking the rest of the width and height.
+  Widget _teacherWide(List<Assignment> assignments) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final Widget right = assignments.isEmpty
+        ? _Empty(
+            icon: Icons.assignment_outlined,
+            title: 'Aún no hay tareas',
+            text: 'Asigna un ejercicio: tus alumnos lo verán en su clase y sus resultados te llegarán solos.',
+            action: FilledButton.icon(
+              onPressed: _assign,
+              icon: const Icon(Icons.assignment_add),
+              label: const Text('Asignar ejercicio'),
+            ),
+          )
+        : _members.isEmpty
+        ? const _Empty(
+            icon: Icons.group_outlined,
+            title: 'Aún no hay alumnos',
+            text: 'Cuando tus alumnos se unan con el código, aquí verás su avance en cada tarea.',
+          )
+        : _ProgressGrid(
+            assignments: assignments,
+            members: _members,
+            submissions: _submissions,
+            completed: _completed,
+            onTap: _showSubmission,
+          );
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SizedBox(
+          width: 340,
+          child: FocusTraversalGroup(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
               children: [
-                if (_isTeacher) _CodeCard(code: widget.room.code, students: _members.length),
-                const SizedBox(height: 16),
+                _CodeCard(code: widget.room.code, students: _members.length),
+                const SizedBox(height: 12),
+                Tooltip(
+                  message: 'Elige uno de tus ejercicios o uno del banco',
+                  child: FilledButton.icon(
+                    onPressed: _assign,
+                    icon: const Icon(Icons.assignment_add),
+                    label: const Text('Asignar ejercicio'),
+                  ),
+                ),
+                const SizedBox(height: 20),
                 Text('Tareas', style: theme.textTheme.titleMedium),
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
                 if (assignments.isEmpty)
                   Text(
-                    _isTeacher
-                        ? 'Asigna un ejercicio: tus alumnos lo verán aquí y sus resultados te llegarán solos.'
-                        : 'Tu profesor aún no asigna tareas.',
-                    style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                    'Todavía no hay tareas en esta clase.',
+                    style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
                   ),
-                if (_isTeacher && assignments.isNotEmpty)
-                  _ProgressTable(
-                    assignments: assignments,
-                    members: _members,
-                    submissions: _submissions,
-                    onTap: _showSubmission,
-                    onRemove: (a) async {
-                      await _backend.removeAssignment(widget.room.id, a.id);
-                      await _load();
-                    },
-                  ),
-                if (!_isTeacher)
-                  for (final a in assignments)
-                    Card(
-                      child: ListTile(
-                        leading: _StatusIcon(submission: _submissions[a.id]?.values.firstOrNull),
-                        title: Text(a.title),
-                        subtitle: Text(switch (_submissions[a.id]?.values.firstOrNull) {
-                          null => 'Sin entregar',
-                          final s when s.complete => 'Completa: ${s.passed} de ${s.total} pruebas',
-                          final s => '${s.passed} de ${s.total} pruebas',
-                        }),
-                        trailing: FilledButton.tonal(
-                          onPressed: () => _openAssignment(a),
-                          child: const Text('Resolver'),
-                        ),
-                      ),
+                for (final a in assignments)
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.assignment_outlined),
+                    title: Text(a.title, maxLines: 2, overflow: TextOverflow.ellipsis),
+                    subtitle: Text('${_completed(a)} de ${_members.length} completas'),
+                    trailing: IconButton(
+                      tooltip: 'Quitar tarea',
+                      icon: const Icon(Icons.delete_outline),
+                      onPressed: () => _removeAssignment(a),
                     ),
+                  ),
               ],
             ),
+          ),
+        ),
+        VerticalDivider(width: 1, color: scheme.outlineVariant),
+        Expanded(
+          child: FocusTraversalGroup(
+            child: Padding(padding: const EdgeInsets.fromLTRB(16, 8, 16, 16), child: right),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -525,6 +696,183 @@ class _ProgressTable extends StatelessWidget {
   }
 }
 
+/// Students x assignments for a computer: the header stays in place while
+/// the rows scroll, the name column is wide, and the table scrolls sideways
+/// only when there are more tasks than room.
+class _ProgressGrid extends StatelessWidget {
+  const _ProgressGrid({
+    required this.assignments,
+    required this.members,
+    required this.submissions,
+    required this.completed,
+    required this.onTap,
+  });
+
+  final List<Assignment> assignments;
+  final List<Member> members;
+  final Map<String, Map<String, Submission>> submissions;
+  final int Function(Assignment) completed;
+  final void Function(Submission, Assignment) onTap;
+
+  static const _nameWidth = 220.0;
+  static const _taskWidth = 190.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: scheme.outlineVariant, width: 1.5),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final natural = _nameWidth + assignments.length * _taskWidth;
+          final width = natural > constraints.maxWidth ? natural : constraints.maxWidth;
+          // The task columns share what the name column leaves, so a few
+          // tasks do not leave an empty strip on the right.
+          final taskWidth = (width - _nameWidth) / assignments.length;
+          final grid = SizedBox(
+            width: width,
+            child: Column(
+              children: [
+                _row(
+                  context,
+                  header: true,
+                  name: Text('Alumno', style: _head(context)),
+                  cells: [
+                    for (final a in assignments)
+                      Tooltip(
+                        message: a.title,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(a.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: _head(context)),
+                            Text(
+                              '${completed(a)} de ${members.length} completas',
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                  taskWidth: taskWidth,
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: members.length,
+                    itemBuilder: (context, i) {
+                      final m = members[i];
+                      return _row(
+                        context,
+                        shaded: i.isOdd,
+                        name: Text(m.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+                        cells: [for (final a in assignments) _cell(context, m, a)],
+                        taskWidth: taskWidth,
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          );
+          return natural > constraints.maxWidth
+              ? SingleChildScrollView(scrollDirection: Axis.horizontal, child: grid)
+              : grid;
+        },
+      ),
+    );
+  }
+
+  TextStyle? _head(BuildContext context) => Theme.of(context).textTheme.labelLarge;
+
+  Widget _row(
+    BuildContext context, {
+    required Widget name,
+    required List<Widget> cells,
+    required double taskWidth,
+    bool header = false,
+    bool shaded = false,
+  }) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      decoration: BoxDecoration(
+        color: header
+            ? scheme.surfaceContainerHigh
+            : shaded
+            ? scheme.surfaceContainerLow
+            : null,
+        border: Border(bottom: BorderSide(color: scheme.outlineVariant)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: _nameWidth,
+            constraints: const BoxConstraints(minHeight: 52),
+            alignment: Alignment.centerLeft,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: name,
+          ),
+          for (final cell in cells)
+            Container(
+              width: taskWidth,
+              constraints: const BoxConstraints(minHeight: 52),
+              alignment: Alignment.centerLeft,
+              padding: header ? const EdgeInsets.symmetric(horizontal: 12, vertical: 8) : EdgeInsets.zero,
+              child: cell,
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _cell(BuildContext context, Member member, Assignment assignment) {
+    final scheme = Theme.of(context).colorScheme;
+    final s = submissions[assignment.id]?[member.uid];
+    if (s == null) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: Semantics(
+          label: '${member.name}, ${assignment.title}: sin entregar',
+          child: Text('Sin entregar', style: TextStyle(color: scheme.onSurfaceVariant)),
+        ),
+      );
+    }
+    return Semantics(
+      button: true,
+      label: '${member.name}, ${assignment.title}: ${s.passed} de ${s.total} pruebas. Abre la entrega.',
+      excludeSemantics: true,
+      child: Tooltip(
+        message: 'Ver la entrega de ${member.name}',
+        child: InkWell(
+          onTap: () => onTap(s, assignment),
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 52),
+            alignment: Alignment.centerLeft,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Row(
+              children: [
+                _StatusIcon(submission: s),
+                const SizedBox(width: 8),
+                Flexible(child: Text('${s.passed} de ${s.total}', maxLines: 1, overflow: TextOverflow.ellipsis)),
+                if (s.pastedLines > 0) ...[
+                  const SizedBox(width: 8),
+                  Tooltip(
+                    message: 'Pegó ${s.pastedLines} líneas de una vez',
+                    child: Icon(Icons.content_paste, size: 16, color: scheme.tertiary),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _StatusIcon extends StatelessWidget {
   const _StatusIcon({required this.submission});
 
@@ -542,10 +890,13 @@ class _StatusIcon extends StatelessWidget {
 
 /// Choose what to assign: one of my exercises or one from the shared bank.
 class _ExercisePicker extends StatefulWidget {
-  const _ExercisePicker({required this.exercises, required this.cloud});
+  const _ExercisePicker({required this.exercises, required this.cloud, this.inDialog = false});
 
   final List<Exercise> exercises;
   final Cloud cloud;
+
+  /// In a dialog on a computer: with its own title and a close button.
+  final bool inDialog;
 
   @override
   State<_ExercisePicker> createState() => _ExercisePickerState();
@@ -559,8 +910,19 @@ class _ExercisePickerState extends State<_ExercisePicker> {
     final theme = Theme.of(context);
     return SafeArea(
       child: ListView(
+        shrinkWrap: widget.inDialog,
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         children: [
+          if (widget.inDialog)
+            Padding(
+              padding: const EdgeInsets.only(top: 12, bottom: 8),
+              child: Row(
+                children: [
+                  Expanded(child: Text('Asignar ejercicio', style: theme.textTheme.titleLarge)),
+                  IconButton(tooltip: 'Cerrar', icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context)),
+                ],
+              ),
+            ),
           Text('Mis ejercicios', style: theme.textTheme.titleMedium),
           if (widget.exercises.isEmpty)
             const Padding(

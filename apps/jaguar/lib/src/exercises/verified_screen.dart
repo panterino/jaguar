@@ -59,104 +59,127 @@ class _VerifiedScreenState extends State<VerifiedScreen> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final wide = MediaQuery.sizeOf(context).width >= 900;
     const green = Color(0xFF1B7F3B);
     const onGreen = Colors.white;
 
     return Scaffold(
       backgroundColor: green,
-      appBar: AppBar(backgroundColor: green, foregroundColor: onGreen, title: const Text('Ejercicio verificado')),
+      appBar: AppBar(
+        backgroundColor: green,
+        foregroundColor: onGreen,
+        iconTheme: const IconThemeData(color: onGreen),
+        // The theme's title color is dark: on this green it needs white.
+        title: Text(
+          'Ejercicio verificado',
+          style: theme.textTheme.titleLarge?.copyWith(color: onGreen, fontWeight: FontWeight.w800),
+        ),
+      ),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) => SingleChildScrollView(
             padding: const EdgeInsets.all(24),
             child: ConstrainedBox(
               constraints: BoxConstraints(minHeight: constraints.maxHeight - 48),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ScaleTransition(
-                    scale: Tween(
-                      begin: 0.92,
-                      end: 1.06,
-                    ).animate(CurvedAnimation(parent: _pulse, curve: Curves.easeInOut)),
-                    child: Stack(
-                      alignment: Alignment.bottomRight,
-                      children: [
-                        const Mascota(pose: MascotPose.lograste, size: 130),
-                        const CircleAvatar(
-                          radius: 22,
-                          backgroundColor: onGreen,
-                          child: Icon(Icons.check, color: green, size: 32),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 720),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ScaleTransition(
+                        scale: Tween(
+                          begin: 0.92,
+                          end: 1.06,
+                        ).animate(CurvedAnimation(parent: _pulse, curve: Curves.easeInOut)),
+                        child: Stack(
+                          alignment: Alignment.bottomRight,
+                          children: [
+                            Mascota(pose: MascotPose.lograste, size: wide ? 180 : 130),
+                            const CircleAvatar(
+                              radius: 22,
+                              backgroundColor: onGreen,
+                              child: Icon(Icons.check, color: green, size: 32),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Text(
+                        widget.studentName,
+                        textAlign: TextAlign.center,
+                        style: (wide ? theme.textTheme.displayMedium : theme.textTheme.displaySmall)?.copyWith(
+                          color: onGreen,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        widget.exerciseTitle,
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.headlineSmall?.copyWith(color: onGreen),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        '${widget.passedCases} de ${widget.passedCases} casos correctos',
+                        style: theme.textTheme.titleLarge?.copyWith(color: onGreen),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Verificado a las ${_time(widget.verifiedAt)}',
+                        style: theme.textTheme.titleMedium?.copyWith(color: onGreen.withValues(alpha: 0.85)),
+                      ),
+                      if (widget.pastedLines > 0) ...[
+                        const SizedBox(height: 4),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.content_paste, size: 18, color: onGreen.withValues(alpha: 0.85)),
+                            const SizedBox(width: 6),
+                            Flexible(
+                              child: Text(
+                                'Pegó ${widget.pastedLines} líneas de una vez',
+                                textAlign: TextAlign.center,
+                                style: theme.textTheme.titleMedium?.copyWith(color: onGreen.withValues(alpha: 0.85)),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    widget.studentName,
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.displaySmall?.copyWith(color: onGreen, fontWeight: FontWeight.w800),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    widget.exerciseTitle,
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.headlineSmall?.copyWith(color: onGreen),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    '${widget.passedCases} de ${widget.passedCases} casos correctos',
-                    style: theme.textTheme.titleLarge?.copyWith(color: onGreen),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Verificado a las ${_time(widget.verifiedAt)}',
-                    style: theme.textTheme.titleMedium?.copyWith(color: onGreen.withValues(alpha: 0.85)),
-                  ),
-                  if (widget.pastedLines > 0) ...[
-                    const SizedBox(height: 4),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.content_paste, size: 18, color: onGreen.withValues(alpha: 0.85)),
-                        const SizedBox(width: 6),
-                        Text(
-                          'Pegó ${widget.pastedLines} líneas de una vez',
-                          style: theme.textTheme.titleMedium?.copyWith(color: onGreen.withValues(alpha: 0.85)),
+                      const SizedBox(height: 28),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.18),
+                          borderRadius: BorderRadius.circular(24),
                         ),
-                      ],
-                    ),
-                  ],
-                  const SizedBox(height: 28),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.18),
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.schedule, color: onGreen, size: 20),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Ahora: ${_time(_now, seconds: true)}',
-                          style: monoStyle.copyWith(color: onGreen, fontSize: 18),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.schedule, color: onGreen, size: 20),
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: Text(
+                                'Ahora: ${_time(_now, seconds: true)}',
+                                style: monoStyle.copyWith(color: onGreen, fontSize: 18),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 32),
+                      OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: onGreen,
+                          side: const BorderSide(color: onGreen),
+                        ),
+                        onPressed: () => _showCode(context),
+                        icon: const Icon(Icons.code),
+                        label: const Text('Ver el código'),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 32),
-                  OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: onGreen,
-                      side: const BorderSide(color: onGreen),
-                    ),
-                    onPressed: () => _showCode(context),
-                    icon: const Icon(Icons.code),
-                    label: const Text('Ver el código'),
-                  ),
-                ],
+                ),
               ),
             ),
           ),

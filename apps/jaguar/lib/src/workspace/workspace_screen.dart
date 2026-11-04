@@ -466,6 +466,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
         builder: (_) => ExercisesScreen(
           store: widget.exercises,
           cloud: widget.cloud,
+          settings: _settings,
           onTryAsStudent: (exercise) {
             Navigator.popUntil(context, (route) => route.isFirst);
             _openExercise(exercise);
@@ -482,7 +483,11 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
     Navigator.push(
       context,
       MaterialPageRoute<void>(
-        builder: (_) => ExerciseEditorScreen(store: widget.exercises, fromProgram: program?.source ?? _code.text),
+        builder: (_) => ExerciseEditorScreen(
+          store: widget.exercises,
+          fromProgram: program?.source ?? _code.text,
+          settings: _settings,
+        ),
       ),
     );
   }

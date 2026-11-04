@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:jaguar_core/jaguar_core.dart';
 
-import '../editor/auto_indent.dart';
+import '../editor/code_editor.dart';
+import '../editor/completions.dart';
+import '../editor/keyword_bar.dart';
 import '../editor/syntax_controller.dart';
+import '../settings.dart';
 import '../theme.dart';
 import 'check_results_sheet.dart';
 import 'exercise_store.dart';
@@ -37,9 +41,13 @@ class _CaseFields {
 /// Jaguar proposes the test cases from it (see `suggestTests`), and the
 /// teacher only reviews them.
 class ExerciseEditorScreen extends StatefulWidget {
-  const ExerciseEditorScreen({super.key, required this.store, this.exercise, this.fromProgram});
+  const ExerciseEditorScreen({super.key, required this.store, this.exercise, this.fromProgram, this.settings});
 
   final ExerciseStore store;
+
+  /// Font size and keyword bar of the code editor, the same as in the
+  /// workspace. Null uses the defaults.
+  final ViewSettings? settings;
 
   /// Null for a new exercise.
   final Exercise? exercise;
@@ -68,6 +76,11 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
   late final List<_CaseFields> _cases = [
     for (final testCase in widget.exercise?.cases ?? const <TestCase>[]) _CaseFields(testCase),
   ];
+  // The solution is written in the same editor as any program: completions,
+  // auto indent, find and replace, and errors while typing.
+  final _solutionFocus = FocusNode();
+  final _undo = UndoHistoryController();
+  late final _diagnostics = Diagnostics(_solution);
   bool _busy = false;
 
   @override
@@ -124,7 +137,10 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
   void dispose() {
     _title.dispose();
     _statement.dispose();
+    _diagnostics.dispose();
     _solution.dispose();
+    _solutionFocus.dispose();
+    _undo.dispose();
     for (final c in _cases) {
       c.dispose();
     }
@@ -204,7 +220,7 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
     final result = await checkSolution(_solution.text, _exercise);
     setState(() => _busy = false);
     if (!mounted) return;
-    await showCheckResults(context, result: result, onShowTeacher: () {});
+    await showCheckResults(context, result: result);
   }
 
   void _project() {
@@ -217,20 +233,278 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
+  /// The code editor of the app, in a frame. [height] null fills the space.
+  Widget _solutionEditor({double? height}) {
+    final settings = widget.settings;
+    final desktop = useDesktopLayout(context);
+    final scheme = Theme.of(context).colorScheme;
+    final editor = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Expanded(
+          child: CodeEditor(
+            diagnostics: _diagnostics,
+            controller: _solution,
+            focusNode: _solutionFocus,
+            undoController: _undo,
+            fontSize: settings?.fontSize ?? 14,
+            highlightCurrentLine: desktop,
+          ),
+        ),
+        if (!desktop || (settings?.keywordBar ?? false)) KeywordBar(controller: _solution, focusNode: _solutionFocus),
+      ],
+    );
+    final framed = Semantics(
+      label: 'Editor de la solución',
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          border: Border.all(color: scheme.outlineVariant, width: 1.5),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: ClipRRect(borderRadius: BorderRadius.circular(10.5), child: editor),
+      ),
+    );
+    return height == null ? framed : SizedBox(height: height, child: framed);
+  }
+
+  /// Saves and stays, for Ctrl+S: the teacher keeps writing.
+  void _saveAndStay() {
+    if (_save()) _toast('Guardado');
+  }
+
+  Widget _titleField() => TextField(
+    controller: _title,
+    decoration: const InputDecoration(labelText: 'Título', hintText: 'Ej. Par o impar'),
+    textCapitalization: TextCapitalization.sentences,
+  );
+
+  Widget _statementField() => TextField(
+    controller: _statement,
+    decoration: const InputDecoration(
+      labelText: 'Enunciado',
+      hintText: 'Lee un número entero y muestra si es par o impar.',
+      alignLabelWithHint: true,
+    ),
+    minLines: 3,
+    maxLines: 8,
+    textCapitalization: TextCapitalization.sentences,
+  );
+
+  Widget _modeSection() {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text('¿Cómo se compara la salida?', style: theme.textTheme.titleSmall),
+        const SizedBox(height: 8),
+        SegmentedButton<MatchMode>(
+          segments: const [
+            ButtonSegment(value: MatchMode.flexible, label: Text('Flexible'), icon: Icon(Icons.tune)),
+            ButtonSegment(value: MatchMode.exact, label: Text('Exacta'), icon: Icon(Icons.rule)),
+          ],
+          selected: {_mode},
+          onSelectionChanged: (selection) => setState(() => _mode = selection.single),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          _mode == MatchMode.flexible
+              ? 'Las líneas esperadas deben aparecer en orden. El alumno puede escribir sus propios '
+                    'mensajes, y no importan mayúsculas, acentos ni espacios.'
+              : 'La salida debe ser idéntica, línea por línea.',
+          style: theme.textTheme.bodySmall,
+        ),
+      ],
+    );
+  }
+
+  Widget _casesSection({required bool addInHeader}) {
+    final theme = Theme.of(context);
+    final add = TextButton.icon(
+      onPressed: () => setState(() => _cases.add(_CaseFields())),
+      icon: const Icon(Icons.add),
+      label: const Text('Agregar caso'),
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Expanded(
+              child: _SectionTitle(
+                title: 'Casos de prueba',
+                subtitle:
+                    'Se generan solos con tu solución. Puedes editarlos, ocultarlos o agregar más: '
+                    'cada dato de entrada va en su propia línea.',
+              ),
+            ),
+            if (addInHeader) ...[const SizedBox(width: 8), add],
+          ],
+        ),
+        if (_cases.isEmpty)
+          Container(
+            padding: const EdgeInsets.all(16),
+            margin: const EdgeInsets.only(bottom: 12),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerLow,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: theme.colorScheme.outlineVariant),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.fact_check_outlined, color: theme.colorScheme.primary),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Text('Aún no hay casos. Escribe tu solución y pulsa «Generar casos», o agrega uno a mano.'),
+                ),
+              ],
+            ),
+          ),
+        for (var i = 0; i < _cases.length; i++)
+          _CaseCard(
+            key: ObjectKey(_cases[i]),
+            index: i + 1,
+            fields: _cases[i],
+            onHiddenChanged: (hidden) => setState(() => _cases[i].hidden = hidden),
+            onDelete: () => setState(() => _cases.removeAt(i).dispose()),
+          ),
+        if (!addInHeader) Align(alignment: Alignment.centerLeft, child: add),
+      ],
+    );
+  }
+
+  Widget _solutionHeader() => const _SectionTitle(
+    title: 'Tu solución',
+    subtitle: 'Escríbela como si fueras el alumno. De ella salen los casos de prueba; nunca se comparte.',
+  );
+
+  Widget _solutionActions() => Wrap(
+    spacing: 8,
+    runSpacing: 8,
+    children: [
+      FilledButton.icon(
+        onPressed: _busy ? null : _generateCases,
+        icon: const Icon(Icons.auto_awesome),
+        label: const Text('Generar casos con mi solución'),
+      ),
+      OutlinedButton.icon(
+        onPressed: _busy ? null : _fillExpectedFromSolution,
+        icon: const Icon(Icons.auto_fix_high),
+        label: const Text('Recalcular salidas'),
+      ),
+      Tooltip(
+        message: 'Corre tu solución con los casos (${shortcutLabel('Enter')})',
+        child: OutlinedButton.icon(
+          onPressed: _busy ? null : _checkSolution,
+          icon: const Icon(Icons.fact_check_outlined),
+          label: const Text('Comprobar mi solución'),
+        ),
+      ),
+    ],
+  );
+
+  /// One column, as on a phone: details, solution, then the cases.
+  Widget _narrowBody() => Center(
+    child: ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 820),
+      child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          _titleField(),
+          const SizedBox(height: 12),
+          _statementField(),
+          const SizedBox(height: 24),
+          _solutionHeader(),
+          _solutionEditor(height: 340),
+          const SizedBox(height: 8),
+          _solutionActions(),
+          const SizedBox(height: 20),
+          _modeSection(),
+          const SizedBox(height: 24),
+          _casesSection(addInHeader: false),
+          const SizedBox(height: 48),
+        ],
+      ),
+    ),
+  );
+
+  /// Two panes on a computer: what the students see on the left (title,
+  /// statement, cases) and the teacher's solution on the right, with room.
+  Widget _wideBody() {
+    final scheme = Theme.of(context).colorScheme;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Expanded(
+          flex: 5,
+          child: FocusTraversalGroup(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 48),
+              children: [
+                _titleField(),
+                const SizedBox(height: 12),
+                _statementField(),
+                const SizedBox(height: 20),
+                _modeSection(),
+                const SizedBox(height: 24),
+                _casesSection(addInHeader: true),
+              ],
+            ),
+          ),
+        ),
+        VerticalDivider(width: 1, color: scheme.outlineVariant),
+        Expanded(
+          flex: 6,
+          child: FocusTraversalGroup(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final header = [_solutionHeader(), _solutionActions(), const SizedBox(height: 12)];
+                // On a short window the editor keeps a usable height and the
+                // pane scrolls instead.
+                if (constraints.maxHeight < 560) {
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [...header, _solutionEditor(height: 340)],
+                    ),
+                  );
+                }
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      ...header,
+                      Expanded(child: _solutionEditor()),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final wide = MediaQuery.sizeOf(context).width >= 900;
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.exercise == null ? 'Nuevo ejercicio' : 'Editar ejercicio'),
         actions: [
-          TextButton.icon(
-            style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8)),
-            onPressed: () {
-              if (_save()) Navigator.pop(context);
-            },
-            icon: const Icon(Icons.save_outlined),
-            label: const Text('Guardar'),
+          Tooltip(
+            message: 'Guardar y cerrar',
+            child: TextButton.icon(
+              style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8)),
+              onPressed: () {
+                if (_save()) Navigator.pop(context);
+              },
+              icon: const Icon(Icons.save_outlined),
+              label: const Text('Guardar'),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.only(right: 12, left: 4),
@@ -244,119 +518,15 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
         ],
         bottom: _busy ? const PreferredSize(preferredSize: Size.fromHeight(4), child: LinearProgressIndicator()) : null,
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 820),
-          child: ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              TextField(
-                controller: _title,
-                decoration: const InputDecoration(labelText: 'Título', hintText: 'Ej. Par o impar'),
-                textCapitalization: TextCapitalization.sentences,
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _statement,
-                decoration: const InputDecoration(
-                  labelText: 'Enunciado',
-                  hintText: 'Lee un número entero y muestra si es par o impar.',
-                  alignLabelWithHint: true,
-                ),
-                minLines: 3,
-                maxLines: 8,
-                textCapitalization: TextCapitalization.sentences,
-              ),
-              const SizedBox(height: 24),
-              _SectionTitle(
-                title: 'Tu solución',
-                subtitle: 'Escríbela como si fueras el alumno. De ella salen los casos de prueba; nunca se comparte.',
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: theme.colorScheme.outlineVariant),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                child: TextField(
-                  controller: _solution,
-                  minLines: 6,
-                  maxLines: null,
-                  style: monoStyle.copyWith(fontSize: 14, height: 1.5),
-                  autocorrect: false,
-                  enableSuggestions: false,
-                  inputFormatters: [AutoIndentFormatter()],
-                  decoration: const InputDecoration.collapsed(hintText: 'Algoritmo solucion ...'),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  FilledButton.icon(
-                    onPressed: _busy ? null : _generateCases,
-                    icon: const Icon(Icons.auto_awesome),
-                    label: const Text('Generar casos con mi solución'),
-                  ),
-                  OutlinedButton.icon(
-                    onPressed: _busy ? null : _fillExpectedFromSolution,
-                    icon: const Icon(Icons.auto_fix_high),
-                    label: const Text('Recalcular salidas'),
-                  ),
-                  OutlinedButton.icon(
-                    onPressed: _busy ? null : _checkSolution,
-                    icon: const Icon(Icons.fact_check_outlined),
-                    label: const Text('Comprobar mi solución'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              Text('¿Cómo se compara la salida?', style: theme.textTheme.titleSmall),
-              const SizedBox(height: 8),
-              SegmentedButton<MatchMode>(
-                segments: const [
-                  ButtonSegment(value: MatchMode.flexible, label: Text('Flexible'), icon: Icon(Icons.tune)),
-                  ButtonSegment(value: MatchMode.exact, label: Text('Exacta'), icon: Icon(Icons.rule)),
-                ],
-                selected: {_mode},
-                onSelectionChanged: (selection) => setState(() => _mode = selection.single),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                _mode == MatchMode.flexible
-                    ? 'Las líneas esperadas deben aparecer en orden. El alumno puede escribir sus propios '
-                          'mensajes, y no importan mayúsculas, acentos ni espacios.'
-                    : 'La salida debe ser idéntica, línea por línea.',
-                style: theme.textTheme.bodySmall,
-              ),
-              const SizedBox(height: 24),
-              _SectionTitle(
-                title: 'Casos de prueba',
-                subtitle:
-                    'Se generan solos con tu solución. Puedes editarlos, ocultarlos o agregar más: '
-                    'cada dato de entrada va en su propia línea.',
-              ),
-              for (var i = 0; i < _cases.length; i++)
-                _CaseCard(
-                  key: ObjectKey(_cases[i]),
-                  index: i + 1,
-                  fields: _cases[i],
-                  onHiddenChanged: (hidden) => setState(() => _cases[i].hidden = hidden),
-                  onDelete: () => setState(() => _cases.removeAt(i).dispose()),
-                ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: TextButton.icon(
-                  onPressed: () => setState(() => _cases.add(_CaseFields())),
-                  icon: const Icon(Icons.add),
-                  label: const Text('Agregar caso'),
-                ),
-              ),
-              const SizedBox(height: 48),
-            ],
-          ),
-        ),
+      body: CallbackShortcuts(
+        bindings: {
+          // Ctrl on Windows and Linux, Cmd on Mac: both work anywhere.
+          for (final (key, action) in <(LogicalKeyboardKey, VoidCallback)>[
+            (LogicalKeyboardKey.keyS, _saveAndStay),
+            (LogicalKeyboardKey.enter, _checkSolution),
+          ]) ...{SingleActivator(key, control: true): action, SingleActivator(key, meta: true): action},
+        },
+        child: wide ? _wideBody() : _narrowBody(),
       ),
     );
   }
