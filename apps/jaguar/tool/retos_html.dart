@@ -633,7 +633,7 @@ String _descargas() {
     ),
     (
       '¿Qué cambia entre la descarga y la versión web?',
-      'Es la misma app. En Windows y Linux (tar.gz y Snap) faltan las clases y la comunidad, que dependen de un servicio que todavía no está configurado para esos sistemas; todo lo demás funciona sin internet.',
+      'Es la misma app, con las clases y la comunidad también. La diferencia es cómo se instala y se actualiza: la web siempre está al día y las descargas las actualizas tú. Todo lo demás funciona sin internet.',
     ),
   ];
   final faq = preguntas
@@ -702,7 +702,7 @@ String _descargas() {
           <li>Abre la carpeta y haz doble clic en <code>jaguar.exe</code>.</li>
           <li>Si Windows muestra «Windows protegió tu PC», toca Más información y luego Ejecutar de todas formas.</li>
         </ol>
-        <p>En Windows no están las clases ni la comunidad; el resto funciona sin conexión.</p>
+        <p>Las clases y la comunidad necesitan conexión; el resto funciona sin ella.</p>
       </section>
       <section id="mac">
         <h2>Cómo instalarlo en Mac</h2>
@@ -719,7 +719,7 @@ String _descargas() {
           <li>Entra a la carpeta y ejecuta <code>./jaguar</code>.</li>
           <li>Para tenerlo en el menú de aplicaciones, ejecuta <code>./instalar.sh</code> y no muevas la carpeta de lugar.</li>
         </ol>
-        <p>En Linux no están las clases ni la comunidad; el resto funciona sin conexión.</p>
+        <p>Las clases y la comunidad necesitan conexión; el resto funciona sin ella.</p>
       </section>
       <section id="preguntas">
         <h2>Preguntas frecuentes</h2>
