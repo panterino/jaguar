@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Error «No se puede dividir entre cero» (y MOD entre cero): qué significa y cómo arreglarlo</title>
+<meta name="description" content="Qué significa el error «No se puede dividir entre cero» y «No se puede calcular MOD entre cero» en pseudocódigo, y cómo evitarlo preguntando antes con un Si.">
+<link rel="canonical" href="https://jaguarcode.org/errores/division-entre-cero">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="apple-touch-icon" href="/icono.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Jaguar Code">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://jaguarcode.org/errores/division-entre-cero">
+<meta property="og:title" content="Error «No se puede dividir entre cero» (y MOD entre cero): qué significa y cómo arreglarlo">
+<meta property="og:description" content="Qué significa el error «No se puede dividir entre cero» y «No se puede calcular MOD entre cero» en pseudocódigo, y cómo evitarlo preguntando antes con un Si.">
+<meta property="og:image" content="https://jaguarcode.org/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Error «No se puede dividir entre cero» (y MOD entre cero): qué significa y cómo arreglarlo">
+<meta name="twitter:description" content="Qué significa el error «No se puede dividir entre cero» y «No se puede calcular MOD entre cero» en pseudocódigo, y cómo evitarlo preguntando antes con un Si.">
+<meta name="twitter:image" content="https://jaguarcode.org/compartir.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://jaguarcode.org/errores/division-entre-cero#articulo",
+      "headline": "Error «No se puede dividir entre cero» (y MOD entre cero): qué significa y cómo arreglarlo",
+      "description": "Qué significa el error «No se puede dividir entre cero» y «No se puede calcular MOD entre cero» en pseudocódigo, y cómo evitarlo preguntando antes con un Si.",
+      "inLanguage": "es-MX",
+      "datePublished": "2026-11-05",
+      "dateModified": "2026-11-05",
+      "mainEntityOfPage": "https://jaguarcode.org/errores/division-entre-cero",
+      "image": "https://jaguarcode.org/compartir.png",
+      "author": { "@type": "Organization", "name": "Panterino", "url": "https://jaguarcode.org/" },
+      "publisher": { "@type": "Organization", "name": "Panterino", "logo": { "@type": "ImageObject", "url": "https://jaguarcode.org/icono.png" } }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "https://jaguarcode.org/" },
+        { "@type": "ListItem", "position": 2, "name": "Errores", "item": "https://jaguarcode.org/errores" },
+        { "@type": "ListItem", "position": 3, "name": "«No se puede dividir entre cero»", "item": "https://jaguarcode.org/errores/division-entre-cero" }
+      ]
+    },
+    { "@type": "FAQPage", "mainEntity": [{"@type":"Question","name":"¿Dividir entre cero da infinito?","acceptedAnswer":{"@type":"Answer","text":"En matemáticas no tiene resultado, y en pseudocódigo es un error. Jaguar no da infinito: se detiene y te muestra la línea."}},{"@type":"Question","name":"¿Qué es MOD?","acceptedAnswer":{"@type":"Answer","text":"Es el residuo de una división: 10 MOD 3 da 1, porque 10 entre 3 es 3 y sobra 1. Sirve, por ejemplo, para saber si un número es par: n MOD 2 = 0."}}] }
+  ]
+}
+</script>
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/estilos.css">
+</head>
+<body>
+<header class="sitio-barra">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="/logo.svg" alt="" width="46" height="40">
+      <a class="nombre" href="/">Jaguar Code</a>
+      <a href="/guias">Guías</a>
+      <a href="/retos">Retos</a>
+      <a href="/profes">Para profes</a>
+      <a href="https://github.com/panterino/jaguar">GitHub</a>
+    </div>
+  </div>
+</header>
+<main class="guia">
+  <div class="ancho angosto">
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › <a href="/errores">Errores</a> › «No se puede dividir entre cero»</nav>
+    <h1>«No se puede dividir entre cero»</h1>
+    <p class="resumen">Este error aparece cuando una división, o un MOD, tiene un divisor que vale 0 al llegar a esa línea. Se evita preguntando antes si el divisor es distinto de cero.</p>
+    <nav class="contenido" aria-label="Contenido de la página"><b>En esta página</b>
+      <ol>
+        <li><a href="#que-significa">Qué significa</a></li>
+        <li><a href="#ejemplos">Ejemplos y cómo arreglarlos</a></li>
+        <li><a href="#causas">Por qué aparece</a></li>
+        <li><a href="#evitarlo">Cómo evitarlo</a></li>
+        <li><a href="#preguntas">Preguntas frecuentes</a></li>
+      </ol>
+    </nav>
+    <article>
+      <section id="que-significa">
+        <h2>Qué significa</h2>
+<p class="aviso-error" role="note"><b>Error al ejecutar en la línea 3</b><br>No se puede dividir entre cero. El divisor valía 0 al llegar aquí. Revisa de dónde sale ese valor, o pregunta antes: Si divisor &lt;&gt; 0 Entonces ... FinSi</p>
+<p>Dividir entre cero no tiene resultado. Jaguar se detiene en la línea de la división y te dice que el divisor valía 0 justo en ese momento. Lo mismo pasa con <code>MOD</code>, que calcula el residuo de una división: <code>10 MOD 0</code> tampoco existe.</p>
+<p>El programa puede estar bien para casi todos los datos y fallar solo cuando alguien escribe un 0, o cuando un cálculo anterior deja el divisor en 0.</p>
+      </section>
+      <section id="ejemplos">
+        <h2>Ejemplos y cómo arreglarlos</h2>
+<h3>El divisor llega en 0</h3>
+<pre class="codigo" data-entradas="0" data-error="No se puede dividir entre cero." tabindex="0"><code>Algoritmo dividir
+    Leer b
+    Escribir 10 / b
+FinAlgoritmo</code></pre>
+<p class="aviso-error" role="note"><b>Error al ejecutar en la línea 3</b><br>No se puede dividir entre cero. El divisor valía 0 al llegar aquí. Revisa de dónde sale ese valor, o pregunta antes: Si divisor &lt;&gt; 0 Entonces ... FinSi</p>
+<p>Pregunta antes de dividir y avisa si el valor no sirve:</p>
+<pre class="codigo" data-entradas="0" data-salida="No se puede dividir entre cero" tabindex="0"><code>Algoritmo dividir
+    Leer b
+    Si b &lt;&gt; 0 Entonces
+        Escribir 10 / b
+    SiNo
+        Escribir "No se puede dividir entre cero"
+    FinSi
+FinAlgoritmo</code></pre>
+<h3>MOD entre cero</h3>
+<pre class="codigo" data-error="No se puede calcular MOD entre cero." tabindex="0"><code>Algoritmo residuo
+    Escribir 10 MOD 0
+FinAlgoritmo</code></pre>
+<p>Se arregla igual: asegura que el número de la derecha de <code>MOD</code> no sea cero.</p>
+<h3>Un promedio sin datos</h3>
+<p>Un caso muy común: promediar cuando no hubo ningún dato, porque el contador quedó en 0.</p>
+<pre class="codigo" data-entradas="-1" data-salida="Sin datos" tabindex="0"><code>Algoritmo promedio
+    suma &lt;- 0
+    cuenta &lt;- 0
+    Leer c
+    Mientras c &lt;&gt; -1 Hacer
+        suma &lt;- suma + c
+        cuenta &lt;- cuenta + 1
+        Leer c
+    FinMientras
+    Si cuenta = 0 Entonces
+        Escribir "Sin datos"
+    SiNo
+        Escribir "Promedio: ", suma / cuenta
+    FinSi
+FinAlgoritmo</code></pre>
+
+      </section>
+      <section id="causas">
+        <h2>Por qué aparece</h2>
+<ul>
+  <li>La persona escribió 0 donde iba el divisor.</li>
+  <li>Un contador que sirve de divisor nunca avanzó, porque no hubo datos.</li>
+  <li>Una resta deja el divisor en 0: <code>x / (a - b)</code> cuando <code>a</code> y <code>b</code> son iguales.</li>
+  <li>El divisor es una variable que se usa antes de recibir su valor real.</li>
+</ul>
+      </section>
+      <section id="evitarlo">
+        <h2>Cómo evitarlo</h2>
+<p>Antes de cualquier división cuyo divisor venga de un dato o de un cálculo, pregunta con un <code>Si divisor &lt;&gt; 0</code>. Y piensa en los datos «raros»: el cero, el vacío, el valor más chico. Los retos de Jaguar traen casos ocultos con esos valores límite justo para eso.</p>
+      </section>
+      <section id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+        <details><summary>¿Dividir entre cero da infinito?</summary><p>En matemáticas no tiene resultado, y en pseudocódigo es un error. Jaguar no da infinito: se detiene y te muestra la línea.</p></details>
+        <details><summary>¿Qué es MOD?</summary><p>Es el residuo de una división: 10 MOD 3 da 1, porque 10 entre 3 es 3 y sobra 1. Sirve, por ejemplo, para saber si un número es par: n MOD 2 = 0.</p></details>
+      </section>
+    </article>
+<aside class="cta-guia" aria-labelledby="cta-t">
+  <h2 id="cta-t">Practica esto en Jaguar Code</h2>
+  <p>Escribe pseudocódigo, mira su diagrama y haz la prueba de escritorio desde el celular. Gratis, sin anuncios y sin cuenta.</p>
+  <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir la app</a></div>
+  <p class="aviso-prueba"><b>Acceso abierto antes del lanzamiento.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo. Lanzamiento oficial: 11 de enero de 2027.</p>
+</aside>
+    <h2 style="margin-top:44px">Sigue aprendiendo</h2>
+    <div class="relacionadas">
+      <a href="/guias/condicionales-si-y-segun">Condicionales en pseudocódigo: Si y Segun<small>Una condicional hace que el programa elija qué hacer según un dato.</small></a>
+      <a href="/errores/variable-sin-valor">«No encuentro la variable» y «todavía no tiene valor»<small>Estos errores aparecen cuando el programa usa una variable que todavía no existe o que existe pero aún no guarda nada.</small></a>
+      <a href="/errores/valor-no-valido-en-una-funcion-o-un-ciclo">Un valor no válido en una función, un arreglo o un ciclo<small>Estos errores aparecen cuando una función matemática recibe un valor para el que no existe resultado, o cuando un arreglo o un ciclo reciben un tamaño o un paso imposible..</small></a>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="ancho">
+    <span class="quien"><img src="/logo.svg" alt="" width="30" height="26">Un proyecto de Panterino · hecho en México</span>
+    <a href="/guias">Guías</a>
+    <a href="/retos">Retos</a>
+    <a href="/descargas">Descargas</a>
+    <a href="/manual">Manual</a>
+    <a href="https://www.facebook.com/jaguareducation">Facebook</a>
+    <a href="https://github.com/panterino/jaguar">Código en GitHub</a>
+    <a href="#" data-analitica-cambiar>Analítica</a>
+  </div>
+</footer>
+<script src="/acceso.js" defer></script>
+<script src="/analitica.js" defer></script>
+</body>
+</html>

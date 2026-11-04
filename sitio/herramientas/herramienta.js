@@ -23,10 +23,19 @@
     [/^(El código debe ir dentro|Falta el bloque principal|Solo puede haber un Algoritmo)/, 'el-codigo-debe-ir-dentro-de-algoritmo'],
     [/^No reconozco el carácter/, 'no-reconozco-el-caracter'],
     [/^Se esperaba 'Segundos'/, 'se-esperaba-segundos-o-milisegundos'],
+    [/^(No encuentro la variable|La variable '.+' todavía no tiene valor)/, 'variable-sin-valor'],
+    [/(está fuera del arreglo|^Esa posición del arreglo|no es un arreglo|es un arreglo; indica)/, 'posicion-fuera-del-arreglo'],
+    [/^(No se puede guardar el número|Se esperaba (un número|Verdadero o Falso) para)/, 'valor-que-no-corresponde-al-tipo'],
+    [/^El programa pidió un dato con Leer/, 'no-hay-mas-datos-para-leer'],
+    [/^El programa se detuvo porque llevaba demasiados pasos/, 'demasiados-pasos-ciclo-infinito'],
+    [/^No se puede (dividir entre cero|calcular MOD)/, 'division-entre-cero'],
+    [/^La condición del '.+' debe ser/, 'la-condicion-debe-ser-verdadero-o-falso'],
+    [/(necesita números, pero recibió|^No se puede comparar)/, 'operacion-con-texto-y-numero'],
+    [/(^Demasiadas llamadas a funciones|terminó sin darle un valor)/, 'errores-de-funciones-al-ejecutar'],
+    [/(raíz cuadrada de un número negativo|^Ln solo funciona|^El tamaño del arreglo debe|^El paso del ciclo Para no puede)/, 'valor-no-valido-en-una-funcion-o-un-ciclo'],
   ];
 
   function enlaceDeError(error) {
-    if (error.title !== 'Error de escritura') return null;
     for (var i = 0; i < paginasDeError.length; i++) {
       if (paginasDeError[i][0].test(error.message)) {
         var a = document.createElement('a');

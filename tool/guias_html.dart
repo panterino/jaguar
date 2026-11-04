@@ -5,6 +5,8 @@
 // (apps/jaguar/test/sitio_test.dart) los ejecuta con el intérprete de Jaguar.
 import 'dart:io';
 
+import 'errores_ejecucion.dart';
+
 const sitio = 'https://jaguarcode.org';
 const fecha = '2026-10-27';
 
@@ -857,7 +859,7 @@ FinAlgoritmo
         'Es una variable que va sumando valores en cada vuelta de un ciclo, como el total de una compra o la suma de calificaciones. Debe empezar en 0 antes del ciclo.',
       ),
     ],
-    relacionadas: ['condicionales-si-y-segun', 'arreglos-en-pseudocodigo', 'prueba-de-escritorio'],
+    relacionadas: ['arreglos-en-pseudocodigo', 'funciones-y-subprocesos-en-pseudocodigo', 'prueba-de-escritorio'],
   ),
   Guia(
     slug: 'arreglos-en-pseudocodigo',
@@ -1786,21 +1788,259 @@ FinAlgoritmo
     ],
     relacionadas: ['pseint-en-el-celular', 'que-es-el-pseudocodigo'],
   ),
+  Guia(
+    slug: 'funciones-y-subprocesos-en-pseudocodigo',
+    titulo: 'Funciones y subprocesos en pseudocódigo: parámetros, Por Referencia y recursión, con ejemplos',
+    h1: 'Funciones y subprocesos en pseudocódigo',
+    descripcion:
+        'Aprende a escribir funciones y subprocesos en pseudocódigo: qué los diferencia, los parámetros por valor y Por Referencia, las variables locales, los arreglos y la recursión, con ejemplos que puedes ejecutar.',
+    resumen:
+        'Una función es un pedazo de programa con nombre que puedes usar muchas veces. La función devuelve un valor; el subproceso solo hace algo. Los dos reciben datos por parámetros y tienen sus propias variables.',
+    publicada: '2026-11-05',
+    secciones: [
+      (
+        'que-es',
+        'Para qué sirven',
+        '''
+<p>Cuando un programa crece, empiezas a repetir las mismas líneas: calcular un área, mostrar un saludo, revisar si un número es par. En lugar de copiarlas, las escribes una vez, les pones un nombre y las <b>llamas</b> cada vez que las necesitas. Eso es una función o un subproceso.</p>
+<p>Tienen la misma estructura, pero con una diferencia:</p>
+${tabla('Función y subproceso', ['', 'Función', 'Subproceso'], [
+          ['Se escribe con', '<code>Funcion … FinFuncion</code>', '<code>SubProceso … FinSubProceso</code>'],
+          ['Devuelve un valor', 'Sí, uno', 'No'],
+          ['Se usa', 'Dentro de una expresión: <code>Escribir Doble(4)</code>', 'Como una instrucción: <code>Saludar("Ana")</code>'],
+          ['Ejemplo', 'Calcular el área', 'Mostrar un saludo'],
+        ])}
+<p>Si lo que necesitas es una respuesta (un número, un texto, Verdadero o Falso), usa una función. Si solo necesitas que algo suceda, usa un subproceso.</p>''',
+      ),
+      (
+        'funcion',
+        'La función: devuelve un valor',
+        '''
+<p>Una función se declara con <code>Funcion</code>, el nombre de la variable que guardará el resultado, una flecha, el nombre de la función y sus parámetros entre paréntesis. Dentro, el resultado se guarda en esa variable, y eso es lo que devuelve:</p>
+${codigo('''
+Funcion a <- AreaRectangulo(base, altura)
+    a <- base * altura
+FinFuncion
+
+Algoritmo areas
+    Escribir AreaRectangulo(3, 4)
+    Escribir AreaRectangulo(5, 2) + 1
+FinAlgoritmo
+''', salida: '12\n11')}
+<p>Aquí <code>a</code> es el resultado de la función. Como devuelve un valor, la llamada se puede usar en cualquier lugar donde iría un número: en un <code>Escribir</code>, en una suma, en una condición.</p>
+<p>Una función también puede devolver texto:</p>
+${codigo('''
+Funcion t <- Etiqueta(n)
+    Si n >= 6 Entonces
+        t <- "Aprobado"
+    SiNo
+        t <- "Reprobado"
+    FinSi
+FinFuncion
+
+Algoritmo calificacion
+    Leer c
+    Escribir Etiqueta(c)
+FinAlgoritmo
+''', entradas: ['8'], salida: 'Aprobado')}''',
+      ),
+      (
+        'subproceso',
+        'El subproceso: hace algo, sin devolver nada',
+        '''
+<p>Un subproceso no tiene variable de resultado. Se llama como una instrucción suelta:</p>
+${codigo('''
+SubProceso Saludar(nombre)
+    Escribir "Hola, ", nombre
+FinSubProceso
+
+Algoritmo saludos
+    Saludar("Ana")
+    Saludar("Luis")
+FinAlgoritmo
+''', salida: 'Hola, Ana\nHola, Luis')}
+<p>Escribimos <code>Saludar</code> una vez y la usamos dos veces con datos distintos. Esa es la ventaja: si mañana quieres cambiar el saludo, lo cambias en un solo lugar.</p>''',
+      ),
+      (
+        'parametros',
+        'Parámetros: por valor y Por Referencia',
+        '''
+<p>Los <b>parámetros</b> son los datos que le pasas a la función entre paréntesis. Hay dos formas de pasarlos.</p>
+<h3>Por valor (lo normal)</h3>
+<p>La función recibe una <i>copia</i>. Si la cambia, la variable de afuera no se entera:</p>
+${codigo('''
+SubProceso Duplicar(n)
+    n <- n * 2
+    Escribir "Dentro: ", n
+FinSubProceso
+
+Algoritmo copia
+    x <- 5
+    Duplicar(x)
+    Escribir "Fuera: ", x
+FinAlgoritmo
+''', salida: 'Dentro: 10\nFuera: 5')}
+<h3>Por referencia</h3>
+<p>Con <code>Por Referencia</code>, la función trabaja con la variable original, y lo que cambie adentro se ve afuera:</p>
+${codigo('''
+SubProceso Duplicar(n Por Referencia)
+    n <- n * 2
+FinSubProceso
+
+Algoritmo referencia
+    x <- 5
+    Duplicar(x)
+    Escribir x
+FinAlgoritmo
+''', salida: '10')}
+<p>Es la forma de lograr que un subproceso «devuelva» más de un valor, como en el intercambio de dos variables:</p>
+${codigo('''
+SubProceso Intercambiar(a Por Referencia, b Por Referencia)
+    aux <- a
+    a <- b
+    b <- aux
+FinSubProceso
+
+Algoritmo cambio
+    p <- 1
+    q <- 2
+    Intercambiar(p, q)
+    Escribir p, " ", q
+FinAlgoritmo
+''', salida: '2 1')}
+<p>Un parámetro <code>Por Referencia</code> necesita una variable al llamar, no un valor suelto: <code>Duplicar(x)</code> sirve, <code>Duplicar(5)</code> no, porque no hay una caja donde guardar el cambio.</p>''',
+      ),
+      (
+        'variables-locales',
+        'Cada función tiene sus propias variables',
+        '''
+<p>Las variables que creas dentro de una función existen solo ahí, y las del algoritmo no se ven adentro. Jaguar no tiene variables globales: lo que una función necesita se lo pasas por parámetros.</p>
+${codigo('''
+SubProceso MostrarTotal()
+    Escribir total
+FinSubProceso
+
+Algoritmo a
+    total <- 10
+    MostrarTotal()
+FinAlgoritmo
+''', error: "No encuentro la variable 'total'.")}
+<p>La función no ve el <code>total</code> del algoritmo. Se arregla pasándolo como parámetro:</p>
+${codigo('''
+SubProceso MostrarTotal(total)
+    Escribir total
+FinSubProceso
+
+Algoritmo a
+    total <- 10
+    MostrarTotal(total)
+FinAlgoritmo
+''', salida: '10')}
+<p>Que cada función tenga sus variables evita sorpresas: puedes usar <code>i</code> o <code>suma</code> en todas sin que se mezclen. Si te sale un error así, está explicado en <a href="/errores/variable-sin-valor">«No encuentro la variable»</a>.</p>''',
+      ),
+      (
+        'arreglos',
+        'Los arreglos se comparten',
+        '''
+<p>Los arreglos son la excepción: cuando se lo pasas a una función, no se copia, sino que se comparte. Lo que la función cambie en sus casillas se ve afuera, sin necesidad de <code>Por Referencia</code>:</p>
+${codigo('''
+SubProceso LlenarCon(v, valor, n)
+    Para i <- 1 Hasta n Hacer
+        v[i] <- valor
+    FinPara
+FinSubProceso
+
+Algoritmo arreglo
+    Dimension notas[3]
+    LlenarCon(notas, 7, 3)
+    Escribir notas[1] + notas[3]
+FinAlgoritmo
+''', salida: '14')}
+<p>Más sobre arreglos en <a href="/guias/arreglos-en-pseudocodigo">la guía de arreglos</a>.</p>''',
+      ),
+      (
+        'recursion',
+        'Recursión: una función que se llama a sí misma',
+        '''
+<p>Una función puede llamarse a sí misma. Es útil cuando un problema se parte en uno más chico del mismo tipo, como el factorial: <code>5! = 5 × 4!</code>. Necesita un <b>caso base</b>, el momento en que responde sin llamar de nuevo, o no termina nunca:</p>
+${codigo('''
+Funcion r <- Factorial(n)
+    Si n <= 1 Entonces
+        r <- 1
+    SiNo
+        r <- n * Factorial(n - 1)
+    FinSi
+FinFuncion
+
+Algoritmo recursion
+    Escribir Factorial(5)
+FinAlgoritmo
+''', salida: '120')}
+<p>El caso base es <code>n &lt;= 1</code>, y cada llamada se acerca a él restando uno. Si olvidas el caso base, aparece el error <a href="/errores/errores-de-funciones-al-ejecutar">«Demasiadas llamadas a funciones»</a>.</p>''',
+      ),
+      (
+        'donde',
+        'Dónde se escriben',
+        '''
+<p>Las funciones y los subprocesos se pueden escribir antes o después del <code>Algoritmo</code>; Jaguar los encuentra igual:</p>
+${codigo('''
+Algoritmo despues
+    Escribir Doble(21)
+FinAlgoritmo
+
+Funcion r <- Doble(n)
+    r <- n * 2
+FinFuncion
+''', salida: '42')}
+<p>Por orden, lo normal es ponerlas arriba, antes del algoritmo, para que quien lea el programa conozca las piezas antes de ver cómo se usan.</p>''',
+      ),
+      (
+        'errores',
+        'Los errores más comunes',
+        '''
+<ul>
+  <li><b>Pasar un número distinto de argumentos:</b> «'Suma' recibe 2 valores, pero se le dieron 1». Hay que dar un dato por cada parámetro. Está explicado en <a href="/errores/errores-al-usar-funciones">errores al usar funciones</a>.</li>
+  <li><b>Una función que termina sin dar valor:</b> olvidaste guardar el resultado en la variable que nombra la función.</li>
+  <li><b>Recursión sin caso base:</b> las llamadas no terminan nunca.</li>
+  <li><b>Usar como nombre una palabra del lenguaje:</b> <code>Mostrar</code>, <code>Leer</code> o <code>y</code> ya significan algo, y no sirven de nombre.</li>
+</ul>''',
+      ),
+    ],
+    preguntas: [
+      (
+        '¿Cuál es la diferencia entre una función y un subproceso?',
+        'La función devuelve un valor y se usa dentro de una expresión, como Escribir Doble(4). El subproceso no devuelve nada y se llama como una instrucción, como Saludar("Ana").',
+      ),
+      (
+        '¿Cuándo uso Por Referencia?',
+        'Cuando quieres que la función cambie la variable original, por ejemplo para intercambiar dos valores. Si solo necesitas leer el dato, déjalo por valor, que es más seguro.',
+      ),
+      (
+        '¿Puedo usar variables del algoritmo dentro de una función?',
+        'No directamente. Cada función tiene sus propias variables y Jaguar no tiene variables globales. Lo que necesite lo recibe por parámetros.',
+      ),
+      (
+        '¿Cuántas llamadas recursivas aguanta Jaguar?',
+        'Hasta 200 llamadas, una dentro de otra. Una recursión con caso base, como sumar hasta 190, funciona sin problema.',
+      ),
+    ],
+    relacionadas: ['arreglos-en-pseudocodigo', 'ciclos-mientras-para-repetir', 'de-pseudocodigo-a-python'],
+  ),
 ];
 
 /// El índice de /errores.
 const indiceErrores = (
-  titulo: 'Errores de escritura en pseudocódigo: qué significan y cómo arreglarlos',
+  titulo: 'Errores en pseudocódigo: de escritura y al ejecutar, qué significan y cómo arreglarlos',
   desc:
-      'Cada error de escritura que muestra Jaguar, explicado: qué significa, por qué aparece, un ejemplo con el error y cómo arreglarlo. Las causas son las mismas en PSeInt.',
-  h1: 'Errores de escritura en pseudocódigo',
+      'Cada error que muestra Jaguar, explicado: los de escritura (el programa no se puede leer) y los de ejecución (algo falla mientras corre). Qué significa, por qué aparece, un ejemplo y cómo arreglarlo.',
+  h1: 'Errores en pseudocódigo',
   resumen:
-      'Cuando Jaguar encuentra algo que no puede leer en tu programa, te dice en qué línea está y qué falta. Aquí está cada uno de esos mensajes explicado con calma, con un ejemplo del error y cómo se arregla.',
+      'Jaguar puede detenerse en dos momentos. Un error de escritura aparece cuando no puede leer el programa; uno al ejecutar, cuando el programa se entiende pero algo falla mientras corre. Aquí está cada mensaje explicado con calma, con un ejemplo del error y cómo se arregla.',
 );
 
 /// Una página por cada error de escritura que muestra Jaguar
 /// (lib/src/lexer.dart y parser.dart del paquete jaguar_core).
-final errores = <Guia>[
+final erroresEscritura = <Guia>[
   Guia(
     carpeta: 'errores',
     slug: 'encontre-pero-antes-falta',
@@ -2306,10 +2546,7 @@ FinAlgoritmo
         '¿Puedo poner dos instrucciones en una línea?',
         'Sí, separadas con punto y coma: a <- 1; b <- 2. Pero un programa se lee mejor con una instrucción por línea.',
       ),
-      (
-        '¿Los nombres de variables pueden tener espacios?',
-        'No. Usa guion bajo (precio_total) o junta las palabras (precioTotal).',
-      ),
+      ('¿Los nombres de variables pueden tener espacios?', 'No. Usa guion bajo (precio_total) o junta las palabras (precioTotal).'),
     ],
     relacionadas: ['falta-poner-el-texto-entre-comillas', 'se-esperaba-un-valor', 'variables-y-tipos-de-datos'],
   ),
@@ -2406,10 +2643,7 @@ FinAlgoritmo
         '¿Qué cuenta como un valor?',
         'Un número, un texto entre comillas, Verdadero o Falso, una variable, una operación entre valores o una función como Raiz(16).',
       ),
-      (
-        '¿Cómo se escribe una potencia?',
-        'Con ^. Por ejemplo, 2 ^ 3 es 8. El ** de Python no funciona en pseudocódigo.',
-      ),
+      ('¿Cómo se escribe una potencia?', 'Con ^. Por ejemplo, 2 ^ 3 es 8. El ** de Python no funciona en pseudocódigo.'),
     ],
     relacionadas: ['sobra-al-final-de-la-instruccion', 'se-esperaba-cerrar-parentesis', 'condicionales-si-y-segun'],
   ),
@@ -2420,8 +2654,7 @@ FinAlgoritmo
     h1: 'Se esperaba \')\' para cerrar el paréntesis',
     descripcion:
         'Qué significa el error «Se esperaba \')\' para cerrar el paréntesis» (o la llamada a una función, o \']\' para cerrar el índice) y cómo arreglarlo.',
-    resumen:
-        'Abriste un paréntesis o un corchete y la línea se terminó, o apareció otra cosa, antes de cerrarlo.',
+    resumen: 'Abriste un paréntesis o un corchete y la línea se terminó, o apareció otra cosa, antes de cerrarlo.',
     publicada: '2026-11-03',
     secciones: [
       (
@@ -2869,10 +3102,7 @@ FinAlgoritmo
         '¿Qué tipos de datos hay en pseudocódigo?',
         'Entero (números sin decimales), Real (con decimales), Logico (Verdadero o Falso) y Caracter o Texto (letras y palabras). Jaguar también acepta Numero como sinónimo de Real y Cadena como sinónimo de Texto.',
       ),
-      (
-        '¿Puedo definir varias variables en una línea?',
-        'Sí, si son del mismo tipo: Definir a, b, c Como Entero.',
-      ),
+      ('¿Puedo definir varias variables en una línea?', 'Sí, si son del mismo tipo: Definir a, b, c Como Entero.'),
     ],
     relacionadas: ['es-una-palabra-reservada', 'variables-y-tipos-de-datos', 'se-esperaba-corchete-en-dimension'],
   ),
@@ -2883,8 +3113,7 @@ FinAlgoritmo
     h1: 'Se esperaba \'[\' con el tamaño del arreglo',
     descripcion:
         'Qué significa el error «Se esperaba \'[\' con el tamaño del arreglo, por ejemplo: Dimension v[10]» en pseudocódigo y cómo crear un arreglo correctamente.',
-    resumen:
-        'Para crear un arreglo con Dimension hay que decir cuántas casillas tiene, entre corchetes, justo después del nombre.',
+    resumen: 'Para crear un arreglo con Dimension hay que decir cuántas casillas tiene, entre corchetes, justo después del nombre.',
     publicada: '2026-11-03',
     secciones: [
       (
@@ -3012,10 +3241,7 @@ FinAlgoritmo
         '¿Puedo poner un rango en una opción de Segun?',
         'No. Segun compara contra valores exactos. Para «de 6 a 8» usa Si con una condición como calificacion >= 6 Y calificacion <= 8.',
       ),
-      (
-        '¿Las opciones pueden ser textos?',
-        'Sí: "a": Escribir "Opción A". El texto de la opción va entre comillas.',
-      ),
+      ('¿Las opciones pueden ser textos?', 'Sí: "a": Escribir "Opción A". El texto de la opción va entre comillas.'),
     ],
     relacionadas: ['condicionales-si-y-segun', 'encontre-pero-antes-falta', 'se-esperaba-un-valor'],
   ),
@@ -3389,10 +3615,7 @@ FinAlgoritmo
       ),
     ],
     preguntas: [
-      (
-        '¿Se puede escribir Esperar 1 Segundo, en singular?',
-        'Sí. Jaguar acepta Segundo y Segundos, Milisegundo y Milisegundos.',
-      ),
+      ('¿Se puede escribir Esperar 1 Segundo, en singular?', 'Sí. Jaguar acepta Segundo y Segundos, Milisegundo y Milisegundos.'),
       (
         '¿Esperar cambia el resultado de la prueba de escritorio?',
         'No. Esperar solo pausa el programa; no cambia ninguna variable ni lo que se muestra en pantalla.',
@@ -3603,6 +3826,9 @@ String indice({
   b.write(pie);
   return b.toString();
 }
+
+/// Todas las páginas de /errores: las de escritura y las de ejecución.
+final errores = <Guia>[...erroresEscritura, ...erroresEjecucion];
 
 void main() {
   final inicio = File('sitio/index.html').readAsStringSync();

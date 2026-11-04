@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Errores de valores no válidos: raíz de un negativo, Ln, tamaño de arreglo y paso de Para</title>
+<meta name="description" content="Qué significan los errores «No se puede sacar la raíz cuadrada de un número negativo», «Ln solo funciona con números mayores que cero», «El tamaño del arreglo debe ser al menos 1» y «El paso del ciclo Para no puede ser 0».">
+<link rel="canonical" href="https://jaguarcode.org/errores/valor-no-valido-en-una-funcion-o-un-ciclo">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#3B2410">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="apple-touch-icon" href="/icono.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Jaguar Code">
+<meta property="og:locale" content="es_MX">
+<meta property="og:url" content="https://jaguarcode.org/errores/valor-no-valido-en-una-funcion-o-un-ciclo">
+<meta property="og:title" content="Errores de valores no válidos: raíz de un negativo, Ln, tamaño de arreglo y paso de Para">
+<meta property="og:description" content="Qué significan los errores «No se puede sacar la raíz cuadrada de un número negativo», «Ln solo funciona con números mayores que cero», «El tamaño del arreglo debe ser al menos 1» y «El paso del ciclo Para no puede ser 0».">
+<meta property="og:image" content="https://jaguarcode.org/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Errores de valores no válidos: raíz de un negativo, Ln, tamaño de arreglo y paso de Para">
+<meta name="twitter:description" content="Qué significan los errores «No se puede sacar la raíz cuadrada de un número negativo», «Ln solo funciona con números mayores que cero», «El tamaño del arreglo debe ser al menos 1» y «El paso del ciclo Para no puede ser 0».">
+<meta name="twitter:image" content="https://jaguarcode.org/compartir.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://jaguarcode.org/errores/valor-no-valido-en-una-funcion-o-un-ciclo#articulo",
+      "headline": "Errores de valores no válidos: raíz de un negativo, Ln, tamaño de arreglo y paso de Para",
+      "description": "Qué significan los errores «No se puede sacar la raíz cuadrada de un número negativo», «Ln solo funciona con números mayores que cero», «El tamaño del arreglo debe ser al menos 1» y «El paso del ciclo Para no puede ser 0».",
+      "inLanguage": "es-MX",
+      "datePublished": "2026-11-05",
+      "dateModified": "2026-11-05",
+      "mainEntityOfPage": "https://jaguarcode.org/errores/valor-no-valido-en-una-funcion-o-un-ciclo",
+      "image": "https://jaguarcode.org/compartir.png",
+      "author": { "@type": "Organization", "name": "Panterino", "url": "https://jaguarcode.org/" },
+      "publisher": { "@type": "Organization", "name": "Panterino", "logo": { "@type": "ImageObject", "url": "https://jaguarcode.org/icono.png" } }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Jaguar Code", "item": "https://jaguarcode.org/" },
+        { "@type": "ListItem", "position": 2, "name": "Errores", "item": "https://jaguarcode.org/errores" },
+        { "@type": "ListItem", "position": 3, "name": "Un valor no válido en una función, un arreglo o un ciclo", "item": "https://jaguarcode.org/errores/valor-no-valido-en-una-funcion-o-un-ciclo" }
+      ]
+    },
+    { "@type": "FAQPage", "mainEntity": [{"@type":"Question","name":"¿Hay raíz cuadrada de un número negativo?","acceptedAnswer":{"@type":"Answer","text":"En matemáticas existen los números complejos, pero Jaguar trabaja con números reales, y ahí no existe. Por eso lo avisa."}},{"@type":"Question","name":"¿Puede el paso del Para ser negativo?","acceptedAnswer":{"@type":"Answer","text":"Sí. Un paso negativo hace que el ciclo cuente hacia atrás: Para i <- 5 Hasta 1 Con Paso -1."}}] }
+  ]
+}
+</script>
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preload" href="/fuentes/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/estilos.css">
+</head>
+<body>
+<header class="sitio-barra">
+  <div class="ancho">
+    <div class="barra-sup">
+      <img src="/logo.svg" alt="" width="46" height="40">
+      <a class="nombre" href="/">Jaguar Code</a>
+      <a href="/guias">Guías</a>
+      <a href="/retos">Retos</a>
+      <a href="/profes">Para profes</a>
+      <a href="https://github.com/panterino/jaguar">GitHub</a>
+    </div>
+  </div>
+</header>
+<main class="guia">
+  <div class="ancho angosto">
+    <nav class="migas" aria-label="Ruta de navegación"><a href="/">Jaguar</a> › <a href="/errores">Errores</a> › Un valor no válido en una función, un arreglo o un ciclo</nav>
+    <h1>Un valor no válido en una función, un arreglo o un ciclo</h1>
+    <p class="resumen">Estos errores aparecen cuando una función matemática recibe un valor para el que no existe resultado, o cuando un arreglo o un ciclo reciben un tamaño o un paso imposible.</p>
+    <nav class="contenido" aria-label="Contenido de la página"><b>En esta página</b>
+      <ol>
+        <li><a href="#que-significa">Qué significa</a></li>
+        <li><a href="#ejemplos">Ejemplos y cómo arreglarlos</a></li>
+        <li><a href="#causas">Por qué aparece</a></li>
+        <li><a href="#evitarlo">Cómo evitarlo</a></li>
+        <li><a href="#preguntas">Preguntas frecuentes</a></li>
+      </ol>
+    </nav>
+    <article>
+      <section id="que-significa">
+        <h2>Qué significa</h2>
+<p class="aviso-error" role="note"><b>Error al ejecutar en la línea 2</b><br>No se puede sacar la raíz cuadrada de un número negativo (-4).</p>
+<p>Algunas operaciones no tienen resultado para ciertos valores: no hay raíz cuadrada (real) de un número negativo, ni logaritmo de cero, ni arreglos de cero casillas, ni ciclos que avancen de cero en cero. En esos casos Jaguar se detiene y te dice qué valor no sirve, porque casi siempre es un dato que llegó de una cuenta o de la persona.</p>
+      </section>
+      <section id="ejemplos">
+        <h2>Ejemplos y cómo arreglarlos</h2>
+<h3>La raíz de un negativo</h3>
+<pre class="codigo" data-error="No se puede sacar la raíz cuadrada de un número negativo (-4)." tabindex="0"><code>Algoritmo a
+    Escribir Raiz(-4)
+FinAlgoritmo</code></pre>
+<p>Revisa que el número no sea negativo antes de sacar la raíz:</p>
+<pre class="codigo" data-entradas="-4" data-salida="No hay raíz de un negativo" tabindex="0"><code>Algoritmo a
+    Leer x
+    Si x &gt;= 0 Entonces
+        Escribir Raiz(x)
+    SiNo
+        Escribir "No hay raíz de un negativo"
+    FinSi
+FinAlgoritmo</code></pre>
+<h3>Logaritmo de cero</h3>
+<pre class="codigo" data-error="Ln solo funciona con números mayores que cero." tabindex="0"><code>Algoritmo a
+    Escribir Ln(0)
+FinAlgoritmo</code></pre>
+<h3>Un arreglo sin casillas</h3>
+<pre class="codigo" data-error="El tamaño del arreglo debe ser al menos 1, pero es 0." tabindex="0"><code>Algoritmo a
+    Dimension v[0]
+FinAlgoritmo</code></pre>
+<p>Si el tamaño lo escribe la persona, revisa que sea al menos 1 antes de crear el arreglo.</p>
+<h3>Un Para que no avanza</h3>
+<pre class="codigo" data-error="El paso del ciclo Para no puede ser 0." tabindex="0"><code>Algoritmo a
+    Para i &lt;- 1 Hasta 5 Con Paso 0 Hacer
+        Escribir i
+    FinPara
+FinAlgoritmo</code></pre>
+<p>El paso es lo que suma el ciclo en cada vuelta. Con 0 no avanzaría nunca, así que debe ser distinto de cero, positivo para subir y negativo para bajar:</p>
+<pre class="codigo" data-salida="1&#10;3&#10;5" tabindex="0"><code>Algoritmo a
+    Para i &lt;- 1 Hasta 5 Con Paso 2 Hacer
+        Escribir i
+    FinPara
+FinAlgoritmo</code></pre>
+
+      </section>
+      <section id="causas">
+        <h2>Por qué aparece</h2>
+<ul>
+  <li>El número viene de un dato de la persona o de un cálculo previo que dio un valor inesperado.</li>
+  <li>Una resta deja un valor negativo donde se esperaba positivo.</li>
+  <li>El tamaño o el paso se calculan con una variable que vale cero.</li>
+</ul>
+      </section>
+      <section id="evitarlo">
+        <h2>Cómo evitarlo</h2>
+<p>Valida los datos antes de usarlos con un <code>Si</code>: que el número sea mayor o igual que cero, mayor que cero, o distinto de cero según la función. Es el mismo hábito que para <a href="/errores/division-entre-cero">la división entre cero</a>.</p>
+      </section>
+      <section id="preguntas">
+        <h2>Preguntas frecuentes</h2>
+        <details><summary>¿Hay raíz cuadrada de un número negativo?</summary><p>En matemáticas existen los números complejos, pero Jaguar trabaja con números reales, y ahí no existe. Por eso lo avisa.</p></details>
+        <details><summary>¿Puede el paso del Para ser negativo?</summary><p>Sí. Un paso negativo hace que el ciclo cuente hacia atrás: Para i &lt;- 5 Hasta 1 Con Paso -1.</p></details>
+      </section>
+    </article>
+<aside class="cta-guia" aria-labelledby="cta-t">
+  <h2 id="cta-t">Practica esto en Jaguar Code</h2>
+  <p>Escribe pseudocódigo, mira su diagrama y haz la prueba de escritorio desde el celular. Gratis, sin anuncios y sin cuenta.</p>
+  <div class="botones"><a class="boton principal" href="https://app.jaguarcode.org/">Abrir la app</a></div>
+  <p class="aviso-prueba"><b>Acceso abierto antes del lanzamiento.</b> Puede tener errores y cambiar. Tus programas se guardan solo en tu dispositivo. Lanzamiento oficial: 11 de enero de 2027.</p>
+</aside>
+    <h2 style="margin-top:44px">Sigue aprendiendo</h2>
+    <div class="relacionadas">
+      <a href="/errores/division-entre-cero">«No se puede dividir entre cero»<small>Este error aparece cuando una división, o un MOD, tiene un divisor que vale 0 al llegar a esa línea.</small></a>
+      <a href="/guias/condicionales-si-y-segun">Condicionales en pseudocódigo: Si y Segun<small>Una condicional hace que el programa elija qué hacer según un dato.</small></a>
+      <a href="/guias/ciclos-mientras-para-repetir">Ciclos en pseudocódigo: Mientras, Para y Repetir<small>Un ciclo repite un grupo de instrucciones.</small></a>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="ancho">
+    <span class="quien"><img src="/logo.svg" alt="" width="30" height="26">Un proyecto de Panterino · hecho en México</span>
+    <a href="/guias">Guías</a>
+    <a href="/retos">Retos</a>
+    <a href="/descargas">Descargas</a>
+    <a href="/manual">Manual</a>
+    <a href="https://www.facebook.com/jaguareducation">Facebook</a>
+    <a href="https://github.com/panterino/jaguar">Código en GitHub</a>
+    <a href="#" data-analitica-cambiar>Analítica</a>
+  </div>
+</footer>
+<script src="/acceso.js" defer></script>
+<script src="/analitica.js" defer></script>
+</body>
+</html>
