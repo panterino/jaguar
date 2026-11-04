@@ -1,0 +1,1 @@
+Primera versión pública. Ruta con lecciones y retos, editor de pseudocódigo, diagramas de flujo, bloques, prueba de escritorio, clases para profesores y comunidad.
