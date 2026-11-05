@@ -82,8 +82,10 @@ limitar los envíos del formulario de la página.
 Cuánto aguanta la cuota gratuita (cálculo aproximado, no medido): una clase de 40
 alumnos que hace una tarea gasta unas 500 lecturas y 200 escrituras. La cuota de
 escrituras (20 mil al día) es la que se acaba primero, a unas 100 clases al día.
-Por eso «Probar» no manda nada si el resultado y el programa son los mismos, ni si
-solo cambió el texto en los últimos 20 segundos (`Cloud.minSendGap`). Las reglas
+Por eso «Probar» no manda nada: el alumno trabaja y prueba sin conexión, con el
+avance guardado en el dispositivo (`TaskStore`), y la entrega es un paso manual
+(«Entregar», `Cloud.deliver`) que sí necesita internet. Las clases y tareas se
+guardan en el dispositivo para verlas sin conexión (`Cloud.syncClasses`). Las reglas
 que comprueban que eres de la clase también cuentan como una lectura por escritura.
 
 Moderar: una publicación que se marca `status: moderado` en la consola ya no la

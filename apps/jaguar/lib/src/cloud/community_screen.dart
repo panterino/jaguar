@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../widgets/skeleton.dart';
+
 import '../programs/examples.dart';
 import '../theme.dart';
 import 'account_dialog.dart';
@@ -115,7 +117,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                       return _Note('No se pudo cargar la comunidad: ${snapshot.error}');
                     }
                     final items = snapshot.data;
-                    if (items == null) return const LinearProgressIndicator();
+                    if (items == null) return const SkeletonRows(count: 5);
                     if (items.isEmpty) {
                       return const _Note('Todavía no hay nada aquí. ¡Sé la primera persona en compartir un programa!');
                     }

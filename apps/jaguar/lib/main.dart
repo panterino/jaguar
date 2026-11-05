@@ -20,6 +20,7 @@ Future<void> main() async {
   final settings = ViewSettings(prefs);
   // Classes and community, when Firebase is reachable; Jaguar works without.
   final cloud = await connectCloud(prefs);
+  exercises.isClassTask = (id) => cloud.tasks.forExercise(id) != null;
 
   // On the web, a shared link carries a program or an exercise in the URL.
   var fromLink = false;

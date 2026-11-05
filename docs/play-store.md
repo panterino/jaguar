@@ -127,14 +127,14 @@ como "compartir".
 
 ## Estado de la consola (4 de noviembre de 2026)
 
-La app está en la cuenta de desarrollador **JF Dev MX** (cuenta personal), como el borrador
-«Jaguar: Aprende a programar», sin paquete subido todavía. En la misma cuenta hay otra, «Jaguar:
-Aprende Facilmente» (`com.panterino.jaguar`, de 2021), que **Google eliminó** y tiene un problema de
-políticas; no es esta y conviene saber por qué fue, porque cuenta en el historial de la cuenta.
+La app es **«Jaguar: Pseudocódigo»** en la cuenta de desarrollador **Cabi Solutions** (cuenta
+personal), un borrador con el paquete `io.github.panterino.jaguar` y sin versión subida. No es la
+cuenta JF Dev MX: ahí se probó por error una vez, y se dejó un borrador viejo con el contenido de
+esta ficha (ver abajo).
 
-Hecho en el borrador:
+Hecho en el borrador de Cabi Solutions:
 
-- Ficha principal: nombre, descripciones, ícono, gráfico de funciones y las 7 capturas.
+- Ficha principal: nombre «Jaguar Code», descripciones, ícono, gráfico de funciones y las 7 capturas.
 - Política de privacidad, anuncios (no), ID de publicidad (no), apps gubernamentales (no),
   funciones financieras (ninguna) y apps de salud (ninguna).
 - Seguridad de los datos: todo respondido y guardado como borrador, falta enviarlo.
@@ -149,7 +149,11 @@ Falta, y no lo puede hacer un asistente:
 4. **Correo de contacto** de la ficha (obligatorio, y es público) y, si quieres, el sitio web
    https://jaguarcode.org.
 5. **El `.aab`:** crear la versión en Pruebas internas y subirlo.
-6. Declarar el estado de comerciante antes de febrero de 2027 (solo el dueño de la cuenta).
+6. Declarar el estado de comerciante a nivel de la app y aceptar sus condiciones.
+
+Lo que quedó en JF Dev MX, en el borrador «Jaguar: Aprende a programar» (no se tocó nada más ahí):
+nombre, descripciones, ícono, gráfico y capturas, política de privacidad, anuncios, ID de publicidad,
+apps gubernamentales, funciones financieras, salud y la seguridad de los datos en borrador.
 
 ## Pendiente
 

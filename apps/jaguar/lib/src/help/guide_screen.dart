@@ -415,8 +415,9 @@ class GuideScreen extends StatelessWidget {
             'necesitas correo.',
         'Toca Unirme con un código. Escribe el código y tu nombre: solo lo ve tu profe, para saber de quién es '
             'cada entrega.',
-        'Abre una tarea con Resolver y toca Probar: el resultado le llega a tu profe y Jaguar te avisa. Puedes '
-            'seguir mejorando y volver a probar.',
+        'Abre una tarea y trabájala: Probar solo te dice cómo vas, y tu avance se guarda en tu dispositivo, aun '
+            'sin internet. Cuando termines, toca Entregar (ahí sí hace falta internet). Si cambias algo después, '
+            'puedes entregar de nuevo.',
       ],
       action: ('Ir a Mis clases', go(onOpenClasses)),
     ),
@@ -525,8 +526,8 @@ class GuideScreen extends StatelessWidget {
       title: 'Revisa las entregas',
       summary: 'Quién va cómo, en una tabla',
       steps: [
-        'Cada vez que un alumno toca Probar, su resultado aparece en la tabla de la clase: cuántas pruebas pasó '
-            'y a qué hora. Usa Actualizar para ver lo más reciente.',
+        'Cada vez que un alumno entrega una tarea, su resultado aparece en la tabla de la clase: cuántas pruebas '
+            'pasó y a qué hora. Usa Actualizar para ver lo más reciente.',
         'Toca una celda para ver su programa. Con Abrir una copia lo abres en tu editor para ejecutarlo o hacer '
             'su prueba de escritorio.',
         'Si ves el ícono de portapapeles, pegó muchas líneas de una vez: pídele que te explique su programa.',

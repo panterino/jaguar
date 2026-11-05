@@ -41,6 +41,24 @@ class ClassRoom {
 
   /// A closed class takes no new students; the ones already in stay.
   final bool open;
+
+  Map<String, Object?> toJson() => {
+    'id': id,
+    'name': name,
+    'code': code,
+    'ownerId': ownerId,
+    'ownerAlias': ownerAlias,
+    'open': open,
+  };
+
+  factory ClassRoom.fromJson(Map<String, Object?> json) => ClassRoom(
+    id: json['id']! as String,
+    name: json['name'] as String? ?? '',
+    code: json['code'] as String? ?? '',
+    ownerId: json['ownerId'] as String? ?? '',
+    ownerAlias: json['ownerAlias'] as String? ?? '',
+    open: json['open'] != false,
+  );
 }
 
 class Member {
@@ -71,6 +89,24 @@ class Assignment {
   final int hiddenCount;
 
   String get title => exercise.title;
+
+  Map<String, Object?> toJson() => {
+    'id': id,
+    'classId': classId,
+    'exercise': exercise.toJson(),
+    if (createdAt != null) 'createdAt': createdAt!.millisecondsSinceEpoch,
+    if (hiddenCount > 0) 'hiddenCount': hiddenCount,
+  };
+
+  factory Assignment.fromJson(Map<String, Object?> json) => Assignment(
+    id: json['id']! as String,
+    classId: json['classId']! as String,
+    exercise: Exercise.fromJson((json['exercise']! as Map).cast<String, Object?>()),
+    createdAt: json['createdAt'] is num
+        ? DateTime.fromMillisecondsSinceEpoch((json['createdAt']! as num).toInt())
+        : null,
+    hiddenCount: (json['hiddenCount'] as num?)?.toInt() ?? 0,
+  );
 }
 
 class Submission {
@@ -152,9 +188,13 @@ const topics = [
 ];
 
 class CloudException implements Exception {
-  const CloudException(this.message);
+  const CloudException(this.message, {this.offline = false});
 
   final String message;
+
+  /// There was no connection (or no way to reach the server): the work is not
+  /// lost, it can be sent later. Anything else is a refusal or a failure.
+  final bool offline;
 
   @override
   String toString() => message;
