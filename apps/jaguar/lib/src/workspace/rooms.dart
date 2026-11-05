@@ -349,7 +349,8 @@ class _HomeRoom extends StatefulWidget {
   State<_HomeRoom> createState() => _HomeRoomState();
 }
 
-/// How many classes there are and how many tasks wait, for the Clases card.
+/// How many classes there are and how many tasks wait to be handed in, for the
+/// Clases card.
 class _ClassStatus {
   const _ClassStatus(this.classes, this.pending);
 
@@ -358,45 +359,34 @@ class _ClassStatus {
 }
 
 class _HomeRoomState extends State<_HomeRoom> {
-  _ClassStatus? _status;
-  String? _loadedFor;
+  String? _uid;
+  int _revision = -1;
 
   @override
   void initState() {
     super.initState();
-    widget.cloud?.addListener(_load);
-    _load();
+    widget.cloud?.addListener(_onCloud);
+    _onCloud();
   }
 
   @override
   void dispose() {
-    widget.cloud?.removeListener(_load);
+    widget.cloud?.removeListener(_onCloud);
     super.dispose();
   }
 
-  Future<void> _load() async {
+  /// Reads the classes again when someone signs in or out or a class changes;
+  /// otherwise (a task changed state) it only repaints.
+  void _onCloud() {
     final cloud = widget.cloud;
-    final user = cloud?.user;
-    if (cloud == null || user == null) {
-      _loadedFor = null;
-      if (_status != null && mounted) setState(() => _status = null);
-      return;
+    if (cloud == null) return;
+    if (cloud.revision != _revision || cloud.user?.uid != _uid) {
+      _revision = cloud.revision;
+      _uid = cloud.user?.uid;
+      // Without a connection the copy kept on the device is what counts.
+      if (cloud.user != null) cloud.syncClasses().catchError((Object _) => false);
     }
-    _loadedFor = user.uid;
-    try {
-      final rooms = await cloud.backend.myClasses();
-      var pending = 0;
-      for (final room in rooms) {
-        if (room.ownerId == user.uid) continue;
-        for (final assignment in await cloud.backend.assignments(room.id)) {
-          if (await cloud.backend.mySubmission(room.id, assignment.id) == null) pending++;
-        }
-      }
-      if (mounted && _loadedFor == user.uid) setState(() => _status = _ClassStatus(rooms.length, pending));
-    } on Object {
-      // Without a connection the card says nothing about classes.
-      if (mounted) setState(() => _status = null);
-    }
+    if (mounted) setState(() {});
   }
 
   ViewSettings get settings => widget.settings;
@@ -413,10 +403,16 @@ class _HomeRoomState extends State<_HomeRoom> {
     ];
     final solved = flags.where((d) => d).length;
     final next = nextMainStep(lessons: settings.doneLessons, challenges: settings.doneChallenges);
-    final task = exercises.received.lastOrNull;
+    // What is waiting to be handed in, from this device's own record: a task
+    // handed in stops being announced.
+    final cloud = widget.cloud;
+    final uid = cloud?.user?.uid;
+    final pendingTasks = uid == null ? const <(CachedClass, Assignment)>[] : cloud!.tasks.pending(uid);
+    final cachedClasses = uid == null ? null : cloud!.tasks.cachedClasses(uid);
+    final task = pendingTasks.firstOrNull?.$2;
     final programs = store.programs.length;
     final teacher = settings.teacher;
-    final status = _status;
+    final status = cachedClasses == null ? null : _ClassStatus(cachedClasses.length, pendingTasks.length);
     final nextIndex = next == null ? -1 : steps.indexWhere((s) => s.id == next.id);
     // The dots show the level the person is in: one per step of the whole path would not fit.
     final dotSteps = (next == null ? null : levelOf(next)?.steps) ?? steps;
@@ -448,18 +444,16 @@ class _HomeRoomState extends State<_HomeRoom> {
       kicker: teacher ? 'CON TU GRUPO' : 'CON TU PROFE',
       title: 'Clases',
       phrase: teacher ? 'Tus grupos y sus entregas.' : 'Los ejercicios de tu profe.',
-      state: task != null
-          ? 'Tarea nueva: ${task.title}'
-          : switch (status) {
-              null => teacher ? 'Tus clases' : 'Sin clase',
-              _ClassStatus(classes: 0) => 'Sin clase',
-              _ClassStatus(:final pending) when pending > 0 && !teacher =>
-                pending == 1 ? '1 tarea por hacer' : '$pending tareas por hacer',
-              _ClassStatus(:final classes) => classes == 1 ? '1 clase' : '$classes clases',
-            },
+      state: switch (status) {
+        null => teacher ? 'Tus clases' : 'Sin clase',
+        _ClassStatus(classes: 0) => 'Sin clase',
+        _ClassStatus(:final pending) when pending > 0 && !teacher =>
+          pending == 1 ? '1 tarea por entregar' : '$pending tareas por entregar',
+        _ClassStatus(:final classes) => classes == 1 ? '1 clase' : '$classes clases',
+      },
       icon: Icons.school_rounded,
-      badge: task != null || (status?.pending ?? 0) > 0 && !teacher,
-      badgeCount: task != null ? 1 : (status?.pending ?? 1),
+      badge: (status?.pending ?? 0) > 0 && !teacher,
+      badgeCount: status?.pending ?? 1,
     );
     final primaryRoom = teacher ? Room.classes : (next != null ? Room.route : Room.workshop);
     final places = {Room.route: route, Room.workshop: workshop, Room.classes: classes};
@@ -527,7 +521,7 @@ class _HomeRoomState extends State<_HomeRoom> {
             if (showTask) ...[
               Appear(
                 index: 1,
-                child: _TaskStrip(title: task.title, onTap: () => actions.onOpenExercise(task)),
+                child: _TaskStrip(title: task.title, onTap: () => actions.onOpenAssignment?.call(task)),
               ),
               SizedBox(height: gap),
             ],
@@ -994,7 +988,7 @@ class _TaskStrip extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                'Tarea de tu profe: $title',
+                'Por entregar: $title',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(color: colors.ink, fontWeight: FontWeight.w800, fontSize: 15),

@@ -20,6 +20,7 @@ class TestsPanel extends StatelessWidget {
     required this.onGoToLine,
     required this.onReplay,
     required this.onShowTeacher,
+    this.delivery,
     this.challenge = false,
     this.onNextChallenge,
     this.onAllChallenges,
@@ -40,6 +41,9 @@ class TestsPanel extends StatelessWidget {
   final ValueChanged<TestCase> onReplay;
   final VoidCallback onShowTeacher;
 
+  /// The card to hand the task in, when the exercise is a task of a class.
+  final Widget? delivery;
+
   /// A reto for practicing alone: there is no teacher to show it to.
   final bool challenge;
 
@@ -58,6 +62,7 @@ class TestsPanel extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(12, 12, 12, 24),
       children: [
+        if (delivery != null) ...[delivery!, const SizedBox(height: 14)],
         _Summary(result: result, total: tests.length, running: running, stale: stale, onRunTests: onRunTests),
         const SizedBox(height: 12),
         if (result != null && result.passed && !stale) ...[

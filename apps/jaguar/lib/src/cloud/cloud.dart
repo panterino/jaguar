@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:jaguar_core/jaguar_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,39 +5,37 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'cloud_backend.dart';
 import 'firebase_rest.dart';
 import 'rest_backend.dart';
+import 'task_store.dart';
 
 export 'cloud_backend.dart';
+export 'task_store.dart';
 
 /// Jaguar's online side: classes, assignments, submissions and the
 /// community. Jaguar works fully without it; when it is available the same
 /// app becomes a suite for students and teachers.
 class Cloud extends ChangeNotifier {
-  Cloud(this.backend, this._prefs, {DateTime Function() now = DateTime.now}) : _now = now {
-    final raw = _prefs.getString(_linksKey);
-    if (raw != null) _links.addAll((jsonDecode(raw) as Map).cast<String, String>());
+  Cloud(this.backend, SharedPreferences prefs, {DateTime Function() now = DateTime.now})
+    : _now = now,
+      tasks = TaskStore(prefs) {
+    tasks.addListener(notifyListeners);
   }
 
   /// The profile chosen on this device is a teacher's: "Entrar en línea"
   /// starts on Profesor.
   bool prefersTeacher = false;
 
-  static const _linksKey = 'jaguar.cloud.assignments';
-
   final CloudBackend backend;
-  final SharedPreferences _prefs;
   final DateTime Function() _now;
 
-  /// What Probar last sent for each assignment, so pressing it again and
-  /// again does not spend the free daily writes of the project.
-  final Map<String, ({String source, int passed, int total, DateTime at})> _lastSent = {};
+  /// What the student did on this device about each task, and a copy of the
+  /// classes for when there is no internet.
+  final TaskStore tasks;
 
-  /// Same program with another result is sent at once; the same result with
-  /// edits, at most this often.
-  static const minSendGap = Duration(seconds: 20);
-
-  /// Exercise id → `classId/assignmentId`, for the exercises opened from a
-  /// class: their Probar results go to the teacher.
-  final Map<String, String> _links = {};
+  @override
+  void dispose() {
+    tasks.removeListener(notifyListeners);
+    super.dispose();
+  }
 
   CloudUser? get user => backend.currentUser;
   bool get signedIn => user != null;
@@ -50,11 +46,18 @@ class Cloud extends ChangeNotifier {
     } on Object {
       // Offline: the session comes back next time.
     }
+    _revision++;
     notifyListeners();
   }
 
+  /// Changes each time the classes may have changed: someone signed in or out,
+  /// created a class or joined one. Not when only a task's state changes.
+  int get revision => _revision;
+  int _revision = 0;
+
   Future<T> _run<T>(Future<T> Function() action) async {
     final result = await action();
+    _revision++;
     notifyListeners();
     return result;
   }
@@ -73,48 +76,72 @@ class Cloud extends ChangeNotifier {
   Future<ClassRoom> joinClass({required String code, required String name}) =>
       _run(() => backend.joinClass(code: code, name: name));
 
-  /// Remembers that [exercise] belongs to an assignment of a class.
-  void linkAssignment(Exercise exercise, Assignment assignment) {
-    _links[exercise.id] = '${assignment.classId}/${assignment.id}';
-    _prefs.setString(_linksKey, jsonEncode(_links));
+  /// Reads my classes and their tasks from the server, keeps a copy for when
+  /// there is no internet, and learns what was already handed in (maybe from
+  /// another device). Returns false, with the copy still there, when there is
+  /// no connection.
+  Future<bool> syncClasses() async {
+    final user = this.user;
+    if (user == null) return false;
+    try {
+      final result = <CachedClass>[];
+      for (final room in await backend.myClasses()) {
+        final assignments = await backend.assignments(room.id);
+        if (room.ownerId != user.uid) {
+          for (final assignment in assignments) {
+            tasks.open(assignment, className: room.name);
+            tasks.syncRemote(assignment, await backend.mySubmission(room.id, assignment.id));
+          }
+        }
+        result.add(CachedClass(room, assignments));
+      }
+      tasks.cacheClasses(user.uid, result);
+      return true;
+    } on CloudException catch (e) {
+      if (e.offline) return false;
+      rethrow;
+    }
   }
 
-  /// Sends the result of Probar to the teacher, when the exercise came
-  /// from a class. Quietly does nothing otherwise or when offline.
-  Future<bool> submitIfAssigned({
+  /// The student opens a task of their class: this device remembers it (and the
+  /// work done on it), so it can be done with no internet.
+  void linkAssignment(Exercise exercise, Assignment assignment, {String className = ''}) =>
+      tasks.open(assignment, className: className);
+
+  /// Hands the work in to the teacher: a step of its own, which needs internet.
+  /// Probar does not send anything; this does.
+  ///
+  /// Throws a [CloudException] if it cannot (with `offline` true when there was
+  /// no connection). The work stays on the device either way.
+  Future<void> deliver({
     required Exercise exercise,
     required String studentName,
     required String source,
     required CheckResult result,
     int pastedLines = 0,
   }) async {
-    final link = _links[exercise.id];
-    if (link == null || !signedIn) return false;
-    final [classId, assignmentId] = link.split('/');
+    final record = tasks.forExercise(exercise.id);
+    if (record == null) throw const CloudException('Esta tarea no es de ninguna clase.');
+    if (!signedIn) throw const CloudException('Primero entra a tu cuenta.');
     final passed = result.passedCount;
     final total = exercise.cases.length;
-    final before = _lastSent[link];
-    final now = _now();
-    if (before != null && before.passed == passed && before.total == total) {
-      // Nothing new for the teacher: skip if the program is the same, or if
-      // only the text changed a moment ago.
-      if (before.source == source || now.difference(before.at) < minSendGap) return true;
-    }
-    try {
-      await backend.submit(
-        classId: classId,
-        assignmentId: assignmentId,
-        name: studentName,
-        source: source,
-        passed: passed,
-        total: total,
-        pastedLines: pastedLines,
-      );
-      _lastSent[link] = (source: source, passed: passed, total: total, at: now);
-      return true;
-    } on Object {
-      return false;
-    }
+    await backend.submit(
+      classId: record.classId,
+      assignmentId: record.assignmentId,
+      name: studentName,
+      source: source,
+      passed: passed,
+      total: total,
+      pastedLines: pastedLines,
+    );
+    tasks.markDelivered(
+      exercise.id,
+      at: _now(),
+      source: source,
+      passed: passed,
+      total: total,
+      pastedLines: pastedLines,
+    );
   }
 }
 
