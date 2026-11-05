@@ -496,25 +496,32 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
       appBar: AppBar(
         title: Text(widget.exercise == null ? 'Nuevo ejercicio' : 'Editar ejercicio'),
         actions: [
-          Tooltip(
-            message: 'Guardar y cerrar',
-            child: TextButton.icon(
-              style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8)),
-              onPressed: () {
-                // The saved exercise goes back, so a class can assign it right away.
-                if (_save()) Navigator.pop(context, _exercise);
-              },
-              icon: const Icon(Icons.save_outlined),
-              label: const Text('Guardar'),
+          // Secondary: on a phone only the icon fits next to Guardar.
+          if (MediaQuery.sizeOf(context).width < 600)
+            IconButton(tooltip: 'Proyectar', icon: const Icon(Icons.qr_code_2), onPressed: _project)
+          else
+            Padding(
+              padding: const EdgeInsets.only(left: 4),
+              child: OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 12)),
+                onPressed: _project,
+                icon: const Icon(Icons.qr_code_2),
+                label: const Text('Proyectar'),
+              ),
             ),
-          ),
           Padding(
-            padding: const EdgeInsets.only(right: 12, left: 4),
-            child: FilledButton.icon(
-              style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 12)),
-              onPressed: _project,
-              icon: const Icon(Icons.qr_code_2),
-              label: const Text('Proyectar'),
+            padding: const EdgeInsets.only(right: 12, left: 8),
+            child: Tooltip(
+              message: 'Guardar y cerrar',
+              child: FilledButton.icon(
+                style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 14)),
+                onPressed: () {
+                  // The saved exercise goes back, so a class can assign it right away.
+                  if (_save()) Navigator.pop(context, _exercise);
+                },
+                icon: const Icon(Icons.save_outlined),
+                label: const Text('Guardar'),
+              ),
             ),
           ),
         ],

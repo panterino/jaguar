@@ -219,7 +219,7 @@ void main() {
       expect(find.text('Incluye 1 prueba oculta'), findsOneWidget);
     });
 
-    testWidgets('copia las calificaciones revisadas, listas para una hoja de cálculo', (tester) async {
+    testWidgets('calificaciones revisadas: se ven como hoja y se pueden copiar', (tester) async {
       await _size(tester, _sizes['escritorio']!);
       await setUpClass(tester);
       String? copied;
@@ -229,19 +229,18 @@ void main() {
       });
       addTearDown(() => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, null));
       await open(tester);
-      await tester.scrollUntilVisible(
-        find.text('Copiar calificaciones'),
-        200,
-        scrollable: find.byType(Scrollable).first,
-      );
-      await tester.tap(find.text('Copiar calificaciones'));
+      await tester.scrollUntilVisible(find.text('Calificaciones'), 200, scrollable: find.byType(Scrollable).first);
+      await tester.tap(find.text('Calificaciones'));
       await tester.pumpAndSettle();
-      expect(find.text('Calificaciones copiadas. Pégalas en una hoja de cálculo.'), findsOneWidget);
+      expect(find.text('Descargar para Excel'), findsOneWidget);
+      await tester.tap(find.text('Copiar'));
+      await tester.pumpAndSettle();
+      expect(find.text('Copiado. Pégalo en una hoja de cálculo.'), findsOneWidget);
       expect(copied!.split('\n'), [
-        'Alumno\tDoble de un número\tTareas completas',
-        'Ana Pérez\t3/3\t1/1',
-        'Beto Ruiz\t2/3\t0/1',
-        'Carla Soto\t\t0/1',
+        'Alumno\tDoble de un número\tTareas completas\tAvance',
+        'Ana Pérez\t3 de 3\t1\t100 %',
+        'Beto Ruiz\t2 de 3\t0\t0 %',
+        'Carla Soto\t\t0\t0 %',
       ]);
     });
   });

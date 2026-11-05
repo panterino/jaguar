@@ -87,7 +87,7 @@ class _OpenLinkDialogState extends State<_OpenLinkDialog> {
   void _open() {
     final content = contentFromLink(_controller.text);
     if (content == null) {
-      setState(() => _error = 'Ese enlace no contiene un programa ni un ejercicio de Jaguar.');
+      setState(() => _error = 'Ese enlace no es un programa, un ejercicio ni una clase de Jaguar.');
     } else {
       Navigator.pop(context, content);
     }
