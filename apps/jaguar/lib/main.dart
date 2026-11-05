@@ -30,8 +30,7 @@ Future<void> main() async {
       store.openSource(source);
       fromLink = true;
     case SharedExercise(:final exercise):
-      exercises.saveReceived(exercise);
-      store.openExercise(exercise);
+      store.openExercise(exercises.saveReceived(exercise));
       fromLink = true;
     case SharedClass(:final code):
       joinCode = code;

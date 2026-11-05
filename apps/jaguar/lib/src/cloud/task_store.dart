@@ -338,6 +338,13 @@ class TaskStore extends ChangeNotifier {
           if (!isDelivered(a)) (c, a),
   ];
 
+  /// Forgets the copy of every account's classes (not the work done).
+  void forgetClasses() {
+    _cache.clear();
+    _prefs.remove(_cacheKey);
+    notifyListeners();
+  }
+
   void clearFor(String uid) {
     _cache.remove(uid);
     _prefs.setString(

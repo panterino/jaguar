@@ -89,11 +89,27 @@ class ExerciseStore extends ChangeNotifier {
     _persist();
   }
 
-  /// Saves an exercise received through a link. A newer version of the same
-  /// exercise (the teacher fixed a case) replaces the old one.
-  void saveReceived(Exercise exercise) {
-    _exercises[exercise.id] = exercise;
+  /// Saves an exercise received through a link and returns what was saved. A
+  /// newer version of the same exercise (the teacher fixed a case) replaces the
+  /// old one. But a link never takes the place of an exercise of the person's
+  /// own, or of a task of their class, that has the same id: it is saved as a
+  /// separate copy, so a crafted link cannot rewrite them.
+  Exercise saveReceived(Exercise exercise) {
+    final existing = _exercises[exercise.id];
+    final protected =
+        _mine.contains(exercise.id) || _assigned.contains(exercise.id) || (isClassTask?.call(exercise.id) ?? false);
+    final saved = existing != null && protected && jsonEncode(existing.toJson()) != jsonEncode(exercise.toJson())
+        ? Exercise(
+            id: newId(),
+            title: exercise.title,
+            statement: exercise.statement,
+            cases: exercise.cases,
+            mode: exercise.mode,
+          )
+        : exercise;
+    _exercises[saved.id] = saved;
     _persist();
+    return saved;
   }
 
   void delete(String id) {

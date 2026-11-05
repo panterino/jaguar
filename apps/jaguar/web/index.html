@@ -34,12 +34,7 @@
 </head>
 <body>
   <script src="analitica.js" defer></script>
+  <script src="registrar_sw.js" defer></script>
   <script src="flutter_bootstrap.js" async></script>
-  <script>
-    // Para abrir Jaguar Code sin internet después de la primera visita.
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
-    }
-  </script>
 </body>
 </html>

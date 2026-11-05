@@ -371,6 +371,15 @@ class RestBackend implements CloudBackend {
   );
 
   @override
+  Future<void> removeMember(String classId, String uid) => _guard(() async {
+    final assignments = await _rest.query('assignments', parent: 'classes/$classId');
+    await _rest.commit([
+      for (final a in assignments) Write.delete('classes/$classId/assignments/${a.id}/submissions/$uid'),
+      Write.delete('classes/$classId/members/$uid'),
+    ]);
+  });
+
+  @override
   Future<void> submit({
     required String classId,
     required String assignmentId,

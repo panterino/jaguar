@@ -816,8 +816,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
       case SharedProgram(:final source):
         _openSource(source);
       case SharedExercise(:final exercise):
-        widget.exercises.saveReceived(exercise);
-        _openExercise(exercise);
+        _openExercise(widget.exercises.saveReceived(exercise));
       case SharedClass(:final code):
         _joinWithCode(code);
       case null:

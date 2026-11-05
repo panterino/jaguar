@@ -37,6 +37,19 @@ flutter:
     - assets/manual/
     - assets/mascota/
   fonts:
+    # Roboto goes inside the app: without it the web asks Google's servers for it
+    # on every visit (before the person accepts anything). Apache License 2.0.
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Roboto-Regular.ttf
+        - asset: assets/fonts/Roboto-Italic.ttf
+          style: italic
+        - asset: assets/fonts/Roboto-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Roboto-Bold.ttf
+          weight: 700
     - family: JetBrainsMono
       fonts:
         - asset: assets/fonts/JetBrainsMono-Regular.ttf
