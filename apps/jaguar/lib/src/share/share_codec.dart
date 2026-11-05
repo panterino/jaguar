@@ -7,6 +7,11 @@ import 'package:jaguar_core/jaguar_core.dart';
 /// with any phone camera works without installing anything.
 const shareBaseUrl = 'https://app.jaguarcode.org/';
 
+/// The longest link fragment read (characters), and the most it may inflate to
+/// (bytes). Far above any program or exercise a person shares.
+const maxLinkFragment = 40000;
+const maxLinkContent = 400000;
+
 /// What a Jaguar link carries.
 sealed class SharedContent {
   const SharedContent();
@@ -52,6 +57,9 @@ String _link(String kind, String text) {
 /// Jaguar content or is damaged.
 SharedContent? contentFromLink(String link) {
   final fragment = Uri.tryParse(link.trim())?.fragment ?? '';
+  // A real link is a few KB. A huge one is not shared work: compressed, it can
+  // swell to hundreds of MB when opened and freeze the tab.
+  if (fragment.length > maxLinkFragment) return null;
   final separator = fragment.indexOf('=');
   if (separator != 1) return null;
   if (fragment[0] == 'c') {
@@ -60,7 +68,9 @@ SharedContent? contentFromLink(String link) {
   }
   try {
     final data = base64Url.normalize(fragment.substring(2));
-    final text = utf8.decode(ZLibDecoder().decodeBytes(base64Url.decode(data)));
+    final inflated = ZLibDecoder().decodeBytes(base64Url.decode(data));
+    if (inflated.length > maxLinkContent) return null;
+    final text = utf8.decode(inflated);
     return switch (fragment[0]) {
       'p' => SharedProgram(text),
       'e' => SharedExercise(Exercise.fromJson((jsonDecode(text) as Map).cast<String, Object?>())),

@@ -84,6 +84,11 @@ ThemeData buildTheme(Brightness brightness) {
     _ => false,
   };
   final base = ThemeData(
+    // On the web the font goes inside the app (a person's browser would ask
+    // Google's servers for it otherwise). The arrows and symbols that Roboto
+    // lacks come from JetBrains Mono, also inside the app.
+    fontFamily: kIsWeb ? 'Roboto' : null,
+    fontFamilyFallback: const [monoFamily],
     colorScheme: scheme,
     scaffoldBackgroundColor: scheme.surface,
     // Menus sized for a mouse, like other desktop apps.

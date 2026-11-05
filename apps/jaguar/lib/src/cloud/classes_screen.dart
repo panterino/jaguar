@@ -585,6 +585,32 @@ class _ClassScreenState extends State<ClassScreen> {
     }
   }
 
+  /// Takes a student out of the class (a joined stranger, a wrong name).
+  Future<void> _removeMember(Member member) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('¿Quitar a ${member.name} de la clase?'),
+        content: const Text(
+          'Deja de ver las tareas y se borran sus entregas. Si tiene el código, puede volver a unirse: '
+          'cierra la clase si no quieres que entre nadie más.',
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Quitar')),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    try {
+      await _backend.removeMember(widget.room.id, member.uid);
+      await _load();
+      _toast('${member.name} salió de la clase.');
+    } on CloudException catch (e) {
+      _toast(e.message);
+    }
+  }
+
   void _toast(String message) {
     if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
@@ -839,6 +865,7 @@ class _ClassScreenState extends State<ClassScreen> {
             submissions: _submissions,
             onTap: _showSubmission,
             onRemove: _removeAssignment,
+            onRemoveMember: _removeMember,
           ),
         if (_isTeacher && assignments.isNotEmpty && _members.isNotEmpty) ...[
           const SizedBox(height: 12),
@@ -974,6 +1001,7 @@ class _ClassScreenState extends State<ClassScreen> {
             completed: _completed,
             claimed: _claimed,
             onTap: _showSubmission,
+            onRemoveMember: _removeMember,
           );
     return Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1228,8 +1256,10 @@ class _ProgressTable extends StatelessWidget {
     required this.submissions,
     required this.onTap,
     required this.onRemove,
+    required this.onRemoveMember,
   });
 
+  final ValueChanged<Member> onRemoveMember;
   final List<Assignment> assignments;
   final List<Member> members;
   final Map<String, Map<String, Submission>> submissions;
@@ -1309,21 +1339,33 @@ class _ProgressTable extends StatelessWidget {
                       dense: true,
                       leading: InitialsAvatar(name: m.name, size: 32),
                       title: Text(m.name),
-                      trailing: Text('Sin entregar', style: theme.textTheme.bodySmall?.copyWith(color: scheme.outline)),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('Sin entregar', style: theme.textTheme.bodySmall?.copyWith(color: scheme.outline)),
+                          _MemberMenu(member: m, onRemove: onRemoveMember),
+                        ],
+                      ),
                     ),
                     final s => ListTile(
                       dense: true,
                       leading: InitialsAvatar(name: m.name, size: 32),
                       title: Text(m.name),
                       subtitle: s.pastedLines > 0 ? Text('Pegó ${s.pastedLines} líneas de una vez') : null,
-                      trailing: StatusPill(
-                        label: '${s.passed} de ${s.total}',
-                        tone: _toneOf(s),
-                        icon: s.complete
-                            ? Icons.check_circle
-                            : s.passed == 0
-                            ? Icons.cancel
-                            : Icons.timelapse,
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          StatusPill(
+                            label: '${s.passed} de ${s.total}',
+                            tone: _toneOf(s),
+                            icon: s.complete
+                                ? Icons.check_circle
+                                : s.passed == 0
+                                ? Icons.cancel
+                                : Icons.timelapse,
+                          ),
+                          _MemberMenu(member: m, onRemove: onRemoveMember),
+                        ],
                       ),
                       onTap: () => onTap(s, a),
                     ),
@@ -1347,8 +1389,10 @@ class _ProgressGrid extends StatelessWidget {
     required this.completed,
     required this.claimed,
     required this.onTap,
+    required this.onRemoveMember,
   });
 
+  final ValueChanged<Member> onRemoveMember;
   final List<Assignment> assignments;
   final List<Member> members;
   final Map<String, Map<String, Submission>> submissions;
@@ -1433,6 +1477,7 @@ class _ProgressGrid extends StatelessWidget {
                             InitialsAvatar(name: m.name),
                             const SizedBox(width: 12),
                             Expanded(child: Text(m.name, maxLines: 1, overflow: TextOverflow.ellipsis)),
+                            _MemberMenu(member: m, onRemove: onRemoveMember),
                           ],
                         ),
                         cells: [for (final a in assignments) _cell(context, m, a)],
@@ -1891,4 +1936,21 @@ class _Empty extends StatelessWidget {
       ),
     );
   }
+}
+
+/// The three dots of a student: the action to take them out of the class.
+class _MemberMenu extends StatelessWidget {
+  const _MemberMenu({required this.member, required this.onRemove});
+
+  final Member member;
+  final ValueChanged<Member> onRemove;
+
+  @override
+  Widget build(BuildContext context) => PopupMenuButton<void>(
+    tooltip: 'Más sobre ${member.name}',
+    icon: const Icon(Icons.more_vert, size: 20),
+    itemBuilder: (context) => [
+      PopupMenuItem<void>(onTap: () => onRemove(member), child: const Text('Quitar de la clase')),
+    ],
+  );
 }

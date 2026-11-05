@@ -188,6 +188,15 @@ class MemoryBackend implements CloudBackend {
   }
 
   @override
+  Future<void> removeMember(String classId, String uid) async {
+    _requireOwner(classId);
+    _members[classId]?.remove(uid);
+    for (final entry in _submissions.entries) {
+      if (entry.key.startsWith('$classId/')) entry.value.remove(uid);
+    }
+  }
+
+  @override
   Future<void> submit({
     required String classId,
     required String assignmentId,
