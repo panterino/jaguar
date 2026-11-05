@@ -12,6 +12,8 @@ import '../widgets/pro_widgets.dart';
 import '../widgets/skeleton.dart';
 import '../workspace/classes_room.dart' show TaskRow;
 import 'account_dialog.dart';
+import 'class_qr.dart';
+import 'grades.dart';
 import 'cloud.dart';
 import 'regrade.dart';
 import '../widgets/page_width.dart';
@@ -22,8 +24,12 @@ const _wideWidth = 900.0;
 bool _isWide(BuildContext context) => MediaQuery.sizeOf(context).width >= _wideWidth;
 
 /// Asks for the class code and the student's name; null if cancelled.
-Future<(String, String)?> askJoinCode(BuildContext context) =>
-    showDialog<(String, String)>(context: context, builder: (_) => const _JoinDialog());
+///
+/// [code] comes filled in when it was read from a QR or a link.
+Future<(String, String)?> askJoinCode(BuildContext context, {String? code}) => showDialog<(String, String)>(
+  context: context,
+  builder: (_) => _JoinDialog(code: code),
+);
 
 /// Asks for the name of a new class; null if cancelled.
 Future<String?> askNewClassName(BuildContext context) =>
@@ -400,6 +406,34 @@ class _ClassScreenState extends State<ClassScreen> {
     });
   }
 
+  bool _refreshing = false;
+
+  /// The refresh button: says it is working and what came out, since the
+  /// numbers on screen may be the same ones as before.
+  Future<void> _manualRefresh() async {
+    if (_refreshing) return;
+    setState(() => _refreshing = true);
+    final before = _error;
+    await _load();
+    if (!mounted) return;
+    setState(() => _refreshing = false);
+    final failed = _error != null && _error != before || (_error != null && _assignments == null);
+    final now = DateTime.now();
+    final clock = '${now.hour}:${now.minute.toString().padLeft(2, '0')}';
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          duration: const Duration(seconds: 2),
+          content: Text(
+            failed
+                ? 'No se pudo actualizar: $_error'
+                : (_offline ? 'Sin conexión. Se ve lo último guardado.' : 'Actualizado a las $clock'),
+          ),
+        ),
+      );
+  }
+
   Future<void> _load() async {
     if (!_isTeacher) return _loadAsStudent();
     try {
@@ -600,11 +634,28 @@ class _ClassScreenState extends State<ClassScreen> {
                   children: [
                     StatusPill(
                       label: '${submission.passed} de ${submission.total} pruebas',
-                      tone: submission.complete ? PillTone.good : PillTone.warn,
-                      icon: submission.complete ? Icons.check_circle : Icons.timelapse,
+                      tone: _toneOf(submission),
+                      icon: submission.complete
+                          ? Icons.check_circle
+                          : submission.passed == 0
+                          ? Icons.cancel
+                          : Icons.timelapse,
                     ),
                     if (submission.updatedAt != null)
-                      StatusPill(label: _time(submission.updatedAt!), icon: Icons.schedule),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 5),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.schedule, size: 16, color: scheme.onSurfaceVariant),
+                            const SizedBox(width: 6),
+                            Text(
+                              _delivered(submission.updatedAt!),
+                              style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+                            ),
+                          ],
+                        ),
+                      ),
                   ],
                 ),
                 if (submission.pastedLines > 0) ...[
@@ -620,11 +671,11 @@ class _ClassScreenState extends State<ClassScreen> {
                 if (said != null) ...[
                   const SizedBox(height: 12),
                   NoticeBox(
-                    tone: PillTone.warn,
+                    tone: _toneOf(submission),
                     icon: Icons.rule,
                     text:
-                        'El alumno dijo $said. Jaguar corrió su programa contra todas las pruebas, '
-                        'las ocultas incluidas, y salió lo que ves arriba.',
+                        'El alumno dijo $said, pero Jaguar corrió su programa contra todas las pruebas '
+                        '(las ocultas incluidas) y pasó ${submission.passed} de ${submission.total}.',
                   ),
                 ],
                 const SizedBox(height: 14),
@@ -705,7 +756,18 @@ class _ClassScreenState extends State<ClassScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.room.name),
-        actions: [IconButton(tooltip: 'Actualizar', icon: const Icon(Icons.refresh), onPressed: _load)],
+        actions: [
+          IconButton(
+            tooltip: 'Actualizar',
+            icon: _refreshing
+                ? const SizedBox.square(dimension: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                : const Icon(Icons.refresh),
+            onPressed: _refreshing ? null : _manualRefresh,
+          ),
+        ],
+        bottom: _refreshing
+            ? const PreferredSize(preferredSize: Size.fromHeight(3), child: LinearProgressIndicator())
+            : null,
       ),
       floatingActionButton: _isTeacher && !wide
           ? FloatingActionButton.extended(
@@ -744,7 +806,13 @@ class _ClassScreenState extends State<ClassScreen> {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
       children: [
         if (_isTeacher)
-          _CodeCard(code: widget.room.code, students: _members.length, open: _open, onOpenChanged: _setOpen),
+          _CodeCard(
+            name: widget.room.name,
+            code: widget.room.code,
+            students: _members.length,
+            open: _open,
+            onOpenChanged: _setOpen,
+          ),
         const SizedBox(height: 16),
         Text('Tareas', style: theme.textTheme.titleMedium),
         const SizedBox(height: 8),
@@ -763,6 +831,14 @@ class _ClassScreenState extends State<ClassScreen> {
             onTap: _showSubmission,
             onRemove: _removeAssignment,
           ),
+        if (_isTeacher && assignments.isNotEmpty && _members.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          OutlinedButton.icon(
+            onPressed: () => _openGrades(assignments),
+            icon: const Icon(Icons.table_view_outlined),
+            label: const Text('Calificaciones'),
+          ),
+        ],
         if (!_isTeacher) ...[
           if (_offline)
             const Padding(
@@ -853,37 +929,12 @@ class _ClassScreenState extends State<ClassScreen> {
     );
   }
 
-  /// The table as text with tabs, which a spreadsheet takes as columns. The
-  /// numbers are the ones Jaguar checked, not what each student reported.
-  String _gradesTsv(List<Assignment> assignments) {
-    String cell(String text) => text.replaceAll(RegExp(r'[\t\r\n]+'), ' ');
-    final rows = <List<String>>[
-      ['Alumno', for (final a in assignments) a.title, 'Tareas completas'],
-    ];
-    for (final m in _members) {
-      var done = 0;
-      final cells = <String>[];
-      for (final a in assignments) {
-        final s = _submissions[a.id]?[m.uid];
-        if (s == null) {
-          cells.add('');
-        } else {
-          cells.add('${s.passed}/${s.total}');
-          if (s.complete) done++;
-        }
-      }
-      rows.add([m.name, ...cells, '$done/${assignments.length}']);
-    }
-    return rows.map((r) => r.map(cell).join('\t')).join('\n');
-  }
-
-  Future<void> _copyGrades(List<Assignment> assignments) async {
-    await Clipboard.setData(ClipboardData(text: _gradesTsv(assignments)));
-    if (!mounted) return;
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(const SnackBar(content: Text('Calificaciones copiadas. Pégalas en una hoja de cálculo.')));
-  }
+  /// The grades like a spreadsheet, with the way to download them for Excel.
+  void _openGrades(List<Assignment> assignments) => showGrades(
+    context,
+    className: widget.room.name,
+    table: GradesTable(assignments: assignments, members: _members, submissions: _submissions),
+  );
 
   /// The teacher on a computer: the class and its tasks on the left, and
   /// the deliveries table taking the rest of the width and height.
@@ -924,7 +975,13 @@ class _ClassScreenState extends State<ClassScreen> {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
               children: [
-                _CodeCard(code: widget.room.code, students: _members.length, open: _open, onOpenChanged: _setOpen),
+                _CodeCard(
+                  name: widget.room.name,
+                  code: widget.room.code,
+                  students: _members.length,
+                  open: _open,
+                  onOpenChanged: _setOpen,
+                ),
                 const SizedBox(height: 12),
                 _stats(assignments),
                 const SizedBox(height: 14),
@@ -953,11 +1010,11 @@ class _ClassScreenState extends State<ClassScreen> {
                 if (assignments.isNotEmpty && _members.isNotEmpty) ...[
                   const SizedBox(height: 12),
                   Tooltip(
-                    message: 'Copia la tabla para pegarla en una hoja de cálculo',
+                    message: 'Ver las calificaciones y descargarlas para Excel',
                     child: OutlinedButton.icon(
-                      onPressed: () => _copyGrades(assignments),
+                      onPressed: () => _openGrades(assignments),
                       icon: const Icon(Icons.table_view_outlined),
-                      label: const Text('Copiar calificaciones'),
+                      label: const Text('Calificaciones'),
                     ),
                   ),
                 ],
@@ -976,14 +1033,44 @@ class _ClassScreenState extends State<ClassScreen> {
   }
 }
 
-String _time(DateTime time) {
+const _monthNames = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+
+/// "Entregó hoy a las 19:25", "ayer a las 8:05" or "el 4 nov a las 19:25": it
+/// reads as a moment, not as a grade like "4/11".
+String _delivered(DateTime time, {DateTime? now}) {
   final local = time.toLocal();
-  return '${local.day}/${local.month} ${local.hour}:${local.minute.toString().padLeft(2, '0')}';
+  final today = now ?? DateTime.now();
+  final days = DateTime(
+    today.year,
+    today.month,
+    today.day,
+  ).difference(DateTime(local.year, local.month, local.day)).inDays;
+  final clock = '${local.hour}:${local.minute.toString().padLeft(2, '0')}';
+  final day = switch (days) {
+    0 => 'hoy',
+    1 => 'ayer',
+    _ => 'el ${local.day} ${_monthNames[local.month - 1]}',
+  };
+  return 'Entregó $day a las $clock';
 }
 
-class _CodeCard extends StatelessWidget {
-  const _CodeCard({required this.code, required this.students, required this.open, required this.onOpenChanged});
+/// Green when it all passed, red when nothing did, yellow in between.
+PillTone _toneOf(Submission s) => s.complete
+    ? PillTone.good
+    : s.passed == 0
+    ? PillTone.bad
+    : PillTone.warn;
 
+class _CodeCard extends StatelessWidget {
+  const _CodeCard({
+    required this.name,
+    required this.code,
+    required this.students,
+    required this.open,
+    required this.onOpenChanged,
+  });
+
+  final String name;
   final String code;
   final int students;
   final bool open;
@@ -1004,7 +1091,14 @@ class _CodeCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const BlockHeading('Código de la clase'),
-          CodeBadge(code: code),
+          CodeBadge(
+            code: code,
+            trailing: IconButton(
+              tooltip: 'Mostrar QR para unirse',
+              icon: const Icon(Icons.qr_code_2, size: 22),
+              onPressed: () => showClassQr(context, className: name, code: code),
+            ),
+          ),
           const SizedBox(height: 10),
           Text(
             students == 1
@@ -1617,14 +1711,16 @@ class _PickRow extends StatelessWidget {
 }
 
 class _JoinDialog extends StatefulWidget {
-  const _JoinDialog();
+  const _JoinDialog({this.code});
+
+  final String? code;
 
   @override
   State<_JoinDialog> createState() => _JoinDialogState();
 }
 
 class _JoinDialogState extends State<_JoinDialog> {
-  final _code = TextEditingController();
+  late final _code = TextEditingController(text: widget.code);
   final _name = TextEditingController();
 
   @override
@@ -1660,7 +1756,7 @@ class _JoinDialogState extends State<_JoinDialog> {
               const SizedBox(height: 16),
               TextField(
                 controller: _code,
-                autofocus: true,
+                autofocus: widget.code == null,
                 textInputAction: TextInputAction.next,
                 textCapitalization: TextCapitalization.characters,
                 style: monoStyle.copyWith(fontSize: 16, letterSpacing: 1),
@@ -1669,6 +1765,7 @@ class _JoinDialogState extends State<_JoinDialog> {
               const SizedBox(height: 14),
               TextField(
                 controller: _name,
+                autofocus: widget.code != null,
                 textInputAction: TextInputAction.done,
                 decoration: const InputDecoration(
                   labelText: 'Tu nombre',

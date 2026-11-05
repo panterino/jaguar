@@ -175,9 +175,12 @@ class StatTile extends StatelessWidget {
 /// The class code on one line, big enough to read from the back of the room,
 /// with a button that copies it.
 class CodeBadge extends StatelessWidget {
-  const CodeBadge({super.key, required this.code, this.large = true});
+  const CodeBadge({super.key, required this.code, this.large = true, this.trailing});
 
   final String code;
+
+  /// Another action next to Copiar, like showing the QR.
+  final Widget? trailing;
   final bool large;
 
   @override
@@ -209,6 +212,7 @@ class CodeBadge extends StatelessWidget {
               ),
             ),
           ),
+          ?trailing,
           IconButton(
             tooltip: 'Copiar código',
             icon: const Icon(Icons.copy_rounded, size: 20),
@@ -297,7 +301,11 @@ class NoticeBox extends StatelessWidget {
             ),
             const SizedBox(width: 10),
             Expanded(
-              child: Text(text, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: scheme.onSurface)),
+              // Selectable: errors and notices can be copied to ask for help.
+              child: SelectableText(
+                text,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: scheme.onSurface),
+              ),
             ),
           ],
         ),

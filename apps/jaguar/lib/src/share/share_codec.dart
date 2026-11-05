@@ -24,6 +24,18 @@ final class SharedExercise extends SharedContent {
   final Exercise exercise;
 }
 
+/// The code of a class, to join it.
+final class SharedClass extends SharedContent {
+  const SharedClass(this.code);
+
+  final String code;
+}
+
+/// A link to join a class: the phone's camera opens it in the browser, and the
+/// scanner inside the app reads the same QR. The code is not a secret to hide:
+/// it is the one the teacher already says out loud.
+String classLink(String code) => '$shareBaseUrl#c=${Uri.encodeComponent(code.trim())}';
+
 /// A link that carries the whole program, compressed, in the URL fragment.
 /// The fragment never reaches a server, so sharing needs no backend.
 String shareLink(String source) => _link('p', source);
@@ -36,12 +48,16 @@ String _link(String kind, String text) {
   return '$shareBaseUrl#$kind=${base64Url.encode(compressed).replaceAll('=', '')}';
 }
 
-/// Reads a link made by [shareLink] or [exerciseLink]; null if it has no
+/// Reads a link made by [shareLink], [exerciseLink] or [classLink]; null if it has no
 /// Jaguar content or is damaged.
 SharedContent? contentFromLink(String link) {
   final fragment = Uri.tryParse(link.trim())?.fragment ?? '';
   final separator = fragment.indexOf('=');
   if (separator != 1) return null;
+  if (fragment[0] == 'c') {
+    final code = Uri.decodeComponent(fragment.substring(2)).trim();
+    return RegExp(r'^[A-Za-z0-9-]{4,24}$').hasMatch(code) ? SharedClass(code.toUpperCase()) : null;
+  }
   try {
     final data = base64Url.normalize(fragment.substring(2));
     final text = utf8.decode(ZLibDecoder().decodeBytes(base64Url.decode(data)));

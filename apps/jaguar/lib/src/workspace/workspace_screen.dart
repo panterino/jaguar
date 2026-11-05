@@ -51,6 +51,7 @@ import 'desktop_chrome.dart';
 import '../lessons/lesson_screen.dart';
 import '../lessons/lessons.dart';
 import 'programs_drawer.dart';
+import 'classes_room.dart' show joinClassFlow;
 import 'rooms.dart';
 import 'programs_sidebar.dart';
 import 'settings_screen.dart';
@@ -73,6 +74,7 @@ class WorkspaceScreen extends StatefulWidget {
     required this.settings,
     this.cloud,
     this.startInEditor = false,
+    this.joinCode,
   });
 
   final ProgramStore store;
@@ -85,6 +87,9 @@ class WorkspaceScreen extends StatefulWidget {
   /// On a phone, open the editor instead of the rooms: the app was launched
   /// with a program or an exercise from a link.
   final bool startInEditor;
+
+  /// The link that opened the app carried the code of a class.
+  final String? joinCode;
 
   @override
   State<WorkspaceScreen> createState() => _WorkspaceScreenState();
@@ -154,7 +159,11 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
     _code.addListener(_scheduleSave);
     _code.addListener(_onTyped);
     _session.addListener(_onSessionChanged);
-    if (_settings.chosenMode == null) WidgetsBinding.instance.addPostFrameCallback((_) => _welcome());
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (_settings.chosenMode == null) await _welcome();
+      final code = widget.joinCode;
+      if (code != null && mounted) await _joinWithCode(code);
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) => precacheMascota(context));
     WidgetsBinding.instance.addPostFrameCallback((_) => _syncTeacher());
     WidgetsBinding.instance.addPostFrameCallback((_) => _restoreTests(_store.current));
@@ -796,9 +805,22 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
       case SharedExercise(:final exercise):
         widget.exercises.saveReceived(exercise);
         _openExercise(exercise);
+      case SharedClass(:final code):
+        _joinWithCode(code);
       case null:
         break;
     }
+  }
+
+  /// A class code that came from a QR or a link: the join form opens with the
+  /// code already written, and the student only adds their name.
+  Future<void> _joinWithCode(String code) async {
+    final cloud = widget.cloud;
+    if (cloud == null) {
+      _toast('Las clases en línea no están disponibles ahora.');
+      return;
+    }
+    await joinClassFlow(context, cloud, widget.exercises, code: code);
   }
 
   /// Runs an editor command from the menu, showing the code if needed.

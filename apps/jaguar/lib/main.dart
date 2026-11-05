@@ -24,6 +24,7 @@ Future<void> main() async {
 
   // On the web, a shared link carries a program or an exercise in the URL.
   var fromLink = false;
+  String? joinCode;
   switch (contentFromLink(Uri.base.toString())) {
     case SharedProgram(:final source):
       store.openSource(source);
@@ -32,11 +33,22 @@ Future<void> main() async {
       exercises.saveReceived(exercise);
       store.openExercise(exercise);
       fromLink = true;
+    case SharedClass(:final code):
+      joinCode = code;
     case null:
       break;
   }
 
-  runApp(JaguarApp(store: store, exercises: exercises, settings: settings, cloud: cloud, openEditor: fromLink));
+  runApp(
+    JaguarApp(
+      store: store,
+      exercises: exercises,
+      settings: settings,
+      cloud: cloud,
+      openEditor: fromLink,
+      joinCode: joinCode,
+    ),
+  );
 }
 
 class JaguarApp extends StatelessWidget {
@@ -47,6 +59,7 @@ class JaguarApp extends StatelessWidget {
     required this.settings,
     this.cloud,
     this.openEditor = false,
+    this.joinCode,
   });
 
   final ProgramStore store;
@@ -56,6 +69,9 @@ class JaguarApp extends StatelessWidget {
 
   /// Phones: start in the editor, not in the rooms (a link brought a program).
   final bool openEditor;
+
+  /// A link brought the code of a class: the join form opens with it.
+  final String? joinCode;
 
   @override
   Widget build(BuildContext context) {
@@ -76,6 +92,7 @@ class JaguarApp extends StatelessWidget {
           settings: settings,
           cloud: cloud,
           startInEditor: openEditor,
+          joinCode: joinCode,
         ),
       ),
     );

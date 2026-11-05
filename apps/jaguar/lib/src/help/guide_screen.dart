@@ -291,7 +291,7 @@ class GuideScreen extends StatelessWidget {
       steps: [
         if (canScanQr) ...[
           'En la sala Clases toca Escanear QR.',
-          'Apunta al QR que proyecta tu profe: el ejercicio se abre solo, listo para resolver.',
+          'Apunta al QR que proyecta tu profe: el ejercicio se abre solo, listo para resolver. El QR de una clase también sirve: se abre Unirme con código con el código ya escrito, y solo falta tu nombre.',
         ] else ...[
           'Escanéalo con la cámara de tu celular: abre el ejercicio en el navegador.',
           desktop
@@ -413,7 +413,7 @@ class GuideScreen extends StatelessWidget {
         desktop ? 'Haz clic en Clases en la barra de la izquierda.' : 'Abre la sala Clases y toca Mis clases en línea.',
         'Toca Entrar, elige Alumno y escribe un alias. No uses tu nombre completo ni datos personales. No '
             'necesitas correo.',
-        'Toca Unirme con un código. Escribe el código y tu nombre: solo lo ve tu profe, para saber de quién es '
+        'Toca Unirme con un código (o escanea el QR de la clase con la cámara del celular o con Escanear QR). Escribe el código y tu nombre: solo lo ve tu profe, para saber de quién es '
             'cada entrega.',
         'Abre una tarea y trabájala: Probar solo te dice cómo vas, y tu avance se guarda en tu dispositivo, aun '
             'sin internet. Cuando termines, toca Entregar (ahí sí hace falta internet). Si cambias algo después, '

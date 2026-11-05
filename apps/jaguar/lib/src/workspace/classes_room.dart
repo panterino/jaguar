@@ -10,12 +10,12 @@ import '../widgets/skeleton.dart';
 
 /// Joins a class with its code: signs in first if needed. Used by the room
 /// and by its app bar button.
-Future<void> joinClassFlow(BuildContext context, Cloud cloud, ExerciseStore exercises) async {
+Future<void> joinClassFlow(BuildContext context, Cloud cloud, ExerciseStore exercises, {String? code}) async {
   if (!cloud.signedIn) {
     await showAccountDialog(context, cloud);
     if (!cloud.signedIn || !context.mounted) return;
   }
-  final result = await askJoinCode(context);
+  final result = await askJoinCode(context, code: code);
   if (result == null || !context.mounted) return;
   final messenger = ScaffoldMessenger.of(context);
   try {
