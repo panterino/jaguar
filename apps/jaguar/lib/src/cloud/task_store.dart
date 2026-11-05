@@ -37,6 +37,7 @@ class TaskRecord {
     this.deliveredPassed,
     this.deliveredTotal,
     this.deliveredSource,
+    this.hiddenCount = 0,
   });
 
   final String exerciseId;
@@ -60,6 +61,9 @@ class TaskRecord {
   /// The program that was handed in. Null when the delivery was found on the
   /// server and this device never saw the program.
   final String? deliveredSource;
+
+  /// Tests the teacher checks that the student does not see.
+  final int hiddenCount;
 
   String get key => '$classId/$assignmentId';
 
@@ -87,6 +91,7 @@ class TaskRecord {
     int? deliveredPassed,
     int? deliveredTotal,
     String? deliveredSource,
+    int? hiddenCount,
   }) => TaskRecord(
     exerciseId: exerciseId,
     classId: classId,
@@ -102,6 +107,7 @@ class TaskRecord {
     deliveredPassed: deliveredPassed ?? this.deliveredPassed,
     deliveredTotal: deliveredTotal ?? this.deliveredTotal,
     deliveredSource: deliveredSource ?? this.deliveredSource,
+    hiddenCount: hiddenCount ?? this.hiddenCount,
   );
 
   Map<String, Object?> toJson() => {
@@ -119,6 +125,7 @@ class TaskRecord {
     if (deliveredPassed != null) 'deliveredPassed': deliveredPassed,
     if (deliveredTotal != null) 'deliveredTotal': deliveredTotal,
     if (deliveredSource != null) 'deliveredSource': deliveredSource,
+    if (hiddenCount > 0) 'hidden': hiddenCount,
   };
 
   factory TaskRecord.fromJson(Map<String, Object?> json) {
@@ -139,6 +146,7 @@ class TaskRecord {
       deliveredPassed: (json['deliveredPassed'] as num?)?.toInt(),
       deliveredTotal: (json['deliveredTotal'] as num?)?.toInt(),
       deliveredSource: json['deliveredSource'] as String?,
+      hiddenCount: (json['hidden'] as num?)?.toInt() ?? 0,
     );
   }
 }
@@ -229,7 +237,11 @@ class TaskStore extends ChangeNotifier {
                   classId: assignment.classId,
                   assignmentId: assignment.id,
                 ))
-            .copyWith(title: assignment.title, className: className.isEmpty ? null : className);
+            .copyWith(
+              title: assignment.title,
+              className: className.isEmpty ? null : className,
+              hiddenCount: assignment.hiddenCount,
+            );
     _persistRecords();
   }
 

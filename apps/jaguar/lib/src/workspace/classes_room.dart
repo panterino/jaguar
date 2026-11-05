@@ -15,14 +15,21 @@ Future<void> joinClassFlow(BuildContext context, Cloud cloud, ExerciseStore exer
     await showAccountDialog(context, cloud);
     if (!cloud.signedIn || !context.mounted) return;
   }
-  final result = await askJoinCode(context, code: code);
-  if (result == null || !context.mounted) return;
-  final messenger = ScaffoldMessenger.of(context);
-  try {
-    await cloud.joinClass(code: result.$1, name: result.$2);
-    exercises.studentName = result.$2;
-  } on CloudException catch (e) {
-    messenger.showSnackBar(SnackBar(content: Text(e.message)));
+  String? name;
+  while (true) {
+    final result = await askJoinCode(context, code: code, name: name);
+    if (result == null || !context.mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await cloud.joinClass(code: result.$1, name: result.$2);
+      exercises.studentName = result.$2;
+      return;
+    } on CloudException catch (e) {
+      // A wrong code does not lose what was typed: the form opens again with it.
+      messenger.showSnackBar(SnackBar(content: Text(e.message)));
+      code = result.$1;
+      name = result.$2;
+    }
   }
 }
 

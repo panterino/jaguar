@@ -466,6 +466,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
       passed: result.passedCount,
       total: exercise.cases.length,
       hasError: result.syntaxError != null,
+      hidden: cloud.tasks.forExercise(exercise.id)?.hiddenCount ?? 0,
     );
     if (!go || !mounted) return;
     setState(() => _delivering = true);
@@ -1583,6 +1584,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
       stale: _testsStale,
       onRunTests: () => _check(exercise),
       delivery: _deliveryCard(exercise),
+      hiddenCount: widget.cloud?.tasks.forExercise(exercise.id)?.hiddenCount ?? 0,
       onGoToLine: _goToLine,
       onReplay: _replay,
       onShowTeacher: () => _showVerified(exercise, _testResult!, _testedSource!),
@@ -2006,6 +2008,37 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
           actions: empty
               ? null
               : [
+                  // A task of a class: the way to hand it in is always in sight
+                  // on a wide screen (on a phone it is in the Pruebas tab).
+                  if (exercise != null &&
+                      !compact &&
+                      widget.cloud != null &&
+                      widget.cloud!.tasks.forExercise(exercise.id) != null)
+                    ListenableBuilder(
+                      listenable: Listenable.merge([_code, widget.cloud!.tasks]),
+                      builder: (context, _) {
+                        final record = widget.cloud!.tasks.forExercise(exercise.id);
+                        if (record == null || record.stateFor(_code.text) == TaskState.delivered) {
+                          return const SizedBox.shrink();
+                        }
+                        return Padding(
+                          padding: const EdgeInsets.only(left: 4),
+                          child: MediaQuery.sizeOf(context).width < 900
+                              ? IconButton(
+                                  tooltip: 'Entregar',
+                                  onPressed: _delivering ? null : () => _deliver(exercise),
+                                  icon: const Icon(Icons.send_outlined),
+                                )
+                              : OutlinedButton.icon(
+                                  onPressed: _delivering ? null : () => _deliver(exercise),
+                                  icon: const Icon(Icons.send_outlined, size: 18),
+                                  label: Text(
+                                    record.stateFor(_code.text) == TaskState.changed ? 'Entregar de nuevo' : 'Entregar',
+                                  ),
+                                ),
+                        );
+                      },
+                    ),
                   if (compact)
                     Padding(
                       padding: const EdgeInsets.only(right: 4),

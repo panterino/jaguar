@@ -1,4 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
+import 'package:jaguar/src/cloud/cloud_backend.dart';
+import 'package:jaguar/src/cloud/firebase_rest.dart';
+import 'package:jaguar/src/cloud/rest_backend.dart';
+import 'package:jaguar/src/cloud/task_store.dart';
 import 'package:jaguar/src/cloud/cloud.dart';
 import 'package:jaguar/src/cloud/memory_backend.dart';
 import 'package:jaguar_core/jaguar_core.dart';
@@ -14,6 +20,7 @@ const _task = Exercise(
 );
 
 void main() {
+  _extra();
   const source = 'Algoritmo p\n    Leer n\n    Escribir "par"\nFinAlgoritmo\n';
 
   Future<(Cloud, MemoryBackend, Assignment)> setup() async {
@@ -92,5 +99,41 @@ void main() {
     );
     await cloud.syncClasses();
     expect(cloud.tasks.pending(cloud.user!.uid), isEmpty);
+  });
+}
+
+void _extra() {
+  test('sin internet la sesión se conserva con quien era, sin pedir entrar otra vez', () async {
+    SharedPreferences.setMockInitialValues({
+      'jaguar.cloud.session': 'token-guardado',
+      'jaguar.cloud.profile': '{"uid":"u1","alias":"Luis","role":"alumno","email":null}',
+    });
+    final prefs = await SharedPreferences.getInstance();
+    final offline = MockClient((_) async => throw http.ClientException('sin red'));
+    final backend = RestBackend(FirebaseRest(apiKey: 'k', projectId: 'p', client: offline), prefs);
+    final user = await backend.restore();
+    expect(user?.uid, 'u1');
+    expect(user?.alias, 'Luis');
+    expect(backend.currentUser?.role, CloudRole.alumno);
+  });
+
+  test('sin internet y sin nadie guardado, no hay sesión inventada', () async {
+    SharedPreferences.setMockInitialValues({'jaguar.cloud.session': 'token-guardado'});
+    final prefs = await SharedPreferences.getInstance();
+    final offline = MockClient((_) async => throw http.ClientException('sin red'));
+    final backend = RestBackend(FirebaseRest(apiKey: 'k', projectId: 'p', client: offline), prefs);
+    await expectLater(backend.restore(), throwsA(isA<FirebaseRestError>()));
+    expect(backend.currentUser, isNull);
+  });
+
+  test('las pruebas que el alumno no ve se recuerdan con la tarea', () async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    final tasks = TaskStore(prefs);
+    tasks.open(
+      Assignment(id: 'a', classId: 'c', exercise: _task, hiddenCount: 2),
+      className: '3A',
+    );
+    expect(TaskStore(prefs).forExercise('par')!.hiddenCount, 2);
   });
 }

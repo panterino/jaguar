@@ -26,10 +26,11 @@ bool _isWide(BuildContext context) => MediaQuery.sizeOf(context).width >= _wideW
 /// Asks for the class code and the student's name; null if cancelled.
 ///
 /// [code] comes filled in when it was read from a QR or a link.
-Future<(String, String)?> askJoinCode(BuildContext context, {String? code}) => showDialog<(String, String)>(
-  context: context,
-  builder: (_) => _JoinDialog(code: code),
-);
+Future<(String, String)?> askJoinCode(BuildContext context, {String? code, String? name}) =>
+    showDialog<(String, String)>(
+      context: context,
+      builder: (_) => _JoinDialog(code: code, name: name),
+    );
 
 /// Asks for the name of a new class; null if cancelled.
 Future<String?> askNewClassName(BuildContext context) =>
@@ -1735,9 +1736,10 @@ class _PickRow extends StatelessWidget {
 }
 
 class _JoinDialog extends StatefulWidget {
-  const _JoinDialog({this.code});
+  const _JoinDialog({this.code, this.name});
 
   final String? code;
+  final String? name;
 
   @override
   State<_JoinDialog> createState() => _JoinDialogState();
@@ -1745,7 +1747,8 @@ class _JoinDialog extends StatefulWidget {
 
 class _JoinDialogState extends State<_JoinDialog> {
   late final _code = TextEditingController(text: widget.code);
-  final _name = TextEditingController();
+  late final _name = TextEditingController(text: widget.name);
+  bool _tried = false;
 
   @override
   void dispose() {
@@ -1755,7 +1758,11 @@ class _JoinDialogState extends State<_JoinDialog> {
   }
 
   void _submit() {
-    if (_code.text.trim().isEmpty || _name.text.trim().isEmpty) return;
+    // Shows what is missing instead of doing nothing.
+    if (_code.text.trim().isEmpty || _name.text.trim().isEmpty) {
+      setState(() => _tried = true);
+      return;
+    }
     Navigator.pop(context, (_code.text.trim(), _name.text.trim()));
   }
 
@@ -1784,14 +1791,19 @@ class _JoinDialogState extends State<_JoinDialog> {
                 textInputAction: TextInputAction.next,
                 textCapitalization: TextCapitalization.characters,
                 style: monoStyle.copyWith(fontSize: 16, letterSpacing: 1),
-                decoration: const InputDecoration(labelText: 'Código de la clase', hintText: 'JAG-K7Q4M2XP'),
+                decoration: InputDecoration(
+                  labelText: 'Código de la clase',
+                  hintText: 'JAG-K7Q4M2XP',
+                  errorText: _tried && _code.text.trim().isEmpty ? 'Escribe el código de la clase' : null,
+                ),
               ),
               const SizedBox(height: 14),
               TextField(
                 controller: _name,
                 autofocus: widget.code != null,
                 textInputAction: TextInputAction.done,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
+                  errorText: _tried && _name.text.trim().isEmpty ? 'Escribe tu nombre' : null,
                   labelText: 'Tu nombre',
                   helperText: 'Solo lo ve tu profesor, para saber de quién es cada entrega.',
                   helperMaxLines: 2,
