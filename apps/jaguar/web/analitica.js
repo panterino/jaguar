@@ -28,7 +28,11 @@
       ad_personalization: 'denied'
     });
     gtag('js', new Date());
+    // Sin el fragmento (#): en la app lleva el código de una clase o un
+    // programa compartido, y eso no debe llegar a Google.
     gtag('config', ID, {
+      page_location: location.origin + location.pathname,
+      page_referrer: '',
       anonymize_ip: true,
       allow_google_signals: false,
       allow_ad_personalization_signals: false

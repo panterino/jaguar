@@ -145,5 +145,11 @@ bool get usePlatformMenus => !kIsWeb && defaultTargetPlatform == TargetPlatform.
 bool get isApple => defaultTargetPlatform == TargetPlatform.macOS || defaultTargetPlatform == TargetPlatform.iOS;
 
 /// Shortcut text for tooltips and hints: "Ctrl+Enter" or "⇧⌘Enter".
-String shortcutLabel(String key, {bool shift = false}) =>
-    isApple ? '${shift ? '⇧' : ''}⌘$key' : 'Ctrl+${shift ? 'Shift+' : ''}$key';
+///
+/// On the web it is spelled out: the ⌘ symbol is in no font of the app, and the
+/// web would ask Google's servers for one.
+String shortcutLabel(String key, {bool shift = false}) => kIsWeb
+    ? '${isApple ? 'Cmd' : 'Ctrl'}+${shift ? 'Shift+' : ''}$key'
+    : isApple
+    ? '${shift ? '⇧' : ''}⌘$key'
+    : 'Ctrl+${shift ? 'Shift+' : ''}$key';

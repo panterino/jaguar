@@ -14,9 +14,7 @@ export 'task_store.dart';
 /// community. Jaguar works fully without it; when it is available the same
 /// app becomes a suite for students and teachers.
 class Cloud extends ChangeNotifier {
-  Cloud(this.backend, SharedPreferences prefs, {DateTime Function() now = DateTime.now})
-    : _now = now,
-      tasks = TaskStore(prefs) {
+  Cloud(this.backend, this._prefs, {DateTime Function() now = DateTime.now}) : _now = now, tasks = TaskStore(_prefs) {
     tasks.addListener(notifyListeners);
   }
 
@@ -30,6 +28,7 @@ class Cloud extends ChangeNotifier {
   /// What the student did on this device about each task, and a copy of the
   /// classes for when there is no internet.
   final TaskStore tasks;
+  final SharedPreferences _prefs;
 
   @override
   void dispose() {
@@ -68,7 +67,15 @@ class Cloud extends ChangeNotifier {
       _run(() => backend.signInTeacher(email: email, password: password));
   Future<CloudUser> registerTeacher({required String email, required String password, required String alias}) =>
       _run(() => backend.registerTeacher(email: email, password: password, alias: alias));
-  Future<void> signOut() => _run(backend.signOut);
+
+  /// Signing out also forgets what the browser kept about the person: their
+  /// name and the copy of their classes. On a computer shared in a lab, the next
+  /// student must not see them.
+  Future<void> signOut() => _run(() async {
+    await backend.signOut();
+    tasks.forgetClasses();
+    await _prefs.remove('jaguar.studentName');
+  });
   Future<void> resetPassword(String email) => backend.resetPassword(email);
   Future<void> deleteAccount() => _run(backend.deleteAccount);
 

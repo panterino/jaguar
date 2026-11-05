@@ -20,6 +20,25 @@ Submission _sent(String source, {required int passed, required int total}) =>
     Submission(uid: 'u1', name: 'Ana', source: source, passed: passed, total: total);
 
 void main() {
+  test('una entrega que pide memoria sin fin no tumba la revisión: se detiene y cuenta como fallida', () async {
+    const bomb =
+        'Algoritmo d\n    s <- "ab"\n    Para i <- 1 Hasta 60 Hacer\n        s <- s + s\n    FinPara\n    Leer n\n    Escribir n * 2\nFinAlgoritmo\n';
+    final started = DateTime.now();
+    final graded = await regrade(_assignment, _sent(bomb, passed: 4, total: 4));
+    expect(graded.passed, 0);
+    expect(graded.complete, isFalse);
+    expect(graded.overstated, isTrue);
+    expect(DateTime.now().difference(started), lessThan(const Duration(seconds: 10)));
+  });
+
+  test('muchos arreglos enormes tampoco: la revisión termina', () async {
+    const arrays =
+        'Algoritmo d\n    Dimension a[9000000]\n    Dimension b[9000000]\n    Dimension c[9000000]\n    Leer n\n    Escribir n * 2\nFinAlgoritmo\n';
+    final graded = await regrade(_assignment, _sent(arrays, passed: 4, total: 4));
+    expect(graded.passed, 0);
+    expect(graded.overstated, isTrue);
+  });
+
   test('una solución buena pasa todo, también lo oculto', () async {
     const good = 'Algoritmo d\n    Leer n\n    Escribir n * 2\nFinAlgoritmo\n';
     final graded = await regrade(_assignment, _sent(good, passed: 4, total: 4));

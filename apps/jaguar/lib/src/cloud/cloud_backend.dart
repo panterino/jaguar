@@ -234,6 +234,9 @@ abstract class CloudBackend {
   Future<List<Assignment>> assignments(String classId);
   Future<Assignment> assign(String classId, Exercise exercise);
   Future<void> removeAssignment(String classId, String assignmentId);
+
+  /// The teacher takes a student out of the class, with their submissions.
+  Future<void> removeMember(String classId, String uid);
   Future<void> submit({
     required String classId,
     required String assignmentId,

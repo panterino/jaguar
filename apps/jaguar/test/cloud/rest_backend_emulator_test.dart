@@ -256,6 +256,50 @@ void main() {
       return (teacher, student, room);
     }
 
+    online('el profesor quita a un alumno con sus entregas; él no puede quitar a otro', () async {
+      final (teacher, student, room) = await classWithStudent();
+      final assignment = await teacher.backend.assign(room.id, withHidden);
+      await student.backend.submit(
+        classId: room.id,
+        assignmentId: assignment.id,
+        name: 'Luis',
+        source: 'Algoritmo a\nFinAlgoritmo',
+        passed: 1,
+        total: 1,
+      );
+      final luis = student.backend.currentUser!.uid;
+      expect(await teacher.backend.members(room.id), hasLength(1));
+      expect(await teacher.backend.submissions(room.id, assignment.id), hasLength(1));
+
+      // Another student of the class cannot take them out.
+      final other = await _Person.device();
+      await other.backend.signInAnonymously(alias: 'Marta', role: CloudRole.alumno);
+      await other.backend.joinClass(code: room.code, name: 'Marta');
+      await failure(() => other.backend.removeMember(room.id, luis));
+      expect(await teacher.backend.members(room.id), hasLength(2));
+
+      await teacher.backend.removeMember(room.id, luis);
+      expect((await teacher.backend.members(room.id)).map((m) => m.name), ['Marta']);
+      expect(await teacher.backend.submissions(room.id, assignment.id), isEmpty);
+      // Out of the class, Luis can no longer read its tasks or hand in.
+      await failure(() => student.backend.assignments(room.id));
+    });
+
+    online('un nombre enorme en la entrega o en la clase se rechaza', () async {
+      final (teacher, student, room) = await classWithStudent();
+      final assignment = await teacher.backend.assign(room.id, withHidden);
+      await failure(
+        () => student.backend.submit(
+          classId: room.id,
+          assignmentId: assignment.id,
+          name: 'x' * 5000,
+          source: 'a',
+          passed: 1,
+          total: 1,
+        ),
+      );
+    });
+
     online('los casos ocultos no llegan al alumno ni leyendo directo del servidor', () async {
       final (teacher, student, room) = await classWithStudent();
       expect(room.code, matches(RegExp(r'^JAG-[A-HJ-NP-Z2-9]{8}$')));
