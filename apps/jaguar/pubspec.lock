@@ -217,8 +217,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "v0.1.0"
-      resolved-ref: e11546125400db937de613cf9e4f81cea19cb72d
+      ref: "91757cf818be83aebdeb221f509bdd56c1a9f29e"
+      resolved-ref: "91757cf818be83aebdeb221f509bdd56c1a9f29e"
       url: "https://github.com/panterino/jaguar_core.git"
     source: git
     version: "0.1.0"

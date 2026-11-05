@@ -159,10 +159,27 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
     _code.addListener(_scheduleSave);
     _code.addListener(_onTyped);
     _session.addListener(_onSessionChanged);
+    // Signing in or out from any place (the rail, a class, the guide) changes
+    // the name in the rail and what the rooms offer.
+    widget.cloud?.addListener(_onCloudChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (_settings.chosenMode == null) await _welcome();
       final code = widget.joinCode;
-      if (code != null && mounted) await _joinWithCode(code);
+      if (code != null) {
+        // A class link: the person is a student with a code. The welcome
+        // question is skipped; they go to join, and choose later if they want.
+        if (_settings.chosenMode == null) {
+          _settings.mode = AppMode.basic;
+          _settings.teacher = false;
+          _settings.tourStep = 3;
+        }
+        setState(() {
+          _inEditor = false;
+          _roomChoice = Room.classes;
+        });
+        await _joinWithCode(code);
+        return;
+      }
+      if (_settings.chosenMode == null) await _welcome();
     });
     WidgetsBinding.instance.addPostFrameCallback((_) => precacheMascota(context));
     WidgetsBinding.instance.addPostFrameCallback((_) => _syncTeacher());
@@ -178,6 +195,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
 
   @override
   void dispose() {
+    widget.cloud?.removeListener(_onCloudChanged);
     WidgetsBinding.instance.removeObserver(this);
     _saveNow();
     _saveTimer?.cancel();
@@ -651,6 +669,10 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
         ),
       ),
     );
+  }
+
+  void _onCloudChanged() {
+    if (mounted) setState(() {});
   }
 
   Future<void> _account() async {
