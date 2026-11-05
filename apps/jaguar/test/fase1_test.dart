@@ -96,8 +96,10 @@ void main() {
     await tester.pumpWidget(JaguarApp(store: ProgramStore(prefs), exercises: exercises, settings: ViewSettings(prefs)));
     await tester.pumpAndSettle();
 
-    // Inicio says in Clases that a task is waiting.
-    expect(find.text('Tarea nueva: Par o impar'), findsOneWidget);
+    // An exercise that came through a link is practice, not a task of a class:
+    // Inicio does not announce it as something to hand in.
+    expect(find.text('Tarea nueva: Par o impar'), findsNothing);
+    expect(find.textContaining('por entregar'), findsNothing);
 
     await irASala(tester, 'Clases');
     expect(find.text('Par o impar'), findsOneWidget);
@@ -152,14 +154,15 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      // The portal already says there is a task waiting in the class.
-      expect(find.text('1 tarea por hacer'), findsOneWidget);
+      // The portal already says there is a task waiting to be handed in.
+      expect(find.text('Por entregar: Par o impar'), findsOneWidget);
+      expect(find.text('1 tarea por entregar'), findsOneWidget);
       await irASala(tester, 'Clases');
 
       expect(find.text('Programación 3A'), findsOneWidget);
       expect(find.text('Prof. Martínez'), findsOneWidget);
       expect(find.text('Par o impar'), findsOneWidget);
-      expect(find.text('Sin empezar'), findsOneWidget);
+      expect(find.text('Por hacer'), findsOneWidget);
       expect(find.text('Unirme con código'), findsOneWidget);
 
       // Opening the task goes to the editor, and Atrás returns to the room.

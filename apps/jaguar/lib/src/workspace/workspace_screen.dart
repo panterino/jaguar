@@ -26,6 +26,7 @@ import '../widgets/mascota.dart';
 import '../diagram/diagram_view.dart';
 import '../editor/syntax_controller.dart';
 import '../exercises/plan_dialog.dart';
+import '../exercises/delivery_card.dart';
 import '../exercises/exercise_banner.dart';
 import '../exercises/exercise_editor_screen.dart';
 import '../exercises/exercise_store.dart';
@@ -131,6 +132,9 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
   _Panel _panel = _Panel.console; // wide layouts
   double _diagramSplit = 0.5; // code | diagram, in "Ambos"
   bool _checking = false;
+
+  /// Handing a task in to the teacher is happening.
+  bool _delivering = false;
 
   /// The last Probar of the program in the editor, and the code it tested.
   CheckResult? _testResult;
@@ -411,15 +415,15 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
       _settings.markChallengeDone(exercise.id);
       _toast('¡Reto superado!');
     }
-    // Exercises from a class send their result to the teacher.
-    final sent = await widget.cloud?.submitIfAssigned(
-      exercise: exercise,
-      studentName: widget.exercises.studentName ?? widget.cloud?.user?.alias ?? 'Alumno',
+    // A task of a class keeps its result on the device. Nothing is sent: handing
+    // it in is the student's own step (Entregar), and it needs internet.
+    widget.cloud?.tasks.recordWork(
+      exercise.id,
       source: source,
-      result: result,
+      passed: result.passedCount,
+      total: exercise.cases.length,
       pastedLines: _store.pastedLines(programId),
     );
-    if (sent ?? false) _toast('Tu resultado llegó a tu profesor: ${result.passedCount} de ${exercise.cases.length}.');
     if (!mounted) return;
     setState(() {
       _checking = false;
@@ -428,6 +432,67 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
       _testResult = result;
       _testedSource = source;
     });
+  }
+
+  /// Entregar: the student hands the work in to the teacher. It runs the tests
+  /// on the program as it is now, asks, and sends. Without internet it says so,
+  /// and the work stays here.
+  Future<void> _deliver(Exercise exercise) async {
+    final cloud = widget.cloud;
+    if (cloud == null || _delivering) return;
+    _saveNow();
+    if (!cloud.signedIn) {
+      await showAccountDialog(context, cloud);
+      if (!cloud.signedIn || !mounted) return;
+    }
+    final source = _code.text;
+    final programId = _editingId;
+    setState(() => _delivering = true);
+    final result = await checkSolution(source, exercise);
+    if (!mounted) return;
+    setState(() => _delivering = false);
+    final go = await showDeliveryConfirm(
+      context,
+      title: exercise.title,
+      passed: result.passedCount,
+      total: exercise.cases.length,
+      hasError: result.syntaxError != null,
+    );
+    if (!go || !mounted) return;
+    setState(() => _delivering = true);
+    try {
+      await cloud.deliver(
+        exercise: exercise,
+        studentName: widget.exercises.studentName ?? cloud.user?.alias ?? 'Alumno',
+        source: source,
+        result: result,
+        pastedLines: _store.pastedLines(programId),
+      );
+      _toast('Entregaste «${exercise.title}» a tu profesor.');
+    } on CloudException catch (e) {
+      _toast(
+        e.offline
+            ? 'Sin conexión. Tu trabajo está guardado en este dispositivo; entrégalo cuando tengas internet.'
+            : e.message,
+      );
+    } finally {
+      if (mounted) setState(() => _delivering = false);
+    }
+  }
+
+  /// The card with the delivery state of a task of a class; null for any other
+  /// exercise.
+  Widget? _deliveryCard(Exercise exercise) {
+    final cloud = widget.cloud;
+    if (cloud == null || cloud.tasks.forExercise(exercise.id) == null) return null;
+    return ListenableBuilder(
+      listenable: Listenable.merge([_code, cloud.tasks]),
+      builder: (context, _) {
+        final record = cloud.tasks.forExercise(exercise.id);
+        if (record == null) return const SizedBox.shrink();
+        return DeliveryCard(record: record, source: _code.text, busy: _delivering, onDeliver: () => _deliver(exercise));
+      },
+    );
   }
 
   /// Shows a test running in the console, its inputs typed by themselves.
@@ -519,7 +584,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
   /// teacher.
   void _openAssignment(Assignment assignment) {
     widget.cloud?.linkAssignment(assignment.exercise, assignment);
-    widget.exercises.saveReceived(assignment.exercise);
+    widget.exercises.saveAssigned(assignment.exercise);
     _openExercise(assignment.exercise);
   }
 
@@ -534,10 +599,11 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
           room: room,
           exercises: widget.exercises,
           onOpenAssignment: (assignment) {
-            widget.exercises.saveReceived(assignment.exercise);
+            widget.exercises.saveAssigned(assignment.exercise);
             _openExercise(assignment.exercise);
           },
           onOpenSource: _openSource,
+          settings: _settings,
         ),
       ),
     );
@@ -556,7 +622,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
           cloud: cloud,
           exercises: widget.exercises,
           onOpenAssignment: (assignment) {
-            widget.exercises.saveReceived(assignment.exercise);
+            widget.exercises.saveAssigned(assignment.exercise);
             _openExercise(assignment.exercise);
           },
           onOpenSource: _openSource,
@@ -1494,6 +1560,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
       running: _checking,
       stale: _testsStale,
       onRunTests: () => _check(exercise),
+      delivery: _deliveryCard(exercise),
       onGoToLine: _goToLine,
       onReplay: _replay,
       onShowTeacher: () => _showVerified(exercise, _testResult!, _testedSource!),
@@ -1562,7 +1629,12 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
     final blockIndex = blockChallenges.indexWhere((c) => c.id == exercise.id);
     if (blockIndex >= 0) return 'Ruta · Nivel 0 · Bloques ${blockIndex + 1}';
     final index = [...challenges, ...challengesNivel2, ...challengesNivel3].indexWhere((c) => c.id == exercise.id);
-    if (index < 0) return 'Ejercicio del profe';
+    if (index < 0) {
+      final record = widget.cloud?.tasks.forExercise(exercise.id);
+      if (record == null) return 'Ejercicio del profe';
+      final state = taskStateLabel(record.stateFor(_code.text));
+      return record.className.isEmpty ? 'Tarea · $state' : '${record.className} · $state';
+    }
     final challenge = [...challenges, ...challengesNivel2, ...challengesNivel3][index];
     return 'Ruta · Nivel ${challenge.level} · Reto ${index + 1}';
   }
@@ -1891,7 +1963,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
           title: empty
               ? const Text('Jaguar Code')
               : ListenableBuilder(
-                  listenable: _code,
+                  listenable: Listenable.merge([_code, ?widget.cloud?.tasks]),
                   builder: (context, _) => Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,

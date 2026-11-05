@@ -501,7 +501,8 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
             child: TextButton.icon(
               style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8)),
               onPressed: () {
-                if (_save()) Navigator.pop(context);
+                // The saved exercise goes back, so a class can assign it right away.
+                if (_save()) Navigator.pop(context, _exercise);
               },
               icon: const Icon(Icons.save_outlined),
               label: const Text('Guardar'),

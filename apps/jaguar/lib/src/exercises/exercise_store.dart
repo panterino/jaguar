@@ -15,6 +15,7 @@ class ExerciseStore extends ChangeNotifier {
       final exercise = Exercise.fromJson((entry['exercise']! as Map).cast<String, Object?>());
       _exercises[exercise.id] = exercise;
       if (entry['mine'] == true) _mine.add(exercise.id);
+      if (entry['assigned'] == true) _assigned.add(exercise.id);
       final solution = entry['solution'] as String?;
       if (solution != null) _solutions[exercise.id] = solution;
     }
@@ -26,6 +27,7 @@ class ExerciseStore extends ChangeNotifier {
   final SharedPreferences _prefs;
   final Map<String, Exercise> _exercises = {};
   final Set<String> _mine = {};
+  final Set<String> _assigned = {};
   final Map<String, String> _solutions = {};
 
   /// Exercises written on this device, in creation order.
@@ -34,11 +36,22 @@ class ExerciseStore extends ChangeNotifier {
       if (_mine.contains(e.id)) e,
   ];
 
-  /// Exercises that arrived through a link or a class, newest last. The
-  /// challenges are not here: they come with the app.
+  /// Tells if an exercise is a task of one of the student's classes, so it is
+  /// not listed as one received through a link (older versions saved them as
+  /// received). Set by the app; without it, only what was saved as assigned
+  /// counts.
+  bool Function(String exerciseId)? isClassTask;
+
+  /// Exercises that arrived through a link, newest last. The tasks of a class
+  /// are not here (their class keeps track of them), and neither are the
+  /// challenges, which come with the app.
   List<Exercise> get received => [
     for (final e in _exercises.values)
-      if (!_mine.contains(e.id) && !e.id.startsWith('reto-')) e,
+      if (!_mine.contains(e.id) &&
+          !_assigned.contains(e.id) &&
+          !(isClassTask?.call(e.id) ?? false) &&
+          !e.id.startsWith('reto-'))
+        e,
   ];
 
   Exercise? byId(String id) => _exercises[id];
@@ -68,6 +81,14 @@ class ExerciseStore extends ChangeNotifier {
     _persist();
   }
 
+  /// Saves a task of a class, so it can be opened with no internet. It is not
+  /// "received": it belongs to its class, which keeps track of it.
+  void saveAssigned(Exercise exercise) {
+    _exercises[exercise.id] = exercise;
+    _assigned.add(exercise.id);
+    _persist();
+  }
+
   /// Saves an exercise received through a link. A newer version of the same
   /// exercise (the teacher fixed a case) replaces the old one.
   void saveReceived(Exercise exercise) {
@@ -78,6 +99,7 @@ class ExerciseStore extends ChangeNotifier {
   void delete(String id) {
     _exercises.remove(id);
     _mine.remove(id);
+    _assigned.remove(id);
     _solutions.remove(id);
     _persist();
   }
@@ -92,6 +114,7 @@ class ExerciseStore extends ChangeNotifier {
           {
             'exercise': exercise.toJson(),
             if (_mine.contains(exercise.id)) 'mine': true,
+            if (_assigned.contains(exercise.id)) 'assigned': true,
             if (_solutions[exercise.id] != null) 'solution': _solutions[exercise.id],
           },
       ]),

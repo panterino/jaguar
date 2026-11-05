@@ -464,7 +464,7 @@ class RestBackend implements CloudBackend {
     try {
       return await action();
     } on FirebaseRestError catch (e) {
-      throw CloudException(switch (e.code) {
+      throw CloudException(offline: e.code == 'NETWORK' || e.code == 'UNAVAILABLE', switch (e.code) {
         'INVALID_LOGIN_CREDENTIALS' ||
         'INVALID_PASSWORD' ||
         'EMAIL_NOT_FOUND' ||

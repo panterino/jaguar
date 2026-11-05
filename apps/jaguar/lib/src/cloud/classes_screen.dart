@@ -4,9 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:jaguar_core/jaguar_core.dart';
 
+import '../exercises/exercise_editor_screen.dart';
 import '../exercises/exercise_store.dart';
+import '../settings.dart';
 import '../theme.dart';
 import '../widgets/pro_widgets.dart';
+import '../widgets/skeleton.dart';
+import '../workspace/classes_room.dart' show TaskRow;
 import 'account_dialog.dart';
 import 'cloud.dart';
 import 'regrade.dart';
@@ -118,7 +122,7 @@ class ClassesScreen extends StatefulWidget {
 }
 
 class _ClassesScreenState extends State<ClassesScreen> {
-  Future<List<ClassRoom>>? _classes;
+  Future<bool>? _sync;
 
   Cloud get _cloud => widget.cloud;
 
@@ -129,9 +133,9 @@ class _ClassesScreenState extends State<ClassesScreen> {
   }
 
   void _reload() {
-    final classes = _cloud.signedIn ? _cloud.backend.myClasses() : null;
+    final sync = _cloud.signedIn ? _cloud.syncClasses() : null;
     setState(() {
-      _classes = classes;
+      _sync = sync;
     });
   }
 
@@ -211,17 +215,36 @@ class _ClassesScreenState extends State<ClassesScreen> {
               title: 'Clases en línea',
               text:
                   'Los profesores crean una clase y le dan el código a su grupo. '
-                  'Las tareas y los resultados de Probar llegan solos.',
+                  'Los alumnos hacen las tareas y las entregan desde su teléfono.',
               action: FilledButton(onPressed: _signIn, child: const Text('Entrar')),
             )
-          : FutureBuilder(
-              future: _classes,
+          : FutureBuilder<bool>(
+              future: _sync,
               builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return _Empty(icon: Icons.cloud_off, title: 'Sin conexión', text: '${snapshot.error}');
+                // The copy kept on the device is shown at once, with or without internet.
+                final cached = _cloud.tasks.cachedClasses(user.uid);
+                if (cached == null) {
+                  if (snapshot.hasError) {
+                    return _Empty(
+                      icon: Icons.cloud_off,
+                      title: 'No se pudieron cargar tus clases',
+                      text: '${snapshot.error}',
+                      action: OutlinedButton(onPressed: _reload, child: const Text('Reintentar')),
+                    );
+                  }
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    return _Empty(
+                      icon: Icons.cloud_off,
+                      title: 'Sin conexión',
+                      text:
+                          'La primera vez hace falta internet para traer tus clases. Después las verás aquí aunque no haya.',
+                      action: OutlinedButton(onPressed: _reload, child: const Text('Reintentar')),
+                    );
+                  }
+                  return const Padding(padding: EdgeInsets.all(12), child: SkeletonClassList());
                 }
-                final classes = snapshot.data;
-                if (classes == null) return const Center(child: CircularProgressIndicator());
+                final classes = [for (final c in cached) c.room];
+                final offline = snapshot.connectionState == ConnectionState.done && snapshot.data == false;
                 if (classes.isEmpty) {
                   return _Empty(
                     icon: Icons.groups_outlined,
@@ -241,6 +264,14 @@ class _ClassesScreenState extends State<ClassesScreen> {
                     child: ListView(
                       padding: EdgeInsets.fromLTRB(12, wide ? 8 : 12, 12, 96),
                       children: [
+                        if (offline)
+                          const Padding(
+                            padding: EdgeInsets.only(bottom: 12),
+                            child: NoticeBox(
+                              icon: Icons.cloud_off,
+                              text: 'Sin conexión. Estás viendo lo último que se guardó.',
+                            ),
+                          ),
                         if (wide)
                           Padding(
                             padding: const EdgeInsets.fromLTRB(4, 0, 4, 12),
@@ -289,11 +320,15 @@ class ClassScreen extends StatefulWidget {
     required this.exercises,
     required this.onOpenAssignment,
     required this.onOpenSource,
+    this.settings,
   });
 
   final Cloud cloud;
   final ClassRoom room;
   final ExerciseStore exercises;
+
+  /// For the code editor when the teacher writes an exercise from here.
+  final ViewSettings? settings;
   final void Function(Assignment assignment) onOpenAssignment;
   final ValueChanged<String> onOpenSource;
 
@@ -308,6 +343,7 @@ class _ClassScreenState extends State<ClassScreen> {
   /// assignmentId → student uid → submission (teacher), or my own.
   Map<String, Map<String, Submission>> _submissions = const {};
   String? _error;
+  bool _offline = false;
   Timer? _refresh;
   late bool _open = widget.room.open;
 
@@ -336,7 +372,36 @@ class _ClassScreenState extends State<ClassScreen> {
     super.dispose();
   }
 
+  /// A student reads the class from the copy kept on the device, refreshed
+  /// from the server when there is internet.
+  Future<void> _loadAsStudent() async {
+    final cloud = widget.cloud;
+    final uid = cloud.user?.uid;
+    if (uid == null) return;
+    bool online;
+    try {
+      online = await cloud.syncClasses();
+    } on CloudException catch (e) {
+      if (mounted && _assignments == null) setState(() => _error = e.message);
+      return;
+    }
+    if (!mounted) return;
+    final cached = cloud.tasks.cachedClasses(uid)?.where((c) => c.room.id == widget.room.id).firstOrNull;
+    setState(() {
+      _offline = !online;
+      if (cached != null) {
+        _assignments = cached.assignments;
+        _error = null;
+      } else if (_assignments == null) {
+        _error = online
+            ? 'Esta clase ya no está.'
+            : 'Sin conexión. Abre la clase una vez con internet para verla aquí después.';
+      }
+    });
+  }
+
   Future<void> _load() async {
+    if (!_isTeacher) return _loadAsStudent();
     try {
       final assignments = await _backend.assignments(widget.room.id);
       final members = _isTeacher ? await _backend.members(widget.room.id) : const <Member>[];
@@ -415,7 +480,12 @@ class _ClassScreenState extends State<ClassScreen> {
         builder: (context) => Dialog(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 560, maxHeight: 640),
-            child: _ExercisePicker(exercises: widget.exercises.authored, cloud: widget.cloud, inDialog: true),
+            child: _ExercisePicker(
+              exercises: widget.exercises.authored,
+              cloud: widget.cloud,
+              inDialog: true,
+              onCreate: _createExercise,
+            ),
           ),
         ),
       );
@@ -423,9 +493,21 @@ class _ClassScreenState extends State<ClassScreen> {
     return showModalBottomSheet<Exercise>(
       context: context,
       showDragHandle: true,
-      builder: (context) => _ExercisePicker(exercises: widget.exercises.authored, cloud: widget.cloud),
+      isScrollControlled: true,
+      builder: (context) =>
+          _ExercisePicker(exercises: widget.exercises.authored, cloud: widget.cloud, onCreate: _createExercise),
     );
   }
+
+  /// Writes a new exercise without leaving the class: the editor opens over
+  /// the picker, and the saved exercise is assigned right away.
+  Future<Exercise?> _createExercise(BuildContext pickerContext) => Navigator.push<Exercise>(
+    pickerContext,
+    MaterialPageRoute<Exercise>(
+      fullscreenDialog: true,
+      builder: (_) => ExerciseEditorScreen(store: widget.exercises, settings: widget.settings),
+    ),
+  );
 
   Future<void> _assign() async {
     final exercise = await _pickExercise();
@@ -465,7 +547,7 @@ class _ClassScreenState extends State<ClassScreen> {
   }
 
   void _openAssignment(Assignment assignment) {
-    widget.cloud.linkAssignment(assignment.exercise, assignment);
+    widget.cloud.linkAssignment(assignment.exercise, assignment, className: widget.room.name);
     Navigator.popUntil(context, (route) => route.isFirst);
     widget.onOpenAssignment(assignment);
   }
@@ -637,9 +719,16 @@ class _ClassScreenState extends State<ClassScreen> {
         child: Focus(
           autofocus: true,
           child: _error != null
-              ? _Empty(icon: Icons.cloud_off, title: 'No se pudo cargar', text: _error!)
+              ? _Empty(
+                  icon: Icons.cloud_off,
+                  title: 'No se pudo cargar',
+                  text: _error!,
+                  action: OutlinedButton(onPressed: _load, child: const Text('Reintentar')),
+                )
               : assignments == null
-              ? const Center(child: CircularProgressIndicator())
+              ? (_isTeacher
+                    ? SkeletonClassBoard(wide: wide)
+                    : const Padding(padding: EdgeInsets.all(16), child: SkeletonRows(count: 3)))
               : _isTeacher && wide
               ? PageWidth(width: workWidth, child: _teacherWide(assignments))
               : _list(assignments, wide),
@@ -674,27 +763,49 @@ class _ClassScreenState extends State<ClassScreen> {
             onTap: _showSubmission,
             onRemove: _removeAssignment,
           ),
-        if (!_isTeacher)
-          for (final a in assignments)
-            Card(
-              child: ListTile(
-                leading: _StatusIcon(submission: _submissions[a.id]?.values.firstOrNull),
-                title: Text(a.title),
-                subtitle: Text(
-                  '${switch (_submissions[a.id]?.values.firstOrNull) {
-                    null => 'Sin entregar',
-                    final s when s.complete => 'Completa: ${s.passed} de ${s.total} pruebas',
-                    final s => '${s.passed} de ${s.total} pruebas',
-                  }}'
-                  '${a.hiddenCount == 0
-                      ? ''
-                      : a.hiddenCount == 1
-                      ? '. Tu profe revisa 1 prueba más que no se ve.'
-                      : '. Tu profe revisa ${a.hiddenCount} pruebas más que no se ven.'}',
-                ),
-                trailing: FilledButton.tonal(onPressed: () => _openAssignment(a), child: const Text('Resolver')),
+        if (!_isTeacher) ...[
+          if (_offline)
+            const Padding(
+              padding: EdgeInsets.only(bottom: 12),
+              child: NoticeBox(
+                icon: Icons.cloud_off,
+                text: 'Sin conexión. Puedes trabajar tus tareas aquí; entrégalas cuando tengas internet.',
               ),
             ),
+          Container(
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerLow,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: theme.colorScheme.outlineVariant),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Column(
+              children: [
+                for (final a in assignments)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      TaskRow(
+                        assignment: a,
+                        record: widget.cloud.tasks.forAssignment(widget.room.id, a.id),
+                        onTap: () => _openAssignment(a),
+                      ),
+                      if (a.hiddenCount > 0)
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(52, 0, 16, 10),
+                          child: Text(
+                            a.hiddenCount == 1
+                                ? 'Tu profe revisa 1 prueba más que no se ve.'
+                                : 'Tu profe revisa ${a.hiddenCount} pruebas más que no se ven.',
+                            style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                          ),
+                        ),
+                    ],
+                  ),
+              ],
+            ),
+          ),
+        ],
       ],
     );
     if (!wide) return list;
@@ -1361,10 +1472,13 @@ class _StatusIcon extends StatelessWidget {
 
 /// Choose what to assign: one of my exercises or one from the shared bank.
 class _ExercisePicker extends StatefulWidget {
-  const _ExercisePicker({required this.exercises, required this.cloud, this.inDialog = false});
+  const _ExercisePicker({required this.exercises, required this.cloud, required this.onCreate, this.inDialog = false});
 
   final List<Exercise> exercises;
   final Cloud cloud;
+
+  /// Opens the editor for a new exercise; the saved one comes back.
+  final Future<Exercise?> Function(BuildContext context) onCreate;
 
   /// In a dialog on a computer: with its own title and a close button.
   final bool inDialog;
@@ -1400,11 +1514,17 @@ class _ExercisePickerState extends State<_ExercisePicker> {
             style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
           ),
           const SizedBox(height: 16),
+          FilledButton.tonalIcon(
+            onPressed: () async {
+              final created = await widget.onCreate(context);
+              if (created != null && context.mounted) Navigator.pop(context, created);
+            },
+            icon: const Icon(Icons.add),
+            label: const Text('Crear un ejercicio nuevo'),
+          ),
+          const SizedBox(height: 16),
           const BlockHeading('Mis ejercicios'),
-          if (widget.exercises.isEmpty)
-            const NoticeBox(
-              text: 'Aún no tienes. Crea uno con "Crear ejercicio con este programa" en el menú Profesor.',
-            ),
+          if (widget.exercises.isEmpty) const NoticeBox(text: 'Aún no tienes ejercicios guardados.'),
           for (final e in widget.exercises)
             _PickRow(
               icon: Icons.assignment_outlined,
@@ -1419,7 +1539,7 @@ class _ExercisePickerState extends State<_ExercisePicker> {
             builder: (context, snapshot) {
               final bank = snapshot.data;
               if (snapshot.hasError) return const NoticeBox(tone: PillTone.bad, text: 'No se pudo cargar el banco.');
-              if (bank == null) return const LinearProgressIndicator();
+              if (bank == null) return const SkeletonRows(count: 3);
               if (bank.isEmpty) return const NoticeBox(text: 'Todavía no hay ejercicios compartidos.');
               return Column(
                 children: [

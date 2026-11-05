@@ -24,6 +24,14 @@ class MemoryBackend implements CloudBackend {
 
   String _id() => 'id${_ids++}';
 
+  /// Simulates having no internet: what needs the network refuses, with the
+  /// same error the real client gives.
+  bool offline = false;
+
+  void _needsNetwork() {
+    if (offline) throw const CloudException('No hay conexión a internet.', offline: true);
+  }
+
   /// Switches to another user, as if on another device.
   void actAs(CloudUser? user) => _user = user;
 
@@ -121,10 +129,13 @@ class MemoryBackend implements CloudBackend {
   }
 
   @override
-  Future<List<ClassRoom>> myClasses() async => [
-    ..._classes.values.where((c) => c.ownerId == _me.uid),
-    for (final id in _joined[_me.uid] ?? const <String>{}) _classes[id]!,
-  ];
+  Future<List<ClassRoom>> myClasses() async {
+    _needsNetwork();
+    return [
+      ..._classes.values.where((c) => c.ownerId == _me.uid),
+      for (final id in _joined[_me.uid] ?? const <String>{}) _classes[id]!,
+    ];
+  }
 
   void _requireOwner(String classId) {
     if (_classes[classId]?.ownerId != _me.uid) throw const CloudException('No tienes permiso para hacer eso.');
@@ -138,6 +149,7 @@ class MemoryBackend implements CloudBackend {
 
   @override
   Future<List<Assignment>> assignments(String classId) async {
+    _needsNetwork();
     final mine = _classes[classId]?.ownerId == _me.uid;
     return [
       for (final a in _assignments[classId] ?? const <Assignment>[])
@@ -185,6 +197,7 @@ class MemoryBackend implements CloudBackend {
     required int total,
     int pastedLines = 0,
   }) async {
+    _needsNetwork();
     if (!(_members[classId]?.containsKey(_me.uid) ?? false)) {
       throw const CloudException('No tienes permiso para hacer eso.');
     }
@@ -206,8 +219,10 @@ class MemoryBackend implements CloudBackend {
   }
 
   @override
-  Future<Submission?> mySubmission(String classId, String assignmentId) async =>
-      _submissions['$classId/$assignmentId']?[_me.uid];
+  Future<Submission?> mySubmission(String classId, String assignmentId) async {
+    _needsNetwork();
+    return _submissions['$classId/$assignmentId']?[_me.uid];
+  }
 
   @override
   Future<List<Publication>> publications({PublicationKind? kind}) async => [

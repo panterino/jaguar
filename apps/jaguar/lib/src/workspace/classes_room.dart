@@ -4,7 +4,9 @@ import '../cloud/account_dialog.dart';
 import '../cloud/classes_screen.dart';
 import '../cloud/cloud.dart';
 import '../exercises/exercise_store.dart';
+import '../exercises/delivery_card.dart' show deliveryDate;
 import '../widgets/pro_widgets.dart';
+import '../widgets/skeleton.dart';
 
 /// Joins a class with its code: signs in first if needed. Used by the room
 /// and by its app bar button.
@@ -36,25 +38,9 @@ Future<void> createClassFlow(BuildContext context, Cloud cloud) async {
   }
 }
 
-class _Entry {
-  const _Entry(this.assignment, this.mine);
-
-  final Assignment assignment;
-  final Submission? mine;
-}
-
-class _ClassView {
-  const _ClassView(this.room, this.entries, {required this.owned});
-
-  final ClassRoom room;
-  final List<_Entry> entries;
-
-  /// The signed-in person created it: a teacher's class.
-  final bool owned;
-}
-
-/// The classes of the person signed in, each with its assignments and how far
-/// they got: the tasks the teacher asked for, in one place.
+/// The classes of the person signed in, each with its tasks and, for a
+/// student, how each one stands. It shows the copy kept on the device right
+/// away, so it works with no internet, and refreshes it in the background.
 class ClassesList extends StatefulWidget {
   const ClassesList({
     super.key,
@@ -77,14 +63,17 @@ class ClassesList extends StatefulWidget {
 }
 
 class _ClassesListState extends State<ClassesList> {
-  Future<List<_ClassView>>? _future;
   String? _uid;
+  int _revision = -1;
+  bool _syncing = false;
+  bool _offline = false;
+  String? _error;
 
   @override
   void initState() {
     super.initState();
     widget.cloud.addListener(_onCloud);
-    _start();
+    _onCloud();
   }
 
   @override
@@ -94,30 +83,31 @@ class _ClassesListState extends State<ClassesList> {
   }
 
   void _onCloud() {
-    // Joining or creating a class, or signing in or out.
-    if (mounted) _reload();
-  }
-
-  void _start() {
-    final user = widget.cloud.user;
-    _uid = user?.uid;
-    _future = user == null ? null : _load(user);
-  }
-
-  void _reload() => setState(_start);
-
-  Future<List<_ClassView>> _load(CloudUser user) async {
-    final backend = widget.cloud.backend;
-    final views = <_ClassView>[];
-    for (final room in await backend.myClasses()) {
-      final owned = room.ownerId == user.uid;
-      final entries = <_Entry>[];
-      for (final assignment in await backend.assignments(room.id)) {
-        entries.add(_Entry(assignment, owned ? null : await backend.mySubmission(room.id, assignment.id)));
-      }
-      views.add(_ClassView(room, entries, owned: owned));
+    final cloud = widget.cloud;
+    // A task changing state only repaints; signing in or out, creating or
+    // joining a class reads the classes again.
+    if (cloud.revision == _revision && cloud.user?.uid == _uid) {
+      if (mounted) setState(() {});
+      return;
     }
-    return views;
+    _revision = cloud.revision;
+    _uid = cloud.user?.uid;
+    if (cloud.user != null) _sync();
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _sync() async {
+    if (_syncing) return;
+    _syncing = true;
+    if (mounted) setState(() => _error = null);
+    try {
+      final online = await widget.cloud.syncClasses();
+      if (mounted) setState(() => _offline = !online);
+    } on CloudException catch (e) {
+      if (mounted) setState(() => _error = e.message);
+    } finally {
+      _syncing = false;
+    }
   }
 
   @override
@@ -125,7 +115,8 @@ class _ClassesListState extends State<ClassesList> {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final cloud = widget.cloud;
-    if (!cloud.signedIn) {
+    final user = cloud.user;
+    if (user == null) {
       return _Note(
         icon: widget.forTeacher ? Icons.school_outlined : Icons.cloud_outlined,
         title: widget.forTeacher ? 'Entra para crear tus clases' : 'Tus clases en línea',
@@ -137,141 +128,201 @@ class _ClassesListState extends State<ClassesList> {
         action: FilledButton(onPressed: () => showAccountDialog(context, cloud), child: const Text('Entrar')),
       );
     }
-    if (_uid != cloud.user?.uid) WidgetsBinding.instance.addPostFrameCallback((_) => _reload());
-    return FutureBuilder<List<_ClassView>>(
-      future: _future,
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return _Note(
-            icon: Icons.cloud_off,
-            title: 'Sin conexión',
-            text: '${snapshot.error}',
-            action: OutlinedButton(onPressed: _reload, child: const Text('Reintentar')),
-          );
-        }
-        final classes = snapshot.data;
-        if (classes == null) {
-          return const Padding(
-            padding: EdgeInsets.all(24),
-            child: Center(child: CircularProgressIndicator()),
-          );
-        }
-        if (classes.isEmpty) {
-          return _Note(
-            icon: Icons.groups_outlined,
-            title: cloud.user!.isTeacher ? 'Aún no tienes clases' : 'Aún no estás en una clase',
-            text: cloud.user!.isTeacher
-                ? 'Crea una y comparte su código con tu grupo.'
-                : 'Pídele el código a tu profe y toca Unirme con código.',
-          );
-        }
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            for (final view in classes)
-              Card(
-                elevation: 0,
-                margin: const EdgeInsets.only(bottom: 12),
-                color: scheme.surfaceContainerLow,
-                clipBehavior: Clip.antiAlias,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(color: scheme.outlineVariant),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (view.owned)
-                      _OwnedHeader(view: view, onTap: () => widget.onOpenClass(view.room))
-                    else
-                      InkWell(
-                        onTap: () => widget.onOpenClass(view.room),
-                        child: Container(
-                          color: scheme.primaryContainer,
-                          padding: const EdgeInsets.fromLTRB(16, 14, 8, 14),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      view.room.name,
-                                      style: theme.textTheme.titleMedium?.copyWith(color: scheme.onPrimaryContainer),
-                                    ),
-                                    Text(
-                                      view.owned
-                                          ? 'Tu clase · código ${view.room.code}'
-                                          : 'Prof. ${view.room.ownerAlias}',
-                                      style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onPrimaryContainer),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Icon(Icons.chevron_right, color: scheme.onPrimaryContainer),
-                            ],
-                          ),
-                        ),
-                      ),
-                    if (view.entries.isEmpty)
-                      Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Text(
-                          'Sin tareas por ahora.',
-                          style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
-                        ),
-                      )
-                    else
-                      for (final entry in view.entries)
-                        _AssignmentRow(
-                          entry: entry,
-                          owned: view.owned,
-                          onTap: () =>
-                              view.owned ? widget.onOpenClass(view.room) : widget.onOpenAssignment(entry.assignment),
-                        ),
-                    const SizedBox(height: 4),
-                  ],
-                ),
-              ),
-          ],
+    final classes = cloud.tasks.cachedClasses(user.uid);
+    if (classes == null) {
+      if (_error != null) {
+        return _Note(
+          icon: Icons.cloud_off,
+          title: 'No se pudieron cargar tus clases',
+          text: _error!,
+          action: OutlinedButton(onPressed: _sync, child: const Text('Reintentar')),
         );
-      },
+      }
+      // Nothing kept yet, and without internet there is nothing to show.
+      if (!_syncing && _offline) {
+        return _Note(
+          icon: Icons.cloud_off,
+          title: 'Sin conexión',
+          text: 'La primera vez hace falta internet para traer tus clases. Después las verás aquí aunque no haya.',
+          action: OutlinedButton(onPressed: _sync, child: const Text('Reintentar')),
+        );
+      }
+      return const SkeletonClassList();
+    }
+    if (classes.isEmpty) {
+      return _Note(
+        icon: Icons.groups_outlined,
+        title: user.isTeacher ? 'Aún no tienes clases' : 'Aún no estás en una clase',
+        text: user.isTeacher
+            ? 'Crea una y comparte su código con tu grupo.'
+            : 'Pídele el código a tu profe y toca Unirme con código.',
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (_offline)
+          const Padding(
+            padding: EdgeInsets.only(bottom: 12),
+            child: NoticeBox(
+              icon: Icons.cloud_off,
+              text:
+                  'Sin conexión. Estás viendo lo último que se guardó. Puedes trabajar tus tareas y entregarlas '
+                  'cuando tengas internet.',
+            ),
+          ),
+        for (final c in classes)
+          Card(
+            elevation: 0,
+            margin: const EdgeInsets.only(bottom: 12),
+            color: scheme.surfaceContainerLow,
+            clipBehavior: Clip.antiAlias,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: scheme.outlineVariant),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (c.room.ownerId == user.uid)
+                  _OwnedHeader(room: c.room, tasks: c.assignments.length, onTap: () => widget.onOpenClass(c.room))
+                else
+                  InkWell(
+                    onTap: () => widget.onOpenClass(c.room),
+                    child: Container(
+                      color: scheme.primaryContainer,
+                      padding: const EdgeInsets.fromLTRB(16, 14, 8, 14),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  c.room.name,
+                                  style: theme.textTheme.titleMedium?.copyWith(color: scheme.onPrimaryContainer),
+                                ),
+                                Text(
+                                  'Prof. ${c.room.ownerAlias}',
+                                  style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onPrimaryContainer),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Icon(Icons.chevron_right, color: scheme.onPrimaryContainer),
+                        ],
+                      ),
+                    ),
+                  ),
+                if (c.assignments.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text(
+                      'Sin tareas por ahora.',
+                      style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+                    ),
+                  )
+                else
+                  for (final a in c.assignments)
+                    c.room.ownerId == user.uid
+                        ? _TeacherTaskRow(assignment: a, onTap: () => widget.onOpenClass(c.room))
+                        : TaskRow(
+                            assignment: a,
+                            record: cloud.tasks.forAssignment(c.room.id, a.id),
+                            onTap: () => widget.onOpenAssignment(a),
+                          ),
+                const SizedBox(height: 4),
+              ],
+            ),
+          ),
+      ],
     );
   }
 }
 
-class _AssignmentRow extends StatelessWidget {
-  const _AssignmentRow({required this.entry, required this.owned, required this.onTap});
+/// A task as the teacher's list shows it: open the class to see the deliveries.
+class _TeacherTaskRow extends StatelessWidget {
+  const _TeacherTaskRow({required this.assignment, required this.onTap});
 
-  final _Entry entry;
-  final bool owned;
+  final Assignment assignment;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final mine = entry.mine;
-    final (Widget marker, String status) = owned
-        ? (Icon(Icons.assignment_outlined, size: 20, color: scheme.onSurfaceVariant), 'Ver entregas')
-        : mine == null
-        ? (
-            Icon(Icons.radio_button_unchecked, size: 20, color: scheme.outline, semanticLabel: 'sin empezar'),
-            'Sin empezar',
-          )
-        : mine.complete
-        ? (
-            Icon(Icons.check, size: 20, color: Colors.green.shade700, semanticLabel: 'entregada'),
-            'Entregada · ${mine.passed} de ${mine.total} pruebas',
-          )
-        : (
-            Icon(Icons.circle, size: 14, color: scheme.primary, semanticLabel: 'en proceso'),
-            '${mine.passed} de ${mine.total} pruebas',
-          );
     return InkWell(
       onTap: onTap,
       child: ConstrainedBox(
         constraints: const BoxConstraints(minHeight: 60),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            children: [
+              Icon(Icons.assignment_outlined, size: 20, color: scheme.onSurfaceVariant),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(assignment.title, style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500)),
+                    Text('Ver entregas', style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A task of the student's class: what it is, where it stands, and what to do.
+class TaskRow extends StatelessWidget {
+  const TaskRow({super.key, required this.assignment, required this.record, required this.onTap});
+
+  final Assignment assignment;
+  final TaskRecord? record;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final state = record?.state ?? TaskState.todo;
+    final started = record?.passed != null;
+    final marker = switch (state) {
+      TaskState.todo => Icon(
+        Icons.radio_button_unchecked,
+        size: 22,
+        color: scheme.outline,
+        semanticLabel: 'sin entregar',
+      ),
+      TaskState.delivered => Icon(
+        Icons.check_circle,
+        size: 22,
+        color: Colors.green.shade600,
+        semanticLabel: 'entregada',
+      ),
+      TaskState.changed => Icon(Icons.edit_outlined, size: 22, color: scheme.tertiary, semanticLabel: 'con cambios'),
+    };
+    final detail = switch (state) {
+      TaskState.todo => started ? 'Por entregar · última prueba ${record!.passed} de ${record!.total}' : 'Por hacer',
+      TaskState.delivered =>
+        'Entregada${record?.deliveredAt == null ? '' : ' · ${deliveryDate(record!.deliveredAt!)}'}'
+            '${record?.deliveredPassed == null ? '' : ' · ${record!.deliveredPassed} de ${record!.deliveredTotal} pruebas'}',
+      TaskState.changed => 'Cambiaste tu programa después de entregar',
+    };
+    final action = switch (state) {
+      TaskState.todo => started ? 'Seguir' : 'Empezar',
+      TaskState.delivered => null,
+      TaskState.changed => 'Entregar',
+    };
+    return InkWell(
+      onTap: onTap,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 64),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Row(
@@ -282,19 +333,12 @@ class _AssignmentRow extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      entry.assignment.title,
-                      style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
-                    ),
-                    Text(status, style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                    Text(assignment.title, style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500)),
+                    Text(detail, style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
                   ],
                 ),
               ),
-              if (!owned && (mine == null || !mine.complete))
-                Text(
-                  mine == null ? 'Empezar' : 'Seguir',
-                  style: theme.textTheme.labelLarge?.copyWith(color: scheme.primary),
-                ),
+              if (action != null) Text(action, style: theme.textTheme.labelLarge?.copyWith(color: scheme.primary)),
             ],
           ),
         ),
@@ -338,16 +382,16 @@ class _Note extends StatelessWidget {
 /// The top of a teacher's class: name, state, how many tasks, and the code
 /// ready to read out or copy.
 class _OwnedHeader extends StatelessWidget {
-  const _OwnedHeader({required this.view, required this.onTap});
+  const _OwnedHeader({required this.room, required this.tasks, required this.onTap});
 
-  final _ClassView view;
+  final ClassRoom room;
+  final int tasks;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final tasks = view.entries.length;
     return Container(
       color: scheme.primaryContainer.withValues(alpha: 0.55),
       child: Column(
@@ -373,7 +417,7 @@ class _OwnedHeader extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(view.room.name, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+                        Text(room.name, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
                         const SizedBox(height: 2),
                         Text(
                           tasks == 0 ? 'Sin tareas todavía' : (tasks == 1 ? '1 tarea' : '$tasks tareas'),
@@ -383,9 +427,9 @@ class _OwnedHeader extends StatelessWidget {
                     ),
                   ),
                   StatusPill(
-                    label: view.room.open ? 'Abierta' : 'Cerrada',
-                    tone: view.room.open ? PillTone.good : PillTone.neutral,
-                    icon: view.room.open ? Icons.lock_open_outlined : Icons.lock_outline,
+                    label: room.open ? 'Abierta' : 'Cerrada',
+                    tone: room.open ? PillTone.good : PillTone.neutral,
+                    icon: room.open ? Icons.lock_open_outlined : Icons.lock_outline,
                   ),
                   Icon(Icons.chevron_right, color: scheme.onSurfaceVariant),
                 ],
@@ -394,7 +438,7 @@ class _OwnedHeader extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 4, 16, 14),
-            child: CodeBadge(code: view.room.code, large: false),
+            child: CodeBadge(code: room.code, large: false),
           ),
         ],
       ),
