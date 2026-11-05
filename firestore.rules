@@ -32,7 +32,8 @@ service cloud.firestore {
         && onlyFields(['alias', 'role', 'classes', 'createdAt'])
         && shortText('alias', 40)
         && request.resource.data.role in ['alumno', 'profesor', 'autodidacta']
-        && (!('classes' in request.resource.data) || request.resource.data.classes is list);
+        && (!('classes' in request.resource.data)
+            || (request.resource.data.classes is list && request.resource.data.classes.size() <= 100));
     }
 
     // A class code points to its class. It can be read only by asking for
@@ -68,12 +69,15 @@ service cloud.firestore {
         && onlyFields(['name', 'ownerId', 'ownerAlias', 'code', 'createdAt', 'open'])
         && request.resource.data.ownerId == request.auth.uid
         && shortText('name', 60)
+        && shortText('ownerAlias', 40)
+        && shortText('code', 24)
         && (!('open' in request.resource.data) || request.resource.data.open is bool);
       allow update: if isOwner()
         && onlyFields(['name', 'ownerId', 'ownerAlias', 'code', 'createdAt', 'open'])
         && request.resource.data.ownerId == resource.data.ownerId
         && request.resource.data.code == resource.data.code
         && shortText('name', 60)
+        && shortText('ownerAlias', 40)
         && (!('open' in request.resource.data) || request.resource.data.open is bool);
       allow delete: if isOwner();
 
@@ -115,6 +119,7 @@ service cloud.firestore {
           && onlyFields(['title', 'exercise', 'createdAt', 'dueAt', 'hiddenCount'])
           && shortText('title', 120)
           && request.resource.data.exercise is map
+          && request.resource.data.exercise.size() <= 20
           && (!('hiddenCount' in request.resource.data)
               || (request.resource.data.hiddenCount is int
                   && request.resource.data.hiddenCount >= 0
@@ -129,6 +134,7 @@ service cloud.firestore {
           // and shows that result. The rules only keep them sane.
           allow create, update: if isMe(uid) && isMember()
             && onlyFields(['name', 'source', 'passed', 'total', 'pasted', 'updatedAt'])
+            && shortText('name', 60)
             && request.resource.data.source is string
             && request.resource.data.source.size() <= 50000
             && request.resource.data.passed is int
@@ -159,7 +165,8 @@ service cloud.firestore {
         && shortText('title', 120)
         && request.resource.data.description is string
         && request.resource.data.description.size() <= 2000
-        && request.resource.data.content is map;
+        && request.resource.data.content is map
+        && request.resource.data.content.size() <= 20;
       // The author can hide and show their own, and fix it. A publication a
       // moderator marked "moderado" (in the console) is out of their hands.
       allow update: if signedIn() && resource.data.authorId == request.auth.uid
@@ -173,7 +180,8 @@ service cloud.firestore {
         && shortText('title', 120)
         && request.resource.data.description is string
         && request.resource.data.description.size() <= 2000
-        && request.resource.data.content is map;
+        && request.resource.data.content is map
+        && request.resource.data.content.size() <= 20;
       allow delete: if signedIn() && resource.data.authorId == request.auth.uid;
 
       // "Me sirvió": one per person. Anyone can count them, so the ids are
@@ -190,6 +198,9 @@ service cloud.firestore {
       allow create: if signedIn()
         && onlyFields(['publicationId', 'reporterId', 'reason', 'createdAt'])
         && request.resource.data.reporterId == request.auth.uid
+        && request.resource.data.publicationId is string
+        && request.resource.data.publicationId.size() > 0
+        && request.resource.data.publicationId.size() <= 64
         && shortText('reason', 500);
     }
 

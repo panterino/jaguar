@@ -1,4 +1,5 @@
 // Tests of firestore.rules against the emulator: `npm test`.
+import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { after, before, beforeEach, describe, test } from 'node:test';
 import {
@@ -16,6 +17,7 @@ import {
   serverTimestamp,
   setDoc,
   where,
+  writeBatch,
 } from 'firebase/firestore';
 
 let env;
@@ -337,5 +339,105 @@ describe('acceso anticipado de la página', () => {
     await assertFails(setDoc(doc(db(null), 'accesoAnticipado/b7'), { ...base, origen: 'otro' }));
     await assertFails(setDoc(doc(db(null), 'accesoAnticipado/b8'), { ...base, nombre: 'Ana' }));
     await assertFails(setDoc(doc(db(null), 'accesoAnticipado/b9'), { ...base, creado: new Date(0) }));
+  });
+});
+
+// Abusos de la auditoría de seguridad: campos sin tipo ni tamaño.
+describe('campos acotados (auditoría)', () => {
+  const big = 'x'.repeat(5000);
+
+  test('la entrega lleva un nombre corto y de texto', async () => {
+    await seedClass();
+    await setDoc(doc(db('ana'), 'classes/c1/members/ana'), member());
+    const work = { name: 'Ana', source: 'x', passed: 1, total: 1, updatedAt: serverTimestamp() };
+    const path = 'classes/c1/assignments/a1/submissions/ana';
+    await assertSucceeds(setDoc(doc(db('ana'), path), work));
+    await assertFails(setDoc(doc(db('ana'), path), { ...work, name: big }));
+    await assertFails(setDoc(doc(db('ana'), path), { ...work, name: 42 }));
+    await assertFails(setDoc(doc(db('ana'), path), { ...work, name: '' }));
+  });
+
+  test('la clase lleva un alias y un código acotados', async () => {
+    const base = { name: '1A', ownerId: 'profe', ownerAlias: 'Profe', code: 'JAG-K7Q4M2XP', createdAt: serverTimestamp() };
+    await assertSucceeds(setDoc(doc(db('profe'), 'classes/ok'), base));
+    await assertFails(setDoc(doc(db('profe'), 'classes/malo1'), { ...base, ownerAlias: big }));
+    await assertFails(setDoc(doc(db('profe'), 'classes/malo2'), { ...base, ownerAlias: 7 }));
+    await assertFails(setDoc(doc(db('profe'), 'classes/malo3'), { ...base, code: big }));
+    await assertFails(setDoc(doc(db('profe'), 'classes/malo4'), { ...base, code: 12 }));
+  });
+
+  test('la tarea lleva un ejercicio de tamaño razonable', async () => {
+    await seedClass();
+    const many = Object.fromEntries(Array.from({ length: 40 }, (_, i) => [`k${i}`, i]));
+    await assertSucceeds(
+      setDoc(doc(db('profe'), 'classes/c1/assignments/ok'), { title: 'T', exercise: { id: 'x', t: 'T', c: [] } }),
+    );
+    await assertFails(setDoc(doc(db('profe'), 'classes/c1/assignments/malo'), { title: 'T', exercise: many }));
+  });
+
+  test('el perfil no guarda una lista de clases interminable', async () => {
+    const classes = (n) => Array.from({ length: n }, (_, i) => `c${i}`);
+    await assertSucceeds(setDoc(doc(db('ana'), 'users/ana'), { alias: 'Ana', role: 'alumno', classes: classes(50) }));
+    await assertFails(setDoc(doc(db('ana'), 'users/ana'), { alias: 'Ana', role: 'alumno', classes: classes(500) }));
+  });
+
+  test('la publicación lleva un contenido acotado y los reportes un id corto', async () => {
+    const many = Object.fromEntries(Array.from({ length: 40 }, (_, i) => [`k${i}`, i]));
+    const pub = (content) => ({
+      kind: 'programa',
+      title: 'Programa',
+      description: 'd',
+      topic: 'ciclos',
+      authorId: 'ana',
+      authorAlias: 'Ana',
+      content,
+      status: 'publicado',
+      createdAt: serverTimestamp(),
+    });
+    await assertSucceeds(setDoc(doc(db('ana'), 'publications/ok'), pub({ source: 'x' })));
+    await assertFails(setDoc(doc(db('ana'), 'publications/malo'), pub(many)));
+    const report = (id) => ({ publicationId: id, reporterId: 'ana', reason: 'no va', createdAt: serverTimestamp() });
+    await assertSucceeds(setDoc(doc(db('ana'), 'reports/r1'), report('ok')));
+    await assertFails(setDoc(doc(db('ana'), 'reports/r2'), report(big)));
+    await assertFails(setDoc(doc(db('ana'), 'reports/r3'), report(5)));
+  });
+});
+
+// Lo que hace la app al quitar a un alumno (RestBackend.removeMember): en una
+// sola escritura, borra sus entregas y su lugar en la clase.
+describe('quitar a un alumno', () => {
+  async function seedStudent() {
+    await seedClass();
+    await setDoc(doc(db('ana'), 'classes/c1/members/ana'), member());
+    await setDoc(doc(db('ana'), 'classes/c1/assignments/a1/submissions/ana'), {
+      name: 'Ana', source: 'x', passed: 1, total: 1, updatedAt: serverTimestamp(),
+    });
+  }
+
+  test('el profesor la quita con sus entregas, en un solo paso', async () => {
+    await seedStudent();
+    const profe = db('profe');
+    const batch = writeBatch(profe);
+    batch.delete(doc(profe, 'classes/c1/assignments/a1/submissions/ana'));
+    batch.delete(doc(profe, 'classes/c1/members/ana'));
+    await assertSucceeds(batch.commit());
+    const left = await getDocs(collection(profe, 'classes/c1/members'));
+    assert.equal(left.size, 0, 'quedó el alumno');
+    const work = await getDocs(collection(profe, 'classes/c1/assignments/a1/submissions'));
+    assert.equal(work.size, 0, 'quedó su entrega');
+  });
+
+  test('otro alumno no puede quitarla, ni borrar su entrega', async () => {
+    await seedStudent();
+    await setDoc(doc(db('beto'), 'classes/c1/members/beto'), member());
+    await assertFails(deleteDoc(doc(db('beto'), 'classes/c1/members/ana')));
+    await assertFails(deleteDoc(doc(db('beto'), 'classes/c1/assignments/a1/submissions/ana')));
+  });
+
+  test('tras quitarla, no puede volver a entregar sin unirse otra vez', async () => {
+    await seedStudent();
+    await deleteDoc(doc(db('profe'), 'classes/c1/members/ana'));
+    const work = { name: 'Ana', source: 'y', passed: 1, total: 1, updatedAt: serverTimestamp() };
+    await assertFails(setDoc(doc(db('ana'), 'classes/c1/assignments/a1/submissions/ana'), work));
   });
 });
