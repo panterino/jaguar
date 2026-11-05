@@ -203,7 +203,7 @@ class _ClassesListState extends State<ClassesList> {
                                   style: theme.textTheme.titleMedium?.copyWith(color: scheme.onPrimaryContainer),
                                 ),
                                 Text(
-                                  'Prof. ${c.room.ownerAlias}',
+                                  _withTitle(c.room.ownerAlias),
                                   style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onPrimaryContainer),
                                 ),
                               ],
@@ -445,3 +445,9 @@ class _OwnedHeader extends StatelessWidget {
     );
   }
 }
+
+/// "Prof. Martínez", without repeating it when the name already says so.
+String _withTitle(String name) =>
+    RegExp(r'^(prof|profa|profesor|profesora|mtro|mtra)\b\.?\s', caseSensitive: false).hasMatch('$name ')
+    ? name
+    : 'Prof. $name';

@@ -96,7 +96,7 @@ class GradeCell {
 
 /// Saves the grades as a `.csv` file. Returns false if the teacher cancelled.
 Future<bool> saveGradesCsv(String className, GradesTable table) async {
-  final safe = className.replaceAll(RegExp(r'[^\w\- ]+', unicode: true), '').trim();
+  final safe = className.replaceAll(RegExp(r'[^\p{L}\p{N}_\- ]+', unicode: true), '').trim();
   final path = await FilePicker.saveFile(
     dialogTitle: 'Guardar calificaciones',
     fileName: 'Calificaciones ${safe.isEmpty ? 'clase' : safe}.csv',
