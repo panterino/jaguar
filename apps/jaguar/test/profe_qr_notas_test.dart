@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:jaguar/src/settings.dart';
+import 'package:jaguar/src/programs/program_store.dart';
+import 'package:jaguar/src/exercises/exercise_store.dart';
+import 'package:jaguar/src/cloud/memory_backend.dart';
+import 'package:jaguar/src/cloud/cloud.dart';
+import 'package:jaguar/main.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jaguar/src/cloud/class_qr.dart';
 import 'package:jaguar/src/cloud/cloud_backend.dart';
@@ -24,6 +31,7 @@ Assignment _assignment(String id, String title) => Assignment(
 );
 
 void main() {
+  joinByLinkTests();
   test('el enlace de una clase se lee con el código y se rechaza lo raro', () {
     final link = classLink('JAG-K7Q4M2XP');
     expect(link, startsWith(shareBaseUrl));
@@ -112,5 +120,30 @@ void main() {
     await tester.tap(find.text('abrir'));
     await tester.pumpAndSettle();
     expect(find.text('JAG-ABCD1234'), findsOneWidget);
+  });
+}
+
+void joinByLinkTests() {
+  testWidgets('con el enlace de una clase no se pregunta cómo quieres usar Jaguar: se va a unirse', (tester) async {
+    tester.view.physicalSize = const Size(360, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    await tester.pumpWidget(
+      JaguarApp(
+        store: ProgramStore(prefs),
+        exercises: ExerciseStore(prefs),
+        settings: ViewSettings(prefs),
+        cloud: Cloud(MemoryBackend(), prefs),
+        joinCode: 'JAG-ABCD1234',
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('¡Hola! Esto es Jaguar Code'), findsNothing, reason: 'no hay bienvenida genérica');
+    // Without an account the first thing is to come in; the code waits.
+    expect(find.text('Entrar a Jaguar Code en línea'), findsOneWidget);
+    expect(ViewSettings(prefs).teacher, isFalse);
+    expect(ViewSettings(prefs).chosenMode, isNotNull, reason: 'queda elegido el modo básico');
   });
 }
