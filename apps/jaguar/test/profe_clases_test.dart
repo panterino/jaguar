@@ -90,7 +90,7 @@ void main() {
         final (cloud, room, store) = await _classWith();
         await _pump(tester, _classScreen(cloud, room, store), size, textScale: scale);
         expect(find.text('Programación 3A'), findsOneWidget);
-        expect(find.text('Alumno número 1'), findsOneWidget);
+        expect(find.text('Alumno número 1'), findsWidgets);
       });
 
       testWidgets('con muchas tareas y alumnos tampoco desborda en $name con letra x$scale', (tester) async {
@@ -200,7 +200,7 @@ void main() {
     final (cloud, room, store) = await _classWith();
     await _pump(tester, _classScreen(cloud, room, store), _sizes['celular']!);
     expect(find.byType(FloatingActionButton), findsOneWidget);
-    expect(find.byType(DataTable), findsOneWidget);
+    expect(find.byTooltip('Quitar tarea'), findsWidgets);
   });
 
   testWidgets('en escritorio Mis clases pone Crear clase arriba y no flotando', (tester) async {

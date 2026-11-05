@@ -15,7 +15,6 @@ import '../programs/examples.dart';
 import '../programs/program_store.dart';
 import '../settings.dart';
 import '../theme.dart';
-import '../cloud/account_dialog.dart';
 import 'classes_room.dart';
 import 'programs_drawer.dart' show timeAgo;
 import '../widgets/page_width.dart';
@@ -203,12 +202,9 @@ class RoomsScaffold extends StatelessWidget {
               icon: const Icon(Icons.add),
               label: const Text('Crear clase'),
             )
+          // The way in is already in the middle of the room and in the rail.
           : teacherToSignIn
-          ? FilledButton.icon(
-              onPressed: () => showAccountDialog(context, cloud),
-              icon: const Icon(Icons.login),
-              label: const Text('Entrar'),
-            )
+          ? const SizedBox.shrink()
           : OutlinedButton.icon(
               onPressed: () => joinClassFlow(context, cloud, exercises),
               icon: const Icon(Icons.add),
@@ -784,9 +780,10 @@ class _PortalTile extends StatelessWidget {
                       ),
                       child: Text(
                         place.state,
-                        maxLines: 1,
+                        // Two lines: "2 programas" and "1 tarea por entregar" read whole.
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: textStyle.copyWith(fontSize: stateSize, fontWeight: FontWeight.w800),
+                        style: textStyle.copyWith(fontSize: stateSize, fontWeight: FontWeight.w800, height: 1.15),
                       ),
                     ),
                   ),

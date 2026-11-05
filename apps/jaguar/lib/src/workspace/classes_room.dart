@@ -15,7 +15,8 @@ Future<void> joinClassFlow(BuildContext context, Cloud cloud, ExerciseStore exer
     await showAccountDialog(context, cloud);
     if (!cloud.signedIn || !context.mounted) return;
   }
-  String? name;
+  // The alias just chosen is a good first guess for the name.
+  String? name = exercises.studentName ?? cloud.user?.alias;
   while (true) {
     final result = await askJoinCode(context, code: code, name: name);
     if (result == null || !context.mounted) return;

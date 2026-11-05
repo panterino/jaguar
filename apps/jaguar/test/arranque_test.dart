@@ -350,6 +350,7 @@ void main() {
 
     testWidgets('Soy profesor pide confirmar antes de activarse', (tester) async {
       await _pumpPhone(tester, values: {}, openEditor: false);
+      await tester.ensureVisible(find.text('Soy profesor'));
       await tester.tap(find.text('Soy profesor'));
       await tester.pumpAndSettle();
       expect(find.text('Modo profesor'), findsOneWidget);
@@ -358,6 +359,7 @@ void main() {
       expect(ViewSettings(_prefs).teacher, isFalse);
       expect(find.text('¡Hola! Esto es Jaguar Code'), findsOneWidget);
 
+      await tester.ensureVisible(find.text('Soy profesor'));
       await tester.tap(find.text('Soy profesor'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Activar'));
