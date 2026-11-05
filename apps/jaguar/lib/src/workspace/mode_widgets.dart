@@ -4,7 +4,7 @@ import '../settings.dart';
 import '../widgets/mascota.dart';
 
 /// What the person answered the first time Jaguar opened.
-enum WelcomeChoice { learning, programmer, teacher }
+enum WelcomeChoice { learning, programmer, student, teacher }
 
 /// The question Jaguar asks on its first launch, and again whenever the
 /// person wants to change how they use it ([again]). It sets the mode and
@@ -79,6 +79,12 @@ class _WelcomeDialog extends StatelessWidget {
                 icon: Icons.terminal,
                 title: 'Ya sé algo de programar',
                 subtitle: 'Abre un programa listo para ejecutar.',
+              ),
+              const _WelcomeOption(
+                choice: WelcomeChoice.student,
+                icon: Icons.qr_code_2,
+                title: 'Tengo un código de clase',
+                subtitle: 'Tu profe te lo dio: entra a su clase y haz tus tareas.',
               ),
               const SizedBox(height: 4),
               Text(

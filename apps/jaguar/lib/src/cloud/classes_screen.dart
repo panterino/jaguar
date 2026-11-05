@@ -12,6 +12,8 @@ import '../widgets/pro_widgets.dart';
 import '../widgets/skeleton.dart';
 import '../workspace/classes_room.dart' show TaskRow;
 import 'account_dialog.dart';
+import 'class_qr.dart';
+import 'grades.dart';
 import 'cloud.dart';
 import 'regrade.dart';
 import '../widgets/page_width.dart';
@@ -22,8 +24,13 @@ const _wideWidth = 900.0;
 bool _isWide(BuildContext context) => MediaQuery.sizeOf(context).width >= _wideWidth;
 
 /// Asks for the class code and the student's name; null if cancelled.
-Future<(String, String)?> askJoinCode(BuildContext context) =>
-    showDialog<(String, String)>(context: context, builder: (_) => const _JoinDialog());
+///
+/// [code] comes filled in when it was read from a QR or a link.
+Future<(String, String)?> askJoinCode(BuildContext context, {String? code, String? name}) =>
+    showDialog<(String, String)>(
+      context: context,
+      builder: (_) => _JoinDialog(code: code, name: name),
+    );
 
 /// Asks for the name of a new class; null if cancelled.
 Future<String?> askNewClassName(BuildContext context) =>
@@ -400,6 +407,34 @@ class _ClassScreenState extends State<ClassScreen> {
     });
   }
 
+  bool _refreshing = false;
+
+  /// The refresh button: says it is working and what came out, since the
+  /// numbers on screen may be the same ones as before.
+  Future<void> _manualRefresh() async {
+    if (_refreshing) return;
+    setState(() => _refreshing = true);
+    final before = _error;
+    await _load();
+    if (!mounted) return;
+    setState(() => _refreshing = false);
+    final failed = _error != null && _error != before || (_error != null && _assignments == null);
+    final now = DateTime.now();
+    final clock = '${now.hour}:${now.minute.toString().padLeft(2, '0')}';
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          duration: const Duration(seconds: 2),
+          content: Text(
+            failed
+                ? 'No se pudo actualizar: $_error'
+                : (_offline ? 'Sin conexión. Se ve lo último guardado.' : 'Actualizado a las $clock'),
+          ),
+        ),
+      );
+  }
+
   Future<void> _load() async {
     if (!_isTeacher) return _loadAsStudent();
     try {
@@ -485,6 +520,7 @@ class _ClassScreenState extends State<ClassScreen> {
               cloud: widget.cloud,
               inDialog: true,
               onCreate: _createExercise,
+              assignedIds: _assignedIds,
             ),
           ),
         ),
@@ -494,8 +530,12 @@ class _ClassScreenState extends State<ClassScreen> {
       context: context,
       showDragHandle: true,
       isScrollControlled: true,
-      builder: (context) =>
-          _ExercisePicker(exercises: widget.exercises.authored, cloud: widget.cloud, onCreate: _createExercise),
+      builder: (context) => _ExercisePicker(
+        exercises: widget.exercises.authored,
+        cloud: widget.cloud,
+        onCreate: _createExercise,
+        assignedIds: _assignedIds,
+      ),
     );
   }
 
@@ -509,12 +549,15 @@ class _ClassScreenState extends State<ClassScreen> {
     ),
   );
 
+  Set<String> get _assignedIds => {for (final a in _assignments ?? const <Assignment>[]) a.exercise.id};
+
   Future<void> _assign() async {
     final exercise = await _pickExercise();
     if (exercise == null) return;
     try {
       await _backend.assign(widget.room.id, exercise);
       await _load();
+      _toast('«${exercise.title}» asignado a ${widget.room.name}.');
     } on CloudException catch (e) {
       _toast(e.message);
     }
@@ -600,11 +643,28 @@ class _ClassScreenState extends State<ClassScreen> {
                   children: [
                     StatusPill(
                       label: '${submission.passed} de ${submission.total} pruebas',
-                      tone: submission.complete ? PillTone.good : PillTone.warn,
-                      icon: submission.complete ? Icons.check_circle : Icons.timelapse,
+                      tone: _toneOf(submission),
+                      icon: submission.complete
+                          ? Icons.check_circle
+                          : submission.passed == 0
+                          ? Icons.cancel
+                          : Icons.timelapse,
                     ),
                     if (submission.updatedAt != null)
-                      StatusPill(label: _time(submission.updatedAt!), icon: Icons.schedule),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 5),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.schedule, size: 16, color: scheme.onSurfaceVariant),
+                            const SizedBox(width: 6),
+                            Text(
+                              _delivered(submission.updatedAt!),
+                              style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+                            ),
+                          ],
+                        ),
+                      ),
                   ],
                 ),
                 if (submission.pastedLines > 0) ...[
@@ -620,11 +680,11 @@ class _ClassScreenState extends State<ClassScreen> {
                 if (said != null) ...[
                   const SizedBox(height: 12),
                   NoticeBox(
-                    tone: PillTone.warn,
+                    tone: _toneOf(submission),
                     icon: Icons.rule,
                     text:
-                        'El alumno dijo $said. Jaguar corrió su programa contra todas las pruebas, '
-                        'las ocultas incluidas, y salió lo que ves arriba.',
+                        'Esta persona veía $said en su pantalla. Con todas las pruebas, las ocultas incluidas, '
+                        'Jaguar da ${submission.passed} de ${submission.total}.',
                   ),
                 ],
                 const SizedBox(height: 14),
@@ -705,7 +765,18 @@ class _ClassScreenState extends State<ClassScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.room.name),
-        actions: [IconButton(tooltip: 'Actualizar', icon: const Icon(Icons.refresh), onPressed: _load)],
+        actions: [
+          IconButton(
+            tooltip: 'Actualizar',
+            icon: _refreshing
+                ? const SizedBox.square(dimension: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                : const Icon(Icons.refresh),
+            onPressed: _refreshing ? null : _manualRefresh,
+          ),
+        ],
+        bottom: _refreshing
+            ? const PreferredSize(preferredSize: Size.fromHeight(3), child: LinearProgressIndicator())
+            : null,
       ),
       floatingActionButton: _isTeacher && !wide
           ? FloatingActionButton.extended(
@@ -744,7 +815,13 @@ class _ClassScreenState extends State<ClassScreen> {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
       children: [
         if (_isTeacher)
-          _CodeCard(code: widget.room.code, students: _members.length, open: _open, onOpenChanged: _setOpen),
+          _CodeCard(
+            name: widget.room.name,
+            code: widget.room.code,
+            students: _members.length,
+            open: _open,
+            onOpenChanged: _setOpen,
+          ),
         const SizedBox(height: 16),
         Text('Tareas', style: theme.textTheme.titleMedium),
         const SizedBox(height: 8),
@@ -763,6 +840,14 @@ class _ClassScreenState extends State<ClassScreen> {
             onTap: _showSubmission,
             onRemove: _removeAssignment,
           ),
+        if (_isTeacher && assignments.isNotEmpty && _members.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          OutlinedButton.icon(
+            onPressed: () => _openGrades(assignments),
+            icon: const Icon(Icons.table_view_outlined),
+            label: const Text('Calificaciones'),
+          ),
+        ],
         if (!_isTeacher) ...[
           if (_offline)
             const Padding(
@@ -853,37 +938,12 @@ class _ClassScreenState extends State<ClassScreen> {
     );
   }
 
-  /// The table as text with tabs, which a spreadsheet takes as columns. The
-  /// numbers are the ones Jaguar checked, not what each student reported.
-  String _gradesTsv(List<Assignment> assignments) {
-    String cell(String text) => text.replaceAll(RegExp(r'[\t\r\n]+'), ' ');
-    final rows = <List<String>>[
-      ['Alumno', for (final a in assignments) a.title, 'Tareas completas'],
-    ];
-    for (final m in _members) {
-      var done = 0;
-      final cells = <String>[];
-      for (final a in assignments) {
-        final s = _submissions[a.id]?[m.uid];
-        if (s == null) {
-          cells.add('');
-        } else {
-          cells.add('${s.passed}/${s.total}');
-          if (s.complete) done++;
-        }
-      }
-      rows.add([m.name, ...cells, '$done/${assignments.length}']);
-    }
-    return rows.map((r) => r.map(cell).join('\t')).join('\n');
-  }
-
-  Future<void> _copyGrades(List<Assignment> assignments) async {
-    await Clipboard.setData(ClipboardData(text: _gradesTsv(assignments)));
-    if (!mounted) return;
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(const SnackBar(content: Text('Calificaciones copiadas. Pégalas en una hoja de cálculo.')));
-  }
+  /// The grades like a spreadsheet, with the way to download them for Excel.
+  void _openGrades(List<Assignment> assignments) => showGrades(
+    context,
+    className: widget.room.name,
+    table: GradesTable(assignments: assignments, members: _members, submissions: _submissions),
+  );
 
   /// The teacher on a computer: the class and its tasks on the left, and
   /// the deliveries table taking the rest of the width and height.
@@ -924,7 +984,13 @@ class _ClassScreenState extends State<ClassScreen> {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
               children: [
-                _CodeCard(code: widget.room.code, students: _members.length, open: _open, onOpenChanged: _setOpen),
+                _CodeCard(
+                  name: widget.room.name,
+                  code: widget.room.code,
+                  students: _members.length,
+                  open: _open,
+                  onOpenChanged: _setOpen,
+                ),
                 const SizedBox(height: 12),
                 _stats(assignments),
                 const SizedBox(height: 14),
@@ -953,11 +1019,11 @@ class _ClassScreenState extends State<ClassScreen> {
                 if (assignments.isNotEmpty && _members.isNotEmpty) ...[
                   const SizedBox(height: 12),
                   Tooltip(
-                    message: 'Copia la tabla para pegarla en una hoja de cálculo',
+                    message: 'Ver las calificaciones y descargarlas para Excel',
                     child: OutlinedButton.icon(
-                      onPressed: () => _copyGrades(assignments),
+                      onPressed: () => _openGrades(assignments),
                       icon: const Icon(Icons.table_view_outlined),
-                      label: const Text('Copiar calificaciones'),
+                      label: const Text('Calificaciones'),
                     ),
                   ),
                 ],
@@ -976,14 +1042,44 @@ class _ClassScreenState extends State<ClassScreen> {
   }
 }
 
-String _time(DateTime time) {
+const _monthNames = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+
+/// "Entregó hoy a las 19:25", "ayer a las 8:05" or "el 4 nov a las 19:25": it
+/// reads as a moment, not as a grade like "4/11".
+String _delivered(DateTime time, {DateTime? now}) {
   final local = time.toLocal();
-  return '${local.day}/${local.month} ${local.hour}:${local.minute.toString().padLeft(2, '0')}';
+  final today = now ?? DateTime.now();
+  final days = DateTime(
+    today.year,
+    today.month,
+    today.day,
+  ).difference(DateTime(local.year, local.month, local.day)).inDays;
+  final clock = '${local.hour}:${local.minute.toString().padLeft(2, '0')}';
+  final day = switch (days) {
+    0 => 'hoy',
+    1 => 'ayer',
+    _ => 'el ${local.day} ${_monthNames[local.month - 1]}',
+  };
+  return 'Entregó $day a las $clock';
 }
 
-class _CodeCard extends StatelessWidget {
-  const _CodeCard({required this.code, required this.students, required this.open, required this.onOpenChanged});
+/// Green when it all passed, red when nothing did, yellow in between.
+PillTone _toneOf(Submission s) => s.complete
+    ? PillTone.good
+    : s.passed == 0
+    ? PillTone.bad
+    : PillTone.warn;
 
+class _CodeCard extends StatelessWidget {
+  const _CodeCard({
+    required this.name,
+    required this.code,
+    required this.students,
+    required this.open,
+    required this.onOpenChanged,
+  });
+
+  final String name;
   final String code;
   final int students;
   final bool open;
@@ -1004,7 +1100,14 @@ class _CodeCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const BlockHeading('Código de la clase'),
-          CodeBadge(code: code),
+          CodeBadge(
+            code: code,
+            trailing: IconButton(
+              tooltip: 'Mostrar QR para unirse',
+              icon: const Icon(Icons.qr_code_2, size: 22),
+              onPressed: () => showClassQr(context, className: name, code: code),
+            ),
+          ),
           const SizedBox(height: 10),
           Text(
             students == 1
@@ -1156,49 +1259,79 @@ class _ProgressTable extends StatelessWidget {
         ],
       );
     }
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: DataTable(
-        columns: [
-          const DataColumn(label: Text('Alumno')),
-          for (final a in assignments)
-            DataColumn(
-              label: Tooltip(
-                message: a.title,
-                child: SizedBox(width: 110, child: Text(a.title, overflow: TextOverflow.ellipsis)),
-              ),
+    // On a phone one card per task, with a row per student: it reads without
+    // moving sideways, and each task has its own menu to remove it.
+    final scheme = theme.colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (final a in assignments)
+          Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            decoration: BoxDecoration(
+              color: scheme.surfaceContainerLow,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: scheme.outlineVariant),
             ),
-        ],
-        rows: [
-          for (final m in members)
-            DataRow(
-              cells: [
-                DataCell(Text(m.name)),
-                for (final a in assignments)
-                  switch (submissions[a.id]?[m.uid]) {
-                    null => const DataCell(Text('—')),
-                    final s => DataCell(
-                      Row(
-                        children: [
-                          _StatusIcon(submission: s),
-                          const SizedBox(width: 6),
-                          Text('${s.passed}/${s.total}'),
-                          if (s.pastedLines > 0) ...[
-                            const SizedBox(width: 6),
-                            Tooltip(
-                              message: 'Pegó ${s.pastedLines} líneas de una vez',
-                              child: Icon(Icons.content_paste, size: 16, color: Theme.of(context).colorScheme.tertiary),
+            clipBehavior: Clip.antiAlias,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 4, 8),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(a.title, style: theme.textTheme.titleSmall),
+                            Text(
+                              '${[for (final m in members)
+                                if (submissions[a.id]?[m.uid]?.complete ?? false) m].length} de ${members.length} completas',
+                              style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
                             ),
                           ],
-                        ],
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: 'Quitar tarea',
+                        icon: const Icon(Icons.delete_outline),
+                        onPressed: () => onRemove(a),
+                      ),
+                    ],
+                  ),
+                ),
+                Divider(height: 1, color: scheme.outlineVariant),
+                for (final m in members)
+                  switch (submissions[a.id]?[m.uid]) {
+                    null => ListTile(
+                      dense: true,
+                      leading: InitialsAvatar(name: m.name, size: 32),
+                      title: Text(m.name),
+                      trailing: Text('Sin entregar', style: theme.textTheme.bodySmall?.copyWith(color: scheme.outline)),
+                    ),
+                    final s => ListTile(
+                      dense: true,
+                      leading: InitialsAvatar(name: m.name, size: 32),
+                      title: Text(m.name),
+                      subtitle: s.pastedLines > 0 ? Text('Pegó ${s.pastedLines} líneas de una vez') : null,
+                      trailing: StatusPill(
+                        label: '${s.passed} de ${s.total}',
+                        tone: _toneOf(s),
+                        icon: s.complete
+                            ? Icons.check_circle
+                            : s.passed == 0
+                            ? Icons.cancel
+                            : Icons.timelapse,
                       ),
                       onTap: () => onTap(s, a),
                     ),
                   },
               ],
             ),
-        ],
-      ),
+          ),
+      ],
     );
   }
 }
@@ -1455,24 +1588,18 @@ class _ProgressGrid extends StatelessWidget {
   }
 }
 
-class _StatusIcon extends StatelessWidget {
-  const _StatusIcon({required this.submission});
-
-  final Submission? submission;
-
-  @override
-  Widget build(BuildContext context) {
-    final s = submission;
-    if (s == null) return Icon(Icons.radio_button_unchecked, color: Theme.of(context).colorScheme.outline);
-    return s.complete
-        ? Icon(Icons.check_circle, color: Colors.green.shade600)
-        : Icon(Icons.timelapse, color: Theme.of(context).colorScheme.tertiary);
-  }
-}
-
 /// Choose what to assign: one of my exercises or one from the shared bank.
 class _ExercisePicker extends StatefulWidget {
-  const _ExercisePicker({required this.exercises, required this.cloud, required this.onCreate, this.inDialog = false});
+  const _ExercisePicker({
+    required this.exercises,
+    required this.cloud,
+    required this.onCreate,
+    this.assignedIds = const {},
+    this.inDialog = false,
+  });
+
+  /// Exercises already assigned to this class: they are shown but not offered again.
+  final Set<String> assignedIds;
 
   final List<Exercise> exercises;
   final Cloud cloud;
@@ -1529,8 +1656,12 @@ class _ExercisePickerState extends State<_ExercisePicker> {
             _PickRow(
               icon: Icons.assignment_outlined,
               title: e.title,
-              detail: e.cases.length == 1 ? '1 prueba' : '${e.cases.length} pruebas',
-              onTap: () => Navigator.pop(context, e),
+              detail: widget.assignedIds.contains(e.id)
+                  ? 'Ya asignado a esta clase'
+                  : e.cases.length == 1
+                  ? '1 prueba'
+                  : '${e.cases.length} pruebas',
+              onTap: widget.assignedIds.contains(e.id) ? null : () => Navigator.pop(context, e),
             ),
           const SizedBox(height: 16),
           const BlockHeading('Del banco de la comunidad'),
@@ -1568,47 +1699,50 @@ class _PickRow extends StatelessWidget {
   final IconData icon;
   final String title;
   final String detail;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: scheme.outlineVariant),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          child: Row(
-            children: [
-              Container(
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(
-                  color: scheme.primary.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(10),
+    return Opacity(
+      opacity: onTap == null ? 0.55 : 1,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainerLowest,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: scheme.outlineVariant),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            child: Row(
+              children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: scheme.primary.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(icon, size: 20, color: scheme.primary),
                 ),
-                child: Icon(icon, size: 20, color: scheme.primary),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title, style: theme.textTheme.titleSmall, maxLines: 2, overflow: TextOverflow.ellipsis),
-                    Text(detail, style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-                  ],
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(title, style: theme.textTheme.titleSmall, maxLines: 2, overflow: TextOverflow.ellipsis),
+                      Text(detail, style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                    ],
+                  ),
                 ),
-              ),
-              Icon(Icons.chevron_right, color: scheme.onSurfaceVariant),
-            ],
+                if (onTap != null) Icon(Icons.chevron_right, color: scheme.onSurfaceVariant),
+              ],
+            ),
           ),
         ),
       ),
@@ -1617,15 +1751,19 @@ class _PickRow extends StatelessWidget {
 }
 
 class _JoinDialog extends StatefulWidget {
-  const _JoinDialog();
+  const _JoinDialog({this.code, this.name});
+
+  final String? code;
+  final String? name;
 
   @override
   State<_JoinDialog> createState() => _JoinDialogState();
 }
 
 class _JoinDialogState extends State<_JoinDialog> {
-  final _code = TextEditingController();
-  final _name = TextEditingController();
+  late final _code = TextEditingController(text: widget.code);
+  late final _name = TextEditingController(text: widget.name);
+  bool _tried = false;
 
   @override
   void dispose() {
@@ -1635,7 +1773,11 @@ class _JoinDialogState extends State<_JoinDialog> {
   }
 
   void _submit() {
-    if (_code.text.trim().isEmpty || _name.text.trim().isEmpty) return;
+    // Shows what is missing instead of doing nothing.
+    if (_code.text.trim().isEmpty || _name.text.trim().isEmpty) {
+      setState(() => _tried = true);
+      return;
+    }
     Navigator.pop(context, (_code.text.trim(), _name.text.trim()));
   }
 
@@ -1660,17 +1802,23 @@ class _JoinDialogState extends State<_JoinDialog> {
               const SizedBox(height: 16),
               TextField(
                 controller: _code,
-                autofocus: true,
+                autofocus: widget.code == null,
                 textInputAction: TextInputAction.next,
                 textCapitalization: TextCapitalization.characters,
                 style: monoStyle.copyWith(fontSize: 16, letterSpacing: 1),
-                decoration: const InputDecoration(labelText: 'Código de la clase', hintText: 'JAG-K7Q4M2XP'),
+                decoration: InputDecoration(
+                  labelText: 'Código de la clase',
+                  hintText: 'JAG-K7Q4M2XP',
+                  errorText: _tried && _code.text.trim().isEmpty ? 'Escribe el código de la clase' : null,
+                ),
               ),
               const SizedBox(height: 14),
               TextField(
                 controller: _name,
+                autofocus: widget.code != null,
                 textInputAction: TextInputAction.done,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
+                  errorText: _tried && _name.text.trim().isEmpty ? 'Escribe tu nombre' : null,
                   labelText: 'Tu nombre',
                   helperText: 'Solo lo ve tu profesor, para saber de quién es cada entrega.',
                   helperMaxLines: 2,

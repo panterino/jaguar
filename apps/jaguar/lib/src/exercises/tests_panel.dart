@@ -21,6 +21,7 @@ class TestsPanel extends StatelessWidget {
     required this.onReplay,
     required this.onShowTeacher,
     this.delivery,
+    this.hiddenCount = 0,
     this.challenge = false,
     this.onNextChallenge,
     this.onAllChallenges,
@@ -44,6 +45,10 @@ class TestsPanel extends StatelessWidget {
   /// The card to hand the task in, when the exercise is a task of a class.
   final Widget? delivery;
 
+  /// Tests of the teacher that this student does not see: passing the visible
+  /// ones is not passing all.
+  final int hiddenCount;
+
   /// A reto for practicing alone: there is no teacher to show it to.
   final bool challenge;
 
@@ -63,11 +68,20 @@ class TestsPanel extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(12, 12, 12, 24),
       children: [
         if (delivery != null) ...[delivery!, const SizedBox(height: 14)],
-        _Summary(result: result, total: tests.length, running: running, stale: stale, onRunTests: onRunTests),
+        _Summary(
+          result: result,
+          total: tests.length,
+          running: running,
+          stale: stale,
+          hidden: hiddenCount,
+          onRunTests: onRunTests,
+        ),
         const SizedBox(height: 12),
         if (result != null && result.passed && !stale) ...[
           _AllPassed(
             onShowTeacher: onShowTeacher,
+            classTask: delivery != null,
+            hidden: hiddenCount,
             challenge: challenge,
             onNextChallenge: onNextChallenge,
             onAllChallenges: onAllChallenges,
@@ -113,9 +127,11 @@ class _Summary extends StatelessWidget {
     required this.total,
     required this.running,
     required this.stale,
+    required this.hidden,
     required this.onRunTests,
   });
 
+  final int hidden;
   final CheckResult? result;
   final int total;
   final bool running;
@@ -133,6 +149,10 @@ class _Summary extends StatelessWidget {
         'Aún no has probado. Toca Probar para ver si tu programa las pasa.',
       ),
       CheckResult(syntaxError: _?) => ('Tu programa tiene un error', null),
+      CheckResult(passed: true) when hidden > 0 => (
+        '¡Pasa las pruebas que ves!',
+        'Tu profe revisa ${hidden == 1 ? '1 prueba más que no se ve' : '$hidden pruebas más que no se ven'}.',
+      ),
       CheckResult(passed: true) => ('¡Pasa todas las pruebas!', null),
       _ => (
         '${result.passedCount} de $total pruebas correctas',
@@ -185,8 +205,9 @@ class _Summary extends StatelessWidget {
             onPressed: running ? null : onRunTests,
             icon: running
                 ? const SizedBox.square(dimension: 16, child: CircularProgressIndicator(strokeWidth: 2))
-                : const Icon(Icons.fact_check_outlined, size: 18),
-            label: Text(result == null ? 'Probar' : 'Probar de nuevo', overflow: TextOverflow.ellipsis),
+                : Icon(result == null ? Icons.fact_check_outlined : Icons.refresh, size: 18),
+            // Short, so it fits next to the result on a phone.
+            label: const Text('Probar'),
           ),
         ),
       ],
@@ -199,11 +220,16 @@ class _Summary extends StatelessWidget {
 class _AllPassed extends StatefulWidget {
   const _AllPassed({
     required this.onShowTeacher,
+    required this.classTask,
+    required this.hidden,
     required this.challenge,
     required this.onNextChallenge,
     required this.onAllChallenges,
   });
 
+  /// A task of a class: it is handed in with Entregar, not shown to the teacher.
+  final bool classTask;
+  final int hidden;
   final VoidCallback onShowTeacher;
   final bool challenge;
   final VoidCallback? onNextChallenge;
@@ -216,6 +242,10 @@ class _AllPassed extends StatefulWidget {
 class _AllPassedState extends State<_AllPassed> {
   String get _message => widget.challenge
       ? (widget.onNextChallenge == null ? '¡Terminaste el nivel 1!' : '¡Reto superado!')
+      : widget.classTask
+      ? (widget.hidden > 0
+            ? '¡Bien! Pasa las pruebas que ves. Cuando termines, entrégalo.'
+            : '¡Todo correcto! Entrégalo cuando quieras.')
       : '¡Todo correcto! Ya puedes mostrárselo al profesor.';
 
   @override
@@ -265,7 +295,7 @@ class _AllPassedState extends State<_AllPassed> {
                       style: TextStyle(color: green, fontWeight: FontWeight.w600),
                     ),
                   ),
-                  if (!widget.challenge) ...[
+                  if (!widget.challenge && !widget.classTask) ...[
                     const SizedBox(width: 8),
                     FilledButton.icon(
                       onPressed: widget.onShowTeacher,

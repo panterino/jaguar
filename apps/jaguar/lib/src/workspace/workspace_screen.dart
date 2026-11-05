@@ -51,6 +51,7 @@ import 'desktop_chrome.dart';
 import '../lessons/lesson_screen.dart';
 import '../lessons/lessons.dart';
 import 'programs_drawer.dart';
+import 'classes_room.dart' show joinClassFlow;
 import 'rooms.dart';
 import 'programs_sidebar.dart';
 import 'settings_screen.dart';
@@ -73,6 +74,7 @@ class WorkspaceScreen extends StatefulWidget {
     required this.settings,
     this.cloud,
     this.startInEditor = false,
+    this.joinCode,
   });
 
   final ProgramStore store;
@@ -85,6 +87,9 @@ class WorkspaceScreen extends StatefulWidget {
   /// On a phone, open the editor instead of the rooms: the app was launched
   /// with a program or an exercise from a link.
   final bool startInEditor;
+
+  /// The link that opened the app carried the code of a class.
+  final String? joinCode;
 
   @override
   State<WorkspaceScreen> createState() => _WorkspaceScreenState();
@@ -154,7 +159,11 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
     _code.addListener(_scheduleSave);
     _code.addListener(_onTyped);
     _session.addListener(_onSessionChanged);
-    if (_settings.chosenMode == null) WidgetsBinding.instance.addPostFrameCallback((_) => _welcome());
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (_settings.chosenMode == null) await _welcome();
+      final code = widget.joinCode;
+      if (code != null && mounted) await _joinWithCode(code);
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) => precacheMascota(context));
     WidgetsBinding.instance.addPostFrameCallback((_) => _syncTeacher());
     WidgetsBinding.instance.addPostFrameCallback((_) => _restoreTests(_store.current));
@@ -255,7 +264,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
   Future<void> _welcome({bool again = false}) async {
     final choice = await showWelcome(context, again: again);
     if (choice == null || !mounted) return;
-    _settings.mode = choice == WelcomeChoice.learning ? AppMode.basic : AppMode.full;
+    _settings.mode = choice == WelcomeChoice.learning || choice == WelcomeChoice.student ? AppMode.basic : AppMode.full;
     _settings.teacher = choice == WelcomeChoice.teacher;
     if (again) return;
     // The blank program of a first launch is not wanted any more.
@@ -273,9 +282,21 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
         _settings.tourStep = 3;
         _openSource(examples.first.$2);
         await _intro(beginner: false);
-      case WelcomeChoice.teacher:
+      case WelcomeChoice.student:
+        // A student with a code goes straight to the join form.
         _settings.tourStep = 3;
-        if (_store.isEmpty && wide) _show(_store.current);
+        setState(() {
+          _inEditor = false;
+          _roomChoice = Room.classes;
+        });
+        if (widget.cloud case final cloud?) await joinClassFlow(context, cloud, widget.exercises);
+      case WelcomeChoice.teacher:
+        // A teacher comes to run classes, not to an empty editor.
+        _settings.tourStep = 3;
+        setState(() {
+          _inEditor = false;
+          _roomChoice = Room.classes;
+        });
     }
   }
 
@@ -457,6 +478,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
       passed: result.passedCount,
       total: exercise.cases.length,
       hasError: result.syntaxError != null,
+      hidden: cloud.tasks.forExercise(exercise.id)?.hiddenCount ?? 0,
     );
     if (!go || !mounted) return;
     setState(() => _delivering = true);
@@ -796,9 +818,22 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
       case SharedExercise(:final exercise):
         widget.exercises.saveReceived(exercise);
         _openExercise(exercise);
+      case SharedClass(:final code):
+        _joinWithCode(code);
       case null:
         break;
     }
+  }
+
+  /// A class code that came from a QR or a link: the join form opens with the
+  /// code already written, and the student only adds their name.
+  Future<void> _joinWithCode(String code) async {
+    final cloud = widget.cloud;
+    if (cloud == null) {
+      _toast('Las clases en línea no están disponibles ahora.');
+      return;
+    }
+    await joinClassFlow(context, cloud, widget.exercises, code: code);
   }
 
   /// Runs an editor command from the menu, showing the code if needed.
@@ -1561,6 +1596,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
       stale: _testsStale,
       onRunTests: () => _check(exercise),
       delivery: _deliveryCard(exercise),
+      hiddenCount: widget.cloud?.tasks.forExercise(exercise.id)?.hiddenCount ?? 0,
       onGoToLine: _goToLine,
       onReplay: _replay,
       onShowTeacher: () => _showVerified(exercise, _testResult!, _testedSource!),
@@ -1984,6 +2020,37 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
           actions: empty
               ? null
               : [
+                  // A task of a class: the way to hand it in is always in sight
+                  // on a wide screen (on a phone it is in the Pruebas tab).
+                  if (exercise != null &&
+                      !compact &&
+                      widget.cloud != null &&
+                      widget.cloud!.tasks.forExercise(exercise.id) != null)
+                    ListenableBuilder(
+                      listenable: Listenable.merge([_code, widget.cloud!.tasks]),
+                      builder: (context, _) {
+                        final record = widget.cloud!.tasks.forExercise(exercise.id);
+                        if (record == null || record.stateFor(_code.text) == TaskState.delivered) {
+                          return const SizedBox.shrink();
+                        }
+                        return Padding(
+                          padding: const EdgeInsets.only(left: 4),
+                          child: MediaQuery.sizeOf(context).width < 900
+                              ? IconButton(
+                                  tooltip: 'Entregar',
+                                  onPressed: _delivering ? null : () => _deliver(exercise),
+                                  icon: const Icon(Icons.send_outlined),
+                                )
+                              : OutlinedButton.icon(
+                                  onPressed: _delivering ? null : () => _deliver(exercise),
+                                  icon: const Icon(Icons.send_outlined, size: 18),
+                                  label: Text(
+                                    record.stateFor(_code.text) == TaskState.changed ? 'Entregar de nuevo' : 'Entregar',
+                                  ),
+                                ),
+                        );
+                      },
+                    ),
                   if (compact)
                     Padding(
                       padding: const EdgeInsets.only(right: 4),

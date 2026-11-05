@@ -120,6 +120,15 @@ class DeliveryCard extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(detail, style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+            if (record.hiddenCount > 0) ...[
+              const SizedBox(height: 6),
+              Text(
+                record.hiddenCount == 1
+                    ? 'Tu profe revisa 1 prueba más que no se ve.'
+                    : 'Tu profe revisa ${record.hiddenCount} pruebas más que no se ven.',
+                style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+              ),
+            ],
             if (canDeliver) ...[
               const SizedBox(height: 12),
               FilledButton.icon(
@@ -144,6 +153,7 @@ Future<bool> showDeliveryConfirm(
   required int passed,
   required int total,
   required bool hasError,
+  int hidden = 0,
 }) async {
   final theme = Theme.of(context);
   final done = !hasError && passed == total && total > 0;
@@ -171,6 +181,15 @@ Future<bool> showDeliveryConfirm(
                         'Tu profesor recibirá tu programa tal como está ahora.',
               style: theme.textTheme.bodyMedium,
             ),
+            if (hidden > 0) ...[
+              const SizedBox(height: 8),
+              Text(
+                hidden == 1
+                    ? 'Tu profe también revisa 1 prueba que no ves.'
+                    : 'Tu profe también revisa $hidden pruebas que no ves.',
+                style: theme.textTheme.bodyMedium,
+              ),
+            ],
             const SizedBox(height: 8),
             Text(
               'Si lo cambias después, podrás entregarlo de nuevo.',

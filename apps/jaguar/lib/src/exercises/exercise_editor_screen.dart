@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:jaguar_core/jaguar_core.dart';
@@ -87,6 +89,8 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
   @override
   void initState() {
     super.initState();
+    // What the editor starts with, to know if anything changed before leaving.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _savedSignature = _signature);
     if (widget.fromProgram != null) WidgetsBinding.instance.addPostFrameCallback((_) => _generateCases());
   }
 
@@ -148,6 +152,28 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
     super.dispose();
   }
 
+  String? _savedSignature;
+
+  String get _signature => '${jsonEncode(_exercise.toJson())}|${_solution.text}';
+
+  bool get _dirty => _savedSignature != null && _savedSignature != _signature;
+
+  /// Leaving with changes asks first, so a draft is not lost by a wrong tap.
+  Future<void> _confirmLeave() async {
+    final leave = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('¿Salir sin guardar?'),
+        content: const Text('Cambiaste este ejercicio y todavía no lo guardas.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Seguir editando')),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Salir sin guardar')),
+        ],
+      ),
+    );
+    if (leave == true && mounted) Navigator.pop(context);
+  }
+
   Exercise get _exercise => Exercise(
     id: _id,
     title: _title.text.trim().isEmpty ? 'Ejercicio sin título' : _title.text.trim(),
@@ -181,6 +207,7 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
       return false;
     }
     widget.store.saveAuthored(_exercise, solution: _hasSolution ? _solution.text : null);
+    _savedSignature = _signature;
     return true;
   }
 
@@ -492,43 +519,58 @@ class _ExerciseEditorScreenState extends State<ExerciseEditorScreen> {
   @override
   Widget build(BuildContext context) {
     final wide = MediaQuery.sizeOf(context).width >= 900;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.exercise == null ? 'Nuevo ejercicio' : 'Editar ejercicio'),
-        actions: [
-          Tooltip(
-            message: 'Guardar y cerrar',
-            child: TextButton.icon(
-              style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8)),
-              onPressed: () {
-                // The saved exercise goes back, so a class can assign it right away.
-                if (_save()) Navigator.pop(context, _exercise);
-              },
-              icon: const Icon(Icons.save_outlined),
-              label: const Text('Guardar'),
+    return PopScope(
+      canPop: !_dirty,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _confirmLeave();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(widget.exercise == null ? 'Nuevo ejercicio' : 'Editar ejercicio'),
+          actions: [
+            // Secondary: on a phone only the icon fits next to Guardar.
+            if (MediaQuery.sizeOf(context).width < 600)
+              IconButton(tooltip: 'Proyectar', icon: const Icon(Icons.qr_code_2), onPressed: _project)
+            else
+              Padding(
+                padding: const EdgeInsets.only(left: 4),
+                child: OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 12)),
+                  onPressed: _project,
+                  icon: const Icon(Icons.qr_code_2),
+                  label: const Text('Proyectar'),
+                ),
+              ),
+            Padding(
+              padding: const EdgeInsets.only(right: 12, left: 8),
+              child: Tooltip(
+                message: 'Guardar y cerrar',
+                child: FilledButton.icon(
+                  style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 14)),
+                  onPressed: () {
+                    // The saved exercise goes back, so a class can assign it right away.
+                    if (_save()) Navigator.pop(context, _exercise);
+                  },
+                  icon: const Icon(Icons.save_outlined),
+                  label: const Text('Guardar'),
+                ),
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 12, left: 4),
-            child: FilledButton.icon(
-              style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 12)),
-              onPressed: _project,
-              icon: const Icon(Icons.qr_code_2),
-              label: const Text('Proyectar'),
-            ),
-          ),
-        ],
-        bottom: _busy ? const PreferredSize(preferredSize: Size.fromHeight(4), child: LinearProgressIndicator()) : null,
-      ),
-      body: CallbackShortcuts(
-        bindings: {
-          // Ctrl on Windows and Linux, Cmd on Mac: both work anywhere.
-          for (final (key, action) in <(LogicalKeyboardKey, VoidCallback)>[
-            (LogicalKeyboardKey.keyS, _saveAndStay),
-            (LogicalKeyboardKey.enter, _checkSolution),
-          ]) ...{SingleActivator(key, control: true): action, SingleActivator(key, meta: true): action},
-        },
-        child: wide ? PageWidth(width: workWidth, child: _wideBody()) : _narrowBody(),
+          ],
+          bottom: _busy
+              ? const PreferredSize(preferredSize: Size.fromHeight(4), child: LinearProgressIndicator())
+              : null,
+        ),
+        body: CallbackShortcuts(
+          bindings: {
+            // Ctrl on Windows and Linux, Cmd on Mac: both work anywhere.
+            for (final (key, action) in <(LogicalKeyboardKey, VoidCallback)>[
+              (LogicalKeyboardKey.keyS, _saveAndStay),
+              (LogicalKeyboardKey.enter, _checkSolution),
+            ]) ...{SingleActivator(key, control: true): action, SingleActivator(key, meta: true): action},
+          },
+          child: wide ? PageWidth(width: workWidth, child: _wideBody()) : _narrowBody(),
+        ),
       ),
     );
   }

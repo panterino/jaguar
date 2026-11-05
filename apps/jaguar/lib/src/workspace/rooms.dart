@@ -15,7 +15,6 @@ import '../programs/examples.dart';
 import '../programs/program_store.dart';
 import '../settings.dart';
 import '../theme.dart';
-import '../cloud/account_dialog.dart';
 import 'classes_room.dart';
 import 'programs_drawer.dart' show timeAgo;
 import '../widgets/page_width.dart';
@@ -150,7 +149,9 @@ class RoomsScaffold extends StatelessWidget {
               onPressed: actions.onOpenSettings,
             ),
           if (room == Room.workshop) ..._workshopActions(context),
-          if (room == Room.classes && cloud != null) _classesAction(context, cloud!),
+          // Signing in changes which button this is, so it listens to the account.
+          if (room == Room.classes && cloud != null)
+            ListenableBuilder(listenable: cloud!, builder: (context, _) => _classesAction(context, cloud!)),
         ],
       ),
       body: ListenableBuilder(
@@ -201,12 +202,9 @@ class RoomsScaffold extends StatelessWidget {
               icon: const Icon(Icons.add),
               label: const Text('Crear clase'),
             )
+          // The way in is already in the middle of the room and in the rail.
           : teacherToSignIn
-          ? FilledButton.icon(
-              onPressed: () => showAccountDialog(context, cloud),
-              icon: const Icon(Icons.login),
-              label: const Text('Entrar'),
-            )
+          ? const SizedBox.shrink()
           : OutlinedButton.icon(
               onPressed: () => joinClassFlow(context, cloud, exercises),
               icon: const Icon(Icons.add),
@@ -782,9 +780,10 @@ class _PortalTile extends StatelessWidget {
                       ),
                       child: Text(
                         place.state,
-                        maxLines: 1,
+                        // Two lines: "2 programas" and "1 tarea por entregar" read whole.
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: textStyle.copyWith(fontSize: stateSize, fontWeight: FontWeight.w800),
+                        style: textStyle.copyWith(fontSize: stateSize, fontWeight: FontWeight.w800, height: 1.15),
                       ),
                     ),
                   ),
@@ -1785,6 +1784,13 @@ class _ClassesRoom extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Signing in or out changes what this room says and offers.
+    final cloud = this.cloud;
+    if (cloud == null) return _body(context);
+    return ListenableBuilder(listenable: cloud, builder: (context, _) => _body(context));
+  }
+
+  Widget _body(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final received = exercises.received.reversed.toList();
