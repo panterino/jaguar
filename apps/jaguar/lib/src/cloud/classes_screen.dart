@@ -1259,49 +1259,79 @@ class _ProgressTable extends StatelessWidget {
         ],
       );
     }
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: DataTable(
-        columns: [
-          const DataColumn(label: Text('Alumno')),
-          for (final a in assignments)
-            DataColumn(
-              label: Tooltip(
-                message: a.title,
-                child: SizedBox(width: 110, child: Text(a.title, overflow: TextOverflow.ellipsis)),
-              ),
+    // On a phone one card per task, with a row per student: it reads without
+    // moving sideways, and each task has its own menu to remove it.
+    final scheme = theme.colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (final a in assignments)
+          Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            decoration: BoxDecoration(
+              color: scheme.surfaceContainerLow,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: scheme.outlineVariant),
             ),
-        ],
-        rows: [
-          for (final m in members)
-            DataRow(
-              cells: [
-                DataCell(Text(m.name)),
-                for (final a in assignments)
-                  switch (submissions[a.id]?[m.uid]) {
-                    null => const DataCell(Text('—')),
-                    final s => DataCell(
-                      Row(
-                        children: [
-                          _StatusIcon(submission: s),
-                          const SizedBox(width: 6),
-                          Text('${s.passed}/${s.total}'),
-                          if (s.pastedLines > 0) ...[
-                            const SizedBox(width: 6),
-                            Tooltip(
-                              message: 'Pegó ${s.pastedLines} líneas de una vez',
-                              child: Icon(Icons.content_paste, size: 16, color: Theme.of(context).colorScheme.tertiary),
+            clipBehavior: Clip.antiAlias,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 4, 8),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(a.title, style: theme.textTheme.titleSmall),
+                            Text(
+                              '${[for (final m in members)
+                                if (submissions[a.id]?[m.uid]?.complete ?? false) m].length} de ${members.length} completas',
+                              style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
                             ),
                           ],
-                        ],
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: 'Quitar tarea',
+                        icon: const Icon(Icons.delete_outline),
+                        onPressed: () => onRemove(a),
+                      ),
+                    ],
+                  ),
+                ),
+                Divider(height: 1, color: scheme.outlineVariant),
+                for (final m in members)
+                  switch (submissions[a.id]?[m.uid]) {
+                    null => ListTile(
+                      dense: true,
+                      leading: InitialsAvatar(name: m.name, size: 32),
+                      title: Text(m.name),
+                      trailing: Text('Sin entregar', style: theme.textTheme.bodySmall?.copyWith(color: scheme.outline)),
+                    ),
+                    final s => ListTile(
+                      dense: true,
+                      leading: InitialsAvatar(name: m.name, size: 32),
+                      title: Text(m.name),
+                      subtitle: s.pastedLines > 0 ? Text('Pegó ${s.pastedLines} líneas de una vez') : null,
+                      trailing: StatusPill(
+                        label: '${s.passed} de ${s.total}',
+                        tone: _toneOf(s),
+                        icon: s.complete
+                            ? Icons.check_circle
+                            : s.passed == 0
+                            ? Icons.cancel
+                            : Icons.timelapse,
                       ),
                       onTap: () => onTap(s, a),
                     ),
                   },
               ],
             ),
-        ],
-      ),
+          ),
+      ],
     );
   }
 }
@@ -1555,21 +1585,6 @@ class _ProgressGrid extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class _StatusIcon extends StatelessWidget {
-  const _StatusIcon({required this.submission});
-
-  final Submission? submission;
-
-  @override
-  Widget build(BuildContext context) {
-    final s = submission;
-    if (s == null) return Icon(Icons.radio_button_unchecked, color: Theme.of(context).colorScheme.outline);
-    return s.complete
-        ? Icon(Icons.check_circle, color: Colors.green.shade600)
-        : Icon(Icons.timelapse, color: Theme.of(context).colorScheme.tertiary);
   }
 }
 

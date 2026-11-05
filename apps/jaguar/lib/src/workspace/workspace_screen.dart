@@ -264,7 +264,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
   Future<void> _welcome({bool again = false}) async {
     final choice = await showWelcome(context, again: again);
     if (choice == null || !mounted) return;
-    _settings.mode = choice == WelcomeChoice.learning ? AppMode.basic : AppMode.full;
+    _settings.mode = choice == WelcomeChoice.learning || choice == WelcomeChoice.student ? AppMode.basic : AppMode.full;
     _settings.teacher = choice == WelcomeChoice.teacher;
     if (again) return;
     // The blank program of a first launch is not wanted any more.
@@ -282,9 +282,21 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> with WidgetsBindingOb
         _settings.tourStep = 3;
         _openSource(examples.first.$2);
         await _intro(beginner: false);
-      case WelcomeChoice.teacher:
+      case WelcomeChoice.student:
+        // A student with a code goes straight to the join form.
         _settings.tourStep = 3;
-        if (_store.isEmpty && wide) _show(_store.current);
+        setState(() {
+          _inEditor = false;
+          _roomChoice = Room.classes;
+        });
+        if (widget.cloud case final cloud?) await joinClassFlow(context, cloud, widget.exercises);
+      case WelcomeChoice.teacher:
+        // A teacher comes to run classes, not to an empty editor.
+        _settings.tourStep = 3;
+        setState(() {
+          _inEditor = false;
+          _roomChoice = Room.classes;
+        });
     }
   }
 

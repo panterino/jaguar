@@ -205,8 +205,9 @@ class _Summary extends StatelessWidget {
             onPressed: running ? null : onRunTests,
             icon: running
                 ? const SizedBox.square(dimension: 16, child: CircularProgressIndicator(strokeWidth: 2))
-                : const Icon(Icons.fact_check_outlined, size: 18),
-            label: Text(result == null ? 'Probar' : 'Probar de nuevo', overflow: TextOverflow.ellipsis),
+                : Icon(result == null ? Icons.fact_check_outlined : Icons.refresh, size: 18),
+            // Short, so it fits next to the result on a phone.
+            label: const Text('Probar'),
           ),
         ),
       ],
