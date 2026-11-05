@@ -15,7 +15,7 @@ Future<void> showClassQr(BuildContext context, {required String className, requi
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       title: Text(className, maxLines: 2, overflow: TextOverflow.ellipsis),
       content: SizedBox(
-        width: 360,
+        width: 440,
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -27,12 +27,16 @@ Future<void> showClassQr(BuildContext context, {required String className, requi
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
-                    child: QrImageView(data: classLink(code), size: 260, backgroundColor: Colors.white),
+                    child: QrImageView(
+                      data: classLink(code),
+                      size: (MediaQuery.sizeOf(context).shortestSide * 0.6).clamp(240.0, 400.0),
+                      backgroundColor: Colors.white,
+                    ),
                   ),
                 ),
               ),
               const SizedBox(height: 14),
-              CodeBadge(code: code, large: false),
+              CodeBadge(code: code),
               const SizedBox(height: 12),
               Text(
                 'Con la cámara del celular, o en Jaguar con Escanear QR. También pueden escribir el código en '

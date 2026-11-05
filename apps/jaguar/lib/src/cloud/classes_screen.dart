@@ -26,10 +26,11 @@ bool _isWide(BuildContext context) => MediaQuery.sizeOf(context).width >= _wideW
 /// Asks for the class code and the student's name; null if cancelled.
 ///
 /// [code] comes filled in when it was read from a QR or a link.
-Future<(String, String)?> askJoinCode(BuildContext context, {String? code}) => showDialog<(String, String)>(
-  context: context,
-  builder: (_) => _JoinDialog(code: code),
-);
+Future<(String, String)?> askJoinCode(BuildContext context, {String? code, String? name}) =>
+    showDialog<(String, String)>(
+      context: context,
+      builder: (_) => _JoinDialog(code: code, name: name),
+    );
 
 /// Asks for the name of a new class; null if cancelled.
 Future<String?> askNewClassName(BuildContext context) =>
@@ -519,6 +520,7 @@ class _ClassScreenState extends State<ClassScreen> {
               cloud: widget.cloud,
               inDialog: true,
               onCreate: _createExercise,
+              assignedIds: _assignedIds,
             ),
           ),
         ),
@@ -528,8 +530,12 @@ class _ClassScreenState extends State<ClassScreen> {
       context: context,
       showDragHandle: true,
       isScrollControlled: true,
-      builder: (context) =>
-          _ExercisePicker(exercises: widget.exercises.authored, cloud: widget.cloud, onCreate: _createExercise),
+      builder: (context) => _ExercisePicker(
+        exercises: widget.exercises.authored,
+        cloud: widget.cloud,
+        onCreate: _createExercise,
+        assignedIds: _assignedIds,
+      ),
     );
   }
 
@@ -543,12 +549,15 @@ class _ClassScreenState extends State<ClassScreen> {
     ),
   );
 
+  Set<String> get _assignedIds => {for (final a in _assignments ?? const <Assignment>[]) a.exercise.id};
+
   Future<void> _assign() async {
     final exercise = await _pickExercise();
     if (exercise == null) return;
     try {
       await _backend.assign(widget.room.id, exercise);
       await _load();
+      _toast('«${exercise.title}» asignado a ${widget.room.name}.');
     } on CloudException catch (e) {
       _toast(e.message);
     }
@@ -674,8 +683,8 @@ class _ClassScreenState extends State<ClassScreen> {
                     tone: _toneOf(submission),
                     icon: Icons.rule,
                     text:
-                        'El alumno dijo $said, pero Jaguar corrió su programa contra todas las pruebas '
-                        '(las ocultas incluidas) y pasó ${submission.passed} de ${submission.total}.',
+                        'Esta persona veía $said en su pantalla. Con todas las pruebas, las ocultas incluidas, '
+                        'Jaguar da ${submission.passed} de ${submission.total}.',
                   ),
                 ],
                 const SizedBox(height: 14),
@@ -1566,7 +1575,16 @@ class _StatusIcon extends StatelessWidget {
 
 /// Choose what to assign: one of my exercises or one from the shared bank.
 class _ExercisePicker extends StatefulWidget {
-  const _ExercisePicker({required this.exercises, required this.cloud, required this.onCreate, this.inDialog = false});
+  const _ExercisePicker({
+    required this.exercises,
+    required this.cloud,
+    required this.onCreate,
+    this.assignedIds = const {},
+    this.inDialog = false,
+  });
+
+  /// Exercises already assigned to this class: they are shown but not offered again.
+  final Set<String> assignedIds;
 
   final List<Exercise> exercises;
   final Cloud cloud;
@@ -1623,8 +1641,12 @@ class _ExercisePickerState extends State<_ExercisePicker> {
             _PickRow(
               icon: Icons.assignment_outlined,
               title: e.title,
-              detail: e.cases.length == 1 ? '1 prueba' : '${e.cases.length} pruebas',
-              onTap: () => Navigator.pop(context, e),
+              detail: widget.assignedIds.contains(e.id)
+                  ? 'Ya asignado a esta clase'
+                  : e.cases.length == 1
+                  ? '1 prueba'
+                  : '${e.cases.length} pruebas',
+              onTap: widget.assignedIds.contains(e.id) ? null : () => Navigator.pop(context, e),
             ),
           const SizedBox(height: 16),
           const BlockHeading('Del banco de la comunidad'),
@@ -1662,47 +1684,50 @@ class _PickRow extends StatelessWidget {
   final IconData icon;
   final String title;
   final String detail;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: scheme.outlineVariant),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          child: Row(
-            children: [
-              Container(
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(
-                  color: scheme.primary.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(10),
+    return Opacity(
+      opacity: onTap == null ? 0.55 : 1,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainerLowest,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: scheme.outlineVariant),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            child: Row(
+              children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: scheme.primary.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(icon, size: 20, color: scheme.primary),
                 ),
-                child: Icon(icon, size: 20, color: scheme.primary),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title, style: theme.textTheme.titleSmall, maxLines: 2, overflow: TextOverflow.ellipsis),
-                    Text(detail, style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-                  ],
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(title, style: theme.textTheme.titleSmall, maxLines: 2, overflow: TextOverflow.ellipsis),
+                      Text(detail, style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                    ],
+                  ),
                 ),
-              ),
-              Icon(Icons.chevron_right, color: scheme.onSurfaceVariant),
-            ],
+                if (onTap != null) Icon(Icons.chevron_right, color: scheme.onSurfaceVariant),
+              ],
+            ),
           ),
         ),
       ),
@@ -1711,9 +1736,10 @@ class _PickRow extends StatelessWidget {
 }
 
 class _JoinDialog extends StatefulWidget {
-  const _JoinDialog({this.code});
+  const _JoinDialog({this.code, this.name});
 
   final String? code;
+  final String? name;
 
   @override
   State<_JoinDialog> createState() => _JoinDialogState();
@@ -1721,7 +1747,8 @@ class _JoinDialog extends StatefulWidget {
 
 class _JoinDialogState extends State<_JoinDialog> {
   late final _code = TextEditingController(text: widget.code);
-  final _name = TextEditingController();
+  late final _name = TextEditingController(text: widget.name);
+  bool _tried = false;
 
   @override
   void dispose() {
@@ -1731,7 +1758,11 @@ class _JoinDialogState extends State<_JoinDialog> {
   }
 
   void _submit() {
-    if (_code.text.trim().isEmpty || _name.text.trim().isEmpty) return;
+    // Shows what is missing instead of doing nothing.
+    if (_code.text.trim().isEmpty || _name.text.trim().isEmpty) {
+      setState(() => _tried = true);
+      return;
+    }
     Navigator.pop(context, (_code.text.trim(), _name.text.trim()));
   }
 
@@ -1760,14 +1791,19 @@ class _JoinDialogState extends State<_JoinDialog> {
                 textInputAction: TextInputAction.next,
                 textCapitalization: TextCapitalization.characters,
                 style: monoStyle.copyWith(fontSize: 16, letterSpacing: 1),
-                decoration: const InputDecoration(labelText: 'Código de la clase', hintText: 'JAG-K7Q4M2XP'),
+                decoration: InputDecoration(
+                  labelText: 'Código de la clase',
+                  hintText: 'JAG-K7Q4M2XP',
+                  errorText: _tried && _code.text.trim().isEmpty ? 'Escribe el código de la clase' : null,
+                ),
               ),
               const SizedBox(height: 14),
               TextField(
                 controller: _name,
                 autofocus: widget.code != null,
                 textInputAction: TextInputAction.done,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
+                  errorText: _tried && _name.text.trim().isEmpty ? 'Escribe tu nombre' : null,
                   labelText: 'Tu nombre',
                   helperText: 'Solo lo ve tu profesor, para saber de quién es cada entrega.',
                   helperMaxLines: 2,

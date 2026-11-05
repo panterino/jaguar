@@ -30,9 +30,17 @@ class ProjectScreen extends StatelessWidget {
     Future<void> copyLink() async {
       await Clipboard.setData(ClipboardData(text: link));
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Enlace copiado. Compártelo por WhatsApp o Classroom.')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: const Duration(seconds: 6),
+            content: Text(
+              exercise.cases.any((c) => c.hidden)
+                  ? 'Enlace copiado. Ojo: las pruebas ocultas viajan dentro del enlace y un alumno curioso podría '
+                        'leerlas. Para mantenerlas ocultas, asigna el ejercicio a una clase.'
+                  : 'Enlace copiado. Compártelo por WhatsApp o Classroom.',
+            ),
+          ),
+        );
       }
     }
 

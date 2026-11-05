@@ -150,7 +150,9 @@ class RoomsScaffold extends StatelessWidget {
               onPressed: actions.onOpenSettings,
             ),
           if (room == Room.workshop) ..._workshopActions(context),
-          if (room == Room.classes && cloud != null) _classesAction(context, cloud!),
+          // Signing in changes which button this is, so it listens to the account.
+          if (room == Room.classes && cloud != null)
+            ListenableBuilder(listenable: cloud!, builder: (context, _) => _classesAction(context, cloud!)),
         ],
       ),
       body: ListenableBuilder(
@@ -1785,6 +1787,13 @@ class _ClassesRoom extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Signing in or out changes what this room says and offers.
+    final cloud = this.cloud;
+    if (cloud == null) return _body(context);
+    return ListenableBuilder(listenable: cloud, builder: (context, _) => _body(context));
+  }
+
+  Widget _body(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final received = exercises.received.reversed.toList();

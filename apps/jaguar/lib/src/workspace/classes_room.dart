@@ -15,14 +15,21 @@ Future<void> joinClassFlow(BuildContext context, Cloud cloud, ExerciseStore exer
     await showAccountDialog(context, cloud);
     if (!cloud.signedIn || !context.mounted) return;
   }
-  final result = await askJoinCode(context, code: code);
-  if (result == null || !context.mounted) return;
-  final messenger = ScaffoldMessenger.of(context);
-  try {
-    await cloud.joinClass(code: result.$1, name: result.$2);
-    exercises.studentName = result.$2;
-  } on CloudException catch (e) {
-    messenger.showSnackBar(SnackBar(content: Text(e.message)));
+  String? name;
+  while (true) {
+    final result = await askJoinCode(context, code: code, name: name);
+    if (result == null || !context.mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await cloud.joinClass(code: result.$1, name: result.$2);
+      exercises.studentName = result.$2;
+      return;
+    } on CloudException catch (e) {
+      // A wrong code does not lose what was typed: the form opens again with it.
+      messenger.showSnackBar(SnackBar(content: Text(e.message)));
+      code = result.$1;
+      name = result.$2;
+    }
   }
 }
 
@@ -203,7 +210,7 @@ class _ClassesListState extends State<ClassesList> {
                                   style: theme.textTheme.titleMedium?.copyWith(color: scheme.onPrimaryContainer),
                                 ),
                                 Text(
-                                  'Prof. ${c.room.ownerAlias}',
+                                  _withTitle(c.room.ownerAlias),
                                   style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onPrimaryContainer),
                                 ),
                               ],
@@ -445,3 +452,9 @@ class _OwnedHeader extends StatelessWidget {
     );
   }
 }
+
+/// "Prof. Martínez", without repeating it when the name already says so.
+String _withTitle(String name) =>
+    RegExp(r'^(prof|profa|profesor|profesora|mtro|mtra)\b\.?\s', caseSensitive: false).hasMatch('$name ')
+    ? name
+    : 'Prof. $name';

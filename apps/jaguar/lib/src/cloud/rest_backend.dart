@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:jaguar_core/jaguar_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -18,6 +20,10 @@ class RestBackend implements CloudBackend {
 
   static const _sessionKey = 'jaguar.cloud.session';
 
+  /// Who the session belongs to, so that without internet the app still knows
+  /// the person and shows their classes (it cannot ask the server).
+  static const _profileKey = 'jaguar.cloud.profile';
+
   @override
   CloudUser? get currentUser => _user;
 
@@ -31,19 +37,46 @@ class RestBackend implements CloudBackend {
     final uid = _rest.uid!;
     final data = (await _rest.get('users/$uid'))?.data;
     if (data == null) return null;
-    return _user = CloudUser(
-      uid: uid,
-      alias: data['alias'] as String? ?? 'Sin nombre',
-      role: CloudRole.values.asNameMap()[data['role']] ?? CloudRole.autodidacta,
-      email: _rest.email,
+    return _keep(
+      CloudUser(
+        uid: uid,
+        alias: data['alias'] as String? ?? 'Sin nombre',
+        role: CloudRole.values.asNameMap()[data['role']] ?? CloudRole.autodidacta,
+        email: _rest.email,
+      ),
     );
+  }
+
+  CloudUser _keep(CloudUser user) {
+    _prefs.setString(
+      _profileKey,
+      jsonEncode({'uid': user.uid, 'alias': user.alias, 'role': user.role.name, 'email': user.email}),
+    );
+    return _user = user;
+  }
+
+  /// The person kept from the last time there was internet, or null.
+  CloudUser? _kept() {
+    final raw = _prefs.getString(_profileKey);
+    if (raw == null) return null;
+    try {
+      final json = (jsonDecode(raw) as Map).cast<String, Object?>();
+      return CloudUser(
+        uid: json['uid']! as String,
+        alias: json['alias'] as String? ?? 'Sin nombre',
+        role: CloudRole.values.asNameMap()[json['role']] ?? CloudRole.autodidacta,
+        email: json['email'] as String?,
+      );
+    } on Object {
+      return null;
+    }
   }
 
   Future<CloudUser> _saveProfile(String alias, CloudRole role) async {
     final uid = _rest.uid!;
     await _rest.set('users/$uid', {'alias': alias, 'role': role.name, 'createdAt': ServerValue.timestamp});
     _remember();
-    return _user = CloudUser(uid: uid, alias: alias, role: role, email: _rest.email);
+    return _keep(CloudUser(uid: uid, alias: alias, role: role, email: _rest.email));
   }
 
   /// Keeps the session, so the person is still in the next time the app opens.
@@ -60,9 +93,17 @@ class RestBackend implements CloudBackend {
       await _rest.restore(token);
     } on FirebaseRestError catch (e) {
       // No connection: the session is still good, it comes back next time.
-      if (e.statusCode == 0 || e.statusCode >= 500) rethrow;
+      if (e.statusCode == 0 || e.statusCode >= 500) {
+        // Without internet the person stays signed in as who they were; the
+        // session is renewed by itself when a call goes through.
+        final kept = _kept();
+        if (kept == null) rethrow;
+        _rest.uid = kept.uid;
+        return _user = kept;
+      }
       // The session ended (the account was deleted, or the token was revoked).
       await _prefs.remove(_sessionKey);
+      await _prefs.remove(_profileKey);
       _rest.signOut();
       return null;
     }
@@ -93,6 +134,7 @@ class RestBackend implements CloudBackend {
   Future<void> signOut() async {
     _rest.signOut();
     await _prefs.remove(_sessionKey);
+    await _prefs.remove(_profileKey);
     _user = null;
   }
 
@@ -144,6 +186,7 @@ class RestBackend implements CloudBackend {
     ]);
     await _rest.deleteAccount();
     await _prefs.remove(_sessionKey);
+    await _prefs.remove(_profileKey);
     _user = null;
   });
 
